@@ -1,0 +1,9 @@
+The 3D models, 2D sprites and sound effects in Kenney's Racing Starter Kit
+are Creative Commons CC0 licensed.
+Source: https://github.com/KenneyNL/Starter-Kit-Racing
+Asset creator: Kenney (https://kenney.nl)
+The skid effect is by Landeplage and is also CC0.
+CC0 terms: https://creativecommons.org/publicdomain/zero/1.0/
+
+Included assets used in Leo Racer: decoration-tents.glb and its palette texture,
+engine.ogg, skid.ogg and impact.ogg. See Kenney-MIT.txt for starter code terms.

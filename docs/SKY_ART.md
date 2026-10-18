@@ -1,0 +1,9 @@
+# Lotus Coast sky
+
+Built-in imagegen created the soft panoramic environment texture used for the game's visible sky, ambient light and kart reflections.
+
+Saved project asset: `assets/art/lotus_coast_sky.png`. This is a static 2:1 panorama on Godot's `PanoramaSkyMaterial`; the city, track, karts, ocean and effects remain real-time 3D.
+
+Exact final prompt:
+
+> Use case: stylized-concept. Asset type: production equirectangular 360-degree panoramic SKY texture for the Godot 3D kart racing game Leo Racer, aspect ratio exactly 2:1, 2048 by 1024 if possible. Primary request: a gorgeous soft high-end animated feature film tropical afternoon sky, made of richly graduated azure blue overhead and warm luminous peach golden haze near the horizon, with beautiful voluminous white and pale apricot cumulus clouds. This is a full-sphere lat-long environment map, NOT a landscape illustration. The horizon is a perfectly level horizontal band across the exact middle of the image (50 percent height). The top half maps the visible sky, with gently billowing fluffy cloud clusters, blue sky gaps, subtle atmospheric lavender cloud shadows and soft warm silver linings. Clouds look rounded, painterly and cinematic, no sharp angular polygons. Lower half is a softly blurred continuation of warm very pale blue atmosphere toward the nadir, no objects. Keep near-horizon light mostly bright aqua/cream and preserve clear saturated deep blue at the zenith. Wide open cheerful sunny coastal Sri Lanka mood, matching glossy colorful cartoon kart-race art. No sun disc, no rays, no lens flare, no buildings, no mountains, no ocean, no ground, no trees, no vehicles, no text or UI. Seamless matching left and right edges; no visible seam. Avoid large white areas clipped to pure white; retain gentle cloud shading. Entire frame is only this usable panoramic sky environment texture.

@@ -1,0 +1,134 @@
+{
+  "building-a": {
+    "width": 8.836,
+    "height": 12.93,
+    "depth": 9.4,
+    "triangles": 1252
+  },
+  "building-b": {
+    "width": 9.7,
+    "height": 12.93,
+    "depth": 9.4,
+    "triangles": 1276
+  },
+  "building-c": {
+    "width": 8.836,
+    "height": 8.93,
+    "depth": 10.9,
+    "triangles": 1195
+  },
+  "building-d": {
+    "width": 8.4,
+    "height": 12.93,
+    "depth": 9.0,
+    "triangles": 1100
+  },
+  "building-e": {
+    "width": 16.4,
+    "height": 8.93,
+    "depth": 10.079,
+    "triangles": 1509
+  },
+  "building-f": {
+    "width": 8.4,
+    "height": 16.93,
+    "depth": 10.3,
+    "triangles": 1794
+  },
+  "building-g": {
+    "width": 9.7,
+    "height": 16.93,
+    "depth": 9.22,
+    "triangles": 2006
+  },
+  "building-h": {
+    "width": 8.836,
+    "height": 12.93,
+    "depth": 10.079,
+    "triangles": 1512
+  },
+  "building-i": {
+    "width": 12.4,
+    "height": 16.8,
+    "depth": 13.02,
+    "triangles": 2544
+  },
+  "building-j": {
+    "width": 20.836,
+    "height": 16.93,
+    "depth": 13.4,
+    "triangles": 5246
+  },
+  "building-k": {
+    "width": 20.836,
+    "height": 14.7,
+    "depth": 9.42,
+    "triangles": 2960
+  },
+  "building-l": {
+    "width": 13.7,
+    "height": 22.7,
+    "depth": 14.02,
+    "triangles": 3512
+  },
+  "building-m": {
+    "width": 12.4,
+    "height": 31.5,
+    "depth": 12.42,
+    "triangles": 3740
+  },
+  "building-n": {
+    "width": 23.2,
+    "height": 24.8,
+    "depth": 18.2,
+    "triangles": 4350
+  },
+  "building-skyscraper-a": {
+    "width": 13.6,
+    "height": 28.8,
+    "depth": 13.6,
+    "triangles": 1292
+  },
+  "building-skyscraper-b": {
+    "width": 13.6,
+    "height": 44.8,
+    "depth": 13.6,
+    "triangles": 1592
+  },
+  "building-skyscraper-c": {
+    "width": 12.8,
+    "height": 40.8,
+    "depth": 13.879,
+    "triangles": 1704
+  },
+  "building-skyscraper-d": {
+    "width": 12.8,
+    "height": 54.7,
+    "depth": 13.879,
+    "triangles": 1892
+  },
+  "building-skyscraper-e": {
+    "width": 12.95,
+    "height": 40.8,
+    "depth": 12.42,
+    "triangles": 1156
+  },
+  "detail-awning-wide": {
+    "width": 8.0,
+    "height": 4.0,
+    "depth": 1.479,
+    "triangles": 40
+  },
+  "detail-parasol-a": {
+    "width": 3.464,
+    "height": 4.5,
+    "depth": 4.0,
+    "triangles": 96
+  },
+  "detail-parasol-b": {
+    "width": 3.464,
+    "height": 4.5,
+    "depth": 4.0,
+    "triangles": 120
+  }
+}

@@ -1,0 +1,10 @@
+.godot/
+__pycache__/
+*.pyc
+*.blend1
+*.tmp
+*.log
+build/
+source_assets/kenney-city/
+export_credentials.cfg
+dist/
