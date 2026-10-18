@@ -1,0 +1,18 @@
+{
+  "generator": "image_gen",
+  "transparent_background": true,
+  "assets": [
+    {
+      "key": "leo_road_crest",
+      "prompt": "Use case: game texture. A single original Leo Racer painted road decal, square composition, transparent background. A bold circular motorsport crest: stylized golden Sri Lankan lion head silhouette, warm ivory checkerboard ring, deep cobalt rim, exact uppercase text 'LEO RACER' in clean chunky arcade motorsport lettering. A few tasteful magenta lotus petals. Designed to be painted flat onto wet dark asphalt, legible from chase camera. Slightly worn edges and sparse paint scratches, rich saturated colors, flat diffuse artwork, no lighting, no shadow, no asphalt, no mockup, no perspective, no watermark. All exterior pixels genuinely transparent. Keep every letter correct."
+    },
+    {
+      "key": "colombo_road_stencil",
+      "prompt": "Use case: game texture. Wide horizontal transparent-background racing road paint stencil for Leo Racer. Exact words 'COLOMBO GRAND PRIX' in large bold ivory and electric amber condensed motorsport typography, navy outline for contrast, small racing checker accents, thin palm leaf and lotus motifs in green and magenta at ends. High quality arcade racing festival graphics, saturated bold readable colors. This is a flat albedo decal applied to asphalt, top-down orthographic, no road background, no shadows, no mockup or perspective, no watermark, genuinely transparent exterior and gaps. Slight wear at paint edges but all lettering fully readable."
+    },
+    {
+      "key": "lotus_road_emblem",
+      "prompt": "Use case: game texture. One premium tropical racing road decal with transparent background, square badge composition. A powerful stylized magenta lotus blossom over a turquoise ocean wave swoosh, gold racing laurel and warm ivory checker accents, exact text 'LOTUS COAST' in bold curved arcade racing lettering. Original Colombo racing festival identity matching navy, golden amber, ivory, teal and burgundy screenprint posters. Rich opaque paint with light asphalt wear scratches, flat diffuse artwork, top-down, no surface background, no scene, no billboard, no perspective, no shadow, no watermark. Genuine transparent exterior."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "checks": 790,
+  "failures": [],
+  "layouts": [
+    {
+      "canvas_position": [
+        0.0,
+        0.0
+      ],
+      "checks": 261,
+      "combinations": 45,
+      "resolution": [
+        1280,
+        720
+      ],
+      "scale": 0.800000011920929
+    },
+    {
+      "canvas_position": [
+        -0.00006103515625,
+        0.0
+      ],
+      "checks": 261,
+      "combinations": 45,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "scale": 1.20000004768372
+    },
+    {
+      "canvas_position": [
+        319.999938964844,
+        0.0
+      ],
+      "checks": 261,
+      "combinations": 45,
+      "resolution": [
+        2560,
+        1080
+      ],
+      "scale": 1.20000004768372
+    }
+  ],
+  "scope": "UI layout, focus, combinations, pause, Reduced Motion, minimap and measured-speed effect contract; full driving and performance are separate tests.",
+  "status": "PASS",
+  "track_points": 953
+}

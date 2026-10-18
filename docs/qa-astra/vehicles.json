@@ -1,0 +1,475 @@
+{
+  "checks": 1264,
+  "combinations": [
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/kart_blue.glb",
+      "status": "PASS",
+      "vehicle": "blue",
+      "vehicle_name": "Blue Bolt"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/kart_coral.glb",
+      "status": "PASS",
+      "vehicle": "coral",
+      "vehicle_name": "Sunset GT"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/kart_aqua.glb",
+      "status": "PASS",
+      "vehicle": "aqua",
+      "vehicle_name": "Palm Dash"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/kart_pink.glb",
+      "status": "PASS",
+      "vehicle": "pink",
+      "vehicle_name": "Lotus Pop"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_blue.glb",
+      "status": "PASS",
+      "vehicle": "formula_blue",
+      "vehicle_name": "Formula Blue"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_red.glb",
+      "status": "PASS",
+      "vehicle": "formula_red",
+      "vehicle_name": "Formula Red"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_roadster_gold.glb",
+      "status": "PASS",
+      "vehicle": "roadster_gold",
+      "vehicle_name": "Lion GT"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_tuk.glb",
+      "status": "PASS",
+      "vehicle": "race_tuk",
+      "vehicle_name": "Racing Tuk-Tuk"
+    },
+    {
+      "checks": 28,
+      "driver": "hedgehog",
+      "driver_name": "Sonic",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_bus.glb",
+      "status": "PASS",
+      "vehicle": "race_bus",
+      "vehicle_name": "Party Bus"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_blue.glb",
+      "status": "PASS",
+      "vehicle": "blue",
+      "vehicle_name": "Blue Bolt"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_coral.glb",
+      "status": "PASS",
+      "vehicle": "coral",
+      "vehicle_name": "Sunset GT"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_aqua.glb",
+      "status": "PASS",
+      "vehicle": "aqua",
+      "vehicle_name": "Palm Dash"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_pink.glb",
+      "status": "PASS",
+      "vehicle": "pink",
+      "vehicle_name": "Lotus Pop"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_blue.glb",
+      "status": "PASS",
+      "vehicle": "formula_blue",
+      "vehicle_name": "Formula Blue"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_red.glb",
+      "status": "PASS",
+      "vehicle": "formula_red",
+      "vehicle_name": "Formula Red"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_roadster_gold.glb",
+      "status": "PASS",
+      "vehicle": "roadster_gold",
+      "vehicle_name": "Lion GT"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_tuk.glb",
+      "status": "PASS",
+      "vehicle": "race_tuk",
+      "vehicle_name": "Racing Tuk-Tuk"
+    },
+    {
+      "checks": 28,
+      "driver": "lion",
+      "driver_name": "Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_bus.glb",
+      "status": "PASS",
+      "vehicle": "race_bus",
+      "vehicle_name": "Party Bus"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/kart_blue.glb",
+      "status": "PASS",
+      "vehicle": "blue",
+      "vehicle_name": "Blue Bolt"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/kart_coral.glb",
+      "status": "PASS",
+      "vehicle": "coral",
+      "vehicle_name": "Sunset GT"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/kart_aqua.glb",
+      "status": "PASS",
+      "vehicle": "aqua",
+      "vehicle_name": "Palm Dash"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/kart_pink.glb",
+      "status": "PASS",
+      "vehicle": "pink",
+      "vehicle_name": "Lotus Pop"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_blue.glb",
+      "status": "PASS",
+      "vehicle": "formula_blue",
+      "vehicle_name": "Formula Blue"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_red.glb",
+      "status": "PASS",
+      "vehicle": "formula_red",
+      "vehicle_name": "Formula Red"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_roadster_gold.glb",
+      "status": "PASS",
+      "vehicle": "roadster_gold",
+      "vehicle_name": "Lion GT"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_tuk.glb",
+      "status": "PASS",
+      "vehicle": "race_tuk",
+      "vehicle_name": "Racing Tuk-Tuk"
+    },
+    {
+      "checks": 28,
+      "driver": "elephant",
+      "driver_name": "Ellie",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_bus.glb",
+      "status": "PASS",
+      "vehicle": "race_bus",
+      "vehicle_name": "Party Bus"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/kart_blue.glb",
+      "status": "PASS",
+      "vehicle": "blue",
+      "vehicle_name": "Blue Bolt"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/kart_coral.glb",
+      "status": "PASS",
+      "vehicle": "coral",
+      "vehicle_name": "Sunset GT"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/kart_aqua.glb",
+      "status": "PASS",
+      "vehicle": "aqua",
+      "vehicle_name": "Palm Dash"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/kart_pink.glb",
+      "status": "PASS",
+      "vehicle": "pink",
+      "vehicle_name": "Lotus Pop"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_blue.glb",
+      "status": "PASS",
+      "vehicle": "formula_blue",
+      "vehicle_name": "Formula Blue"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_red.glb",
+      "status": "PASS",
+      "vehicle": "formula_red",
+      "vehicle_name": "Formula Red"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_roadster_gold.glb",
+      "status": "PASS",
+      "vehicle": "roadster_gold",
+      "vehicle_name": "Lion GT"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_tuk.glb",
+      "status": "PASS",
+      "vehicle": "race_tuk",
+      "vehicle_name": "Racing Tuk-Tuk"
+    },
+    {
+      "checks": 28,
+      "driver": "parrot",
+      "driver_name": "Rio",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_bus.glb",
+      "status": "PASS",
+      "vehicle": "race_bus",
+      "vehicle_name": "Party Bus"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_blue.glb",
+      "status": "PASS",
+      "vehicle": "blue",
+      "vehicle_name": "Blue Bolt"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_coral.glb",
+      "status": "PASS",
+      "vehicle": "coral",
+      "vehicle_name": "Sunset GT"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_aqua.glb",
+      "status": "PASS",
+      "vehicle": "aqua",
+      "vehicle_name": "Palm Dash"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/kart_pink.glb",
+      "status": "PASS",
+      "vehicle": "pink",
+      "vehicle_name": "Lotus Pop"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_blue.glb",
+      "status": "PASS",
+      "vehicle": "formula_blue",
+      "vehicle_name": "Formula Blue"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_formula_red.glb",
+      "status": "PASS",
+      "vehicle": "formula_red",
+      "vehicle_name": "Formula Red"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_roadster_gold.glb",
+      "status": "PASS",
+      "vehicle": "roadster_gold",
+      "vehicle_name": "Lion GT"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_tuk.glb",
+      "status": "PASS",
+      "vehicle": "race_tuk",
+      "vehicle_name": "Racing Tuk-Tuk"
+    },
+    {
+      "checks": 28,
+      "driver": "human",
+      "driver_name": "Shaven Leo",
+      "errors": [],
+      "model": "res://assets/models/astra/kart_race_bus.glb",
+      "status": "PASS",
+      "vehicle": "race_bus",
+      "vehicle_name": "Party Bus"
+    }
+  ],
+  "combinations_exercised": 45,
+  "coverage": [
+    "actual imported wheel binds",
+    "four independent wheel pivots",
+    "seating transforms",
+    "collider dimensions",
+    "exhaust attachment positions",
+    "measured displacement rolling",
+    "stationary throttle rejection",
+    "front-only steering",
+    "long spin basis stability",
+    "reverse wheel travel",
+    "pooled impacts",
+    "repeated recovery",
+    "effect teardown"
+  ],
+  "driver_count": 5,
+  "errors": [],
+  "status": "PASS",
+  "vehicle_count": 9
+}

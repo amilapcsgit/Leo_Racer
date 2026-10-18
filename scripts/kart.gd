@@ -57,27 +57,63 @@ var auto_drive := false
 var bump_cooldown := 0.0
 var effects: LeoKartEffects
 var impact_feedback_cooldown := 0.0
+var vehicle_key := "blue"
+var wheel_radius := .49
+var exhaust_positions: Array[Vector3] = []
+var rear_tire_positions: Array[Vector3] = []
+var camera_height_offset := 0.0
+var engine_pitch := 1.0
+var stuck_time := 0.0
+static var _vehicle_specs: Dictionary = {}
+
+static func chassis_path(key: String) -> String:
+	return "res://assets/models/astra/kart_%s.glb"%key if key in ["formula_blue","formula_red","roadster_gold","race_tuk","race_bus"] else "res://assets/models/kart_%s.glb"%key
+
+static func driver_path(key: String) -> String:
+	return "res://assets/models/astra/driver_human.glb" if key=="human" else "res://assets/models/driver_%s.glb"%key
+
+static func vehicle_spec(key: String) -> Dictionary:
+	if _vehicle_specs.is_empty():
+		_vehicle_specs = JSON.parse_string(FileAccess.get_file_as_string("res://assets/models/astra/vehicle-specs.json"))
+	return _vehicle_specs.get(key,{"driver_position":[0,0,0],"driver_scale":[1,1,1],"collision_size":[2.15,1.4,3.5],"collision_position":[0,.78,0],"wheel_radius":.49,"exhausts":[[-.5,.47,2.05],[.5,.47,2.05]]})
+
+static func vector(value: Array) -> Vector3:
+	return Vector3(float(value[0]),float(value[1]),float(value[2]))
+
+static func seat_driver(model: Node3D,key: String) -> void:
+	var spec := vehicle_spec(key)
+	model.position = vector(spec.driver_position)
+	model.scale = vector(spec.driver_scale)
 
 func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String) -> void:
 	circuit = track
 	racer_id = id
 	is_player = player
+	vehicle_key = kart_color
+	var spec := vehicle_spec(kart_color)
+	wheel_radius = float(spec.wheel_radius)
+	camera_height_offset = .45 if kart_color=="race_bus" else (.2 if kart_color=="race_tuk" else 0.0)
+	engine_pitch = .65 if kart_color=="race_bus" else (1.22 if kart_color=="race_tuk" else (1.12 if kart_color.begins_with("formula") else 1.0))
+	for p in spec.exhausts: exhaust_positions.append(vector(p))
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_ON
 	visual = Node3D.new()
 	add_child(visual)
-	chassis = load("res://assets/models/kart_%s.glb" % kart_color).instantiate()
+	chassis = load(chassis_path(kart_color)).instantiate()
 	visual.add_child(chassis)
-	driver = load("res://assets/models/driver_%s.glb" % animal).instantiate()
+	driver = load(driver_path(animal)).instantiate()
 	visual.add_child(driver)
+	seat_driver(driver,kart_color)
 	for axle in ["front", "back"]:
 		for side in ["left", "right"]:
 			var w := chassis.find_child("wheel-%s-%s" % [axle, side], true, false) as Node3D
-			if w: attach_wheel(w, axle == "front")
+			if w:
+				if axle=="back": rear_tire_positions.append(w.position)
+				attach_wheel(w, axle == "front")
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = Vector3(2.15, 1.4, 3.5)
+	shape.size = vector(spec.collision_size)
 	collision.shape = shape
-	collision.position.y = 0.78
+	collision.position = vector(spec.collision_position)
 	add_child(collision)
 	collision_layer = 2
 	collision_mask = 1 | 2
@@ -92,7 +128,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		m.rings = 8
 		f.mesh = m
 		f.rotation.x = PI / 2
-		f.position = Vector3(side * .5, .47, 2.05)
+		f.position = exhaust_positions[0 if side==-1 else 1]
 		var material := StandardMaterial3D.new()
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		material.albedo_color = Color("47edff")
@@ -110,8 +146,9 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		core_material.emission = Color("baffff")
 		core.material_override = core_material
 		f.add_child(core)
-		exhaust_trails.append(make_particles(Vector3(side * .5, .47, 2.05), true))
-		var sparks := make_particles(Vector3(side * 1.1, .2, 1.0))
+		exhaust_trails.append(make_particles(exhaust_positions[0 if side==-1 else 1], true))
+		var tire := rear_tire_positions[0 if side==-1 else 1]
+		var sparks := make_particles(Vector3(tire.x,.2,tire.z))
 		if side == -1: spark_left = sparks
 		else: spark_right = sparks
 	if is_player:
@@ -158,7 +195,7 @@ func animate_wheels(dt: float) -> void:
 	wheel_visual_speed = wheel_motion_speed + (wheel_visual_speed - wheel_motion_speed) * decay
 	if absf(wheel_visual_speed) < .005 and absf(wheel_motion_speed) < .005:
 		wheel_visual_speed = 0
-	wheel_roll = wrapf(wheel_roll - travel / .49, -PI, PI)
+	wheel_roll = wrapf(wheel_roll - travel / wheel_radius, -PI, PI)
 	for i in wheel_spin_pivots.size():
 		var steering_pivot := wheel_steering_pivots[i]
 		steering_pivot.basis = Basis(Vector3.UP, -steer * .35 if steering_pivot.get_meta("front") else 0.0)
@@ -235,6 +272,7 @@ func place(distance: float, lane: float) -> void:
 	nearest_index = int(last_s / circuit.step)
 	velocity = Vector3.ZERO
 	speed = 0
+	stuck_time = 0
 	wheel_motion_speed = 0
 	wheel_visual_speed = 0
 	reset_physics_interpolation()
@@ -250,8 +288,12 @@ func recover() -> void:
 	nearest_index = int(last_s / circuit.step)
 	velocity = Vector3.ZERO
 	speed = 0
+	stuck_time = 0
 	drifting = false
 	drift_charge = 0
+	boost_time = 0
+	steer = 0
+	visual.rotation = Vector3.ZERO
 	wheel_motion_speed = 0
 	wheel_visual_speed = 0
 	reset_physics_interpolation()
@@ -276,12 +318,13 @@ func _physics_process(dt: float) -> void:
 		if is_player and not auto_drive:
 			throttle = Input.get_axis("brake", "accelerate")
 			desired_steer = Input.get_axis("left", "right")
-			want_drift = Input.is_action_pressed("drift") and absf(speed) > 12 and absf(desired_steer) > .12
+			want_drift = Input.is_action_pressed("drift") and absf(speed) > 12 and (drifting or absf(desired_steer) > .12)
 			if Input.is_action_just_pressed("boost") and boost_fuel >= 1:
 				boost_fuel = 0
 				boost(1.6, "NITRO BOOST")
 		else:
-			var look := 10.0 + absf(speed) * .42
+			var bend_ahead := absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s+26),Vector3.UP))
+			var look := lerpf(8.0+absf(speed)*.36,9.0+absf(speed)*.18,clampf(bend_ahead,0,1))
 			var target := circuit.sample(last_s + look, ai_lane + sin(progress * .013 + ai_phase) * .7)
 			var dir := (target - position).normalized()
 			var desired_yaw := atan2(-dir.x, -dir.z)
@@ -300,7 +343,8 @@ func _physics_process(dt: float) -> void:
 		drift_direction = signf(desired_steer)
 		air_hop = .18
 	if drifting and not want_drift:
-		if drift_charge >= .65 and throttle >= -.1: boost(1.0 + minf(drift_charge, 2.5) * .35, "DRIFT BOOST")
+		if drift_charge >= .65 and throttle >= -.1:
+			boost(1.0+minf(drift_charge,2.5)*.35,"SUPER DRIFT" if drift_charge>=1.65 else "DRIFT BOOST")
 		drift_charge = 0
 	if drifting != want_drift: drift_changed.emit(self,want_drift)
 	drifting = want_drift
@@ -327,10 +371,15 @@ func _physics_process(dt: float) -> void:
 	velocity.z = lerpf(velocity.z, target_vel.z, minf(1, dt * lateral_grip))
 	velocity.y -= 18 * dt
 	var motion_origin := global_position
+	var contact_velocity := Vector3(velocity.x,0,velocity.z)
 	move_and_slide()
 	if get_slide_collision_count()>0 and bump_cooldown<=0 and absf(speed)>12 and absf(wheel_motion_speed)>5:
-		var hit := get_slide_collision(0)
-		emit_impact_feedback(hit.get_position(),hit.get_normal())
+		for i in get_slide_collision_count():
+			var hit := get_slide_collision(i)
+			# Floor contact is continuous; only a closing lateral impact earns feedback.
+			if absf(hit.get_normal().y)<.6 and -contact_velocity.dot(hit.get_normal())>5:
+				emit_impact_feedback(hit.get_position(),hit.get_normal())
+				break
 	# Soft continuous barrier response avoids gaps between modular rail meshes.
 	var projection := circuit.project(position, nearest_index)
 	nearest_index = projection.index
@@ -345,6 +394,10 @@ func _physics_process(dt: float) -> void:
 			impact.play()
 			bump_cooldown = .65
 	update_wheel_motion(global_position - motion_origin, dt)
+	if is_player and not auto_drive and active and throttle>.5 and absf(wheel_motion_speed)<.5:
+		stuck_time += dt
+		if stuck_time>3.0: recover(); return
+	else: stuck_time = 0
 	var s: float = projection.distance
 	var change := circuit.delta_distance(last_s, s)
 	last_s = s
@@ -366,7 +419,7 @@ func _physics_process(dt: float) -> void:
 	visual.rotation.z = lerp_angle(visual.rotation.z, -steer * .075 * grip, dt * 7)
 	visual.rotation.y = lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
 	if is_player and engine:
-		engine.pitch_scale = lerpf(engine.pitch_scale, .7 + absf(speed) / 20, dt * 3)
+		engine.pitch_scale = lerpf(engine.pitch_scale, (.7 + absf(speed) / 20)*engine_pitch, dt * 3)
 		engine.volume_db = -24 if not active else -17
 		skid.volume_db = lerpf(skid.volume_db, -13.0 if drifting else -65.0, dt * 8)
 

@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "length_m": 1905.072,
+  "previous_length_m": 758,
+  "length_multiple": 2.513,
+  "samples": 953,
+  "step_m": 1.999026,
+  "minimum_radius_m": 16.285,
+  "minimum_nonlocal_center_clearance_m": 66.544,
+  "closest_nonlocal_indices": [
+    730,
+    771
+  ],
+  "local_exclusion_distance_m": 80,
+  "centerline_self_crossings": [],
+  "minimum_road_edge_clearance_m": 48.544,
+  "conservative_segment_clearance_m": 62.546,
+  "start": [
+    -90.0,
+    0,
+    78.0
+  ],
+  "start_heading": [
+    0.0,
+    -1.0
+  ],
+  "boost_pads": 8,
+  "features": {
+    "coast_straight": {
+      "start": 0.0,
+      "end": 0.17
+    },
+    "harbor_hairpin": {
+      "start": 0.36,
+      "end": 0.44
+    },
+    "lagoon_causeway": {
+      "start": 0.49,
+      "end": 0.6
+    },
+    "garden_esses": {
+      "start": 0.69,
+      "end": 0.86
+    },
+    "lagoon_center": [
+      215,
+      0,
+      -80
+    ],
+    "lagoon_radius": [
+      85,
+      125
+    ]
+  },
+  "assertions": {
+    "lap_1600_to_2000m": true,
+    "radius_at_least_15m": true,
+    "nonlocal_clearance_at_least_45m": true,
+    "no_self_crossings": true,
+    "sample_spacing_under_2_1m": true
+  }
+}

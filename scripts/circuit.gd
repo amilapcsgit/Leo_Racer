@@ -7,14 +7,25 @@ var step: float
 const WIDTH := 18.0
 const GATES := 8
 var boosts: Array = []
+var sectors: Array = []
+var features: Dictionary = {}
 
 func _init() -> void:
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/track.json"))
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/track-astra.json"))
 	length = float(data.length)
 	for p in data.points:
 		points.append(Vector3(p[0], p[1], p[2]))
 	step = length / points.size()
 	boosts = data.boosts
+	sectors = data.get("sectors",[])
+	features = data.get("features",{})
+
+func sector_name(distance: float) -> String:
+	var fraction := fposmod(distance,length)/length
+	var label := "LOTUS COAST"
+	for sector in sectors:
+		if fraction >= float(sector.fraction): label = sector.name
+	return label
 
 func sample(distance: float, lane: float = 0.0) -> Vector3:
 	var f := fposmod(distance, length) / step

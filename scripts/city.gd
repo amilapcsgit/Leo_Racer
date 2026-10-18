@@ -120,10 +120,12 @@ func _street_fronts(side: float) -> void:
 func _plot_is_clear(pos: Vector3, rot: Basis, width: float, depth: float) -> bool:
 	if pos.x - width * .5 < -116.0:
 		return false
+	if circuit.length>1500 and pow((pos.x-215)/91.0,2)+pow((pos.z+80)/131.0,2)<1.0: return false
 	var half := Vector2(width * .5 + .6, depth * .5 + .6)
 	for xx in [-1.0, 1.0]:
 		for zz in [-1.0, 1.0]:
 			var corner: Vector3 = pos + rot.x * half.x * xx + rot.z * half.y * zz
+			if circuit.length>1500 and pow((corner.x-215)/91.0,2)+pow((corner.z+80)/131.0,2)<1.0: return false
 			var road: Dictionary = circuit.project(corner)
 			if corner.distance_to(road.center) < 14.2:
 				return false

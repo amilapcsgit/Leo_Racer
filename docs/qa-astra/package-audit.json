@@ -1,0 +1,130 @@
+{
+  "status": "PASS",
+  "errors": [],
+  "version": "1.4.0",
+  "branch": "astra",
+  "audit_date": "2026-10-18",
+  "method": "Independent read-only inspection of ZIP central directory, PE/PCK headers and embedded file table, small config files and existing fresh Windows test reports. No GPU process was launched.",
+  "archive": {
+    "path": "dist/LeoRacer-Windows-v1.4-Astra.zip",
+    "bytes": 478260203,
+    "entries": 212,
+    "uncompressed_bytes": 613099874,
+    "single_root": "Leo Racer Astra",
+    "manifest_size_matches": true,
+    "forbidden_source_input_paths": []
+  },
+  "build_and_fresh": {
+    "build_path": "build/Astra",
+    "fresh_path": "build/qa-astra-fresh/Leo Racer Astra",
+    "exe_bytes": 518839784,
+    "required_files": [
+      "Leo Racer.exe",
+      "Leo Racer.console.exe",
+      "libterrain.windows.release.x86_64.dll",
+      "Play Leo Racer.cmd",
+      "Play Compatibility Mode.cmd",
+      "README.txt",
+      "build-manifest.json",
+      "data_LeoRacer_windows_x86_64/LeoRacer.dll",
+      "data_LeoRacer_windows_x86_64/GodotSharp.dll",
+      "data_LeoRacer_windows_x86_64/coreclr.dll",
+      "data_LeoRacer_windows_x86_64/hostfxr.dll",
+      "data_LeoRacer_windows_x86_64/hostpolicy.dll",
+      "data_LeoRacer_windows_x86_64/System.Private.CoreLib.dll"
+    ],
+    "missing_files": [],
+    "zip_entry_file_size_mismatches": [],
+    "net_runtime_config": {
+      "runtimeOptions": {
+        "tfm": "net8.0",
+        "includedFrameworks": [
+          {
+            "name": "Microsoft.NETCore.App",
+            "version": "8.0.32"
+          }
+        ],
+        "configProperties": {
+          "System.Reflection.Metadata.MetadataUpdater.IsSupported": false,
+          "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization": false
+        }
+      }
+    },
+    "terrain_native_library_present": true,
+    "compatibility_launcher_arguments": "--rendering-method gl_compatibility --rendering-driver opengl3"
+  },
+  "embedded_pck": {
+    "format_version": 4,
+    "entries": 3437,
+    "bytes": 409326044,
+    "required_resources": [
+      "assets/track-astra.json",
+      "assets/models/astra/vehicle-specs.json",
+      "scripts/astra_world.gd.remap",
+      "scripts/main.gd.remap",
+      "assets/config/astra.tres.remap",
+      "assets/art/astra/colombo_road_stencil.png.import",
+      "assets/art/astra/leo_road_crest.png.import",
+      "assets/art/astra/lotus_road_emblem.png.import"
+    ],
+    "missing_resources": [],
+    "forbidden_top_level_development_paths": [],
+    "csharp_stub_entries": 1676,
+    "csharp_stub_total_bytes": 1676,
+    "all_csharp_entries_one_byte": true,
+    "sampled_csharp_entries": 3,
+    "sampled_entries_are_newline_stubs": true,
+    "note": "C# paths are export stubs; the sampled entries contain only a newline. Runtime code resides in the compiled assembly."
+  },
+  "licenses": {
+    "count": 18,
+    "files": [
+      "AmbientCG-CC0.txt",
+      "ASTRA_ASSETS.md",
+      "Barlow-OFL.txt",
+      "Godot-MIT.txt",
+      "Godot-THIRDPARTY.txt",
+      "Kenney-ASSETS-CC0.txt",
+      "Kenney-MIT.txt",
+      "KENNEY_CITY_KIT_COMMERCIAL_CC0.txt",
+      "LeoRacer-MIT.txt",
+      "Microsoft-DotNet-LICENSE.txt",
+      "Microsoft-DotNet-ThirdPartyNotices.txt",
+      "Quaternius-Nature-CC0.txt",
+      "Rajdhani-OFL.txt",
+      "RGSdev-CC0.txt",
+      "Rokojori-Clipper-Boost.txt",
+      "Rokojori-Public-Indie-License.txt",
+      "Rokojori-TriangleNET-Notice.md",
+      "SRILANKA_ASSETS.md"
+    ]
+  },
+  "fresh_runtime_report_inspection": {
+    "windows-vulkan-smoke.json": {
+      "boosts": 0,
+      "engine": "4.7.2-stable (official)",
+      "errors": [],
+      "race_time": 0.0,
+      "status": "PASS"
+    },
+    "windows-compatibility-smoke.json": {
+      "boosts": 0,
+      "engine": "4.7.2-stable (official)",
+      "errors": [],
+      "race_time": 0.0,
+      "status": "PASS"
+    },
+    "windows-vulkan-race.json": {
+      "boosts": 32,
+      "engine": "4.7.2-stable (official)",
+      "errors": [],
+      "race_time": 177.144714,
+      "status": "PASS"
+    }
+  },
+  "limits": [
+    "Whole-EXE and whole-ZIP SHA-256 hashes were not recalculated by this audit to avoid I/O during final render profiling. The root delivery verifier will perform those checks after profiling.",
+    "ZIP central-directory and file-size inspection is not a replacement for the separate full CRC/integrity and extracted-runtime tests.",
+    "This audit inspected existing fresh-runtime PASS reports; it did not launch additional game instances."
+  ]
+}

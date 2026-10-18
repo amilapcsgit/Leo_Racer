@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "engine": "Godot 4.7.2 .NET",
+  "renderer": "Vulkan Forward+",
+  "device": "NVIDIA RTX A1000 6GB Laptop GPU",
+  "issue": "Hard rectangular brightness seams on the Astra asphalt",
+  "diagnosis": "Unshaded wetness visualization isolated discontinuities at procedural noise cell boundaries. The sine-based hash field was responsible; the road ribbon and texture mapping were continuous.",
+  "ruled_out": [
+    "Normal-map depth and tangent basis",
+    "Screen-space reflections",
+    "Directional shadow maps",
+    "Reflection probes",
+    "Underlying sculpted terrain",
+    "Albedo texture world-space mapping"
+  ],
+  "fix": "Replace sine hashing with a bounded sin-free hash and explicit four-corner smooth interpolation in road_surface.gdshader.",
+  "preserved": [
+    "AmbientCG color, normal and roughness maps",
+    "Editable art-profile base roughness 0.35",
+    "Continuous world-space texture mapping",
+    "Subtle wetness and grain variation",
+    "Road geometry, collision, track data and gameplay"
+  ],
+  "verification": {
+    "diagnostic_script": "tools/astra_road_probe.gd",
+    "output_directory": "build/astra-road-probe",
+    "baseline": "00-baseline.png",
+    "continuous_wetness_visualization": "15-debug-wetness.png",
+    "probe_report": "build/astra-road-probe/report.json",
+    "observations": "Final production baseline has no hard rectangular seams; debug wetness blends smoothly across cell boundaries. No shader compilation or runtime script errors."
+  },
+  "known_engine_cleanup_warning": "Existing 7 leaked Texture RID warning on engine shutdown remains unchanged."
+}

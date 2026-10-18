@@ -1,0 +1,512 @@
+{
+  "authorship": "Original procedural Blender artwork for Leo Racer, 2026",
+  "license": "CC0-1.0; authored for this project",
+  "forward": "-Z",
+  "units": "metres",
+  "wheel_contract": "Independent mesh nodes; identity local bases; X axles; Y=.49",
+  "models": {
+    "kart_formula_blue": {
+      "driver_position": [
+        0,
+        0,
+        0
+      ],
+      "driver_scale": [
+        1,
+        1,
+        1
+      ],
+      "collision_size": [
+        2.2,
+        1.4,
+        3.8
+      ],
+      "collision_position": [
+        0,
+        0.78,
+        0
+      ],
+      "wheel_radius": 0.49,
+      "exhausts": [
+        [
+          -0.5,
+          0.47,
+          2.05
+        ],
+        [
+          0.5,
+          0.47,
+          2.05
+        ]
+      ],
+      "triangles": 19174,
+      "mesh_nodes": 5,
+      "wheels": [
+        {
+          "name": "wheel-front-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            -1.22
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-front-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            -1.22
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            1.12
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            1.12
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        }
+      ],
+      "godot_bounds_min": [
+        -1.1406,
+        0.0,
+        -2.05
+      ],
+      "godot_bounds_max": [
+        1.1406,
+        1.485,
+        2.078
+      ],
+      "glb": "assets/models/astra/kart_formula_blue.glb",
+      "editable_source": "assets/models/astra/source/kart_formula_blue.blend",
+      "glb_bytes": 412024,
+      "glb_sha256": "d9bb41c33ae5e2ba695f7162165065a3d9bdcb6094a76a851f71a930931637ba",
+      "exported_wheel_contract_verified": true
+    },
+    "kart_formula_red": {
+      "driver_position": [
+        0,
+        0,
+        0
+      ],
+      "driver_scale": [
+        1,
+        1,
+        1
+      ],
+      "collision_size": [
+        2.2,
+        1.4,
+        3.8
+      ],
+      "collision_position": [
+        0,
+        0.78,
+        0
+      ],
+      "wheel_radius": 0.49,
+      "exhausts": [
+        [
+          -0.5,
+          0.47,
+          2.05
+        ],
+        [
+          0.5,
+          0.47,
+          2.05
+        ]
+      ],
+      "triangles": 19174,
+      "mesh_nodes": 5,
+      "wheels": [
+        {
+          "name": "wheel-front-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            -1.22
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-front-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            -1.22
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            1.12
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            1.12
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        }
+      ],
+      "godot_bounds_min": [
+        -1.1406,
+        0.0,
+        -2.05
+      ],
+      "godot_bounds_max": [
+        1.1406,
+        1.485,
+        2.078
+      ],
+      "glb": "assets/models/astra/kart_formula_red.glb",
+      "editable_source": "assets/models/astra/source/kart_formula_red.blend",
+      "glb_bytes": 412772,
+      "glb_sha256": "0991af23884e31c76f9a4d04101b0b59570da170447cea01ec3bc33589acae63",
+      "exported_wheel_contract_verified": true
+    },
+    "kart_roadster_gold": {
+      "driver_position": [
+        0,
+        0.06,
+        0
+      ],
+      "driver_scale": [
+        1,
+        1,
+        1
+      ],
+      "collision_size": [
+        2.2,
+        1.4,
+        3.85
+      ],
+      "collision_position": [
+        0,
+        0.78,
+        0
+      ],
+      "wheel_radius": 0.49,
+      "exhausts": [
+        [
+          -0.5,
+          0.47,
+          2.04
+        ],
+        [
+          0.5,
+          0.47,
+          2.04
+        ]
+      ],
+      "triangles": 21278,
+      "mesh_nodes": 5,
+      "wheels": [
+        {
+          "name": "wheel-front-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            -1.18
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-front-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            -1.18
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            1.02
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            1.02
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        }
+      ],
+      "godot_bounds_min": [
+        -1.1406,
+        0.0,
+        -2.02
+      ],
+      "godot_bounds_max": [
+        1.1406,
+        1.525,
+        2.068
+      ],
+      "glb": "assets/models/astra/kart_roadster_gold.glb",
+      "editable_source": "assets/models/astra/source/kart_roadster_gold.blend",
+      "glb_bytes": 461640,
+      "glb_sha256": "a8f2abbed820be931001ad70685b2f3777c6b60198af5115bad1edb44bfd522f",
+      "exported_wheel_contract_verified": true
+    },
+    "kart_race_tuk": {
+      "driver_position": [
+        0,
+        0.06,
+        -0.44
+      ],
+      "driver_scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "collision_size": [
+        2.05,
+        2.1,
+        3.65
+      ],
+      "collision_position": [
+        0,
+        1.06,
+        0
+      ],
+      "wheel_radius": 0.49,
+      "exhausts": [
+        [
+          -0.5,
+          0.47,
+          2.12
+        ],
+        [
+          0.5,
+          0.47,
+          2.12
+        ]
+      ],
+      "triangles": 20104,
+      "mesh_nodes": 5,
+      "wheels": [
+        {
+          "name": "wheel-front-left",
+          "godot_center": [
+            -0.17,
+            0.49,
+            -1.28
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-front-right",
+          "godot_center": [
+            0.17,
+            0.49,
+            -1.28
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-left",
+          "godot_center": [
+            -0.83,
+            0.49,
+            1.06
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-right",
+          "godot_center": [
+            0.83,
+            0.49,
+            1.06
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        }
+      ],
+      "godot_bounds_min": [
+        -1.0306,
+        0.0,
+        -1.89
+      ],
+      "godot_bounds_max": [
+        1.0306,
+        2.1,
+        2.148
+      ],
+      "glb": "assets/models/astra/kart_race_tuk.glb",
+      "editable_source": "assets/models/astra/source/kart_race_tuk.blend",
+      "glb_bytes": 437028,
+      "glb_sha256": "26863f467ca0fecbecba3ea232484209188138716b3bcd1f8d1ca9146916ef1f",
+      "exported_wheel_contract_verified": true
+    },
+    "kart_race_bus": {
+      "driver_position": [
+        0,
+        0.12,
+        -1.2
+      ],
+      "driver_scale": [
+        0.89,
+        0.89,
+        0.89
+      ],
+      "collision_size": [
+        2.2,
+        2.3,
+        4.2
+      ],
+      "collision_position": [
+        0,
+        1.17,
+        0
+      ],
+      "wheel_radius": 0.49,
+      "exhausts": [
+        [
+          -0.5,
+          0.47,
+          2.12
+        ],
+        [
+          0.5,
+          0.47,
+          2.12
+        ]
+      ],
+      "triangles": 18996,
+      "mesh_nodes": 5,
+      "wheels": [
+        {
+          "name": "wheel-front-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            -1.24
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-front-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            -1.24
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-left",
+          "godot_center": [
+            -0.94,
+            0.49,
+            1.22
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        },
+        {
+          "name": "wheel-back-right",
+          "godot_center": [
+            0.94,
+            0.49,
+            1.22
+          ],
+          "local_basis_identity": true,
+          "axis": "X"
+        }
+      ],
+      "godot_bounds_min": [
+        -1.1406,
+        0.0,
+        -2.14
+      ],
+      "godot_bounds_max": [
+        1.1406,
+        2.455,
+        2.148
+      ],
+      "glb": "assets/models/astra/kart_race_bus.glb",
+      "editable_source": "assets/models/astra/source/kart_race_bus.blend",
+      "glb_bytes": 412748,
+      "glb_sha256": "809237545e8ba34de782da0c1383b3e670479b26d54df697ae8413c9b74dec62",
+      "exported_wheel_contract_verified": true
+    },
+    "driver_human": {
+      "display_name": "Shaven Leo",
+      "driver_position": [
+        0,
+        0,
+        0
+      ],
+      "driver_scale": [
+        1,
+        1,
+        1
+      ],
+      "seated": true,
+      "compatible_with": "all Astra and original karts",
+      "triangles": 16008,
+      "mesh_nodes": 1,
+      "wheels": [],
+      "godot_bounds_min": [
+        -0.585,
+        0.65,
+        -0.66
+      ],
+      "godot_bounds_max": [
+        0.585,
+        2.56,
+        0.55
+      ],
+      "glb": "assets/models/astra/driver_human.glb",
+      "editable_source": "assets/models/astra/source/driver_human.blend",
+      "glb_bytes": 386268,
+      "glb_sha256": "3f2362b003d984a05c407b1366c4c0a7ae90b30d3a96e1f0761ffd8c87952a42",
+      "exported_wheel_contract_verified": null
+    }
+  }
+}

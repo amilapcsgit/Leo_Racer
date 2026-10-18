@@ -4,8 +4,23 @@ uniform sampler2D normal_map : hint_normal, filter_linear_mipmap_anisotropic, re
 uniform sampler2D rough_map : filter_linear_mipmap, repeat_enable;
 varying vec3 wp;
 uniform float base_roughness = .35;
-float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float noise(vec2 p){vec2 i=floor(p);vec2 f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+// Keep corner hashes bounded and independent of sine precision/constant folding.
+// Explicit corner interpolation keeps the world-space puddle field continuous.
+float road_hash(vec2 cell){
+	vec3 p3=fract(vec3(cell.xyx)*.1031);
+	p3+=dot(p3,p3.yzx+33.33);
+	return fract((p3.x+p3.y)*p3.z);
+}
+float noise(vec2 p){
+	vec2 cell=floor(p);
+	vec2 blend=fract(p);
+	blend=blend*blend*(3.0-2.0*blend);
+	float a=road_hash(cell);
+	float b=road_hash(cell+vec2(1.0,0.0));
+	float c=road_hash(cell+vec2(0.0,1.0));
+	float d=road_hash(cell+vec2(1.0,1.0));
+	return mix(mix(a,b,blend.x),mix(c,d,blend.x),blend.y);
+}
 void vertex(){wp=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;}
 void fragment(){
 	float footprint = max(length(dFdx(wp.xz)),length(dFdy(wp.xz)));

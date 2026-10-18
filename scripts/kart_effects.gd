@@ -21,7 +21,7 @@ func setup(owner_kart: LeoKart) -> void:
 		ribbon.lifetime = .38
 		ribbon.local_coords = false
 		ribbon.emitting = false
-		ribbon.position = Vector3(side*.5,.49,2.05)
+		ribbon.position = kart.exhaust_positions[0 if side<0 else 1]
 		ribbon.trail_enabled = RenderingServer.get_current_rendering_method()!="gl_compatibility"
 		ribbon.trail_lifetime = .28
 		ribbon.visibility_aabb = AABB(Vector3(-10,-3,-15),Vector3(20,10,30))
@@ -65,7 +65,8 @@ func setup(owner_kart: LeoKart) -> void:
 		add_child(ribbon)
 		ribbons.append(ribbon)
 		var emitter := GPUParticles3D.new()
-		emitter.position = Vector3(side*1.05,.22,.95)
+		var tire := kart.rear_tire_positions[0 if side<0 else 1]
+		emitter.position = Vector3(tire.x,.22,tire.z)
 		emitter.amount = 22 if kart.is_player else 10
 		emitter.lifetime = .75
 		emitter.emitting = false
@@ -101,7 +102,7 @@ func setup(owner_kart: LeoKart) -> void:
 			q.size = Vector2(.65,2.0)
 			h.mesh = q
 			h.rotation_degrees.x = -55
-			h.position = Vector3(side*.5,.6,2.6)
+			h.position = kart.exhaust_positions[0 if side<0 else 1]+Vector3(0,.13,.55)
 			var hm := ShaderMaterial.new()
 			hm.shader = load("res://shaders/exhaust_heat.gdshader")
 			h.material_override = hm
@@ -183,7 +184,7 @@ func _process(dt: float) -> void:
 		for side in [-1,1]:
 			var mark := marks[mark_cursor]
 			mark_cursor = (mark_cursor+1)%marks.size()
-			mark.global_position = kart.visual.global_transform*Vector3(side*1.05,0,1.0)
+			mark.global_position = kart.visual.global_transform*(kart.rear_tire_positions[0 if side<0 else 1]-Vector3.UP* .49)
 			mark.global_position.y = .075
 			mark.rotation = Vector3(0,kart.rotation.y+kart.visual.rotation.y,0)
 			(mark.mesh as BoxMesh).size.z = maxf(.8,absf(kart.wheel_motion_speed)*.065)

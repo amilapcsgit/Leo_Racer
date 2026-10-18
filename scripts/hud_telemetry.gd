@@ -19,10 +19,15 @@ static func draw(h: LeoHUD) -> void:
 	var amber := Color("ff9000")
 	glass(h,Rect2(42,36,230,142),cyan)
 	glass(h,Rect2(306,36,244,139),cyan)
+	# Sunset sky can be nearly white; telemetry retains the same contrast as gauges.
+	glass(h,Rect2(574,28,600,120),cyan)
 	glass(h,Rect2(1193,30,365,96),cyan)
 	h.draw_polyline(PackedVector2Array([Vector2(574,36),Vector2(585,75),Vector2(1145,75),Vector2(1174,36)]),Color(cyan,.5),1.2,true)
 	h.draw_line(Vector2(638,81),Vector2(735,81),Color(amber,.8),2,true)
-	glass(h,Rect2(42,836,735,45),cyan)
+	glass(h,Rect2(42,836,847,45),cyan)
+	var lap_fraction := fposmod(h.game.player.last_s/h.game.circuit.length,1.0)
+	h.draw_line(Vector2(595,136),Vector2(1156,136),Color(cyan,.15),3,true)
+	h.draw_line(Vector2(595,136),Vector2(595+561*lap_fraction,136),Color(cyan,.8),3,true)
 	# Position badge metallic edge.
 	h.draw_line(Vector2(46,52),Vector2(46,151),Color(amber,.8),3,true)
 	h.draw_line(Vector2(50,55),Vector2(50,146),Color("ffd796"),1,true)
@@ -56,6 +61,8 @@ static func draw(h: LeoHUD) -> void:
 	# Curved nitro tube; energy follows the real fuel value.
 	h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.27,.45,.48),23,true)
 	h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.018,.05,.06),18,true)
+	if h.ready_flash>0 and not h.game.reduced_motion:
+		h.draw_arc(c,168,deg_to_rad(42),deg_to_rad(138),64,Color(.4,1.0,.75,h.ready_flash*.25),10,true)
 	# The shader-backed child draws liquid energy inside this fixed tube.
 	# Holographic map.
 	glass(h,Rect2(42,498,242,311),cyan)
@@ -63,25 +70,41 @@ static func draw(h: LeoHUD) -> void:
 		h.draw_line(Vector2(49+i*32,507),Vector2(49+i*32,800),Color(cyan,.045),1)
 	for i in range(10):
 		h.draw_line(Vector2(48,508+i*32),Vector2(278,508+i*32),Color(cyan,.045),1)
-	var center := Vector2(156,665)
+	# Fit actual circuit bounds, keeping the full extended harbour route on screen.
+	var projection := map_transform(h.game.circuit.points,Rect2(62,521,203,269))
 	var line := PackedVector2Array()
 	for i in range(0,h.game.circuit.points.size(),3):
 		var p: Vector3 = h.game.circuit.points[i]
-		line.append(center+Vector2(p.x,p.z)*.86)
-	line.append(line[0])
-	h.draw_polyline(line,Color(0,.65,.8,.10),15,true)
-	h.draw_polyline(line,Color(.12,.32,.37),8,true)
-	h.draw_polyline(line,Color("65dae0"),2,true)
+		line.append(projection*Vector2(p.x,p.z))
+	if line.size()>1:
+		line.append(line[0])
+		h.draw_polyline(line,Color(0,.65,.8,.10),12,true)
+		h.draw_polyline(line,Color(.12,.32,.37),6,true)
+		h.draw_polyline(line,Color("65dae0"),2,true)
 	for kart in h.game.karts:
-		var dot := center+Vector2(kart.position.x,kart.position.z)*.86
+		var dot := projection*Vector2(kart.position.x,kart.position.z)
 		if kart.is_player:
-			h.draw_circle(dot,15+sin(h.time*4)*2,Color(cyan,.08),true,-1,true)
+			var pulse := 0.0 if h.game.reduced_motion else sin(h.time*4)*2
+			h.draw_circle(dot,13+pulse,Color(cyan,.08),true,-1,true)
 			lotus(h,dot,cyan)
 		else:
 			h.draw_circle(dot,4,amber,true,-1,true)
 	if h.game.player.drifting:
 		glass(h,Rect2(600,805,400,10),cyan)
 		h.draw_rect(Rect2(602,807,396*minf(1,h.game.player.drift_charge/2.5),6),amber)
+
+## The same projection is used for the road and all racer markers.
+static func map_transform(points: PackedVector3Array, area: Rect2) -> Transform2D:
+	if points.is_empty(): return Transform2D.IDENTITY
+	var minimum := Vector2(INF,INF)
+	var maximum := Vector2(-INF,-INF)
+	for p in points:
+		minimum = minimum.min(Vector2(p.x,p.z))
+		maximum = maximum.max(Vector2(p.x,p.z))
+	var span := maximum-minimum
+	var fit := minf(area.size.x/maxf(span.x,1.0),area.size.y/maxf(span.y,1.0))
+	var offset := area.get_center()-(minimum+maximum)*.5*fit
+	return Transform2D(Vector2(fit,0),Vector2(0,fit),offset)
 
 static func lotus(h: Control,c: Vector2,color: Color) -> void:
 	for i in range(5):
