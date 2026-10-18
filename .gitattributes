@@ -1,0 +1,11 @@
+* text=auto
+*.glb binary
+*.blend binary
+*.res binary
+*.png binary
+*.jpg binary
+*.ttf binary
+*.wav binary
+*.ogg binary
+*.dll binary
+*.zip binary

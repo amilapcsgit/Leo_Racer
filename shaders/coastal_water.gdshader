@@ -15,8 +15,9 @@ void fragment() {
 	vec3 shallow = vec3(.018,.48,.48);
 	ALBEDO = mix(deep,shallow,shore*.73+w*.09)+vec3(.55,.73,.68)*foam;
 	float glitter = pow(ripple,32.0)*pow(max(0.0,sin(p.y*1.3+p.x*.43+TIME)),14.0);
-	EMISSION = vec3(1.0,.8,.47)*glitter*.18;
+	EMISSION = vec3(1.0,.8,.47)*glitter*.18+mix(deep,shallow,shore*.73)*.12;
 	ROUGHNESS = .23;
-	METALLIC = .26;
-	NORMAL = normalize(vec3(cos(p.x*.38+TIME*1.7)*.10, sin(p.y*.32-TIME*.9)*.09, 1.0));
+	METALLIC = .0;
+	NORMAL_MAP = vec3(.5+cos(p.x*.38+TIME*1.7)*.045,.5+sin(p.y*.32-TIME*.9)*.04,1.0);
+	NORMAL_MAP_DEPTH = .7;
 }

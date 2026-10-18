@@ -1,0 +1,12 @@
+{
+  "version": "1.2.0",
+  "branch": "Colombo",
+  "godot": "4.7.2 .NET",
+  "architecture": "Windows x86_64",
+  "exe_sha256": "1985b39ffeaa60166140120b1468ab518604e932c51ef3a98a698c72cb0cb5a2",
+  "runtime_bundled": true,
+  "terrain_library_bundled": true,
+  "zip_sha256": "0d3a3a784751c292aeb346ebdf2d0152ef7f3d0d71a969b567b685999d40c667",
+  "zip_bytes": 140145421,
+  "exe_bytes": 178464304
+}

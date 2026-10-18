@@ -47,6 +47,10 @@ var test_errors: Array[String] = []
 var capture_results := false
 var wrong_way_time := 0.0
 var diagnostics_mode := false
+var art_profile: LeoArtProfile = preload("res://assets/config/colombo.tres")
+var feedback: Node
+var reduced_motion := false
+var camera_roll := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -66,6 +70,11 @@ func _ready() -> void:
 	camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(camera)
 	camera.current = true
+	feedback = load("res://scripts/RaceFeedbackBridge.cs").new()
+	feedback.name = "RaceFeedback"
+	add_child(feedback)
+	feedback.configure(art_profile.camera_boost_peak,art_profile.camera_boost_hold)
+	feedback.set_reduced_motion(reduced_motion)
 	music = make_sound("island_music.wav", -22)
 	(music.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
 	(music.stream as AudioStreamWAV).loop_end = int((music.stream as AudioStreamWAV).get_length() * (music.stream as AudioStreamWAV).mix_rate)
@@ -138,11 +147,15 @@ func build_world() -> void:
 	polish_materials(scenery)
 	var city := LeoCity.new()
 	world.add_child(city)
-	city.setup(circuit)
+	city.setup(circuit,art_profile)
+	var colombo := LeoColomboWorld.new()
+	world.add_child(colombo)
+	colombo.setup(circuit,art_profile)
 	var tower: Node3D = load("res://assets/models/lotus_tower.glb").instantiate()
-	tower.position = Vector3(0, .07, -230)
+	tower.position = art_profile.landmark_position
 	tower.scale = Vector3.ONE * .85
 	world.add_child(tower)
+	polish_materials(tower,true)
 	var ground := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -188,6 +201,7 @@ func build_world() -> void:
 	sun.shadow_bias = .04
 	sun.directional_shadow_blend_splits = true
 	add_child(sun)
+	LeoColomboWorld.environment_setup(environment,sun,art_profile)
 	var ocean := MeshInstance3D.new()
 	var plane := PlaneMesh.new()
 	plane.size = Vector2(1100,1500)
@@ -212,7 +226,7 @@ func build_world() -> void:
 			car.rotation.y = PI/2
 			world.add_child(car)
 
-func polish_materials(node: Node) -> void:
+func polish_materials(node: Node, landmark: bool=false) -> void:
 	if node is MeshInstance3D:
 		var instance := node as MeshInstance3D
 		for i in instance.mesh.get_surface_count():
@@ -220,8 +234,22 @@ func polish_materials(node: Node) -> void:
 			if old and old.resource_name == "road":
 				var material := ShaderMaterial.new()
 				material.shader = load("res://shaders/road_surface.gdshader")
+				for pair in [["color_map","Color"],["normal_map","NormalGL"],["rough_map","Roughness"]]:
+					material.set_shader_parameter(pair[0],load("res://assets/materials/Asphalt023S_2K-JPG_%s.jpg"%pair[1]))
 				instance.set_surface_override_material(i,material)
-	for child in node.get_children(): polish_materials(child)
+			elif old:
+				var material := old.duplicate() as StandardMaterial3D
+				var colors := {"grass":"254e38","grasslight":"3b6533","cyan":"779a9d","cream":"cabb9d","white":"d9d8cb","leaf":"1b6337","leaflight":"417e2d","sand":"c3a26a","pink":"a32868","purple":"693774"}
+				if colors.has(old.resource_name): material.albedo_color = Color(colors[old.resource_name])
+				if old.resource_name in ["pink","purple","gold"]:
+					material.metallic = .5
+					material.roughness = .3
+				if landmark and old.resource_name in ["pink","purple"]:
+					material.emission_enabled = true
+					material.emission = Color("cf3d9d") if old.resource_name=="pink" else Color("6c279c")
+					material.emission_energy_multiplier = .55
+				instance.set_surface_override_material(i,material)
+	for child in node.get_children(): polish_materials(child,landmark)
 
 func build_stage() -> void:
 	stage = Node3D.new()
@@ -257,7 +285,14 @@ func build_stage() -> void:
 	light.position = Vector3(3, 5, -3)
 	light.omni_range = 18
 	light.light_energy = 2.5
+	light.light_color = Color("ffdfb5")
 	stage.add_child(light)
+	var edge_light := OmniLight3D.new()
+	edge_light.position = Vector3(-4,3,3)
+	edge_light.omni_range = 14
+	edge_light.light_color = Color("13c8ed")
+	edge_light.light_energy = 2.0
+	stage.add_child(edge_light)
 	stage.hide()
 
 func update_preview() -> void:
@@ -281,10 +316,19 @@ func enter_garage() -> void:
 	update_preview()
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = Color("091c37")
+	showroom_lighting(true)
 	camera.position = stage.position + Vector3(6.2, 3.8, -8.8)
 	camera.look_at(stage.position + Vector3.UP * 1.0)
 	camera.look_at(stage.position - camera.global_basis.x * 2.9 + Vector3.UP * 1.0)
 	camera.fov = 44
+
+func showroom_lighting(enabled: bool) -> void:
+	environment.fog_enabled = not enabled
+	environment.volumetric_fog_enabled = not enabled and RenderingServer.get_current_rendering_method()=="forward_plus"
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR if enabled else Environment.AMBIENT_SOURCE_SKY
+	environment.ambient_light_color = Color("558fa2")
+	environment.ambient_light_energy = .55 if enabled else art_profile.ambient_energy
+	environment.tonemap_exposure = .9 if enabled else art_profile.exposure
 
 func select_driver(index: int) -> void:
 	selected_driver = index
@@ -295,6 +339,8 @@ func select_kart(index: int) -> void:
 	save_settings()
 
 func remove_racers() -> void:
+	if feedback: feedback.reset_feedback()
+	camera_roll = 0.0
 	for kart in karts:
 		kart.stop_audio()
 		remove_child(kart)
@@ -303,6 +349,7 @@ func remove_racers() -> void:
 	player = null
 
 func return_menu() -> void:
+	showroom_lighting(false)
 	get_tree().paused = false
 	paused = false
 	state = "menu"
@@ -315,6 +362,7 @@ func return_menu() -> void:
 	hud.show_menu()
 
 func start_race() -> void:
+	showroom_lighting(false)
 	get_tree().paused = false
 	paused = false
 	remove_racers()
@@ -344,6 +392,8 @@ func start_race() -> void:
 		kart.place(-8.0 - (i / 2) * 5.5, -3.2 if i % 2 == 0 else 3.2)
 		kart.gate_crossed.connect(on_gate)
 		kart.boosted.connect(on_boost)
+		kart.impacted.connect(on_impact)
+		kart.recovered.connect(on_recover)
 		karts.append(kart)
 	player = karts[0]
 	if test_mode: player.auto_drive = true
@@ -373,8 +423,23 @@ func on_gate(kart: LeoKart, gate: int) -> void:
 
 func on_boost(kart: LeoKart, source: String) -> void:
 	if kart.is_player:
+		feedback.play_boost(source,kart.boost_time)
 		boost_count += 1
 		hud.announce(source, 1.1)
+
+func on_impact(kart: LeoKart, _point: Vector3, _normal: Vector3, strength: float) -> void:
+	if kart.is_player: feedback.play_impact(strength)
+
+func on_recover(kart: LeoKart) -> void:
+	if kart.is_player:
+		feedback.play_recover()
+		cam_heading = kart.rotation.y
+		camera_roll = 0.0
+
+func set_reduced_motion(value: bool) -> void:
+	reduced_motion = value
+	if feedback: feedback.set_reduced_motion(value)
+	save_settings()
 
 func finish_race() -> void:
 	if test_mode:
@@ -384,6 +449,7 @@ func finish_race() -> void:
 		for kart in karts:
 			if not kart.is_player: check(kart.finished, "AI %s completes all three laps without stalling" % kart.racer_name)
 	state = "results"
+	feedback.reset_feedback()
 	for kart in karts: kart.active = false
 	if best_time <= 0 or player.finish_time < best_time:
 		best_time = player.finish_time
@@ -456,9 +522,15 @@ func _process(dt: float) -> void:
 		var pose := player.get_global_transform_interpolated()
 		cam_heading = lerp_angle(cam_heading, pose.basis.get_euler().y, 1.0-exp(-dt*6.0))
 		var behind := Vector3(sin(cam_heading),0,cos(cam_heading))
-		camera.position = pose.origin+behind*(7.0+absf(player.speed)*.018)+Vector3.UP*3.4
+		camera.position = pose.origin+behind*(6.4+absf(player.speed)*.012)+Vector3.UP*3.1
 		camera.look_at(pose.origin-behind*6.0+Vector3.UP*1.85)
-		camera.fov = lerpf(camera.fov, 74.0 if player.boost_time > 0 else 63.0 + absf(player.speed) * .1, minf(1, dt * 4))
+		feedback.set_boost_active(player.boost_time>0 and player.active)
+		var base_fov := 63.0+absf(player.speed)*.1
+		camera.fov = lerpf(camera.fov,base_fov+float(feedback.get_fov_offset()),1.0-exp(-dt*12.0))
+		var roll_target := 0.0 if reduced_motion else -player.steer*deg_to_rad(art_profile.camera_roll_degrees)*clampf(absf(player.speed)/36.0,0,1)
+		camera_roll = lerpf(camera_roll,roll_target,1.0-exp(-dt*6.0))
+		camera.rotate_object_local(Vector3.FORWARD,camera_roll+float(feedback.get_shake_roll()))
+		camera.position += camera.global_basis*Vector3(feedback.get_shake_offset())
 		for kart in karts:
 			if not kart.is_player:
 				kart.visual.visible = (kart.position - player.position).dot(-player.global_basis.z) > -3.0 or kart.position.distance_to(camera.position) > 7.0
@@ -502,6 +574,7 @@ func save_settings() -> void:
 	cfg.set_value("game", "kart", selected_kart)
 	cfg.set_value("game", "best_time", best_time)
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
+	cfg.set_value("display", "reduced_motion", reduced_motion)
 	cfg.save("user://leo_racer.cfg")
 
 func load_settings() -> void:
@@ -509,6 +582,7 @@ func load_settings() -> void:
 	if cfg.load("user://leo_racer.cfg") == OK:
 		master_volume = cfg.get_value("audio", "volume", .72)
 		music_enabled = cfg.get_value("audio", "music", true)
+		reduced_motion = cfg.get_value("display", "reduced_motion", false)
 		selected_driver = clampi(cfg.get_value("game", "driver", 0), 0, 3)
 		selected_kart = clampi(cfg.get_value("game", "kart", 0), 0, 3)
 		best_time = cfg.get_value("game", "best_time", 0.0)

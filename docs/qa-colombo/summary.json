@@ -1,0 +1,52 @@
+{
+  "version": "1.2.0",
+  "checks": 129,
+  "status": "PASS",
+  "suites": {
+    "wheel-test": {
+      "checks": 39,
+      "errors": [],
+      "status": "PASS"
+    },
+    "drive-test": {
+      "checks": 11,
+      "errors": [],
+      "status": "PASS"
+    },
+    "visual-regression": {
+      "checks": 22,
+      "errors": [],
+      "status": "PASS"
+    },
+    "presentation-test": {
+      "checks": 24,
+      "errors": [],
+      "status": "PASS"
+    },
+    "smoke-test": {
+      "boosts": 0,
+      "engine": "4.7.2-stable (official)",
+      "errors": [],
+      "race_time": 0.0,
+      "status": "PASS",
+      "checks": 19
+    },
+    "race-test": {
+      "boosts": 16,
+      "engine": "4.7.2-stable (official)",
+      "errors": [],
+      "race_time": 72.0815039999995,
+      "status": "PASS",
+      "checks": 8
+    },
+    "layout-test": {
+      "checks": 6,
+      "errors": [],
+      "status": "PASS"
+    }
+  },
+  "geometry_models_preserved": 34,
+  "fps_1080p": 113.812429707632,
+  "p95_ms": 10.67345,
+  "known_cleanup_warning": true
+}

@@ -6,6 +6,9 @@ extends CharacterBody3D
 # replaces its sphere to make barrier contact and race recovery deterministic.
 signal gate_crossed(kart, gate)
 signal boosted(kart, source)
+signal drift_changed(kart, enabled)
+signal impacted(kart, point, normal, strength)
+signal recovered(kart)
 var circuit: LeoCircuit
 var racer_id := 0
 var racer_name := "Sonic"
@@ -52,6 +55,8 @@ var ai_lane := 0.0
 var ai_phase := 0.0
 var auto_drive := false
 var bump_cooldown := 0.0
+var effects: LeoKartEffects
+var impact_feedback_cooldown := 0.0
 
 func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String) -> void:
 	circuit = track
@@ -116,6 +121,9 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		impact = sound("impact.ogg", -14, false)
 	ai_phase = float(id) * 1.73
 	ai_lane = [-3.8, 0.0, 3.8, -2.5, 2.5, 0.5][id % 6]
+	effects = LeoKartEffects.new()
+	visual.add_child(effects)
+	effects.setup(self)
 	reset_physics_interpolation()
 
 func attach_wheel(wheel: Node3D, front: bool) -> void:
@@ -247,6 +255,7 @@ func recover() -> void:
 	wheel_motion_speed = 0
 	wheel_visual_speed = 0
 	reset_physics_interpolation()
+	recovered.emit(self)
 
 func boost(duration: float, source: String) -> void:
 	boost_time = maxf(boost_time, duration)
@@ -258,6 +267,7 @@ func _physics_process(dt: float) -> void:
 	boost_time = maxf(0, boost_time - dt)
 	boost_cooldown = maxf(0, boost_cooldown - dt)
 	bump_cooldown = maxf(0, bump_cooldown - dt)
+	impact_feedback_cooldown = maxf(0,impact_feedback_cooldown-dt)
 	var throttle := 0.0
 	var desired_steer := 0.0
 	var want_drift := false
@@ -292,6 +302,7 @@ func _physics_process(dt: float) -> void:
 	if drifting and not want_drift:
 		if drift_charge >= .65 and throttle >= -.1: boost(1.0 + minf(drift_charge, 2.5) * .35, "DRIFT BOOST")
 		drift_charge = 0
+	if drifting != want_drift: drift_changed.emit(self,want_drift)
 	drifting = want_drift
 	if drifting:
 		drift_charge = minf(2.5, drift_charge + dt)
@@ -317,6 +328,9 @@ func _physics_process(dt: float) -> void:
 	velocity.y -= 18 * dt
 	var motion_origin := global_position
 	move_and_slide()
+	if get_slide_collision_count()>0 and bump_cooldown<=0 and absf(speed)>12 and absf(wheel_motion_speed)>5:
+		var hit := get_slide_collision(0)
+		emit_impact_feedback(hit.get_position(),hit.get_normal())
 	# Soft continuous barrier response avoids gaps between modular rail meshes.
 	var projection := circuit.project(position, nearest_index)
 	nearest_index = projection.index
@@ -327,6 +341,7 @@ func _physics_process(dt: float) -> void:
 		velocity -= normal * maxf(0, velocity.dot(normal))
 		speed *= .985
 		if is_player and bump_cooldown <= 0 and speed > 12:
+			emit_impact_feedback(position+normal*1.0,-normal)
 			impact.play()
 			bump_cooldown = .65
 	update_wheel_motion(global_position - motion_origin, dt)
@@ -366,3 +381,8 @@ func _process(dt: float) -> void:
 		trail.emitting = boost_time > 0 and active
 	if spark_left: spark_left.emitting = drifting and drift_charge > .3
 	if spark_right: spark_right.emitting = drifting and drift_charge > .3
+
+func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
+	if impact_feedback_cooldown>0: return
+	impact_feedback_cooldown = .35
+	impacted.emit(self,point,normal,clampf(absf(speed)/42.0,0,1))

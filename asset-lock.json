@@ -1,0 +1,24 @@
+{
+  "nature": {
+    "file": "Stylized_Nature_MegaKitStandard.zip",
+    "sha256": "298f6732b872e4cf7b30e6e7abf9641c7f6dc6b326df37ac089533ed7e3d58c9",
+    "license": "CC0-1.0"
+  },
+  "materials": [
+    {
+      "file": "Asphalt023S_2K-JPG.zip",
+      "url": "https://ambientcg.com/get?file=Asphalt023S_2K-JPG.zip",
+      "sha256": "5803eb6d066bff83708406568d5905c7eda3c1c210e4d0391626951a6729f210"
+    },
+    {
+      "file": "Concrete034_2K-JPG.zip",
+      "url": "https://ambientcg.com/get?file=Concrete034_2K-JPG.zip",
+      "sha256": "fafd7cd3aee2b703abbb12b7810ef565ab76ac7ea3b1ea9a73b088e423e670b3"
+    },
+    {
+      "file": "PavingStones001_2K-JPG.zip",
+      "url": "https://ambientcg.com/get?file=PavingStones001_2K-JPG.zip",
+      "sha256": "c67fc1796a4b08a367266f7c30bfa4ae7cfaddb42b69e0bca6657313bbc4b2c5"
+    }
+  ]
+}

@@ -46,7 +46,7 @@ func run() -> void:
 	verify(city.stats.shop_signs >= 30,"Physical storefront signage is installed")
 	game.stop_all_audio()
 	var report := {"status":"PASS" if errors.is_empty() else "FAIL","checks":count,"errors":errors}
-	FileAccess.open("res://docs/qa-v2/visual-regression.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+	FileAccess.open("res://docs/qa-colombo/visual-regression.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 	print("VISUAL_REGRESSION ",JSON.stringify(report))
 	await process_frame
 	await process_frame

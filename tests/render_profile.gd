@@ -3,9 +3,9 @@ extends SceneTree
 # Run with the real renderer, not --headless:
 # Godot --path LeoRacer --script res://tests/render_profile.gd -- --drive-test
 # --drive-test prevents loading/writing personal settings in main.gd.
-const WARMUP_SECONDS := 3.0
-const SAMPLE_SECONDS := 12.0
-const REPORT_PATH := "res://docs/qa-v2/render-profile.json"
+const WARMUP_SECONDS := 5.0
+const SAMPLE_SECONDS := 90.0
+const REPORT_PATH := "res://docs/qa-colombo/render-profile.json"
 
 var game: Node3D
 var sampling := false
@@ -46,6 +46,11 @@ func run() -> void:
 	print("RENDER_PROFILE_WARMUP | %.1f seconds | renderer=%s | device=%s" % [WARMUP_SECONDS, RenderingServer.get_current_rendering_method(), RenderingServer.get_video_adapter_name()])
 	await create_timer(WARMUP_SECONDS, true, false, true).timeout
 	await RenderingServer.frame_post_draw
+	game.start_race()
+	game.player.auto_drive = true
+	game.state = "race"
+	for kart in game.karts: kart.active = true
+	await process_frame
 	starting_progress = game.player.progress
 	sample_started_usec = Time.get_ticks_usec()
 	last_process_usec = sample_started_usec
@@ -66,7 +71,7 @@ func _process(delta: float) -> bool:
 	physics_ms.append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
 	peak_video_bytes = maxf(peak_video_bytes, Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED))
 	peak_static_bytes = maxf(peak_static_bytes, Performance.get_monitor(Performance.MEMORY_STATIC))
-	if float(now - sample_started_usec) / 1000000.0 >= SAMPLE_SECONDS and not completed:
+	if (game.karts.all(func(kart): return kart.finished) or float(now - sample_started_usec)/1000000.0 >= SAMPLE_SECONDS) and not completed:
 		sampling = false
 		completed = true
 		finish.call_deferred()
@@ -135,6 +140,7 @@ func finish() -> void:
 		"player_start_progress_m": starting_progress,
 		"player_end_progress_m": game.player.progress,
 		"racer_count": game.karts.size(),
+		"full_race_completed": game.karts.all(func(kart): return kart.finished),
 		"frame_times_ms": frame_ms,
 		"wall_frame_times_ms": wall_frame_ms,
 		"notes": "Real GPU/windowed render; no headless mode. Frame deltas include rendering, presentation, CPU work and the explicit 120 FPS cap. Primitive counts are Godot render-monitor primitives, including renderer passes; they are not unique scene triangles."

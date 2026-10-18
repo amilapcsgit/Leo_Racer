@@ -8,3 +8,15 @@ build/
 source_assets/kenney-city/
 export_credentials.cfg
 dist/
+addons/rokojori_action_library/
+.dotnet/
+/bin/
+/obj/
+source_assets/nature/
+source_assets/materials/
+docs/qa-colombo/*.log
+
+.tools/
+
+.rokojori/
+_rokojori-cache/

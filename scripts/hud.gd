@@ -12,15 +12,21 @@ var labels := {}
 var time := 0.0
 var announcement := ""
 var announcement_time := 0.0
-var accent := Color("4cdaff")
-var gold := Color("ffdb65")
-var ink := Color("0a1734")
-var muted := Color("b9cce3")
+var accent := Color("00f2fe")
+var gold := Color("ff9000")
+var ink := Color("090f17")
+var muted := Color("9aafb7")
 var photo_mode := false
 var speed_overlay: ColorRect
+var display_speed := 0.0
+var display_nitro := 1.0
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# A centered 1600x900 design canvas scales as a unit on every aspect ratio.
+	set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	size = Vector2(1600,900)
+	get_viewport().size_changed.connect(resize_canvas)
+	resize_canvas()
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	heading_font = load("res://assets/fonts/heading.ttf")
 	body_font = load("res://assets/fonts/body.ttf")
@@ -66,7 +72,7 @@ func style(bg: Color, border: Color = Color.TRANSPARENT, radius: int = 16) -> St
 	s.bg_color = bg
 	s.border_color = border
 	s.set_border_width_all(2 if border.a > 0 else 0)
-	s.set_corner_radius_all(radius)
+	s.set_corner_radius_all(mini(radius,4))
 	s.content_margin_left = 24
 	s.content_margin_right = 24
 	return s
@@ -94,6 +100,11 @@ func panel(parent: Node, p: Vector2, size: Vector2, bg: Color) -> Panel:
 	n.position = p
 	n.size = size
 	n.add_theme_stylebox_override("panel", style(bg))
+	var glass := ShaderMaterial.new()
+	glass.shader = load("res://shaders/ui_glass.gdshader")
+	glass.set_shader_parameter("panel_size",size)
+	glass.set_shader_parameter("panel_color",Color(.025,.042,.052,.92))
+	n.material = glass
 	parent.add_child(n)
 	return n
 
@@ -133,14 +144,14 @@ func show_menu() -> void:
 	title = text_at(menu_root, Vector2(78, 223), Vector2(600, 140), "RACER", 118, accent, true)
 	title.add_theme_constant_override("outline_size", 5)
 	title.add_theme_color_override("font_outline_color", ink)
-	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), "Big drifts. Island energy.", 29, Color.WHITE, true)
+	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), "COLOMBO // AFTERGLOW", 29, Color.WHITE, true)
 	text_at(menu_root, Vector2(89, 417), Vector2(600, 54), "Chase the coast. Light up the Lotus.", 20, muted)
 	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "LET'S RACE     →", game.start_race, true)
 	button(menu_root, Vector2(88, 600), Vector2(389, 62), "GARAGE & RACERS", show_garage)
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
 	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "LOTUS COAST    /    3 LAPS    /    6 RACERS", 17, Color("d8e7ef"), true)
-	text_at(menu_root, Vector2(1230, 835), Vector2(320, 28), "LEO RACER  /  LOCAL EDITION", 14, Color.WHITE, true)
+	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "COLOMBO 2026  //  v1.2.0", 17, accent, true)
 	button(menu_root, Vector2(1430, 40), Vector2(120, 46), "QUIT", game.quit_game)
 	first.grab_focus()
 	queue_redraw()
@@ -225,6 +236,13 @@ func show_settings() -> void:
 	music_check.button_pressed = game.music_enabled
 	music_check.toggled.connect(game.set_music)
 	modal_root.add_child(music_check)
+	var motion_check := CheckButton.new()
+	motion_check.position = Vector2(482,602)
+	motion_check.text = "Reduced Motion"
+	motion_check.add_theme_font_size_override("font_size",24)
+	motion_check.button_pressed = game.reduced_motion
+	motion_check.toggled.connect(game.set_reduced_motion)
+	modal_root.add_child(motion_check)
 	button(modal_root, Vector2(482, 694), Vector2(634, 54), "BACK TO IT", close_settings)
 
 func close_settings() -> void:
@@ -238,16 +256,31 @@ func show_race() -> void:
 	clear(hud_root)
 	labels.clear()
 	hud_root.show()
-	labels.position = text_at(hud_root, Vector2(65, 46), Vector2(170, 80), "1", 76, gold, true)
+	labels.position = text_at(hud_root, Vector2(65, 46), Vector2(170, 80), "1", 76, accent, true)
+	labels.position.add_theme_constant_override("outline_size",1)
+	labels.position.add_theme_color_override("font_outline_color",Color("d4af37"))
 	text_at(hud_root, Vector2(142, 88), Vector2(140, 35), "/ 6", 27, Color.WHITE, true)
 	text_at(hud_root, Vector2(68, 133), Vector2(180, 25), "POSITION", 16, muted, true)
-	labels.lap = text_at(hud_root, Vector2(335, 58), Vector2(220, 45), "LAP  1 / 3", 29, Color.WHITE, true)
-	labels.timer = text_at(hud_root, Vector2(335, 105), Vector2(250, 30), "00:00.000", 21, muted)
-	text_at(hud_root, Vector2(1260, 46), Vector2(260, 32), "LOTUS COAST", 23, Color.WHITE, true)
-	labels.sector = text_at(hud_root, Vector2(1260, 81), Vector2(300, 30), "COASTAL PROMENADE", 15, gold, true)
-	labels.speed = text_at(hud_root, Vector2(1326, 685), Vector2(230, 106), "000", 84, Color.WHITE, true)
-	text_at(hud_root, Vector2(1440, 789), Vector2(120, 30), "KM/H", 17, muted, true)
-	labels.nitro = text_at(hud_root, Vector2(1205, 849), Vector2(345, 25), "SHIFT   NITRO READY", 15, gold, true)
+	labels.lap = text_at(hud_root,Vector2(325,48),Vector2(200,52),"1 / 3",42,accent,true)
+	labels.timer = text_at(hud_root,Vector2(325,106),Vector2(215,30),"00:00.000",21,Color.WHITE)
+	text_at(hud_root,Vector2(326,140),Vector2(180,25),"LAP // RACE TIME",14,muted,true)
+	text_at(hud_root,Vector2(590,36),Vector2(575,35),"LOTUS COAST // MODERN COLOMBO 2026",21,Color("bce7e7"),true)
+	labels.sector = text_at(hud_root,Vector2(755,77),Vector2(400,28),"COASTAL PROMENADE",16,gold,true)
+	text_at(hud_root,Vector2(1282,51),Vector2(280,55),"LEO RACER",37,Color("e7f5f7"),true)
+	var lion := TextureRect.new()
+	lion.texture = load("res://assets/art/neon_lion.svg")
+	lion.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	lion.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	lion.position = Vector2(1207,44)
+	lion.size = Vector2(64,64)
+	lion.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud_root.add_child(lion)
+	labels.speed = text_at(hud_root,Vector2(1293,663),Vector2(220,110),"000",91,Color("c3fcff"),true)
+	labels.speed.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	labels.speed.add_theme_constant_override("shadow_outline_size",4)
+	labels.speed.add_theme_color_override("font_shadow_color",Color(0,.8,.9,.24))
+	text_at(hud_root,Vector2(1370,773),Vector2(110,27),"KM/H",18,muted,true)
+	labels.nitro = text_at(hud_root,Vector2(1198,854),Vector2(160,25),"NITRO READY",17,Color("69e9b2"),true)
 	labels.drift = text_at(hud_root, Vector2(575, 758), Vector2(500, 35), "", 23, accent, true)
 	labels.drift.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	text_at(hud_root, Vector2(55, 842), Vector2(1100, 28), "SPACE  DRIFT     SHIFT  NITRO     R  RECOVER     ESC  PAUSE", 15, Color("dfebf2"), true)
@@ -294,15 +327,20 @@ func _process(dt: float) -> void:
 	time += dt
 	if scene_mode == "race" and not labels.is_empty():
 		var p: LeoKart = game.player
+		var actual_speed := absf(p.wheel_motion_speed)
 		speed_overlay.visible = not photo_mode
-		var intensity := (1.0 if p.boost_time > 0 else clampf((absf(p.speed)-24.0)/30.0,0,.22)) if p.active else 0.0
+		var intensity := (1.0 if p.boost_time > 0 and actual_speed>8 else clampf((actual_speed-24.0)/30.0,0,.22)) if p.active else 0.0
+		if game.reduced_motion: intensity *= .16
 		(speed_overlay.material as ShaderMaterial).set_shader_parameter("strength",intensity)
+		(speed_overlay.material as ShaderMaterial).set_shader_parameter("glitch",game.feedback.get_recover_glitch())
 		labels.position.text = str(game.player_place())
-		labels.lap.text = "LAP  %d / 3" % p.lap
+		labels.lap.text = "%d / 3" % p.lap
 		labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
-		labels.speed.text = "%03d" % int(absf(p.speed) * 3.6)
+		display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-dt*12))
+		display_nitro = lerpf(display_nitro,p.boost_fuel,1.0-exp(-dt*10))
+		labels.speed.text = "%03d" % int(actual_speed*3.6)
 		labels.drift.text = "RELEASE FOR BOOST!" if p.drift_charge >= .65 else ("BUILDING DRIFT..." if p.drifting else "")
-		labels.nitro.text = "SHIFT   NITRO READY" if p.boost_fuel >= 1 else "NITRO   %d%%" % int(p.boost_fuel * 100)
+		labels.nitro.text = "NITRO READY" if p.boost_fuel>=1 else "CHARGING %d%%"%int(p.boost_fuel*100)
 		labels.sector.text = ["COASTAL PROMENADE", "FORT QUARTER", "LOTUS PLAZA", "INDEPENDENCE GARDENS"][mini(3, int(fposmod(p.last_s / game.circuit.length, 1) * 4))]
 		if game.state == "countdown": labels.countdown.text = str(maxi(1, int(ceil(game.countdown))))
 		else: labels.countdown.text = "GO!" if game.race_time < .85 else ""
@@ -313,36 +351,12 @@ func _process(dt: float) -> void:
 		speed_overlay.hide()
 	queue_redraw()
 
+func resize_canvas() -> void:
+	var available := get_viewport_rect().size
+	var factor := minf(available.x/1600.0,available.y/900.0)
+	scale = Vector2.ONE*factor
+	position = (available-Vector2(1600,900)*factor)*.5
+
 func _draw() -> void:
-	if scene_mode != "race" or not game or not game.player or photo_mode: return
-	var shade := Color(.025, .06, .13, .78)
-	draw_style_box(style(shade), Rect2(42, 36, 230, 142))
-	draw_style_box(style(shade), Rect2(306, 40, 244, 121))
-	draw_style_box(style(shade), Rect2(1234, 36, 321, 91))
-	draw_style_box(style(shade), Rect2(1193, 668, 365, 163))
-	draw_style_box(style(shade), Rect2(42, 836, 720, 45))
-	draw_rect(Rect2(1208, 834, 342, 8), Color("24364c"))
-	draw_rect(Rect2(1208, 834, 342 * game.player.boost_fuel, 8), gold)
-	# Live track map: sampled from the exact centreline used by AI and checkpoints.
-	var center := Vector2(156, 665)
-	draw_style_box(style(shade), Rect2(42, 498, 242, 311))
-	var line := PackedVector2Array()
-	for i in range(0, game.circuit.points.size(), 3):
-		var p: Vector3 = game.circuit.points[i]
-		line.append(center + Vector2(p.x, p.z) * .86)
-	line.append(line[0])
-	draw_polyline(line, Color("7a99b2"), 9, true)
-	draw_polyline(line, Color("122a40"), 5, true)
-	for k in game.karts:
-		var dot := center + Vector2(k.position.x, k.position.z) * .86
-		draw_circle(dot, 7 if k.is_player else 4, gold if k.is_player else accent)
-		if k.is_player: draw_arc(dot, 11, 0, TAU, 20, Color.WHITE, 2, true)
-	if game.player.drifting:
-		draw_style_box(style(shade), Rect2(600, 805, 400, 10))
-		draw_rect(Rect2(600, 805, 400 * minf(1, game.player.drift_charge / 2.5), 10), gold if game.player.drift_charge > .65 else accent)
-	if game.player.boost_time > 0:
-		for i in range(13):
-			var a := i * TAU / 13 + .16
-			var c := Vector2(800, 450)
-			var v := Vector2(cos(a), sin(a))
-			draw_line(c + v * (650 + sin(time * 14 + i) * 40), c + v * 900, Color(.4, .9, 1, .4), 3, true)
+	if scene_mode!="race" or not game or not game.player or photo_mode: return
+	LeoTelemetry.draw(self)

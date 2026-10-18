@@ -1,0 +1,36 @@
+{
+  "godot": "4.7.2",
+  "dotnet_sdk": "8.0.426",
+  "files": [
+    {
+      "file": "godot-net.zip",
+      "url": "https://downloads.godotengine.org/?version=4.7.2&flavor=stable&slug=mono_win64.zip&platform=windows.64",
+      "sha256": "a2a48473a7414c5f19fab690518caebb738c09ef9601f6bd2388676a7f53b3c0"
+    },
+    {
+      "file": "godot-net-templates.tpz",
+      "url": "https://downloads.godotengine.org/?version=4.7.2&flavor=stable&slug=mono_export_templates.tpz&platform=templates",
+      "sha256": "92f8681e349ef1f90891b792da95e3b2b0bd1ed610b78018c58feb2d87e15a9d"
+    },
+    {
+      "file": "dotnet-sdk.zip",
+      "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.426/dotnet-sdk-8.0.426-win-x64.zip",
+      "sha256": "b2523f881c97e13234e9b3905fe9978831b84e52f8115ba397d31203d2e022ce"
+    },
+    {
+      "file": "Asphalt023S_2K-JPG.zip",
+      "url": "https://ambientcg.com/get?file=Asphalt023S_2K-JPG.zip",
+      "sha256": "5803eb6d066bff83708406568d5905c7eda3c1c210e4d0391626951a6729f210"
+    },
+    {
+      "file": "Concrete034_2K-JPG.zip",
+      "url": "https://ambientcg.com/get?file=Concrete034_2K-JPG.zip",
+      "sha256": "fafd7cd3aee2b703abbb12b7810ef565ab76ac7ea3b1ea9a73b088e423e670b3"
+    },
+    {
+      "file": "PavingStones001_2K-JPG.zip",
+      "url": "https://ambientcg.com/get?file=PavingStones001_2K-JPG.zip",
+      "sha256": "c67fc1796a4b08a367266f7c30bfa4ae7cfaddb42b69e0bca6657313bbc4b2c5"
+    }
+  ]
+}

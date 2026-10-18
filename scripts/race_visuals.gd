@@ -28,13 +28,15 @@ static func polish_chassis(node: Node) -> void:
 			if not source: continue
 			var m := source.duplicate() as StandardMaterial3D
 			if source.resource_name in ["blue","coral","aqua","pink"]:
-				m.roughness = .19
-				m.metallic = .18
+				m.roughness = .20
+				m.metallic = .9
+				if source.resource_name=="blue": m.albedo_color = Color("1d4ed8")
 				m.clearcoat_enabled = true
 				m.clearcoat = .75
 				m.clearcoat_roughness = .15
 			elif source.resource_name == "gold":
-				m.metallic = .7
+				m.albedo_color = Color("d4af37")
+				m.metallic = .85
 				m.roughness = .23
 			elif source.resource_name == "cyan":
 				m.emission_enabled = true
