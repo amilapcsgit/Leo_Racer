@@ -1,0 +1,12 @@
+Rokojori Action Library v0.6
+Copyright Rokojori. Distributed in this game under the Public Indie License.
+Authoritative license: https://rokojori.com/en/labs/rokojori-action-library/license
+
+License summary (consult the authoritative page for the complete terms):
+Indie developers may use the library in published games, including commercial
+games. Permission does not extend to repackaging the library as a standalone
+asset, developer toolkit, or engine plugin. Additional usage restrictions apply.
+
+The original addon sources are obtained separately for development and are not
+republished in this repository. This game's own integration code does not change
+the library's license. Other bundled external notices remain with the addon.

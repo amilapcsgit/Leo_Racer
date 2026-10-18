@@ -1,0 +1,664 @@
+{
+  "captures": [
+    {
+      "camera_position": "(-110.0, 25.0, 110.0)",
+      "camera_rotation": "(-3.28659, -39.17366, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "menu",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "01-menu",
+      "selected_driver": 0,
+      "selected_vehicle": 0,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-110.0, 25.0, 110.0)",
+      "camera_rotation": "(-3.28659, -39.17366, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "menu",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "02-guide",
+      "selected_driver": 0,
+      "selected_vehicle": 0,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-110.0, 25.0, 110.0)",
+      "camera_rotation": "(-3.28659, -39.17366, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "menu",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "03-settings",
+      "selected_driver": 0,
+      "selected_vehicle": 0,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-01-blue",
+      "selected_driver": 4,
+      "selected_vehicle": 0,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-02-coral",
+      "selected_driver": 4,
+      "selected_vehicle": 1,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-03-aqua",
+      "selected_driver": 4,
+      "selected_vehicle": 2,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-04-pink",
+      "selected_driver": 4,
+      "selected_vehicle": 3,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-05-formula_blue",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-06-formula_red",
+      "selected_driver": 4,
+      "selected_vehicle": 5,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-07-roadster_gold",
+      "selected_driver": 4,
+      "selected_vehicle": 6,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-08-race_tuk",
+      "selected_driver": 4,
+      "selected_vehicle": 7,
+      "width": 1920
+    },
+    {
+      "camera_position": "(6.2, 303.8, -8.8)",
+      "camera_rotation": "(-14.09839, 159.911, 0.0)",
+      "height": 1080,
+      "hud": {
+        "mode": "garage",
+        "photo_mode": false,
+        "reduced_motion": false
+      },
+      "name": "garage-09-race_bus",
+      "selected_driver": 4,
+      "selected_vehicle": 8,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, 81.38985)",
+      "camera_rotation": "(-5.630684, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "3",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "04-countdown",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "05-coast",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(274.121, 3.27, -312.6303)",
+      "camera_rotation": "(-5.630687, -105.2362, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "06-harbor",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(220.759, 3.27, -112.6075)",
+      "camera_rotation": "(-5.630685, 145.5958, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "07-lagoon",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(225.324, 3.27, 164.9509)",
+      "camera_rotation": "(-5.630684, 90.95385, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "08-gardens",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-29.96287, 3.27, 229.3491)",
+      "camera_rotation": "(-5.630683, 66.9585, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "09-fort",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-270.0, 365.0, 305.0)",
+      "camera_rotation": "(-35.79454, -42.19755, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "10-route-overview",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-97.79235, 2.9, -150.4517)",
+      "camera_rotation": "(-2.454032, 91.20731, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "11-billboard-wide",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-112.1692, 2.9, -150.1487)",
+      "camera_rotation": "(-2.454032, -88.79267, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "11b-billboard-wide-reverse",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-101.95, 4.5, 40.36)",
+      "camera_rotation": "(-3.990916, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "12-billboard-portrait",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-101.95, 4.5, 31.64)",
+      "camera_rotation": "(-3.990916, 180.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "12b-billboard-portrait-reverse",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(165.1697, 5.1, -246.5884)",
+      "camera_rotation": "(-3.43363, -68.23274, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "13-national-flag",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 8.065, 50.7087)",
+      "camera_rotation": "(-48.81407, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-01",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.83855, 8.065, -162.6517)",
+      "camera_rotation": "(-48.81407, 0.927135, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-02",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(95.6869, 8.065, -298.1917)",
+      "camera_rotation": "(-48.81412, -157.9365, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-03",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(315.2444, 8.065, -246.4804)",
+      "camera_rotation": "(-48.81407, 175.139, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-04",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(259.6155, 8.065, 3.859866)",
+      "camera_rotation": "(-48.81406, -111.4731, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-05",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(146.7301, 8.065, 161.3939)",
+      "camera_rotation": "(-48.8141, 151.0781, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-06",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-55.86559, 8.065, 216.8111)",
+      "camera_rotation": "(-48.81405, 52.88278, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": true,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "14-road-decal-07",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "NITRO BOOST",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "144"
+      },
+      "name": "15-nitro",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": true,
+        "speed": "144"
+      },
+      "name": "15b-nitro-reduced-motion",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "176"
+      },
+      "name": "16-speed-lines",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "DRIFT CHARGED // RELEASE!",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "104"
+      },
+      "name": "17-drift",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "DRIFT CHARGED // RELEASE!",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "18-pause",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.27, -0.528242)",
+      "camera_rotation": "(-5.630683, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "DRIFT CHARGED // RELEASE!",
+        "countdown": "",
+        "mode": "results",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "19-results",
+      "selected_driver": 4,
+      "selected_vehicle": 4,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.47, -0.528242)",
+      "camera_rotation": "(-6.428748, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "20-race-race_tuk",
+      "selected_driver": 4,
+      "selected_vehicle": 7,
+      "width": 1920
+    },
+    {
+      "camera_position": "(-90.0, 3.72, -0.528242)",
+      "camera_rotation": "(-7.422784, 0.0, 0.0)",
+      "height": 1080,
+      "hud": {
+        "callout": "",
+        "countdown": "",
+        "mode": "race",
+        "nitro": "NITRO READY",
+        "photo_mode": false,
+        "reduced_motion": false,
+        "speed": "000"
+      },
+      "name": "20-race-race_bus",
+      "selected_driver": 4,
+      "selected_vehicle": 8,
+      "width": 1920
+    }
+  ],
+  "errors": [],
+  "godot_version": "4.7.2-stable (official)",
+  "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+  "presentation_states_are_staged": true,
+  "renderer": "forward_plus",
+  "status": "PASS"
+}

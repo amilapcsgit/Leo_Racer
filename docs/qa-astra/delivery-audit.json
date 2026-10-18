@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "checks": 36,
+  "errors": [],
+  "baseline_glbs_preserved": 67,
+  "capture_count": 39,
+  "performance": {
+    "device": "NVIDIA RTX A1000 6GB Laptop GPU",
+    "viewport_pixels": [
+      1920,
+      1080
+    ],
+    "mean_fps": 111.772252942242,
+    "p95_frame_ms": 9.872,
+    "p99_frame_ms": 10.17142,
+    "minimum_one_second_fps": 98.1300768685603,
+    "sample_wall_seconds": 188.597791,
+    "full_race_completed": true
+  },
+  "zip_sha256": "adcab5e049a0d41bbabab4091a9e0a7ab897aed17992da25c4b6d6d4e67c2e20"
+}

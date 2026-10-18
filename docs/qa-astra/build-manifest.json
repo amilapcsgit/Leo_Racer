@@ -1,0 +1,12 @@
+{
+  "version": "1.4.0",
+  "branch": "astra",
+  "godot": "4.7.2 .NET",
+  "architecture": "Windows x86_64",
+  "exe_sha256": "30704d1e4dbc85c08fec243e2060aa59c9fa5f288e3dc02683ae97231ac999ba",
+  "runtime_bundled": true,
+  "terrain_library_bundled": true,
+  "zip_sha256": "adcab5e049a0d41bbabab4091a9e0a7ab897aed17992da25c4b6d6d4e67c2e20",
+  "zip_bytes": 478260203,
+  "exe_bytes": 518839784
+}

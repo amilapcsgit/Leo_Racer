@@ -1,0 +1,71 @@
+{
+  "elapsed": 189.49298600002,
+  "errors": [],
+  "models": 9,
+  "status": "PASS",
+  "vehicles": [
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "blue",
+      "time": 176.701838000015
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "formula_blue",
+      "time": 156.303470000009
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "race_tuk",
+      "time": 182.990990000017
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "formula_red",
+      "time": 160.11006200001
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "race_bus",
+      "time": 189.48702200002
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "roadster_gold",
+      "time": 166.688846000012
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "coral",
+      "time": 176.908718000015
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "aqua",
+      "time": 179.515406000016
+    },
+    {
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "model": "pink",
+      "time": 183.197870000018
+    }
+  ]
+}

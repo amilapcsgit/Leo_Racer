@@ -13,12 +13,14 @@ var _manifest: Dictionary
 var _mesh_cache: Dictionary = {}
 var _batches: Dictionary = {}
 var _materials: Dictionary = {}
-var _walls: Array[StandardMaterial3D] = []
+var _walls: Array[Material] = []
+var art_profile: LeoArtProfile
 var _plots: Array[Dictionary] = []
 var _rng := RandomNumberGenerator.new()
 
-func setup(track: LeoCircuit) -> void:
+func setup(track: LeoCircuit, profile: LeoArtProfile=null) -> void:
 	circuit = track
+	art_profile = profile if profile else load("res://assets/config/colombo.tres")
 	_rng.seed = 1082026
 	_manifest = JSON.parse_string(FileAccess.get_file_as_string(MODEL_DIR + "manifest.json"))
 	_make_materials()
@@ -33,11 +35,12 @@ func setup(track: LeoCircuit) -> void:
 	print("CITY_READY | buildings=%d | skyline=%d | props=%d | batches=%d | shops=%d | nearest_building_corner=%.2fm" % [stats.buildings, stats.skyline, stats.props, stats.batches, stats.shop_signs, stats.minimum_road_clearance])
 
 func _make_materials() -> void:
-	for color in PALETTE:
-		var wall := StandardMaterial3D.new()
-		wall.albedo_color = color
-		wall.vertex_color_use_as_albedo = true
-		wall.roughness = .82
+	for color in art_profile.city_palette:
+		var wall := ShaderMaterial.new()
+		wall.shader = load("res://shaders/city_pbr.gdshader")
+		wall.set_shader_parameter("tint",color)
+		wall.set_shader_parameter("concrete_color",load("res://assets/materials/Concrete034_2K-JPG_Color.jpg"))
+		wall.set_shader_parameter("concrete_normal",load("res://assets/materials/Concrete034_2K-JPG_NormalGL.jpg"))
 		_walls.append(wall)
 	var detail := StandardMaterial3D.new()
 	detail.vertex_color_use_as_albedo = true
@@ -45,8 +48,9 @@ func _make_materials() -> void:
 	_materials["city_detail"] = detail
 	var glass := StandardMaterial3D.new()
 	glass.vertex_color_use_as_albedo = true
-	glass.roughness = .24
-	glass.metallic = .3
+	glass.albedo_color = Color("35616b")
+	glass.roughness = .16
+	glass.metallic = .68
 	_materials["city_glass"] = glass
 	for entry in [["paving", "decbaa"], ["paving_light", "f0d9b4"], ["cream", "ffedcc"], ["terracotta", "cb6f4b"], ["wood", "77482e"], ["iron", "264b50"], ["leaf", "27854c"], ["leaf_light", "68b849"], ["leaf_dark", "1f623d"], ["pink", "fa4b92"], ["mango", "ffba31"], ["aqua", "26d6ce"], ["coral", "fb7468"], ["violet", "a789e4"]]:
 		var material := StandardMaterial3D.new()
@@ -59,6 +63,7 @@ func _make_materials() -> void:
 	lantern.emission = Color("ffc860")
 	lantern.emission_energy_multiplier = .75
 	_materials["lantern"] = lantern
+	_materials["paving"] = LeoColomboWorld.pbr_material("res://shaders/paving_pbr.gdshader","PavingStones001")
 
 func _sidewalks() -> void:
 	# Separate ribbons follow the true sampled circuit, with no coplanar faces.
@@ -115,10 +120,12 @@ func _street_fronts(side: float) -> void:
 func _plot_is_clear(pos: Vector3, rot: Basis, width: float, depth: float) -> bool:
 	if pos.x - width * .5 < -116.0:
 		return false
+	if circuit.length>1500 and pow((pos.x-215)/91.0,2)+pow((pos.z+80)/131.0,2)<1.0: return false
 	var half := Vector2(width * .5 + .6, depth * .5 + .6)
 	for xx in [-1.0, 1.0]:
 		for zz in [-1.0, 1.0]:
 			var corner: Vector3 = pos + rot.x * half.x * xx + rot.z * half.y * zz
+			if circuit.length>1500 and pow((corner.x-215)/91.0,2)+pow((corner.z+80)/131.0,2)<1.0: return false
 			var road: Dictionary = circuit.project(corner)
 			if corner.distance_to(road.center) < 14.2:
 				return false
@@ -303,16 +310,15 @@ func _festival_flags() -> void:
 		add_child(flags)
 
 func _tree(p: Vector3, height: float) -> void:
-	_cylinder(p + Vector3.UP * height * .36, .28, height * .72, "wood")
-	for i in range(5):
-		var a := float(i) * TAU / 5.0
-		var offset := Vector3(cos(a) * 1.3, height * .78 + .4 * float(i % 2), sin(a) * 1.3)
-		_sphere(p + offset, Vector3(2.3, 1.8, 2.1), "leaf_light" if i % 2 == 0 else "leaf")
-	for i in range(7):
-		var a := float(i) * TAU / 7.0
-		_sphere(p + Vector3(cos(a) * 2.6, height * .82, sin(a) * 2.6), Vector3.ONE * .22, "pink" if int(height) % 2 == 0 else "mango")
+	if not art_profile.parking_clear(p,circuit,2.8):return
+	# Replace primitive canopy props with baked EZ Tree foliage; core assets stay intact.
+	var variant := int(height)%3
+	var mesh: Mesh = load("res://assets/models/colombo/shade_tree_%d.res"%variant)
+	_queue("ez_shade_%d"%variant,mesh,Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*height/14.0),p),true)
+	return
 
 func _planter(p: Vector3, rot: Basis, index: int) -> void:
+	if not art_profile.parking_clear(p,circuit,1.6):return
 	_box(p + Vector3.UP * .35, Vector3(2.1, .7, 1.15), rot, "terracotta")
 	_box(p + Vector3.UP * .73, Vector3(2.3, .14, 1.3), rot, "cream")
 	for j in range(3):
@@ -322,6 +328,7 @@ func _planter(p: Vector3, rot: Basis, index: int) -> void:
 			_sphere(q + Vector3(.26 * cos(float(k) * TAU / 3.0), .43, .23 * sin(float(k) * TAU / 3.0)), Vector3.ONE * .15, "pink" if index % 2 == 0 else "mango")
 
 func _bench(p: Vector3, rot: Basis) -> void:
+	if not art_profile.parking_clear(p,circuit,1.8):return
 	for side in [-1.0, 1.0]:
 		_box(p + rot.x * side * 1.05 + Vector3.UP * .37, Vector3(.15, .74, .8), rot, "iron")
 	for j in range(4):

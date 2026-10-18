@@ -28,13 +28,15 @@ static func polish_chassis(node: Node) -> void:
 			if not source: continue
 			var m := source.duplicate() as StandardMaterial3D
 			if source.resource_name in ["blue","coral","aqua","pink"]:
-				m.roughness = .19
-				m.metallic = .18
+				m.roughness = .20
+				m.metallic = .9
+				if source.resource_name=="blue": m.albedo_color = Color("1d4ed8")
 				m.clearcoat_enabled = true
 				m.clearcoat = .75
 				m.clearcoat_roughness = .15
 			elif source.resource_name == "gold":
-				m.metallic = .7
+				m.albedo_color = Color("d4af37")
+				m.metallic = .85
 				m.roughness = .23
 			elif source.resource_name == "cyan":
 				m.emission_enabled = true
@@ -86,8 +88,8 @@ static func build_signs(world: Node3D, circuit: LeoCircuit) -> Node3D:
 		board.position = circuit.sample(s,-14.4)
 		board.rotation.y = atan2(normal.x,normal.z)
 		root.add_child(board)
-		mesh_box(board,Vector3(7.8,1.65,.28),Vector3(0,2.35,0),navy)
-		mesh_box(board,Vector3(7.9,.10,.32),Vector3(0,3.24,0),gold)
+		mesh_box(board,Vector3(7.8,2.6,.28),Vector3(0,2.6,0),navy)
+		mesh_box(board,Vector3(7.9,.10,.32),Vector3(0,3.95,0),gold)
 		for x in [-2.8,2.8]: mesh_box(board,Vector3(.17,2.0,.17),Vector3(x,1,0),navy)
 		label(board,words[i],Vector3(0,2.38,.17),0,6.9,Color("fff3c7"))
 	return root

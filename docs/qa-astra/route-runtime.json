@@ -1,0 +1,25 @@
+{
+  "checks": 33,
+  "errors": [],
+  "measurements": {
+    "advert_faces": 148,
+    "crossings": 0,
+    "foliage_instances_with_lods": 1286,
+    "lagoon_y_m": -0.639999985694885,
+    "lap_m": 1905.071996,
+    "max_lane_error_m": 0.0168275833129883,
+    "max_projection_distance_error_m": 0.518360350362514,
+    "min_radius_m": 16.2864968530866,
+    "national_flags": 36,
+    "nonlocal_segment_clearance_m": 65.0150909423828,
+    "ocean_y_m": -0.660000026226044,
+    "road_y_m": 0.0450000017881393,
+    "sample_max_m": 1.99904954433441,
+    "sample_min_m": 1.99766719341278,
+    "samples": 953,
+    "static_spatial_batches": 277,
+    "terrain_max_y_m": 12.9101943969727,
+    "terrain_min_y_m": -3.0
+  },
+  "status": "PASS"
+}

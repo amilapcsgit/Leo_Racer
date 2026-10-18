@@ -1,0 +1,14 @@
+{
+  "name": "street_tuk_tuk_lod",
+  "triangles": 5817,
+  "bytes": 6289440,
+  "materials": [
+    "Tuktuk",
+    "Tuktuk.001",
+    "Tuktuk.002",
+    "Tuktuk.003",
+    "Tuktuk_glass",
+    "Tuktuk_retro",
+    "Tuktuk_wheel"
+  ]
+}

@@ -1,0 +1,10 @@
+AmbientCG PBR assets are released under CC0 1.0 Universal.
+https://docs.ambientcg.com/license/
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Asphalt023S, Concrete034, PavingStones001, 2K-JPG:
+https://ambientcg.com/view?id=Asphalt023S
+https://ambientcg.com/view?id=Concrete034
+https://ambientcg.com/view?id=PavingStones001
+
+Original archive checksums and URLs: asset-lock.json.

@@ -8,3 +8,26 @@ build/
 source_assets/kenney-city/
 export_credentials.cfg
 dist/
+addons/rokojori_action_library/
+.dotnet/
+/bin/
+/obj/
+source_assets/nature/
+source_assets/materials/
+docs/qa-colombo/*.log
+
+.tools/
+
+.rokojori/
+_rokojori-cache/
+.srilanka-inputs/
+docs/qa-srilanka/*.log
+# Godot extracts these from the committed, self-contained Sri Lanka GLBs.
+assets/models/srilanka/*.png
+assets/models/srilanka/*.jpg
+assets/models/srilanka/*.png.import
+assets/models/srilanka/*.jpg.import
+
+# Astra diagnostic captures are source evidence, not runtime texture imports.
+docs/qa-astra/captures/*.png.import
+docs/qa-astra/*.log

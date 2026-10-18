@@ -1,0 +1,14 @@
+{
+  "rokojori_action_library-v0.6.zip": {
+    "sha256": "be91c418a20287ed33370cd3e9d610c1057e408cb8b8cc53766d156ef41fa66e",
+    "prefix": "addons/rokojori_action_library/"
+  },
+  "Terrain3D_v1.0.2-stable-2.zip": {
+    "sha256": "a071850250ec5e596aa54da61c01d75768774eb379ee997584d426a45f4884a2",
+    "prefix": "addons/terrain_3d/"
+  },
+  "addons.zip": {
+    "sha256": "8d165091778eac55f3607cdcd0cbb94a26f627d159d2e3afbe5cab6cca6cf16e",
+    "prefix": "addons/EZ-Tree-Godot-Port/"
+  }
+}

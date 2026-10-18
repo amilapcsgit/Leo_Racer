@@ -1,0 +1,138 @@
+{
+  "assets/models/city_vehicle.glb": {
+    "sha256": "e46948d58f86a07ed74d4cda2e62f2ea29c2028270e9fcaa977d6108115a7186",
+    "matches_v1_1": true
+  },
+  "assets/models/driver_elephant.glb": {
+    "sha256": "3b2f4ecd2de3ec4a0f2db09cbfac59412c8bf66e95c0d926ce6ccf4abaa0d3e9",
+    "matches_v1_1": true
+  },
+  "assets/models/driver_hedgehog.glb": {
+    "sha256": "5166f97f2691c20fa92a664a06604dc33f384a0f92e56417595d1ad801548f4b",
+    "matches_v1_1": true
+  },
+  "assets/models/driver_lion.glb": {
+    "sha256": "baaf310c5ce9f6167ab050f98b76355fc85a13f4d3fba9d9ef2758d2d38203e4",
+    "matches_v1_1": true
+  },
+  "assets/models/driver_parrot.glb": {
+    "sha256": "3e87dda366710569a7d51d11e5bd7b48165d5b3ad4bce89645081686874e3997",
+    "matches_v1_1": true
+  },
+  "assets/models/kart_aqua.glb": {
+    "sha256": "f631be5c2f3dbc5858f2ebaf05f843af3e6fe68d7dea5c14fc91939941444170",
+    "matches_v1_1": true
+  },
+  "assets/models/kart_blue.glb": {
+    "sha256": "60551ab75ac62cd2ffbaf6e076c825f5d46562cb5d009d5aabf8eab08de1eae1",
+    "matches_v1_1": true
+  },
+  "assets/models/kart_coral.glb": {
+    "sha256": "9169a61fcfd682f8dc48745bc2af493bd9bdff2675eb64501a17dff754a0f2f3",
+    "matches_v1_1": true
+  },
+  "assets/models/kart_pink.glb": {
+    "sha256": "e92f82380c22538777bef2486cc53189c347a86e0143f68ce89889a49366ceac",
+    "matches_v1_1": true
+  },
+  "assets/models/lotus_coast.glb": {
+    "sha256": "afb21bca9e1cb81f3ebb03b7e6601b5afafd91d0eebb04bdd3a261098675272d",
+    "matches_v1_1": true
+  },
+  "assets/models/lotus_tower.glb": {
+    "sha256": "17e4bb98249497b7ea8eb91decdb6b33f4cd31a118b316008b6bfeb1eee6a1fb",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-a.glb": {
+    "sha256": "71dd78b857a8fd8f030cac8c3aa2514c5d597ffc97e863ffd0dd5a933e765469",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-b.glb": {
+    "sha256": "09b9c3ea3650cc864328aa7c04353cd0c88e60939fc43bf1cfc416b2af52c650",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-c.glb": {
+    "sha256": "e3f265af089c5d8abbbd9ca36f8442aec2b793634b69c8a1a63f52a7a8e40d4a",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-d.glb": {
+    "sha256": "e9ce2ed7542eb76df0be12620ad19e3b8e5ff7e358d1080e46481af915dd9c3b",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-e.glb": {
+    "sha256": "a08a1bd7ff9f711680b8af6da839424da313da60223693389d6f5ca8bdcd8ad2",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-f.glb": {
+    "sha256": "b0a57498252bc601078b26e2f8ffd2aaa3e3fc7303d0d6fb768fc6a98d6ffe59",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-g.glb": {
+    "sha256": "adba8ca4215d085edf431c9e753a36c3ee5b3c351807e71aa3af77662c33b77a",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-h.glb": {
+    "sha256": "9cf60a06c5e1a80dd48b17e971387b16b8815d25778461f69c7df6e5340c0c73",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-i.glb": {
+    "sha256": "d4723e8d2c23b585f82fb452d239d8edda3f990a0cbaf65f419efe95a72f0455",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-j.glb": {
+    "sha256": "6387122ab3efa467baa590a0b7f3b45d37e73651bbfb49a8f542c910dcc92a6e",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-k.glb": {
+    "sha256": "e7887498fb8b852a66775bdc4494c4706b1b5a7a86fa0f15dd5799d0c82416eb",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-l.glb": {
+    "sha256": "7872099b6f14616fcff8c99cece2673ecd3c9f27601315d6976ec9c2479a8e53",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-m.glb": {
+    "sha256": "3786bdc2650f06ea38567d8c2a9eb950ba4af97f762626e788affb9ef7dd5c54",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-n.glb": {
+    "sha256": "9bed8f7e6a061f0f92fbba1a9c64d2a2720f123eecaf1bf80a67ec4ad9d58be9",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-skyscraper-a.glb": {
+    "sha256": "7ac87a033e2827ec256a73409731719292f08739ac22710e027c443c32a1ca58",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-skyscraper-b.glb": {
+    "sha256": "68e4e18ba5efc3a3f39513b4840b118f007558651a8a0c7b30f9934cd659e895",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-skyscraper-c.glb": {
+    "sha256": "b438d4eb3064da4ece94da758eae5e7e0c46de3b735a1db1cf92e061e091a34b",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-skyscraper-d.glb": {
+    "sha256": "be91a532e6faa047cddf59dc3f9e9f93a8df3cdda0cee875c5c5eb308a323568",
+    "matches_v1_1": true
+  },
+  "assets/models/city/building-skyscraper-e.glb": {
+    "sha256": "9e1ac44a7404cc67cbfe13ab317a4cc3dee8c35a8a0bf5becf73d6a411053053",
+    "matches_v1_1": true
+  },
+  "assets/models/city/detail-awning-wide.glb": {
+    "sha256": "d80caf7c884e64c37c20178b545bbe41bba0e0a9c7b401c66504dcdbe13a022e",
+    "matches_v1_1": true
+  },
+  "assets/models/city/detail-parasol-a.glb": {
+    "sha256": "15c06105fa9694861fe8456e35f7dc18f1fbb25bac2a4d40713e6b38db7184ff",
+    "matches_v1_1": true
+  },
+  "assets/models/city/detail-parasol-b.glb": {
+    "sha256": "8342de4dba46a0e4fc381d5277879df07ad597bd68c7100d148c03c6cf534ed9",
+    "matches_v1_1": true
+  },
+  "assets/models/kenney/decoration-tents.glb": {
+    "sha256": "19dbf2a778ad75f95c7d61f12866ef7174ab69cad169d3749c5400f5e14db8a3",
+    "matches_v1_1": true
+  }
+}

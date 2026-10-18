@@ -1,0 +1,13 @@
+{
+  "name": "phoenix_0",
+  "triangles": 24499,
+  "bytes": 8230528,
+  "materials": [
+    "Phoenix_Sylvestris_Branche_Mat",
+    "Phoenix_Sylvestris_Branche_Red_Mat",
+    "Phoenix_Sylvestris_Cap_Mat",
+    "Phoenix_Sylvestris_Leaf_Mat",
+    "Phoenix_Sylvestris_Stem_Mat",
+    "Phoenix_Sylvestris_Trunk02_Mat"
+  ]
+}
