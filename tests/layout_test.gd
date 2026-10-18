@@ -26,7 +26,7 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		var image := viewport.get_texture().get_image()
 		var suffix := "%dx%d"%[dimensions.x,dimensions.y]
-		image.save_png("res://docs/qa-colombo/layout-"+suffix+".png")
+		image.save_png("res://docs/qa-srilanka/layout-"+suffix+".png")
 		verify(image.get_size()==dimensions,"Rendered exact "+suffix)
 		var hud: LeoHUD = game.hud
 		var end := hud.position+Vector2(1600,900)*hud.scale
@@ -37,7 +37,7 @@ func run() -> void:
 		await process_frame
 		await process_frame
 	var report := {"checks":checks,"status":"PASS" if errors.is_empty() else "FAIL","errors":errors}
-	var file := FileAccess.open("res://docs/qa-colombo/layout-test.json",FileAccess.WRITE)
+	var file := FileAccess.open("res://docs/qa-srilanka/layout-test.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  "))
 	file.close()
 	print("LAYOUT_REPORT ",JSON.stringify(report))

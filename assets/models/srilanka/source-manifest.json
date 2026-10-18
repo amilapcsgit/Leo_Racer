@@ -1,0 +1,67 @@
+{
+  "sources": [
+    {
+      "source_file": "lotus_tower_-_nelum_kuluna.glb",
+      "sha256": "1e61d06f0f22949d7a33e744c38c62523aed3061192528f8614a85560bdd9fb3",
+      "bytes": 6150176,
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "author": "usd95 (https://sketchfab.com/usd95)",
+      "source": "https://sketchfab.com/3d-models/lotus-tower-nelum-kuluna-add83285e4404fb5bdaa70eb632ef55c",
+      "title": "Lotus Tower - Nelum Kuluna"
+    },
+    {
+      "source_file": "street-art_tuk-tuk.glb",
+      "sha256": "1e430bac7fe84a6c25ea0dc10e341d21f48ec7431de50325f5fe82017fc90af2",
+      "bytes": 33977312,
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "author": "FlockyGame (https://sketchfab.com/flockygame)",
+      "source": "https://sketchfab.com/3d-models/street-art-tuk-tuk-1252e7c0a4874538875bb91739a34897",
+      "title": "Street-Art Tuk-Tuk"
+    },
+    {
+      "source_file": "tuk_tuk_rikshaw.glb",
+      "sha256": "0969017051c5a3e4d6f8b4ca36004ffd9ce5c65253083e88d55b802b064d337b",
+      "bytes": 8916584,
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "author": "alnmathew (https://sketchfab.com/alnmathew21)",
+      "source": "https://sketchfab.com/3d-models/tuk-tuk-rikshaw-0bdfdf97a0f248008806840f7188367c",
+      "title": "Tuk Tuk Rikshaw"
+    },
+    {
+      "source_file": "banana+tree.glb",
+      "sha256": "4c52b8e5880823cf16c4f81a8b411ecd5cb706b60320c86fe4fc825bc73cf63c",
+      "bytes": 6077092,
+      "license": "User-supplied; no license metadata bundled"
+    },
+    {
+      "source_file": "Banana_Plant_01.blend",
+      "sha256": "5f33e788b35f490df51420d2c8b25a3729676093fb0946246072a92a643a5f54",
+      "bytes": 7485483,
+      "license": "User-supplied; no license metadata bundled"
+    },
+    {
+      "source_file": "Textures.zip",
+      "sha256": "94a7201a1e4fe19f580914088e4c44529168c4883acfe17d376d7ca2862394fa",
+      "bytes": 8175342,
+      "license": "User-supplied; no license metadata bundled"
+    },
+    {
+      "source_file": "New_Plant_High_detail_Phoenix_Sylvestris_Small+blender.rar",
+      "sha256": "a13ae973310c859035df3b59d64996033a9d7a794eccba71e721fcc6ebcb7c06",
+      "bytes": 56751769,
+      "license": "User-supplied; no license metadata bundled"
+    },
+    {
+      "source_file": "Leyland+FBX_OBJ_080331.zip",
+      "sha256": "764d78e5202f8b70cd5a231aa624ffa8331c38d7749e5c7a7ecedd1b84e27e2e",
+      "bytes": 1284797,
+      "license": "User-supplied; no license metadata bundled"
+    },
+    {
+      "source_file": "Flag_of_Sri_Lanka.svg",
+      "sha256": "eea9217df822c4b9a50001821453f73cb45d61df96086cec87cb4a2be2e066fd",
+      "bytes": 19062,
+      "license": "User-supplied; no license metadata bundled"
+    }
+  ]
+}

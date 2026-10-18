@@ -1,0 +1,12 @@
+{
+  "name": "sri_lanka_bus_lod",
+  "triangles": 7850,
+  "bytes": 1021492,
+  "materials": [
+    "Transit_Cream",
+    "Transit_Glass",
+    "Transit_Roof",
+    "Transit_Rubber",
+    "Transit_Scarlet"
+  ]
+}

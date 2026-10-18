@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="LeoArtProfile" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/art_profile.gd" id="1"]
+[resource]
+script = ExtResource("1")
+sun_color = Color(1, 0.91, 0.75, 1)
+sun_energy = 1.35
+sun_angles = Vector3(-12, -175, 0)
+exposure = 1.1
+ambient_energy = 0.30
+sky_top = Color(0.24, 0.33, 0.36, 1)
+sky_horizon = Color(0.76, 0.52, 0.36, 1)
+haze_density = 0.0007
+bloom_intensity = 0.38
+landmark_position = Vector3(-105, 0.07, -270)
+landmark_scale = 1.0
+world_model = "res://assets/models/srilanka/world.glb"
+landmark_model = "res://assets/models/srilanka/lotus_tower.glb"
+road_roughness = 0.35
+bay_fog_density = 0.012
+reserve_transport_bays = true

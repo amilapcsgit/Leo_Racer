@@ -1,0 +1,28 @@
+{
+  "road_geometry_sha256": "8a1c16fbf34f2a4f3a1455c864c7cf8f1ed7845b88d3b49fd8c025940770d943",
+  "track_sha256": "de61c98e0dc36ee219ec0469911aa07fd6a54a873bf530e8686576e75edd80bb",
+  "removed_triangles": {
+    "grass": 0,
+    "sand": 0,
+    "road": 0,
+    "white": 5889,
+    "cream": 0,
+    "cyan": 5220,
+    "gold": 12912,
+    "red": 840,
+    "navy": 0,
+    "trunk": 34200,
+    "leaf": 18360,
+    "leaflight": 19440,
+    "pink": 7044,
+    "roof": 0,
+    "aqua": 0,
+    "muzzle": 0
+  },
+  "groups": [
+    "GroundPreserved",
+    "RoadPreserved",
+    "ArchitecturePreserved"
+  ],
+  "original_world_preserved": true
+}

@@ -56,17 +56,7 @@ static func draw(h: LeoHUD) -> void:
 	# Curved nitro tube; energy follows the real fuel value.
 	h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.27,.45,.48),23,true)
 	h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.018,.05,.06),18,true)
-	for i in range(52):
-		var t := float(i)/52
-		var a := deg_to_rad(138-t*96)
-		var b := deg_to_rad(138-(t+1.0/52)*96)
-		var p := c+Vector2(cos(a),sin(a))*164
-		var q := c+Vector2(cos(b),sin(b))*164
-		if t<h.display_nitro:
-			var energy := Color("43ef82").lerp(cyan,t)
-			h.draw_line(p,q,Color(energy,.16),23,true)
-			h.draw_line(p,q,energy,11,true)
-			h.draw_line(p+Vector2(0,-2),q+Vector2(0,-2),Color("a0ffed"),2,true)
+	# The shader-backed child draws liquid energy inside this fixed tube.
 	# Holographic map.
 	glass(h,Rect2(42,498,242,311),cyan)
 	for i in range(8):

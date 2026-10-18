@@ -20,3 +20,10 @@ docs/qa-colombo/*.log
 
 .rokojori/
 _rokojori-cache/
+.srilanka-inputs/
+docs/qa-srilanka/*.log
+# Godot extracts these from the committed, self-contained Sri Lanka GLBs.
+assets/models/srilanka/*.png
+assets/models/srilanka/*.jpg
+assets/models/srilanka/*.png.import
+assets/models/srilanka/*.jpg.import

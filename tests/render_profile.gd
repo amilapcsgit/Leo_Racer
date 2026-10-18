@@ -5,7 +5,7 @@ extends SceneTree
 # --drive-test prevents loading/writing personal settings in main.gd.
 const WARMUP_SECONDS := 5.0
 const SAMPLE_SECONDS := 90.0
-const REPORT_PATH := "res://docs/qa-colombo/render-profile.json"
+const REPORT_PATH := "res://docs/qa-srilanka/render-profile.json"
 
 var game: Node3D
 var sampling := false

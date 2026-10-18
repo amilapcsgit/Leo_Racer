@@ -1,0 +1,19 @@
+{
+  "name": "lotus_tower",
+  "triangles": 21928,
+  "bytes": 6108484,
+  "materials": [
+    "Base",
+    "Base_petal",
+    "Glass_railing",
+    "Material.001",
+    "Material.002",
+    "Material.004",
+    "Petal_interior",
+    "Petals",
+    "Railinng",
+    "Stem1",
+    "Top_dark_blue",
+    "Top_light_blue"
+  ]
+}

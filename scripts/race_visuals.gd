@@ -88,8 +88,8 @@ static func build_signs(world: Node3D, circuit: LeoCircuit) -> Node3D:
 		board.position = circuit.sample(s,-14.4)
 		board.rotation.y = atan2(normal.x,normal.z)
 		root.add_child(board)
-		mesh_box(board,Vector3(7.8,1.65,.28),Vector3(0,2.35,0),navy)
-		mesh_box(board,Vector3(7.9,.10,.32),Vector3(0,3.24,0),gold)
+		mesh_box(board,Vector3(7.8,2.6,.28),Vector3(0,2.6,0),navy)
+		mesh_box(board,Vector3(7.9,.10,.32),Vector3(0,3.95,0),gold)
 		for x in [-2.8,2.8]: mesh_box(board,Vector3(.17,2.0,.17),Vector3(x,1,0),navy)
 		label(board,words[i],Vector3(0,2.38,.17),0,6.9,Color("fff3c7"))
 	return root

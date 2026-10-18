@@ -157,7 +157,8 @@ func _process(dt: float) -> void:
 	previous = kart.global_position
 	# The displacement-derived physics speed stays stable between rendered frames.
 	var moving := absf(kart.wheel_motion_speed)>4.0
-	var near := kart.is_player or get_viewport().get_camera_3d().global_position.distance_to(kart.global_position)<55
+	var camera:=get_viewport().get_camera_3d()
+	var near := kart.is_player or (is_instance_valid(camera) and camera.global_position.distance_to(kart.global_position)<55)
 	for emitter in smoke: emitter.emitting = kart.drifting and moving and kart.active and near
 	var charge_color := Color("00b9d4").lerp(Color("ffae36"),smoothstep(.65,2.5,kart.drift_charge))
 	trace_material.emission = charge_color

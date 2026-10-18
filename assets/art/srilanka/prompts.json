@@ -1,0 +1,61 @@
+{
+  "generator": "Built-in image_gen",
+  "assets": [
+    {
+      "key": "coast_race",
+      "format": "ultra wide horizontal billboard, 4:1 aspect ratio",
+      "copy": "LEO RACER",
+      "scene": "A sculptural cobalt and gold arcade racing kart bursting along Colombo's sea road, authentic slender green Lotus Tower with magenta lotus crown in the skyline, golden Indian Ocean sunset, racing flag motifs",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, ultra wide horizontal billboard, 4:1 aspect ratio. Primary request: A sculptural cobalt and gold arcade racing kart bursting along Colombo's sea road, authentic slender green Lotus Tower with magenta lotus crown in the skyline, golden Indian Ocean sunset, racing flag motifs. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"LEO RACER\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "lotus_coast",
+      "format": "ultra wide horizontal billboard, 4:1 aspect ratio",
+      "copy": "LOTUS COAST 2026",
+      "scene": "Panoramic Colombo Port City skyline across the glowing bay, authentic Lotus Tower, layered tropical palms, sweeping red-and-white coastal circuit and a small racing kart",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, ultra wide horizontal billboard, 4:1 aspect ratio. Primary request: Panoramic Colombo Port City skyline across the glowing bay, authentic Lotus Tower, layered tropical palms, sweeping red-and-white coastal circuit and a small racing kart. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"LOTUS COAST 2026\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "colombo_gp",
+      "format": "ultra wide horizontal billboard, 4:1 aspect ratio",
+      "copy": "COLOMBO GRAND PRIX",
+      "scene": "Energetic Sri Lankan tuk-tuk racing festival, red green and yellow tuk-tuks in a dynamic motorsport composition, Colombo colonial facades and modern towers, checkerboard accents",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, ultra wide horizontal billboard, 4:1 aspect ratio. Primary request: Energetic Sri Lankan tuk-tuk racing festival, red green and yellow tuk-tuks in a dynamic motorsport composition, Colombo colonial facades and modern towers, checkerboard accents. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"COLOMBO GRAND PRIX\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "chase_coast",
+      "format": "ultra wide horizontal billboard, 4:1 aspect ratio",
+      "copy": "CHASE THE COAST",
+      "scene": "High speed coastal racing celebration, racing kart silhouette, turquoise waves, warm ivory spray, coral sunset, coconut palms and Sri Lankan tropical floral motifs",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, ultra wide horizontal billboard, 4:1 aspect ratio. Primary request: High speed coastal racing celebration, racing kart silhouette, turquoise waves, warm ivory spray, coral sunset, coconut palms and Sri Lankan tropical floral motifs. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"CHASE THE COAST\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "portrait_lotus",
+      "format": "vertical portrait racing event banner, 1:2 aspect ratio",
+      "copy": "LOTUS COAST 2026",
+      "scene": "Authentic Colombo Lotus Tower rising above intricate tropical palms and sunlit city skyline, a winding coastal circuit at its base",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, vertical portrait racing event banner, 1:2 aspect ratio. Primary request: Authentic Colombo Lotus Tower rising above intricate tropical palms and sunlit city skyline, a winding coastal circuit at its base. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"LOTUS COAST 2026\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "portrait_leo",
+      "format": "vertical portrait racing event banner, 1:2 aspect ratio",
+      "copy": "LEO RACER",
+      "scene": "Dramatic close-up cobalt blue racing kart nose with gold trim, neon lion-shaped original racing crest above, Colombo skyline and orange sunset, no characters",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, vertical portrait racing event banner, 1:2 aspect ratio. Primary request: Dramatic close-up cobalt blue racing kart nose with gold trim, neon lion-shaped original racing crest above, Colombo skyline and orange sunset, no characters. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"LEO RACER\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "portrait_gp",
+      "format": "vertical portrait racing event banner, 1:2 aspect ratio",
+      "copy": "COLOMBO GRAND PRIX",
+      "scene": "A charismatic painted Sri Lankan tuk-tuk, tropical banana leaves, racing chevrons, warm colonial Colombo street architecture and city festival atmosphere",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, vertical portrait racing event banner, 1:2 aspect ratio. Primary request: A charismatic painted Sri Lankan tuk-tuk, tropical banana leaves, racing chevrons, warm colonial Colombo street architecture and city festival atmosphere. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"COLOMBO GRAND PRIX\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    },
+    {
+      "key": "portrait_coast",
+      "format": "vertical portrait racing event banner, 1:2 aspect ratio",
+      "copy": "CHASE THE COAST",
+      "scene": "Golden coastal road sweeping around the Indian Ocean, a tiny cobalt racing kart, lush coconut palms, rich terracotta and ivory sun rays, modern Colombo skyline",
+      "prompt": "Use case: ads-marketing. Asset type: print-ready PNG artwork for a trackside billboard inside Leo Racer, vertical portrait racing event banner, 1:2 aspect ratio. Primary request: Golden coastal road sweeping around the Indian Ocean, a tiny cobalt racing kart, lush coconut palms, rich terracotta and ivory sun rays, modern Colombo skyline. Cohesive premium Sri Lankan local racing festival campaign, sophisticated illustrated screenprint meets cinematic racing poster, richly textured, strong readable composition, cobalt, burgundy, golden amber, deep jungle green and warm ivory. Fill the entire canvas with finished artwork; no empty teal panels. Text verbatim: \"CHASE THE COAST\". Bold crisp highly legible original motorsport typography integrated into composition. Flat rectangular artwork viewed straight on, no mockup, no billboard frame, no perspective, no watermark, no real sponsor logos, no extra text. Deliver only the artwork."
+    }
+  ]
+}

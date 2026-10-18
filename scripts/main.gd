@@ -47,7 +47,7 @@ var test_errors: Array[String] = []
 var capture_results := false
 var wrong_way_time := 0.0
 var diagnostics_mode := false
-var art_profile: LeoArtProfile = preload("res://assets/config/colombo.tres")
+var art_profile: LeoArtProfile = preload("res://assets/config/srilanka.tres")
 var feedback: Node
 var reduced_motion := false
 var camera_roll := 0.0
@@ -142,18 +142,19 @@ func build_world() -> void:
 	world = Node3D.new()
 	world.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(world)
-	var scenery: Node3D = load("res://assets/models/lotus_coast.glb").instantiate()
+	var scenery: Node3D = load(art_profile.world_model).instantiate()
 	world.add_child(scenery)
 	polish_materials(scenery)
 	var city := LeoCity.new()
 	world.add_child(city)
 	city.setup(circuit,art_profile)
-	var colombo := LeoColomboWorld.new()
+	var colombo := LeoSriLankaWorld.new()
 	world.add_child(colombo)
 	colombo.setup(circuit,art_profile)
-	var tower: Node3D = load("res://assets/models/lotus_tower.glb").instantiate()
+	var tower: Node3D = load(art_profile.landmark_model).instantiate()
 	tower.position = art_profile.landmark_position
-	tower.scale = Vector3.ONE * .85
+	tower.scale = Vector3.ONE * art_profile.landmark_scale
+	tower.name = "AuthenticLotusTower"
 	world.add_child(tower)
 	polish_materials(tower,true)
 	var ground := StaticBody3D.new()
@@ -234,9 +235,15 @@ func polish_materials(node: Node, landmark: bool=false) -> void:
 			if old and old.resource_name == "road":
 				var material := ShaderMaterial.new()
 				material.shader = load("res://shaders/road_surface.gdshader")
+				material.set_shader_parameter("base_roughness",art_profile.road_roughness)
 				for pair in [["color_map","Color"],["normal_map","NormalGL"],["rough_map","Roughness"]]:
 					material.set_shader_parameter(pair[0],load("res://assets/materials/Asphalt023S_2K-JPG_%s.jpg"%pair[1]))
 				instance.set_surface_override_material(i,material)
+			elif old and old.resource_name in ["white","navy"] and not landmark:
+				var paint:=ShaderMaterial.new()
+				paint.shader=load("res://shaders/road_marking.gdshader")
+				paint.set_shader_parameter("paint",Color("d9d6c8") if old.resource_name=="white" else Color("14212b"))
+				instance.set_surface_override_material(i,paint)
 			elif old:
 				var material := old.duplicate() as StandardMaterial3D
 				var colors := {"grass":"254e38","grasslight":"3b6533","cyan":"779a9d","cream":"cabb9d","white":"d9d8cb","leaf":"1b6337","leaflight":"417e2d","sand":"c3a26a","pink":"a32868","purple":"693774"}
@@ -649,7 +656,7 @@ func capture_tour() -> void:
 	quit_game()
 
 func diagnostic_path(file: String) -> String:
-	return "res://docs/" + file if OS.has_feature("editor") else OS.get_executable_path().get_base_dir().path_join(file)
+	return "res://docs/qa-srilanka/" + file if OS.has_feature("editor") else OS.get_executable_path().get_base_dir().path_join(file)
 
 func check(condition: bool, message: String) -> void:
 	if not condition: test_errors.append(message)

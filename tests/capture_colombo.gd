@@ -1,7 +1,7 @@
 extends SceneTree
 ## Reproducible visual tour. -- --drive-test keeps the personal profile untouched.
 var game: Node3D
-var destination := "res://docs/qa-colombo"
+var destination := "res://docs/qa-srilanka"
 func _initialize() -> void:
 	run.call_deferred()
 func capture(label: String) -> void:
@@ -36,12 +36,35 @@ func run() -> void:
 		game.camera.look_at(game.player.position+dir*7+Vector3.UP*1.7)
 		game.camera.fov = 66
 		await capture(labels[i])
+	var scenery: LeoSriLankaWorld=game.world.find_child("SriLanka2026",true,false)
+	var poster: MeshInstance3D=get_nodes_in_group("sri_advertising")[0]
+	game.camera.global_position=poster.global_position+poster.global_basis.z*3+Vector3.UP*.1
+	game.camera.look_at(poster.global_position)
+	await capture("billboard")
+	var flag: MeshInstance3D=get_nodes_in_group("sri_national_flag")[2]
+	game.camera.global_position=flag.global_position+flag.global_basis.z*6+Vector3.UP*.2
+	game.camera.look_at(flag.global_position)
+	await capture("flag")
+	game.camera.position=Vector3(-75,3.0,60)
+	game.camera.look_at(game.art_profile.bus_position+Vector3.UP*1.8)
+	await capture("bus")
+	game.camera.position=Vector3(-73.6,2.4,33)
+	game.camera.look_at(Vector3(-71,1.1,30))
+	await capture("tuk-tuk")
+	var s0: float=game.circuit.length*.04
+	game.player.place(s0,0)
+	var direction: Vector3=game.circuit.direction(s0)
+	game.camera.position=game.player.position-direction*7.2+Vector3.UP*3.15
+	game.camera.look_at(game.player.position+direction*7+Vector3.UP*1.7)
 	game.state = "race"
 	game.player.active = true
 	game.player.speed = 35
 	game.player.wheel_motion_speed = 35
 	game.player.boost(1.6,"NITRO BOOST")
 	await capture("boost")
+	game.player.boost_time=0
+	game.player.wheel_motion_speed=48
+	await capture("speed-lines")
 	game.player.boost_time = 0
 	game.player.speed = 29
 	game.player.drifting = true

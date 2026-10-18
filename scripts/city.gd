@@ -308,6 +308,7 @@ func _festival_flags() -> void:
 		add_child(flags)
 
 func _tree(p: Vector3, height: float) -> void:
+	if not art_profile.parking_clear(p,circuit,2.8):return
 	# Replace primitive canopy props with baked EZ Tree foliage; core assets stay intact.
 	var variant := int(height)%3
 	var mesh: Mesh = load("res://assets/models/colombo/shade_tree_%d.res"%variant)
@@ -315,6 +316,7 @@ func _tree(p: Vector3, height: float) -> void:
 	return
 
 func _planter(p: Vector3, rot: Basis, index: int) -> void:
+	if not art_profile.parking_clear(p,circuit,1.6):return
 	_box(p + Vector3.UP * .35, Vector3(2.1, .7, 1.15), rot, "terracotta")
 	_box(p + Vector3.UP * .73, Vector3(2.3, .14, 1.3), rot, "cream")
 	for j in range(3):
@@ -324,6 +326,7 @@ func _planter(p: Vector3, rot: Basis, index: int) -> void:
 			_sphere(q + Vector3(.26 * cos(float(k) * TAU / 3.0), .43, .23 * sin(float(k) * TAU / 3.0)), Vector3.ONE * .15, "pink" if index % 2 == 0 else "mango")
 
 func _bench(p: Vector3, rot: Basis) -> void:
+	if not art_profile.parking_clear(p,circuit,1.8):return
 	for side in [-1.0, 1.0]:
 		_box(p + rot.x * side * 1.05 + Vector3.UP * .37, Vector3(.15, .74, .8), rot, "iron")
 	for j in range(4):

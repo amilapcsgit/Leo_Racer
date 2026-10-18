@@ -47,6 +47,7 @@ static func environment_setup(env: Environment, sun: DirectionalLight3D, p: LeoA
 	env.volumetric_fog_length = 210
 	sun.light_color = p.sun_color
 	sun.light_energy = p.sun_energy
+	sun.light_specular = .16
 	sun.rotation_degrees = p.sun_angles
 	sun.directional_shadow_max_distance = 130
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
@@ -94,7 +95,7 @@ func _terrain() -> void:
 		haze.position = Vector3(-210,8,-165)
 		haze.size = Vector3(110,25,140)
 		var fm := FogMaterial.new()
-		fm.density = .008
+		fm.density = profile.bay_fog_density
 		fm.albedo = profile.haze_color
 		haze.material = fm
 		add_child(haze)

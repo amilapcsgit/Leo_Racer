@@ -20,6 +20,7 @@ var photo_mode := false
 var speed_overlay: ColorRect
 var display_speed := 0.0
 var display_nitro := 1.0
+var nitro_liquid: ColorRect
 
 func _ready() -> void:
 	# A centered 1600x900 design canvas scales as a unit on every aspect ratio.
@@ -283,7 +284,28 @@ func show_race() -> void:
 	labels.nitro = text_at(hud_root,Vector2(1198,854),Vector2(160,25),"NITRO READY",17,Color("69e9b2"),true)
 	labels.drift = text_at(hud_root, Vector2(575, 758), Vector2(500, 35), "", 23, accent, true)
 	labels.drift.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	text_at(hud_root, Vector2(55, 842), Vector2(1100, 28), "SPACE  DRIFT     SHIFT  NITRO     R  RECOVER     ESC  PAUSE", 15, Color("dfebf2"), true)
+	var carbon:=ColorRect.new()
+	carbon.position=Vector2(47,840)
+	carbon.size=Vector2(725,36)
+	carbon.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	var carbon_material:=ShaderMaterial.new()
+	carbon_material.shader=load("res://shaders/control_carbon.gdshader")
+	carbon.material=carbon_material
+	hud_root.add_child(carbon)
+	var x:=59.0
+	for prompt in [["SPACE","DRIFT"],["SHIFT","NITRO"],["R","RECOVER"],["ESC","PAUSE"]]:
+		text_at(hud_root,Vector2(x,842),Vector2(72,28),prompt[0],15,accent,true)
+		x+=66 if prompt[0].length()>3 else 36
+		text_at(hud_root,Vector2(x,842),Vector2(100,28),prompt[1],15,Color("dfebf2"),true)
+		x+=105
+	nitro_liquid=ColorRect.new()
+	nitro_liquid.position=Vector2(1200,520)
+	nitro_liquid.size=Vector2(400,400)
+	nitro_liquid.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	var liquid:=ShaderMaterial.new()
+	liquid.shader=load("res://shaders/nitro_liquid.gdshader")
+	nitro_liquid.material=liquid
+	hud_root.add_child(nitro_liquid)
 	labels.countdown = text_at(hud_root, Vector2(250, 310), Vector2(1100, 180), "3", 126, gold, true)
 	labels.countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	labels.callout = text_at(hud_root, Vector2(400, 225), Vector2(800, 65), "", 37, gold, true)
@@ -324,20 +346,24 @@ func show_results() -> void:
 	queue_redraw()
 
 func _process(dt: float) -> void:
-	time += dt
+	if not game or not game.paused:time += dt
 	if scene_mode == "race" and not labels.is_empty():
 		var p: LeoKart = game.player
 		var actual_speed := absf(p.wheel_motion_speed)
 		speed_overlay.visible = not photo_mode
-		var intensity := (1.0 if p.boost_time > 0 and actual_speed>8 else clampf((actual_speed-24.0)/30.0,0,.22)) if p.active else 0.0
-		if game.reduced_motion: intensity *= .16
+		var intensity := speed_line_strength(actual_speed,p.boost_time>0,p.active,game.reduced_motion)
 		(speed_overlay.material as ShaderMaterial).set_shader_parameter("strength",intensity)
+		(speed_overlay.material as ShaderMaterial).set_shader_parameter("animation_time",time)
 		(speed_overlay.material as ShaderMaterial).set_shader_parameter("glitch",game.feedback.get_recover_glitch())
 		labels.position.text = str(game.player_place())
 		labels.lap.text = "%d / 3" % p.lap
 		labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
 		display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-dt*12))
 		display_nitro = lerpf(display_nitro,p.boost_fuel,1.0-exp(-dt*10))
+		if is_instance_valid(nitro_liquid):
+			(nitro_liquid.material as ShaderMaterial).set_shader_parameter("fuel",display_nitro)
+			(nitro_liquid.material as ShaderMaterial).set_shader_parameter("animation_time",time)
+			(nitro_liquid.material as ShaderMaterial).set_shader_parameter("motion",0.0 if game.reduced_motion else 1.0)
 		labels.speed.text = "%03d" % int(actual_speed*3.6)
 		labels.drift.text = "RELEASE FOR BOOST!" if p.drift_charge >= .65 else ("BUILDING DRIFT..." if p.drifting else "")
 		labels.nitro.text = "NITRO READY" if p.boost_fuel>=1 else "CHARGING %d%%"%int(p.boost_fuel*100)
@@ -356,6 +382,10 @@ func resize_canvas() -> void:
 	var factor := minf(available.x/1600.0,available.y/900.0)
 	scale = Vector2.ONE*factor
 	position = (available-Vector2(1600,900)*factor)*.5
+
+static func speed_line_strength(speed_mps: float,boosting: bool,active: bool,reduced: bool) -> float:
+	if not active or reduced:return 0.0
+	return maxf(1.0 if boosting and speed_mps>8 else 0.0,smoothstep(150.0,180.0,absf(speed_mps)*3.6)*.65)
 
 func _draw() -> void:
 	if scene_mode!="race" or not game or not game.player or photo_mode: return

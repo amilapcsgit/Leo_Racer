@@ -24,7 +24,7 @@ func run() -> void:
 	game.hud._process(.016)
 	verify(game.hud.labels.speed.text=="072","Speedometer converts measured travel speed to km/h")
 	verify(game.art_profile is LeoArtProfile,"Editable Colombo profile is active")
-	verify(game.world.find_child("Colombo2026",true,false)!=null,"Additive Colombo scenery is assembled")
+	verify(game.world.find_child("SriLanka2026",true,false)!=null,"Additive Colombo scenery is assembled")
 	verify(game.world.find_child("SculptedCoastalDunes",true,false).collision_mode==0,"Terrain3D does not change racing collision")
 	game.player.boost(1.6,"NITRO BOOST")
 	await create_timer(.12).timeout
@@ -77,7 +77,7 @@ func run() -> void:
 	await process_frame
 	verify(game.karts.is_empty(),"Menu return releases racers and their effect pools")
 	var report := {"checks":checks,"errors":errors,"status":"PASS" if errors.is_empty() else "FAIL"}
-	var file := FileAccess.open("res://docs/qa-colombo/presentation-test.json",FileAccess.WRITE)
+	var file := FileAccess.open("res://docs/qa-srilanka/presentation-test.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  "))
 	file.close()
 	print("PRESENTATION_REPORT ",JSON.stringify(report))

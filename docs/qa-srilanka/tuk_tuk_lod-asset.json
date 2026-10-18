@@ -1,0 +1,12 @@
+{
+  "name": "tuk_tuk_lod",
+  "triangles": 7727,
+  "bytes": 5651524,
+  "materials": [
+    "Body_01",
+    "Glass",
+    "Llanta",
+    "Metal_Rin",
+    "material"
+  ]
+}
