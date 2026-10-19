@@ -15,6 +15,9 @@ var state := "menu"
 var paused := false
 var selected_driver := 0
 var selected_kart := 0
+var custom_player_name := ""
+var garage_from_pause := false
+var race_modified := false
 var countdown := 3.6
 var race_time := 0.0
 var lap_start := 0.0
@@ -294,7 +297,12 @@ func update_preview() -> void:
 		hud.garage_selector.set_selection(ROSTER[selected_driver].animal,KARTS[selected_kart].color)
 		preview = hud.garage_selector.assembly
 
-func enter_garage() -> void:
+func enter_garage(retain_race: bool=false) -> void:
+	garage_from_pause=retain_race
+	if retain_race:
+		paused=true
+		get_tree().paused=true
+		return
 	get_tree().paused = false
 	paused = false
 	state = "garage"
@@ -329,6 +337,7 @@ func remove_racers() -> void:
 	player = null
 
 func return_menu() -> void:
+	garage_from_pause=false
 	showroom_lighting(false)
 	get_tree().paused = false
 	paused = false
@@ -342,6 +351,8 @@ func return_menu() -> void:
 	hud.show_menu()
 
 func start_race() -> void:
+	garage_from_pause=false
+	race_modified=false
 	showroom_lighting(false)
 	get_tree().paused = false
 	paused = false
@@ -369,6 +380,7 @@ func start_race() -> void:
 		var color_index: int = selected_kart if i == 0 else (selected_kart+i*3) % catalog.vehicles.size()
 		kart.setup(circuit, i, i == 0, ROSTER[driver_index].animal, KARTS[color_index].color)
 		kart.racer_name = ROSTER[driver_index].name
+		if i==0 and not custom_player_name.strip_edges().is_empty():kart.racer_name=custom_player_name.strip_edges()
 		kart.max_speed *= 1.0 if i==0 else .96
 		kart.place(-8.0 - (i / 2) * 5.5, -3.2 if i % 2 == 0 else 3.2)
 		kart.gate_crossed.connect(on_gate)
@@ -434,7 +446,7 @@ func finish_race() -> void:
 	state = "results"
 	feedback.reset_feedback()
 	for kart in karts: kart.active = false
-	if best_time <= 0 or player.finish_time < best_time:
+	if not race_modified and (best_time <= 0 or player.finish_time < best_time):
 		best_time = player.finish_time
 		save_settings()
 	hud.show_results()
@@ -455,6 +467,72 @@ func ranking() -> Array:
 func player_place() -> int:
 	return ranking().find(player) + 1
 
+func apply_garage_selection(d: StringName,v: StringName,player_name: String) -> void:
+	selected_driver=catalog.driver_index(d)
+	selected_kart=catalog.vehicle_index(v)
+	custom_player_name=player_name.strip_edges().left(32)
+	save_settings()
+
+func cancel_pause_garage() -> void:
+	garage_from_pause=false
+	if is_instance_valid(hud.garage_selector):hud.garage_selector.hide()
+	hud.menu_root.hide()
+	hud.hud_root.show()
+	hud.scene_mode="race"
+	hud.pause_menu()
+
+func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> bool:
+	if not garage_from_pause or not paused or not is_instance_valid(player):return false
+	var old:=player
+	var fresh:=LeoKart.new()
+	fresh.process_mode=Node.PROCESS_MODE_PAUSABLE
+	add_child(fresh)
+	fresh.setup(circuit,old.racer_id,true,String(d),String(v))
+	var query:=PhysicsShapeQueryParameters3D.new()
+	var shape:=BoxShape3D.new();shape.size=fresh.definition.collision_size
+	query.shape=shape;query.collision_mask=3;query.exclude=[old.get_rid(),fresh.get_rid()]
+	var tangent:=circuit.direction(old.last_s)
+	var heading:=atan2(-tangent.x,-tangent.z)
+	var basis:=Basis(Vector3.UP,heading)
+	var lane: float=circuit.project(old.position).offset
+	var safe_position:=Vector3.ZERO
+	var found:=false
+	# Try the existing lane first, then nearby lanes at EXACTLY the same
+	# circuit distance. No forward teleport can skip a checkpoint.
+	var half_road: float=LeoCircuit.WIDTH*.5-fresh.definition.collision_size.x*.5-.45
+	lane=clampf(lane,-half_road,half_road)
+	var candidates: Array[float]=[lane]
+	for i in range(1,ceili(2*half_road/.30)+1):
+		var offset:=i*.30
+		for side in [-1.,1.]:
+			var candidate: float=lane+offset*float(side)
+			if absf(candidate)<=half_road:candidates.append(candidate)
+	for candidate in candidates:
+		var position_at:=circuit.sample(old.last_s,candidate)+Vector3.UP*.12
+		query.transform=Transform3D(basis,position_at+basis*fresh.definition.collision_position)
+		if get_world_3d().direct_space_state.intersect_shape(query,1).is_empty():
+			safe_position=position_at;found=true;break
+	if not found:
+		fresh.stop_audio();fresh.queue_free()
+		hud.garage_selector.policy.text="TRACK BUSY — BACK TO PAUSE, RESUME, THEN TRY AGAIN"
+		return false
+	fresh.position=safe_position;fresh.rotation.y=heading
+	for property in ["progress","next_gate","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
+	fresh.speed=clampf(old.speed,-10.,fresh.max_speed)
+	fresh.velocity=-fresh.global_basis.z*fresh.speed
+	fresh.boost_fuel=old.boost_fuel
+	fresh.racer_name=player_name.strip_edges() if not player_name.strip_edges().is_empty() else catalog.driver(d).display_name
+	fresh.gate_crossed.connect(on_gate);fresh.boosted.connect(on_boost);fresh.impacted.connect(on_impact);fresh.recovered.connect(on_recover)
+	fresh.reset_physics_interpolation()
+	old.effects._recover(old);old.stop_audio();remove_child(old);old.queue_free()
+	karts[0]=fresh;player=fresh
+	race_modified=true;garage_from_pause=false
+	feedback.reset_feedback();camera_roll=0.;slipstream_time=0.;cam_heading=heading
+	apply_garage_selection(d,v,player_name)
+	paused=false;get_tree().paused=false
+	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
+	return true
+
 func toggle_pause() -> void:
 	if state not in ["race", "countdown"]: return
 	paused = not paused
@@ -463,6 +541,9 @@ func toggle_pause() -> void:
 	else: hud.clear(hud.modal_root)
 
 func _unhandled_input(event: InputEvent) -> void:
+	if garage_from_pause:
+		if event.is_action_pressed("pause_race"):cancel_pause_garage()
+		return
 	if event.is_action_pressed("accelerate") and state=="countdown" and countdown>0 and countdown<=1.05 and not paused:
 		launch_charged = true
 	if event.is_action_pressed("horn") and player and state=="race" and not paused and horn_cooldown<=0:
@@ -587,6 +668,7 @@ func save_settings() -> void:
 	cfg.set_value("game", "kart", selected_kart)
 	cfg.set_value("game","driver_id",String(catalog.drivers[selected_driver].id))
 	cfg.set_value("game","vehicle_id",String(catalog.vehicles[selected_kart].id))
+	cfg.set_value("game","custom_player_name",custom_player_name.strip_edges())
 	cfg.set_value("game", "best_time_astra", best_time)
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
@@ -601,6 +683,7 @@ func load_settings() -> void:
 		var selection := catalog.migrate(cfg)
 		selected_driver = selection.x
 		selected_kart = selection.y
+		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
 		best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		if cfg.get_value("display", "fullscreen", false): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(master_volume, .0001)))
@@ -704,6 +787,15 @@ func run_smoke_checks() -> void:
 	check(LeoHUD.speed_line_strength(149.0/3.6,false,true,false)==0 and LeoHUD.speed_line_strength(180.0/3.6,false,true,false)>.6,"Measured speed lines use the 150 to 180 km/h threshold")
 	hud.play_arcade_cue("tuk_horn")
 	hud.play_arcade_cue("bus_horn")
+	var retained_gate:=player.next_gate
+	var retained_time:=race_time
+	var retained_opponent:=karts[1]
+	toggle_pause()
+	hud.show_garage("pause")
+	check(paused and get_tree().paused and garage_from_pause,"Packaged pause garage retains the frozen race")
+	check(swap_player_vehicle(&"mario",&"duster","PACKAGED PILOT"),"Packaged Continue swaps only the player")
+	check(player.next_gate==retained_gate and race_time==retained_time and karts[1]==retained_opponent and race_modified,"Packaged swap preserves race state and excludes records")
+	check(player.driver.get_meta("visible_driver_id")==&"human" and player.visual.get_meta("driver_id")==&"mario","Packaged Dacia shows helmet driver with independent identity")
 	start_race()
 	check(player.next_gate == 0 and player.lap == 1 and boost_count == 0, "Restart clears checkpoint lap and boost state")
 	hud.show_garage()

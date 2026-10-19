@@ -1,0 +1,13 @@
+{
+  "version": "1.6.0-rc.1",
+  "branch": "bigster",
+  "godot": "4.7.2 .NET",
+  "architecture": "Windows x86_64",
+  "exe_sha256": "9c6beb7171dc9db89e343519d89dadd1d7ddef79127cae2fbf423293b8323ed8",
+  "runtime_bundled": true,
+  "terrain_library_bundled": true,
+  "commit": "4392b255b6648f15ee33821b055c1bd08e02637d",
+  "zip_sha256": "f2e333961598f9f89b4cb72a1b0320fa7dcba1253a2bef4642f051a5d56c9fdc",
+  "zip_bytes": 644606516,
+  "exe_bytes": 616966632
+}

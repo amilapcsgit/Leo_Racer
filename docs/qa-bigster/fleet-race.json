@@ -1,0 +1,171 @@
+{
+  "errors": [],
+  "models": 16,
+  "racers_per_race": 6,
+  "races": 3,
+  "status": "PASS",
+  "vehicles": [
+    {
+      "batch": 0,
+      "driver": "hedgehog",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 176.841923000016,
+      "vehicle": "blue"
+    },
+    {
+      "batch": 0,
+      "driver": "lion",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 173.159459000014,
+      "vehicle": "coral"
+    },
+    {
+      "batch": 0,
+      "driver": "elephant",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 174.773123000015,
+      "vehicle": "aqua"
+    },
+    {
+      "batch": 0,
+      "driver": "parrot",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 178.165955000016,
+      "vehicle": "pink"
+    },
+    {
+      "batch": 0,
+      "driver": "human",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 150.154403000007,
+      "vehicle": "formula_blue"
+    },
+    {
+      "batch": 0,
+      "driver": "mario",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 173.366339000014,
+      "vehicle": "formula_red"
+    },
+    {
+      "batch": 1,
+      "driver": "lion",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 161.98704000001,
+      "vehicle": "roadster_gold"
+    },
+    {
+      "batch": 1,
+      "driver": "elephant",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 178.578816000016,
+      "vehicle": "race_tuk"
+    },
+    {
+      "batch": 1,
+      "driver": "parrot",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 178.992576000016,
+      "vehicle": "race_bus"
+    },
+    {
+      "batch": 1,
+      "driver": "human",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 151.105152000007,
+      "vehicle": "duster"
+    },
+    {
+      "batch": 1,
+      "driver": "mario",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 175.806624000015,
+      "vehicle": "cyberpunk"
+    },
+    {
+      "batch": 1,
+      "driver": "hedgehog",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 178.909824000016,
+      "vehicle": "hover"
+    },
+    {
+      "batch": 2,
+      "driver": "elephant",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 144.816000000005,
+      "vehicle": "bigster"
+    },
+    {
+      "batch": 2,
+      "driver": "parrot",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 175.020480000015,
+      "vehicle": "mclaren"
+    },
+    {
+      "batch": 2,
+      "driver": "human",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 171.917280000014,
+      "vehicle": "pony"
+    },
+    {
+      "batch": 2,
+      "driver": "mario",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 176.716896000015,
+      "vehicle": "colombo_tuk"
+    },
+    {
+      "batch": 2,
+      "driver": "hedgehog",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 174.399840000014,
+      "vehicle": "blue"
+    },
+    {
+      "batch": 2,
+      "driver": "lion",
+      "finished": true,
+      "gate": 25,
+      "lap": 3,
+      "time": 175.185984000015,
+      "vehicle": "coral"
+    }
+  ]
+}

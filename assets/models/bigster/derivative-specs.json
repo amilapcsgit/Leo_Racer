@@ -1,0 +1,169 @@
+[
+  {
+    "id": "duster",
+    "source": "assets/models/modular/duster.glb",
+    "source_sha256": "172b37a0f38d1b81712708f9633cae29959325c3e0c406915d3c18d6aec80c72",
+    "prepared_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+    "target_metres": {
+      "length": 4.315,
+      "width_with_mirrors": 2.0,
+      "height": 1.68,
+      "wheelbase": 2.673
+    },
+    "wheels": [
+      {
+        "pivot": [
+          0.7776377097247844,
+          0.3383737464399163,
+          -1.3365
+        ],
+        "radius": 0.3383737464399163
+      },
+      {
+        "pivot": [
+          -0.7776377716187824,
+          0.3383737464399164,
+          -1.336499961882961
+        ],
+        "radius": 0.3383737464399164
+      },
+      {
+        "pivot": [
+          0.7776376811583233,
+          0.33837374990816876,
+          1.3364999618829607
+        ],
+        "radius": 0.33837374990816876
+      },
+      {
+        "pivot": [
+          -0.7776377716187828,
+          0.33837374990816876,
+          1.3365
+        ],
+        "radius": 0.33837374990816876
+      }
+    ],
+    "material_triangles": {
+      "blinker_lamps": 106,
+      "rearlights_white": 104,
+      "front_lamps": 180,
+      "brakelights_red": 486,
+      "back_blinkers": 56,
+      "metal": 12540,
+      "wheel_rubber": 3600,
+      "brakes": 96,
+      "metal_dark": 888,
+      "sits_leather": 2346,
+      "black_plastic": 10234,
+      "chrome": 1242,
+      "interior": 568,
+      "panel": 178,
+      "glass": 1352,
+      "varnish": 4068,
+      "mirror_left": 19,
+      "mirror_right": 19
+    },
+    "method": "Axle-station body mapping; independently uniformly scaled tire/rim groups; original triangle topology and UVs retained. Bigster is the supplied 2024-Duster-derived approximation."
+  },
+  {
+    "id": "bigster",
+    "source": "assets/models/modular/bigster.glb",
+    "source_sha256": "041e7e30b7513289efbe107fd9b44ebe53ebcf31dff67e2d25491126534acb79",
+    "prepared_sha256": "e8cabe52cc2b7c20fb4f60b894d2f82ca6d8fa19591f80d78e8798f1ee9b3cc8",
+    "target_metres": {
+      "length": 4.57,
+      "width_with_mirrors": 2.069,
+      "height": 1.712,
+      "wheelbase": 2.702
+    },
+    "wheels": [
+      {
+        "pivot": [
+          -0.78,
+          0.355,
+          -1.351
+        ],
+        "radius": 0.355
+      },
+      {
+        "pivot": [
+          0.78,
+          0.355,
+          -1.351
+        ],
+        "radius": 0.355
+      },
+      {
+        "pivot": [
+          -0.78,
+          0.355,
+          1.351
+        ],
+        "radius": 0.355
+      },
+      {
+        "pivot": [
+          0.78,
+          0.355,
+          1.351
+        ],
+        "radius": 0.355
+      }
+    ],
+    "material_triangles": {
+      "Standard00FF99": 992,
+      "Graphite paint": 372,
+      "Clear automotive glass": 18,
+      "Unpainted trim": 350
+    },
+    "method": "Axle-station body mapping; independently uniformly scaled tire/rim groups; original triangle topology and UVs retained. Bigster is the supplied 2024-Duster-derived approximation."
+  },
+  {
+    "id": "colombo_tuk",
+    "source": "assets/models/modular/colombo_tuk.glb",
+    "source_sha256": "20ea07f664ca0f050894feb5161ade3684ae3eaeb5812659e0e40046c8574970",
+    "prepared_sha256": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
+    "target_metres": {
+      "length": 2.635,
+      "width_with_mirrors": 1.3,
+      "height": 1.7,
+      "wheelbase": 2.0
+    },
+    "wheels": [
+      {
+        "pivot": [
+          7.731303016564337e-07,
+          0.2032,
+          -1.0
+        ],
+        "radius": 0.2032
+      },
+      {
+        "pivot": [
+          -0.515,
+          0.2032,
+          0.9999999999999996
+        ],
+        "radius": 0.2032
+      },
+      {
+        "pivot": [
+          0.515,
+          0.2032,
+          1.0
+        ],
+        "radius": 0.2032
+      }
+    ],
+    "material_triangles": {
+      "Body_01": 4188,
+      "Matte woven canopy": 2852,
+      "Metal_Rin": 43296,
+      "Llanta": 54144,
+      "material": 1698,
+      "Colombo glass": 24
+    },
+    "method": "Axle-station body mapping; independently uniformly scaled tire/rim groups; original triangle topology and UVs retained. Bigster is the supplied 2024-Duster-derived approximation."
+  }
+]

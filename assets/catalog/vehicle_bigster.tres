@@ -3,59 +3,77 @@
 
 [ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/catalog/wheel_binding.gd" id="2"]
-[ext_resource type="PackedScene" path="res://assets/models/modular/bigster.glb" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/bigster/bigster.glb" id="3"]
 [ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/vehicle_bigster.png" id="thumb"]
+
+[ext_resource type="PackedScene" path="res://assets/models/bigster/driver_human_cabin.glb" id="cabin"]
 
 [sub_resource type="Resource" id="w0"]
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_0")])
 steering = true
-pivot = Vector3(-0.7916912, 0.3729599, -1.4410285)
-radius = 0.3729593123969553
+pivot = Vector3(-0.78000000, 0.43500000, -1.35100000)
+radius = 0.355000000
 axle = Vector3(1, 0, 0)
 
 [sub_resource type="Resource" id="w1"]
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_1")])
 steering = true
-pivot = Vector3(0.7916898, 0.3729596, -1.4410285)
-radius = 0.37295960543359213
+pivot = Vector3(0.78000000, 0.43500000, -1.35100000)
+radius = 0.355000000
 axle = Vector3(1, 0, 0)
 
 [sub_resource type="Resource" id="w2"]
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_2")])
 steering = false
-pivot = Vector3(-0.7916912, 0.3729599, 1.469422)
-radius = 0.3729593123969553
+pivot = Vector3(-0.78000000, 0.43500000, 1.35100000)
+radius = 0.355000000
 axle = Vector3(1, 0, 0)
 
 [sub_resource type="Resource" id="w3"]
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_3")])
 steering = false
-pivot = Vector3(0.7916898, 0.3729596, 1.469422)
-radius = 0.37295960543359213
+pivot = Vector3(0.78000000, 0.43500000, 1.35100000)
+radius = 0.355000000
 axle = Vector3(1, 0, 0)
 
 
 [resource]
 script = ExtResource("1")
 id = &"bigster"
-display_name = "Dacia Bigster"
+display_name = "Dacia Bigster Hybrid"
 model = ExtResource("3")
 wheels = Array[ExtResource("2")]([SubResource("w0"), SubResource("w1"), SubResource("w2"), SubResource("w3")])
-collision_size = Vector3(2.2, 1.7146896, 4.2)
-collision_position = Vector3(0.0, 0.9373448, 0.0)
-max_speed = 33
+collision_size = Vector3(1.8500, 1.7120, 4.5700)
+collision_position = Vector3(0, 0.9360, 0)
+max_speed = 50.0
 acceleration = 18
 handling = 1
 seat = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-driver_policy = 1
+driver_policy = 2
 preserve_materials = true
 setup_complete = true
-preview_target = Vector3(0, 0.857344812411304, 0)
-preview_distance = 7.783917488503884
-exhausts = PackedVector3Array(-0.5, 0.5, 2.122886587773787, 0.5, 0.5, 2.122886587773787)
+preview_target = Vector3(0, 0.8218, 0)
+preview_distance = 8.1
+exhausts = PackedVector3Array(-0.42, 0.40, 2.1022, 0.42, 0.40, 2.1022)
 thumbnail = ExtResource("thumb")
 normalization = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
+
+boosted_speed = 62.5
+
+fixed_driver_id = &"human"
+
+ai_lateral_acceleration = 13.5
+
+driver_fits = {"human": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37, 0.70, -0.08)}
+
+electric_boost = true
+
+braking_regeneration = 0.035
+
+camera_height = 0.35
+
+fixed_driver_model = ExtResource("cabin")

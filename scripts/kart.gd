@@ -309,6 +309,9 @@ func boost(duration: float, source: String) -> void:
 	boosted.emit(self, source)
 	if is_player and boost_sound: boost_sound.play()
 
+func boosted_ceiling() -> float:
+	return definition.boosted_speed*(max_speed/definition.max_speed) if definition and definition.boosted_speed>0 else max_speed*1.4
+
 func _physics_process(dt: float) -> void:
 	if not circuit: return
 	boost_time = maxf(0, boost_time - dt)
@@ -326,7 +329,7 @@ func _physics_process(dt: float) -> void:
 			want_drift = Input.is_action_pressed("drift") and absf(speed) > 12 and (drifting or absf(desired_steer) > .12)
 			if Input.is_action_just_pressed("boost") and boost_fuel >= 1:
 				boost_fuel = 0
-				boost(1.6, "NITRO BOOST")
+				boost(1.6, "HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
 		else:
 			var bend_ahead := absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s+26),Vector3.UP))
 			var look := lerpf(8.0+absf(speed)*.36,9.0+absf(speed)*.18,clampf(bend_ahead,0,1))
@@ -337,6 +340,11 @@ func _physics_process(dt: float) -> void:
 			desired_steer = clampf(-error * 2.2, -1, 1)
 			var bend := absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s + 22), Vector3.UP))
 			ai_speed = max_speed * lerpf(1.0, .67, clampf(bend / 1.0, 0, 1))
+			if definition.ai_lateral_acceleration>0:
+				var braking_look:=maxf(26.,absf(speed)*1.25)
+				var preview_bend:=absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s+braking_look),Vector3.UP))
+				ai_speed=minf(ai_speed,sqrt(definition.ai_lateral_acceleration*braking_look/maxf(preview_bend,.001)))
+				bend=maxf(bend,preview_bend)
 			throttle = 1 if speed < ai_speed else .15
 			if boost_fuel >= 1 and bend < .2 and next_gate > 1:
 				boost_fuel = 0
@@ -344,6 +352,8 @@ func _physics_process(dt: float) -> void:
 	steer = lerpf(steer, desired_steer, minf(1, dt * 8))
 	if is_player and not auto_drive and throttle < -.1:
 		boost_time = 0
+		if active and speed>5 and definition.braking_regeneration>0:
+			boost_fuel=minf(1.,boost_fuel+dt*definition.braking_regeneration*clampf(speed/max_speed,0,1))
 	if want_drift and not drifting:
 		drift_direction = signf(desired_steer)
 		air_hop = .18
@@ -359,7 +369,7 @@ func _physics_process(dt: float) -> void:
 	else: boost_fuel = minf(1, boost_fuel + dt * .045)
 	var target_speed := max_speed * throttle
 	if throttle < 0: target_speed = -10.0
-	if boost_time > 0 and active: target_speed = max_speed * 1.4
+	if boost_time > 0 and active: target_speed = boosted_ceiling()
 	if not is_player or auto_drive: target_speed = minf(target_speed, ai_speed * (1.3 if boost_time > 0 else 1.0))
 	var rate := acceleration if throttle > .1 else 9.0
 	if throttle < 0 and speed > 0: rate = 34

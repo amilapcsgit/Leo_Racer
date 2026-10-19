@@ -22,4 +22,4 @@ Get-ChildItem -LiteralPath $build -Recurse -File | ForEach-Object {$owned+='Dele
 Get-ChildItem -LiteralPath $build -Recurse -Directory | Sort-Object {$_.FullName.Length} -Descending | ForEach-Object {$owned+='RMDir "$INSTDIR\'+$_.FullName.Substring($build.Length+1)+'"'}
 [IO.File]::WriteAllLines((Join-Path $project 'installer/owned-files.nsh'),$owned)
 Push-Location (Join-Path $project 'installer')
-try { & $compiler "/DVERSION=$Version" 'LeoRacer.nsi'; if ($LASTEXITCODE -ne 0) {throw 'NSIS build failed'} } finally {Pop-Location}
+try { & $compiler "/DVERSION=$Version" "/DCHANNEL=$($Version.Contains('-rc'))" 'LeoRacer.nsi'; if ($LASTEXITCODE -ne 0) {throw 'NSIS build failed'} } finally {Pop-Location}

@@ -46,3 +46,8 @@ launcher/bin/
 launcher/obj/
 
 installer/owned-files.nsh
+
+assets/models/bigster/*.png
+assets/models/bigster/*.jpg
+assets/models/bigster/*.png.import
+assets/models/bigster/*.jpg.import

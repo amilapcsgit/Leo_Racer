@@ -10,7 +10,7 @@
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_0")])
 steering = true
-pivot = Vector3(-0.7698097, 0.322073, -1.1527555)
+pivot = Vector3(-0.7698097, 0.40207300, -1.1527555)
 radius = 0.32207297273144153
 axle = Vector3(1, 0, 0)
 
@@ -18,7 +18,7 @@ axle = Vector3(1, 0, 0)
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_1")])
 steering = true
-pivot = Vector3(0.8852605, 0.322073, -1.1499628)
+pivot = Vector3(0.8852605, 0.40207300, -1.1499628)
 radius = 0.3220729587590747
 axle = Vector3(1, 0, 0)
 
@@ -26,7 +26,7 @@ axle = Vector3(1, 0, 0)
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_2")])
 steering = false
-pivot = Vector3(-0.76955, 0.322073, 0.9618893)
+pivot = Vector3(-0.76955, 0.40207300, 0.9618893)
 radius = 0.32207297273144153
 axle = Vector3(1, 0, 0)
 
@@ -34,7 +34,7 @@ axle = Vector3(1, 0, 0)
 script = ExtResource("2")
 rotating_groups = Array[NodePath]([NodePath("wheel_3")])
 steering = false
-pivot = Vector3(0.8850009, 0.322073, 0.9618894)
+pivot = Vector3(0.8850009, 0.40207300, 0.9618894)
 radius = 0.3220729587590747
 axle = Vector3(1, 0, 0)
 

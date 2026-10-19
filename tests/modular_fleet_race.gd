@@ -40,6 +40,6 @@ func finish_batch() -> void:
 	for row in rows:unique[row.vehicle]=true
 	if unique.size()!=16:errors.append("Not all 16 vehicles raced")
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"models":unique.size(),"races":3,"racers_per_race":6,"vehicles":rows}
-	FileAccess.open("res://docs/qa-modular-garage/fleet-race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+	FileAccess.open("res://docs/qa-bigster/fleet-race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 	print("MODULAR_FLEET_REPORT ",report.status," models=",unique.size())
 	Engine.time_scale=1;game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

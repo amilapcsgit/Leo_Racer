@@ -191,35 +191,34 @@ func show_menu() -> void:
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
 	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "LOTUS COAST    /    3 LAPS    /    6 RACERS", 17, Color("d8e7ef"), true)
-	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "MODULAR GARAGE  //  v1.5.0", 17, accent, true)
+	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "BIGSTER  //  v1.6.0 RC", 17, accent, true)
 	button(menu_root, Vector2(1430, 40), Vector2(120, 46), "QUIT", game.quit_game)
 	first.grab_focus()
 	queue_redraw()
 
 func show_garage(_focus_group: String = "driver") -> void:
-	game.enter_garage()
-	scene_mode = "garage"
-	hud_root.hide()
-	clear(modal_root)
-	clear(menu_root)
-	menu_root.show()
-	garage_selector = preload("res://scenes/ModularCarSelector.tscn").instantiate()
+	var retaining:=_focus_group=="pause"
+	game.enter_garage(retaining)
+	scene_mode="garage";hud_root.hide();clear(modal_root);clear(menu_root);menu_root.show()
+	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
 	garage_selector.configure(game.catalog,game.catalog.drivers[game.selected_driver].id,game.catalog.vehicles[game.selected_kart].id,game.reduced_motion)
+	garage_selector.custom_name=game.custom_player_name
+	garage_selector.race_context=retaining
 	menu_root.add_child(garage_selector)
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
-		game.selected_driver=game.catalog.driver_index(d)
-		game.selected_kart=game.catalog.vehicle_index(v)
 		game.preview=garage_selector.assembly
-		game.save_settings()
+		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
 		play_arcade_cue("select"))
+	garage_selector.name_changed.connect(func(value: String):
+		if not retaining:game.apply_garage_selection(garage_selector.driver_id,garage_selector.vehicle_id,value))
 	garage_selector.race_requested.connect(func(d: StringName,v: StringName):
-		game.selected_driver=game.catalog.driver_index(d)
-		game.selected_kart=game.catalog.vehicle_index(v)
-		game.save_settings()
-		game.start_race())
-	garage_selector.back_requested.connect(game.return_menu)
+		game.apply_garage_selection(d,v,garage_selector.custom_name);game.start_race())
+	garage_selector.continue_requested.connect(func(d: StringName,v: StringName):game.swap_player_vehicle(d,v,garage_selector.custom_name))
+	garage_selector.back_requested.connect(func():
+		if retaining:game.cancel_pause_garage()
+		else:game.return_menu())
 	game.preview=garage_selector.assembly
-	garage_selector.driver_buttons[game.selected_driver%6].grab_focus()
+	garage_selector.driver_buttons[game.selected_driver].grab_focus()
 	queue_redraw()
 
 func modal(title: String, subtitle: String = "") -> void:
@@ -361,10 +360,11 @@ func announce(words: String, duration: float = 1.8) -> void:
 
 func pause_menu() -> void:
 	modal("TAKE A BREATHER", "Your island lap will be right here.")
-	button(modal_root, Vector2(482, 320), Vector2(634, 65), "RESUME RACE", game.toggle_pause, true).grab_focus()
-	button(modal_root, Vector2(482, 408), Vector2(634, 65), "RESTART RACE", game.start_race)
-	button(modal_root, Vector2(482, 496), Vector2(634, 65), "SETTINGS", show_settings)
-	button(modal_root, Vector2(482, 584), Vector2(634, 65), "MAIN MENU", game.return_menu)
+	button(modal_root,Vector2(482,320),Vector2(634,60),"RESUME RACE",game.toggle_pause,true).grab_focus()
+	button(modal_root,Vector2(482,398),Vector2(634,60),"CHANGE CAR",func():show_garage("pause"))
+	button(modal_root,Vector2(482,476),Vector2(634,60),"RESTART RACE",game.start_race)
+	button(modal_root,Vector2(482,554),Vector2(634,60),"SETTINGS",show_settings)
+	button(modal_root,Vector2(482,632),Vector2(634,60),"MAIN MENU",game.return_menu)
 
 func show_results() -> void:
 	scene_mode = "results"
@@ -375,6 +375,7 @@ func show_results() -> void:
 	text_at(modal_root, Vector2(430, 101), Vector2(750, 32), "COLOMBO GRAND PRIX   /   LOTUS COAST", 18, accent, true)
 	text_at(modal_root, Vector2(425, 149), Vector2(780, 85), "ISLAND CHAMPION!" if game.finish_place == 1 else "WHAT A RIDE!", 55, gold, true)
 	text_at(modal_root, Vector2(430, 246), Vector2(760, 35), "YOUR TIME  %s     •     BEST  %s" % [game.format_time(game.player.finish_time), game.format_time(game.best_time)], 22, Color.WHITE, true)
+	if game.race_modified:text_at(modal_root,Vector2(432,282),Vector2(750,22),"MODIFIED RACE  /  RECORD NOT SAVED",15,gold,true)
 	text_at(modal_root, Vector2(432, 306), Vector2(760, 28), "POS        RACER                                         RACE TIME", 16, muted, true)
 	var order: Array = game.ranking()
 	for i in order.size():

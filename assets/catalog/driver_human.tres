@@ -3,7 +3,7 @@
 
 
 [ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="1"]
-[ext_resource type="PackedScene" path="res://assets/models/modular/driver_human_seated.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/bigster/driver_human_seated.glb" id="2"]
 [ext_resource type="PackedScene" path="res://assets/models/modular/driver_human_standing.glb" id="3"]
 [ext_resource type="Texture2D" path="res://assets/models/modular/helmet_driver.png" id="4"]
 [ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/driver_human.png" id="thumb"]
@@ -18,5 +18,5 @@ standing_model = ExtResource("3")
 material_name = "Wolf3D_Headwear"
 material_albedo = ExtResource("4")
 portrait = ExtResource("thumb")
-orientation = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0.2)
+orientation = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 setup_complete = true

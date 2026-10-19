@@ -77,7 +77,7 @@ func run() -> void:
 	await process_frame
 	verify(game.karts.is_empty(),"Menu return releases racers and their effect pools")
 	var report := {"checks":checks,"errors":errors,"status":"PASS" if errors.is_empty() else "FAIL"}
-	var file := FileAccess.open("res://docs/qa-modular-garage/presentation-test.json",FileAccess.WRITE)
+	var file := FileAccess.open("res://docs/qa-bigster/presentation-test.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  "))
 	file.close()
 	print("PRESENTATION_REPORT ",JSON.stringify(report))

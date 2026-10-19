@@ -42,6 +42,7 @@ func problems() -> PackedStringArray:
 		if ids.has(v.id): errors.append("Duplicate vehicle ID: "+String(v.id))
 		ids[v.id]=true
 		for issue in v.problems(): errors.append(String(v.id)+": "+issue)
+		if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED and not drivers.any(func(d):return d.id==v.fixed_driver_id): errors.append(String(v.id)+": unknown fixed driver")
 	ids.clear()
 	for d in drivers:
 		if d.id.is_empty() or ids.has(d.id) or not d.seated_model or not d.standing_model or not d.setup_complete: errors.append("Incomplete driver: "+String(d.id))

@@ -35,8 +35,10 @@ func run() -> void:
 		selector.showroom.add_child(selector.assembly)
 		VehicleAssembler.bind_albedo(selector.assembly,d.material_name,d.material_albedo) if d.material_albedo else null
 		var box := bounds(selector.assembly)
-		var target := box.position+Vector3(box.size.x*.5,box.size.y*.72,box.size.z*.5)
-		selector.camera.position=target+Vector3(-.16,.06,-1).normalized()*maxf(.8,box.size.y*1.1)
+		var head_factor:=.85 if d.id==&"human" else (.78 if d.id==&"mario" else .72)
+		var framing:=.5 if d.id==&"human" else (.75 if d.id==&"mario" else 1.1)
+		var target := box.position+Vector3(box.size.x*.5,box.size.y*head_factor,box.size.z*.5)
+		selector.camera.position=target+Vector3(-.16,.06,-1).normalized()*maxf(.65,box.size.y*framing)
 		selector.camera.look_at(target)
 		await process_frame
 		await RenderingServer.frame_post_draw

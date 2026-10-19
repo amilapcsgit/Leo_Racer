@@ -83,6 +83,6 @@ func run() -> void:
 	await process_frame
 	await process_frame
 	var report := {"status":"PASS" if errors.is_empty() else "FAIL", "checks":checks.size(), "errors":errors}
-	FileAccess.open("res://docs/qa-modular-garage/drive-test.json", FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+	FileAccess.open("res://docs/qa-bigster/drive-test.json", FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 	print("DRIVE_TEST_REPORT ", JSON.stringify(report))
 	quit(0 if errors.is_empty() else 1)

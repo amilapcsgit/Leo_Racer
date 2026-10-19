@@ -4,10 +4,20 @@ Unicode true
 !ifndef VERSION
 !define VERSION "1.5.0"
 !endif
-Name "Leo Racer ${VERSION}"
+!ifndef CHANNEL
+!define CHANNEL "False"
+!endif
+!if "${CHANNEL}" == "True"
+!define APP_NAME "Leo Racer RC"
+!define APP_KEY "LeoRacerRC"
+!else
+!define APP_NAME "Leo Racer"
+!define APP_KEY "LeoRacer"
+!endif
+Name "${APP_NAME} ${VERSION}"
 OutFile "..\dist\LeoRacer-Setup-${VERSION}.exe"
-InstallDir "$LOCALAPPDATA\Programs\Leo Racer"
-InstallDirRegKey HKCU "Software\LeoRacer" "InstallDir"
+InstallDir "$LOCALAPPDATA\Programs\${APP_NAME}"
+InstallDirRegKey HKCU "Software\${APP_KEY}" "InstallDir"
 RequestExecutionLevel user
 SetCompressor /FINAL zlib
 Icon "..\assets\art\launcher\leo-road-crest.ico"
@@ -28,17 +38,17 @@ Section "Leo Racer (required)"
   SetOutPath "$INSTDIR"
   File /r "..\build\ModularGarage\*.*"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  WriteRegStr HKCU "Software\LeoRacer" "InstallDir" "$INSTDIR"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LeoRacer" "DisplayName" "Leo Racer"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LeoRacer" "DisplayVersion" "${VERSION}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LeoRacer" "DisplayIcon" "$INSTDIR\Leo Racer Launcher.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LeoRacer" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
-  CreateDirectory "$SMPROGRAMS\Leo Racer"
-  CreateShortcut "$SMPROGRAMS\Leo Racer\Leo Racer.lnk" "$INSTDIR\Leo Racer Launcher.exe"
-  CreateShortcut "$SMPROGRAMS\Leo Racer\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+  WriteRegStr HKCU "Software\${APP_KEY}" "InstallDir" "$INSTDIR"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayName" "${APP_NAME}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayVersion" "${VERSION}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayIcon" "$INSTDIR\Leo Racer Launcher.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
+  CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\Leo Racer.lnk" "$INSTDIR\Leo Racer Launcher.exe"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 Section /o "Desktop shortcut"
-  CreateShortcut "$DESKTOP\Leo Racer.lnk" "$INSTDIR\Leo Racer Launcher.exe"
+  CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\Leo Racer Launcher.exe"
 SectionEnd
 Section "Uninstall"
   SetShellVarContext current
@@ -46,10 +56,10 @@ Section "Uninstall"
   !include "owned-files.nsh"
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
-  Delete "$SMPROGRAMS\Leo Racer\Leo Racer.lnk"
-  Delete "$SMPROGRAMS\Leo Racer\Uninstall.lnk"
-  RMDir "$SMPROGRAMS\Leo Racer"
-  Delete "$DESKTOP\Leo Racer.lnk"
-  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\LeoRacer"
-  DeleteRegKey HKCU "Software\LeoRacer"
+  Delete "$SMPROGRAMS\${APP_NAME}\Leo Racer.lnk"
+  Delete "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk"
+  RMDir "$SMPROGRAMS\${APP_NAME}"
+  Delete "$DESKTOP\${APP_NAME}.lnk"
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}"
+  DeleteRegKey HKCU "Software\${APP_KEY}"
 SectionEnd

@@ -178,7 +178,8 @@ func _process(dt: float) -> void:
 		var flame := kart.flames[i]
 		flame.scale.z = 1.1+gain*.5
 		var material := flame.material_override as StandardMaterial3D
-		material.emission = Color("ffad38").lerp(Color("20dfff"),.55+.35*sin(elapsed*18))
+		material.emission = Color("9effdd").lerp(Color("00e4ff"),.5+.4*sin(elapsed*22)) if kart.definition.electric_boost else Color("ffad38").lerp(Color("20dfff"),.55+.35*sin(elapsed*18))
+		if kart.definition.electric_boost: flame.scale.z=.55+gain*.35
 	mark_timer -= dt
 	if kart.drifting and moving and kart.active and near and mark_timer<=0:
 		mark_timer = .045

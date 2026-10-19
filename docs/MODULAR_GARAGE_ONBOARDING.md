@@ -11,11 +11,11 @@ Open this project with the pinned **Godot 4.7.2 .NET** editor using `tools/run_g
 3. Recognizable wheel names are proposed automatically. Review every `WheelBinding`: rotating node paths, stationary caliper paths, steering flag, vehicle-space pivot and axle, and **individual radius in metres**. Imported groups with offset geometry need their actual hub center entered. A fused body requires offline partitioning first; the tool does not guess hidden wheel faces. Mark a wheel-free vehicle `hovering`; this adds presentation motion without changing driving physics.
 4. For a driver, assign standing and seated PackedScenes, orientation/seat offset and optional material-name/albedo binding. A material binding affects only the named material. Bake a seated pose in Blender when the source is a standing rig.
 5. Set `setup_complete` only after reviewing a vehicle. Click **Validate, render card & publish**. Missing IDs/models, unresolved groups, incomplete setup and unbound non-hover wheels are rejected. Drafts are excluded from Windows exports. A successful publish saves an actual rendered PNG and appends the definition to `assets/catalog/catalog.tres`.
-6. Open the garage. Driver pages contain six cards and vehicle pages contain nine. More pages appear automatically. Test the asset in a race, reverse, drift, recovery and both renderers. Run **Validate playable catalog** before exporting; the release script below enforces validation as well.
+6. Open the garage. Driver portraits form a horizontal selector; vehicle arrows wrap through the complete catalog. No vehicle pages or grid need editing. Test the asset in a race, reverse, drift, recovery and both renderers. Run **Validate playable catalog** before exporting; the release script below enforces validation as well.
 
 ![Helmeted Shaven Leo in an existing open kart](qa-modular-garage/helmeted-shaven-leo.png)
 
-The driver ID `human` still means **Shaven Leo**. His model, portrait, garage preview, player and AI appearances now use the supplied helmeted racer. `mario` is the sixth identity. All seven supplied vehicles intentionally omit an added driver. The other nine retain a visible seated driver.
+The driver ID `human` still means **Shaven Leo**. His model, portrait, garage preview, player and AI appearances now use the supplied helmeted racer. `mario` is the sixth identity. Five supplied vehicles omit an added driver. Both Dacias use fixed helmeted Shaven Leo with a cabin-specific pose; racer identity stays independent. The original nine retain the selected visible driver. `driver_fits` provides pelvis-anchored per-vehicle adjustments. See BIGSTER_VALIDATION.md for v1.6 preparation and acceptance details.
 
 ## Resource map
 

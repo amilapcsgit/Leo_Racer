@@ -22,6 +22,7 @@ internal sealed class Launcher : Form {
         Text = "Leo Racer · Colombo Motor Club";
         ClientSize = new Size(780, 470); FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false; StartPosition = FormStartPosition.CenterScreen;
+        Icon = System.Drawing.Icon.ExtractAssociatedIcon(Environment.ProcessPath!);
         BackColor = Color.FromArgb(13, 21, 32); ForeColor = Color.FromArgb(243, 225, 182);
         Font = new Font("Segoe UI", 11);
         using var source = Assembly.GetExecutingAssembly().GetManifestResourceStream("crest.png");

@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "release": "v1.5.0",
+  "sha256": "44a879ec83491f9cabd58d5ed834659c2c96d1ff02df40ea95a232d877807967",
+  "public_download": true,
+  "vulkan": {
+    "boosts": 0,
+    "engine": "4.7.2-stable (official)",
+    "errors": [],
+    "race_time": 0.0,
+    "status": "PASS"
+  },
+  "compatibility": {
+    "boosts": 0,
+    "engine": "4.7.2-stable (official)",
+    "errors": [],
+    "race_time": 0.0,
+    "status": "PASS"
+  }
+}

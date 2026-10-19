@@ -11,10 +11,14 @@ static func assemble(vehicle: VehicleDefinition, racer: DriverDefinition) -> Nod
 	body.transform = vehicle.normalization * body.transform
 	root.add_child(body)
 	if not vehicle.preserve_materials: LeoRaceVisuals.polish_chassis(body)
-	if vehicle.driver_policy==VehicleDefinition.DriverPolicy.SEATED:
-		var driver := racer.seated_model.instantiate() as Node3D
+	if vehicle.driver_policy!=VehicleDefinition.DriverPolicy.IDENTITY_ONLY:
+		if vehicle.driver_policy==VehicleDefinition.DriverPolicy.FIXED:
+			racer=GarageCatalog.shared().driver(vehicle.fixed_driver_id)
+		var driver := (vehicle.fixed_driver_model if vehicle.driver_policy==VehicleDefinition.DriverPolicy.FIXED and vehicle.fixed_driver_model else racer.seated_model).instantiate() as Node3D
 		driver.name = "Driver"
-		driver.transform = vehicle.seat * racer.orientation * driver.transform
+		driver.set_meta("visible_driver_id",racer.id)
+		var fit: Transform3D=vehicle.driver_fits.get(String(racer.id),vehicle.seat)
+		driver.transform = fit * racer.orientation * driver.transform
 		root.add_child(driver)
 		if racer.material_albedo: bind_albedo(driver,racer.material_name,racer.material_albedo)
 		for key in racer.material_bindings:
