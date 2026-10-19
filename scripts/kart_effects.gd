@@ -15,13 +15,13 @@ var trace_material: StandardMaterial3D
 
 func setup(owner_kart: LeoKart) -> void:
 	kart = owner_kart
-	for side in [-1.0,1.0]:
+	for slot in kart.exhaust_positions.size():
 		var ribbon := GPUParticles3D.new()
 		ribbon.amount = 6
 		ribbon.lifetime = .38
 		ribbon.local_coords = false
 		ribbon.emitting = false
-		ribbon.position = kart.exhaust_positions[0 if side<0 else 1]
+		ribbon.position = kart.exhaust_positions[slot]
 		ribbon.trail_enabled = RenderingServer.get_current_rendering_method()!="gl_compatibility"
 		ribbon.trail_lifetime = .28
 		ribbon.visibility_aabb = AABB(Vector3(-10,-3,-15),Vector3(20,10,30))
@@ -64,8 +64,22 @@ func setup(owner_kart: LeoKart) -> void:
 		ribbon.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(ribbon)
 		ribbons.append(ribbon)
+		if RenderingServer.get_current_rendering_method()=="forward_plus":
+			var h := MeshInstance3D.new()
+			var q := QuadMesh.new()
+			q.size = Vector2(.65,2.0)
+			h.mesh = q
+			h.rotation_degrees.x = -55
+			h.position = kart.exhaust_positions[slot]+Vector3(0,.13,.55)
+			var hm := ShaderMaterial.new()
+			hm.shader = load("res://shaders/exhaust_heat.gdshader")
+			h.material_override = hm
+			h.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			add_child(h)
+			heat.append(h)
+	for tire_position in kart.rear_tire_positions:
 		var emitter := GPUParticles3D.new()
-		var tire := kart.rear_tire_positions[0 if side<0 else 1]
+		var tire := tire_position
 		emitter.position = Vector3(tire.x,.22,tire.z)
 		emitter.amount = 22 if kart.is_player else 10
 		emitter.lifetime = .75
@@ -96,19 +110,6 @@ func setup(owner_kart: LeoKart) -> void:
 		emitter.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(emitter)
 		smoke.append(emitter)
-		if RenderingServer.get_current_rendering_method()=="forward_plus":
-			var h := MeshInstance3D.new()
-			var q := QuadMesh.new()
-			q.size = Vector2(.65,2.0)
-			h.mesh = q
-			h.rotation_degrees.x = -55
-			h.position = kart.exhaust_positions[0 if side<0 else 1]+Vector3(0,.13,.55)
-			var hm := ShaderMaterial.new()
-			hm.shader = load("res://shaders/exhaust_heat.gdshader")
-			h.material_override = hm
-			h.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			add_child(h)
-			heat.append(h)
 	impact_sparks = kart.make_particles(Vector3.ZERO)
 	impact_sparks.reparent(self)
 	impact_sparks.amount = 28
@@ -163,7 +164,7 @@ func _process(dt: float) -> void:
 	for emitter in smoke: emitter.emitting = kart.drifting and moving and kart.active and near
 	var charge_color := Color("00b9d4").lerp(Color("ffae36"),smoothstep(.65,2.5,kart.drift_charge))
 	trace_material.emission = charge_color
-	for spark in [kart.spark_left,kart.spark_right]:
+	for spark in kart.tire_sparks:
 		spark.emitting = kart.drifting and moving and kart.active and near and kart.drift_charge>.3
 		(spark.draw_pass_1.material as StandardMaterial3D).emission = charge_color
 	var gain := 1.0 if kart.boost_time>0 and kart.active else 0.0
@@ -181,10 +182,10 @@ func _process(dt: float) -> void:
 	mark_timer -= dt
 	if kart.drifting and moving and kart.active and near and mark_timer<=0:
 		mark_timer = .045
-		for side in [-1,1]:
+		for tire in kart.rear_tire_positions:
 			var mark := marks[mark_cursor]
 			mark_cursor = (mark_cursor+1)%marks.size()
-			mark.global_position = kart.visual.global_transform*(kart.rear_tire_positions[0 if side<0 else 1]-Vector3.UP* .49)
+			mark.global_position = kart.visual.global_transform*tire
 			mark.global_position.y = .075
 			mark.rotation = Vector3(0,kart.rotation.y+kart.visual.rotation.y,0)
 			(mark.mesh as BoxMesh).size.z = maxf(.8,absf(kart.wheel_motion_speed)*.065)

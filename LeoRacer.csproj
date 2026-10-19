@@ -6,4 +6,9 @@
     <RootNamespace>LeoRacer</RootNamespace>
     <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="launcher/**/*.cs" />
+    <EmbeddedResource Remove="launcher/**/*" />
+    <None Remove="launcher/**/*" />
+  </ItemGroup>
 </Project>

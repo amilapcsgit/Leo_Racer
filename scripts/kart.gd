@@ -47,6 +47,7 @@ var exhaust_trails: Array[GPUParticles3D] = []
 var effect_clock := 0.0
 var spark_left: GPUParticles3D
 var spark_right: GPUParticles3D
+var tire_sparks: Array[GPUParticles3D] = []
 var engine: AudioStreamPlayer
 var skid: AudioStreamPlayer
 var boost_sound: AudioStreamPlayer
@@ -64,61 +65,58 @@ var rear_tire_positions: Array[Vector3] = []
 var camera_height_offset := 0.0
 var engine_pitch := 1.0
 var stuck_time := 0.0
-static var _vehicle_specs: Dictionary = {}
+var definition: VehicleDefinition
+var wheel_radii: Array[float] = []
+var wheel_axes: Array[Vector3] = []
+var wheel_angles: Array[float] = []
 
 static func chassis_path(key: String) -> String:
-	return "res://assets/models/astra/kart_%s.glb"%key if key in ["formula_blue","formula_red","roadster_gold","race_tuk","race_bus"] else "res://assets/models/kart_%s.glb"%key
+	return GarageCatalog.shared().vehicle(key).model.resource_path
 
 static func driver_path(key: String) -> String:
-	return "res://assets/models/astra/driver_human.glb" if key=="human" else "res://assets/models/driver_%s.glb"%key
-
-static func vehicle_spec(key: String) -> Dictionary:
-	if _vehicle_specs.is_empty():
-		_vehicle_specs = JSON.parse_string(FileAccess.get_file_as_string("res://assets/models/astra/vehicle-specs.json"))
-	return _vehicle_specs.get(key,{"driver_position":[0,0,0],"driver_scale":[1,1,1],"collision_size":[2.15,1.4,3.5],"collision_position":[0,.78,0],"wheel_radius":.49,"exhausts":[[-.5,.47,2.05],[.5,.47,2.05]]})
+	return GarageCatalog.shared().driver(key).seated_model.resource_path
 
 static func vector(value: Array) -> Vector3:
 	return Vector3(float(value[0]),float(value[1]),float(value[2]))
 
+static func vehicle_spec(key: String) -> Dictionary:
+	var v := GarageCatalog.shared().vehicle(key)
+	return {"driver_position":[v.seat.origin.x,v.seat.origin.y,v.seat.origin.z],"driver_scale":[v.seat.basis.get_scale().x,v.seat.basis.get_scale().y,v.seat.basis.get_scale().z],"collision_size":[v.collision_size.x,v.collision_size.y,v.collision_size.z],"collision_position":[v.collision_position.x,v.collision_position.y,v.collision_position.z],"wheel_radius":v.wheels[0].radius if not v.wheels.is_empty() else .49,"exhausts":v.exhausts}
+
 static func seat_driver(model: Node3D,key: String) -> void:
-	var spec := vehicle_spec(key)
-	model.position = vector(spec.driver_position)
-	model.scale = vector(spec.driver_scale)
+	model.transform = GarageCatalog.shared().vehicle(key).seat * model.transform
 
 func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String) -> void:
 	circuit = track
 	racer_id = id
 	is_player = player
 	vehicle_key = kart_color
-	var spec := vehicle_spec(kart_color)
-	wheel_radius = float(spec.wheel_radius)
-	camera_height_offset = .45 if kart_color=="race_bus" else (.2 if kart_color=="race_tuk" else 0.0)
-	engine_pitch = .65 if kart_color=="race_bus" else (1.22 if kart_color=="race_tuk" else (1.12 if kart_color.begins_with("formula") else 1.0))
-	for p in spec.exhausts: exhaust_positions.append(vector(p))
+	definition = GarageCatalog.shared().vehicle(kart_color)
+	max_speed = definition.max_speed
+	acceleration = definition.acceleration
+	handling = definition.handling
+	wheel_radius = definition.wheels[0].radius if not definition.wheels.is_empty() else .49
+	camera_height_offset = definition.camera_height
+	engine_pitch = .65 if kart_color=="race_bus" else (1.22 if kart_color in ["race_tuk","colombo_tuk"] else (1.12 if kart_color.begins_with("formula") else 1.0))
+	for p in definition.exhausts: exhaust_positions.append(p)
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_ON
-	visual = Node3D.new()
+	visual = VehicleAssembler.assemble(definition,GarageCatalog.shared().driver(animal))
 	add_child(visual)
-	chassis = load(chassis_path(kart_color)).instantiate()
-	visual.add_child(chassis)
-	driver = load(driver_path(animal)).instantiate()
-	visual.add_child(driver)
-	seat_driver(driver,kart_color)
-	for axle in ["front", "back"]:
-		for side in ["left", "right"]:
-			var w := chassis.find_child("wheel-%s-%s" % [axle, side], true, false) as Node3D
-			if w:
-				if axle=="back": rear_tire_positions.append(w.position)
-				attach_wheel(w, axle == "front")
+	chassis = visual.get_node("Chassis")
+	driver = visual.get_node_or_null("Driver")
+	for binding in definition.wheels:
+		if not binding.steering: rear_tire_positions.append(binding.pivot)
+		attach_binding(binding)
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()
-	shape.size = vector(spec.collision_size)
+	shape.size = definition.collision_size
 	collision.shape = shape
-	collision.position = vector(spec.collision_position)
+	collision.position = definition.collision_position
 	add_child(collision)
 	collision_layer = 2
 	collision_mask = 1 | 2
 	floor_snap_length = .5
-	for side in [-1, 1]:
+	for exhaust_index in exhaust_positions.size():
 		var f := MeshInstance3D.new()
 		f.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		var m := SphereMesh.new()
@@ -128,7 +126,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		m.rings = 8
 		f.mesh = m
 		f.rotation.x = PI / 2
-		f.position = exhaust_positions[0 if side==-1 else 1]
+		f.position = exhaust_positions[exhaust_index]
 		var material := StandardMaterial3D.new()
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		material.albedo_color = Color("47edff")
@@ -146,11 +144,13 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		core_material.emission = Color("baffff")
 		core.material_override = core_material
 		f.add_child(core)
-		exhaust_trails.append(make_particles(exhaust_positions[0 if side==-1 else 1], true))
-		var tire := rear_tire_positions[0 if side==-1 else 1]
+		exhaust_trails.append(make_particles(exhaust_positions[exhaust_index], true))
+	for i in rear_tire_positions.size():
+		var tire := rear_tire_positions[i]
 		var sparks := make_particles(Vector3(tire.x,.2,tire.z))
-		if side == -1: spark_left = sparks
-		else: spark_right = sparks
+		tire_sparks.append(sparks)
+		if i == 0: spark_left = sparks
+		elif i == 1: spark_right = sparks
 	if is_player:
 		engine = sound("engine.ogg", -22, true)
 		skid = sound("skid.ogg", -50, true)
@@ -163,27 +163,31 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	effects.setup(self)
 	reset_physics_interpolation()
 
-func attach_wheel(wheel: Node3D, front: bool) -> void:
-	# glTF keeps the mesh's authored bind basis. Steering belongs in the kart's
-	# space; rolling belongs beneath it. Never combine spin with Euler yaw.
-	var bind := wheel.transform
-	var parent := wheel.get_parent()
+func attach_binding(binding: WheelBinding) -> void:
 	var steering_pivot := Node3D.new()
-	steering_pivot.name = String(wheel.name) + "-steer"
-	# Godot 4.7 interpolates the parent's local transform; this branch can
-	# animate each render frame while still riding the smoothed chassis.
+	steering_pivot.name = "WheelSteering"+str(wheels.size())
 	steering_pivot.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-	parent.add_child(steering_pivot)
-	steering_pivot.position = bind.origin
-	steering_pivot.set_meta("front", front)
+	chassis.add_child(steering_pivot)
+	steering_pivot.position = binding.pivot
+	steering_pivot.set_meta("front",binding.steering)
 	var spin_pivot := Node3D.new()
-	spin_pivot.name = String(wheel.name) + "-roll"
+	spin_pivot.name = "WheelRolling"
 	steering_pivot.add_child(spin_pivot)
-	wheel.reparent(spin_pivot, false)
-	wheel.transform = Transform3D(bind.basis, Vector3.ZERO)
-	wheels.append(wheel)
+	var first: Node3D
+	for path in binding.rotating_groups:
+		var group := VehicleAssembler.find_group(chassis,path)
+		if not group: push_error("Unresolved wheel binding: "+String(path)); continue
+		if not first: first=group
+		group.reparent(spin_pivot,true)
+	for path in binding.stationary_groups:
+		var group := VehicleAssembler.find_group(chassis,path)
+		if group: group.reparent(steering_pivot,true)
+	wheels.append(first)
 	wheel_steering_pivots.append(steering_pivot)
 	wheel_spin_pivots.append(spin_pivot)
+	wheel_radii.append(binding.radius)
+	wheel_axes.append(binding.axle.normalized())
+	wheel_angles.append(0.)
 
 func animate_wheels(dt: float) -> void:
 	# Rebuild from a bounded angle, avoiding accumulated basis drift and the
@@ -199,7 +203,8 @@ func animate_wheels(dt: float) -> void:
 	for i in wheel_spin_pivots.size():
 		var steering_pivot := wheel_steering_pivots[i]
 		steering_pivot.basis = Basis(Vector3.UP, -steer * .35 if steering_pivot.get_meta("front") else 0.0)
-		wheel_spin_pivots[i].basis = Basis(Vector3.RIGHT, wheel_roll)
+		wheel_angles[i] = wrapf(wheel_angles[i] - travel / wheel_radii[i], -PI, PI)
+		wheel_spin_pivots[i].basis = Basis(wheel_axes[i], wheel_angles[i])
 
 func update_wheel_motion(movement: Vector3, dt: float) -> void:
 	# Include the final soft-barrier correction as well as move_and_slide.
@@ -415,7 +420,7 @@ func _physics_process(dt: float) -> void:
 				boost_cooldown = 2.0
 	# Kenney-style independent wheel and body response.
 	air_hop = move_toward(air_hop, 0, dt * .8)
-	visual.position.y = air_hop + sin(Time.get_ticks_msec() * .018) * .012 * absf(speed) / 33
+	visual.position.y = (.20 + sin(Time.get_ticks_msec()*.0018)*.055 if definition.hovering else 0.0) + air_hop + sin(Time.get_ticks_msec() * .018) * .012 * absf(speed) / 33
 	visual.rotation.z = lerp_angle(visual.rotation.z, -steer * .075 * grip, dt * 7)
 	visual.rotation.y = lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
 	if is_player and engine:
@@ -432,8 +437,7 @@ func _process(dt: float) -> void:
 		flame.scale = Vector3(1, 1.6 + sin(effect_clock * 38) * .3, 1)
 	for trail in exhaust_trails:
 		trail.emitting = boost_time > 0 and active
-	if spark_left: spark_left.emitting = drifting and drift_charge > .3
-	if spark_right: spark_right.emitting = drifting and drift_charge > .3
+	for sparks in tire_sparks: sparks.emitting = drifting and drift_charge > .3 and absf(wheel_motion_speed)>4.
 
 func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
 	if impact_feedback_cooldown>0: return

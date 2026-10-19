@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+<defs><pattern id="carbon" width="8" height="8" patternUnits="userSpaceOnUse"><path fill="#17191a" d="M0 0h8v8H0z"/><path stroke="#252729" stroke-width="2" d="M0 8L8 0M-4 4L4-4M4 12l8-8"/></pattern><linearGradient id="brass" x2="0" y2="1"><stop stop-color="#e7ca86"/><stop offset=".45" stop-color="#957044"/><stop offset="1" stop-color="#d4af68"/></linearGradient><linearGradient id="button" x2="0" y2="1"><stop stop-color="#60422c"/><stop offset=".5" stop-color="#29211b"/><stop offset="1" stop-color="#100f0e"/></linearGradient></defs>
+<!-- Panel 0,0,512,256; card 512,0,256,160; strip 0,256,512,64;
+     button 512,160,256,96; instrument 768,0,256,256. Text is always live. -->
+<path fill="url(#carbon)" stroke="url(#brass)" stroke-width="3" d="M12 2h488l10 10v232l-10 10H12L2 244V12z"/>
+<path fill="none" stroke="#66573c" d="M16 8h480l8 8v224l-8 8H16l-8-8V16z"/>
+<path fill="url(#button)" stroke="url(#brass)" stroke-width="3" d="M520 2h240l6 6v144l-6 6H520l-6-6V8z"/>
+<path fill="url(#button)" stroke="url(#brass)" stroke-width="3" d="M520 164h240l6 6v76l-6 6H520l-6-6v-76z"/>
+<path fill="url(#brass)" d="M8 260h496l6 6v44l-6 6H8l-6-6v-44z"/>
+<circle cx="896" cy="128" r="121" fill="url(#carbon)" stroke="url(#brass)" stroke-width="5"/><circle cx="896" cy="128" r="110" fill="none" stroke="#5e4931" stroke-width="2"/>
+<g fill="#d0b273"><circle cx="18" cy="18" r="3"/><circle cx="494" cy="18" r="3"/><circle cx="18" cy="238" r="3"/><circle cx="494" cy="238" r="3"/></g>
+</svg>

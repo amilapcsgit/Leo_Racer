@@ -60,7 +60,8 @@ if ($AssetArchives) {
     }
 }
 if (-not (Test-Path (Join-Path $project 'addons/rokojori_action_library/plugin.cfg'))) {
-    throw 'Obtain Rokojori v0.6 from its Godot Asset Store page, then rerun with -AssetArchives pointing to the original AI archive folder. See docs/COLOMBO_SETUP.md.'
+    & "$PSScriptRoot/setup_rokojori.ps1"
+    if ($LASTEXITCODE -ne 0) {throw 'Rokojori setup failed'}
 }
 $sdk=Join-Path $localTools 'dotnet/dotnet.exe'
 $sharedSdk=[IO.Path]::GetFullPath((Join-Path $project '../../tools/dotnet/dotnet.exe'))
@@ -82,7 +83,7 @@ Push-Location $project
 try {
     & $sdk build LeoRacer.sln --nologo
     if ($LASTEXITCODE -ne 0) {throw 'C# build failed'}
-    & $engine --headless --editor --import --path $project
+    & $engine --headless --editor --import --quit --path $project
     if ($LASTEXITCODE -ne 0) {throw 'Godot import failed'}
     Write-Host 'Colombo setup complete. Open Colombo in Godot.cmd starts the .NET editor.'
 } finally {Pop-Location}

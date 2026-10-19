@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="DriverDefinition" load_steps=5 format=3]
+
+
+
+[ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/driver_elephant.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/driver_elephant.glb" id="3"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/driver_elephant.png" id="thumb"]
+
+[resource]
+script = ExtResource("1")
+id = &"elephant"
+display_name = "Ellie"
+tagline = "Small kart. Giant island energy."
+seated_model = ExtResource("2")
+standing_model = ExtResource("3")
+portrait = ExtResource("thumb")
+setup_complete = true

@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/garage/modular_car_selector.gd" id="1"]
+
+[node name="ModularCarSelector" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 0
+offset_left = 650.0
+offset_top = 135.0
+offset_right = 1580.0
+offset_bottom = 780.0
+stretch = true
+mouse_filter = 2
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+transparent_bg = true
+own_world_3d = true
+size = Vector2i(930, 645)
+render_target_update_mode = 4
+
+[node name="Garage3D" type="Node3D" parent="SubViewportContainer/SubViewport"]

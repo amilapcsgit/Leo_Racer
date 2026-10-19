@@ -1,21 +1,8 @@
 extends Node3D
 
-const ROSTER := [
-	{"name": "Sonic", "animal": "hedgehog", "tagline": "Blue blur. Big grin. Born for the coast."},
-	{"name": "Leo", "animal": "lion", "tagline": "A little lion with a roaring racing heart."},
-	{"name": "Ellie", "animal": "elephant", "tagline": "Small kart. Giant island energy."},
-	{"name": "Rio", "animal": "parrot", "tagline": "Tropical colour. Fearless corners."},
-	{"name": "Shaven Leo", "animal": "human", "tagline": "Fresh head. Fearless heart. Full throttle."}]
-const KARTS := [
-	{"name": "Blue Bolt", "color": "blue", "speed": 4.5, "grip": 3.9, "accel": 4.1},
-	{"name": "Sunset GT", "color": "coral", "speed": 4.8, "grip": 3.6, "accel": 3.8},
-	{"name": "Palm Dash", "color": "aqua", "speed": 4.0, "grip": 4.8, "accel": 4.5},
-	{"name": "Lotus Pop", "color": "pink", "speed": 4.2, "grip": 4.4, "accel": 4.8},
-	{"name": "Formula Blue", "color": "formula_blue", "speed": 4.8, "grip": 4.2, "accel": 4.2, "top":38.0},
-	{"name": "Formula Red", "color": "formula_red", "speed": 5.0, "grip": 3.8, "accel": 4.0, "top":39.0},
-	{"name": "Lion GT", "color": "roadster_gold", "speed": 4.6, "grip": 4.6, "accel": 4.4, "top":36.0},
-	{"name": "Racing Tuk-Tuk", "color": "race_tuk", "speed": 3.8, "grip": 5.0, "accel": 5.0, "top":32.5},
-	{"name": "Party Bus", "color": "race_bus", "speed": 3.6, "grip": 3.7, "accel": 3.6, "top":32.0}]
+var catalog: GarageCatalog
+var ROSTER: Array = []
+var KARTS: Array = []
 var circuit: LeoCircuit
 var world: Node3D
 var karts: Array[LeoKart] = []
@@ -64,11 +51,14 @@ var slipstream_cooldown := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	catalog = GarageCatalog.shared()
 	var args := OS.get_cmdline_user_args()
 	test_mode = "--race-test" in args
 	smoke_mode = "--smoke-test" in args
 	for arg in args:
 		if arg.begins_with("--capture-"): diagnostics_mode = true
+	for d in catalog.drivers: ROSTER.append({"name":d.display_name,"animal":String(d.id),"tagline":d.tagline})
+	for v in catalog.vehicles: KARTS.append({"name":v.display_name,"color":String(v.id),"speed":(v.max_speed-29.)/.9,"grip":(v.handling-.8)/.05,"accel":(v.acceleration-13.)/1.2,"top":v.max_speed})
 	configure_input()
 	if not test_mode and not smoke_mode and not diagnostics_mode and "--drive-test" not in args: load_settings()
 	circuit = LeoCircuit.new()
@@ -300,16 +290,9 @@ func build_stage() -> void:
 	stage.hide()
 
 func update_preview() -> void:
-	if is_instance_valid(preview):
-		stage.remove_child(preview)
-		preview.queue_free()
-	preview = Node3D.new()
-	stage.add_child(preview)
-	preview.add_child(load(LeoKart.chassis_path(KARTS[selected_kart].color)).instantiate())
-	LeoRaceVisuals.polish_chassis(preview.get_child(0))
-	preview.add_child(load(LeoKart.driver_path(ROSTER[selected_driver].animal)).instantiate())
-	LeoKart.seat_driver(preview.get_child(1),KARTS[selected_kart].color)
-	preview.rotation.y = -.42
+	if hud and is_instance_valid(hud.garage_selector):
+		hud.garage_selector.set_selection(ROSTER[selected_driver].animal,KARTS[selected_kart].color)
+		preview = hud.garage_selector.assembly
 
 func enter_garage() -> void:
 	get_tree().paused = false
@@ -317,15 +300,7 @@ func enter_garage() -> void:
 	state = "garage"
 	remove_racers()
 	world.hide()
-	stage.show()
-	update_preview()
-	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color("091c37")
-	showroom_lighting(true)
-	camera.position = stage.position + Vector3(6.2, 3.8, -8.8)
-	camera.look_at(stage.position + Vector3.UP * 1.0)
-	camera.look_at(stage.position - camera.global_basis.x * 2.9 + Vector3.UP * 1.0)
-	camera.fov = 44
+	stage.hide()
 
 func showroom_lighting(enabled: bool) -> void:
 	environment.fog_enabled = not enabled
@@ -391,13 +366,10 @@ func start_race() -> void:
 		kart.process_mode = Node.PROCESS_MODE_PAUSABLE
 		add_child(kart)
 		var driver_index := selected_driver if i == 0 else i % ROSTER.size()
-		var color_index: int = selected_kart if i == 0 else [4,7,5,8,6][i-1]
+		var color_index: int = selected_kart if i == 0 else (selected_kart+i*3) % catalog.vehicles.size()
 		kart.setup(circuit, i, i == 0, ROSTER[driver_index].animal, KARTS[color_index].color)
-		LeoRaceVisuals.polish_chassis(kart.chassis)
-		kart.racer_name = ROSTER[driver_index].name if i < 5 else "Kavi"
-		kart.max_speed = float(KARTS[color_index].get("top",29.0 + KARTS[color_index].speed * .9)) * (1.0 if i==0 else .96)
-		kart.handling = .8 + KARTS[color_index].grip * .05
-		kart.acceleration = 13 + KARTS[color_index].accel * 1.2
+		kart.racer_name = ROSTER[driver_index].name
+		kart.max_speed *= 1.0 if i==0 else .96
 		kart.place(-8.0 - (i / 2) * 5.5, -3.2 if i % 2 == 0 else 3.2)
 		kart.gate_crossed.connect(on_gate)
 		kart.boosted.connect(on_boost)
@@ -509,8 +481,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(dt: float) -> void:
 	clock += dt
-	if state == "garage" and preview:
-		preview.rotation.y += dt * .2
+	if state == "garage":
+		pass
 	if paused: return
 	if state == "countdown":
 		countdown -= dt
@@ -613,6 +585,8 @@ func save_settings() -> void:
 	cfg.set_value("audio", "music", music_enabled)
 	cfg.set_value("game", "driver", selected_driver)
 	cfg.set_value("game", "kart", selected_kart)
+	cfg.set_value("game","driver_id",String(catalog.drivers[selected_driver].id))
+	cfg.set_value("game","vehicle_id",String(catalog.vehicles[selected_kart].id))
 	cfg.set_value("game", "best_time_astra", best_time)
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
@@ -624,8 +598,9 @@ func load_settings() -> void:
 		master_volume = cfg.get_value("audio", "volume", .72)
 		music_enabled = cfg.get_value("audio", "music", true)
 		reduced_motion = cfg.get_value("display", "reduced_motion", false)
-		selected_driver = clampi(cfg.get_value("game", "driver", 0), 0, ROSTER.size()-1)
-		selected_kart = clampi(cfg.get_value("game", "kart", 0), 0, KARTS.size()-1)
+		var selection := catalog.migrate(cfg)
+		selected_driver = selection.x
+		selected_kart = selection.y
 		best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		if cfg.get_value("display", "fullscreen", false): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(master_volume, .0001)))
@@ -690,7 +665,7 @@ func capture_tour() -> void:
 	quit_game()
 
 func diagnostic_path(file: String) -> String:
-	return "res://docs/qa-astra/" + file if OS.has_feature("editor") else OS.get_executable_path().get_base_dir().path_join(file)
+	return "res://docs/qa-modular-garage/" + file if OS.has_feature("editor") else OS.get_executable_path().get_base_dir().path_join(file)
 
 func check(condition: bool, message: String) -> void:
 	if not condition: test_errors.append(message)
@@ -732,13 +707,13 @@ func run_smoke_checks() -> void:
 	start_race()
 	check(player.next_gate == 0 and player.lap == 1 and boost_count == 0, "Restart clears checkpoint lap and boost state")
 	hud.show_garage()
-	check(state == "garage" and stage.visible, "Garage shows modular preview")
+	check(state == "garage" and is_instance_valid(hud.garage_selector), "Garage shows modular preview")
 	for i in ROSTER.size():
 		selected_driver = i
 		for j in KARTS.size():
 			selected_kart = j
 			update_preview()
-	check(preview.get_child_count() == 2, "Every driver and kart combination loads independently")
+	check(is_instance_valid(preview), "Every driver and kart combination loads independently")
 	selected_driver = 0
 	selected_kart = 0
 	return_menu()

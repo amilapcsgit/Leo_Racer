@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+
+[ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/catalog/wheel_binding.gd" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/modular/bigster.glb" id="3"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/vehicle_bigster.png" id="thumb"]
+
+[sub_resource type="Resource" id="w0"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_0")])
+steering = true
+pivot = Vector3(-0.7916912, 0.3729599, -1.4410285)
+radius = 0.3729593123969553
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w1"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_1")])
+steering = true
+pivot = Vector3(0.7916898, 0.3729596, -1.4410285)
+radius = 0.37295960543359213
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w2"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_2")])
+steering = false
+pivot = Vector3(-0.7916912, 0.3729599, 1.469422)
+radius = 0.3729593123969553
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w3"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_3")])
+steering = false
+pivot = Vector3(0.7916898, 0.3729596, 1.469422)
+radius = 0.37295960543359213
+axle = Vector3(1, 0, 0)
+
+
+[resource]
+script = ExtResource("1")
+id = &"bigster"
+display_name = "Dacia Bigster"
+model = ExtResource("3")
+wheels = Array[ExtResource("2")]([SubResource("w0"), SubResource("w1"), SubResource("w2"), SubResource("w3")])
+collision_size = Vector3(2.2, 1.7146896, 4.2)
+collision_position = Vector3(0.0, 0.9373448, 0.0)
+max_speed = 33
+acceleration = 18
+handling = 1
+seat = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+driver_policy = 1
+preserve_materials = true
+setup_complete = true
+preview_target = Vector3(0, 0.857344812411304, 0)
+preview_distance = 7.783917488503884
+exhausts = PackedVector3Array(-0.5, 0.5, 2.122886587773787, 0.5, 0.5, 2.122886587773787)
+thumbnail = ExtResource("thumb")
+normalization = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
