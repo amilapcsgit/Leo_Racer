@@ -1,0 +1,14 @@
+{
+  "unowned_file_retained": true,
+  "settings_unchanged": true,
+  "uninstall": "PASS",
+  "install": "PASS",
+  "nsis": "3.13",
+  "upgrade": "PASS",
+  "unsigned": true,
+  "vulkan_smoke": "PASS",
+  "owned_game_removed": true,
+  "compatibility_smoke": "PASS",
+  "launcher_offline": "PASS",
+  "status": "PASS"
+}

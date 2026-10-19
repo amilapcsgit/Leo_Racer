@@ -31,3 +31,18 @@ assets/models/srilanka/*.jpg.import
 # Astra diagnostic captures are source evidence, not runtime texture imports.
 docs/qa-astra/captures/*.png.import
 docs/qa-astra/*.log
+
+# Recreated from the self-contained modular GLBs by Godot's importer.
+assets/models/modular/*.png
+assets/models/modular/*.jpg
+assets/models/modular/*.png.import
+assets/models/modular/*.jpg.import
+!assets/models/modular/helmet_driver.png
+!assets/models/modular/helmet_driver.png.import
+docs/qa-modular-garage/*.png.import
+docs/qa-modular-garage/*.jpg.import
+assets/catalog/drafts/
+launcher/bin/
+launcher/obj/
+
+installer/owned-files.nsh

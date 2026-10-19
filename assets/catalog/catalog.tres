@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="GarageCatalog" format=3]
+
+[ext_resource type="Script" path="res://scripts/catalog/garage_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="v"]
+[ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="d"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_blue.tres" id="v_blue"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_coral.tres" id="v_coral"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_aqua.tres" id="v_aqua"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_pink.tres" id="v_pink"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_formula_blue.tres" id="v_formula_blue"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_formula_red.tres" id="v_formula_red"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_roadster_gold.tres" id="v_roadster_gold"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_race_tuk.tres" id="v_race_tuk"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_race_bus.tres" id="v_race_bus"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_duster.tres" id="v_duster"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_cyberpunk.tres" id="v_cyberpunk"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_hover.tres" id="v_hover"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_bigster.tres" id="v_bigster"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_mclaren.tres" id="v_mclaren"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_pony.tres" id="v_pony"]
+[ext_resource type="Resource" path="res://assets/catalog/vehicle_colombo_tuk.tres" id="v_colombo_tuk"]
+[ext_resource type="Resource" path="res://assets/catalog/driver_hedgehog.tres" id="d_hedgehog"]
+[ext_resource type="Resource" path="res://assets/catalog/driver_lion.tres" id="d_lion"]
+[ext_resource type="Resource" path="res://assets/catalog/driver_elephant.tres" id="d_elephant"]
+[ext_resource type="Resource" path="res://assets/catalog/driver_parrot.tres" id="d_parrot"]
+[ext_resource type="Resource" path="res://assets/catalog/driver_human.tres" id="d_human"]
+[ext_resource type="Resource" path="res://assets/catalog/driver_mario.tres" id="d_mario"]
+
+[resource]
+script = ExtResource("1")
+vehicles = Array[ExtResource("v")]([ExtResource("v_blue"), ExtResource("v_coral"), ExtResource("v_aqua"), ExtResource("v_pink"), ExtResource("v_formula_blue"), ExtResource("v_formula_red"), ExtResource("v_roadster_gold"), ExtResource("v_race_tuk"), ExtResource("v_race_bus"), ExtResource("v_duster"), ExtResource("v_cyberpunk"), ExtResource("v_hover"), ExtResource("v_bigster"), ExtResource("v_mclaren"), ExtResource("v_pony"), ExtResource("v_colombo_tuk")])
+drivers = Array[ExtResource("d")]([ExtResource("d_hedgehog"), ExtResource("d_lion"), ExtResource("d_elephant"), ExtResource("d_parrot"), ExtResource("d_human"), ExtResource("d_mario")])

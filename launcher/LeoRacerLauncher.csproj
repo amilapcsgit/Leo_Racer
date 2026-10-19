@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <ApplicationIcon>../assets/art/launcher/leo-road-crest.ico</ApplicationIcon>
+    <AssemblyName>Leo Racer Launcher</AssemblyName>
+    <Version>1.5.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../assets/art/astra/leo_road_crest.png" LogicalName="crest.png" />
+  </ItemGroup>
+</Project>

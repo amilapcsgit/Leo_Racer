@@ -1,0 +1,584 @@
+{
+  "assertions": 2651,
+  "combinations": [
+    {
+      "driver": "hedgehog",
+      "vehicle": "blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "coral",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "aqua",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "pink",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "formula_blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "formula_red",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "roadster_gold",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "race_tuk",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "race_bus",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "duster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "cyberpunk",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "hover",
+      "visible_driver": false,
+      "wheels": 0
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "bigster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "mclaren",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "pony",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "hedgehog",
+      "vehicle": "colombo_tuk",
+      "visible_driver": false,
+      "wheels": 3
+    },
+    {
+      "driver": "lion",
+      "vehicle": "blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "coral",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "aqua",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "pink",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "formula_blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "formula_red",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "roadster_gold",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "race_tuk",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "race_bus",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "duster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "cyberpunk",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "hover",
+      "visible_driver": false,
+      "wheels": 0
+    },
+    {
+      "driver": "lion",
+      "vehicle": "bigster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "mclaren",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "pony",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "lion",
+      "vehicle": "colombo_tuk",
+      "visible_driver": false,
+      "wheels": 3
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "coral",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "aqua",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "pink",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "formula_blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "formula_red",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "roadster_gold",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "race_tuk",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "race_bus",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "duster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "cyberpunk",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "hover",
+      "visible_driver": false,
+      "wheels": 0
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "bigster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "mclaren",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "pony",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "elephant",
+      "vehicle": "colombo_tuk",
+      "visible_driver": false,
+      "wheels": 3
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "coral",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "aqua",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "pink",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "formula_blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "formula_red",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "roadster_gold",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "race_tuk",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "race_bus",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "duster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "cyberpunk",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "hover",
+      "visible_driver": false,
+      "wheels": 0
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "bigster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "mclaren",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "pony",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "parrot",
+      "vehicle": "colombo_tuk",
+      "visible_driver": false,
+      "wheels": 3
+    },
+    {
+      "driver": "human",
+      "vehicle": "blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "coral",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "aqua",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "pink",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "formula_blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "formula_red",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "roadster_gold",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "race_tuk",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "race_bus",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "duster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "cyberpunk",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "hover",
+      "visible_driver": false,
+      "wheels": 0
+    },
+    {
+      "driver": "human",
+      "vehicle": "bigster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "mclaren",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "pony",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "human",
+      "vehicle": "colombo_tuk",
+      "visible_driver": false,
+      "wheels": 3
+    },
+    {
+      "driver": "mario",
+      "vehicle": "blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "coral",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "aqua",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "pink",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "formula_blue",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "formula_red",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "roadster_gold",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "race_tuk",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "race_bus",
+      "visible_driver": true,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "duster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "cyberpunk",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "hover",
+      "visible_driver": false,
+      "wheels": 0
+    },
+    {
+      "driver": "mario",
+      "vehicle": "bigster",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "mclaren",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "pony",
+      "visible_driver": false,
+      "wheels": 4
+    },
+    {
+      "driver": "mario",
+      "vehicle": "colombo_tuk",
+      "visible_driver": false,
+      "wheels": 3
+    }
+  ],
+  "errors": [],
+  "selections": 96,
+  "status": "PASS"
+}

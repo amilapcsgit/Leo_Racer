@@ -25,6 +25,7 @@ var arcade_audio: AudioStreamPlayer
 var arcade_streams := {}
 var interaction_buttons: Array[Button] = []
 var garage_buttons: Array[Button] = []
+var garage_selector: ModularCarSelector
 var last_ready := true
 var last_drift_charged := false
 var ready_flash := 0.0
@@ -190,94 +191,35 @@ func show_menu() -> void:
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
 	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "LOTUS COAST    /    3 LAPS    /    6 RACERS", 17, Color("d8e7ef"), true)
-	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "ASTRA EDITION  //  v1.4.0", 17, accent, true)
+	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "MODULAR GARAGE  //  v1.5.0", 17, accent, true)
 	button(menu_root, Vector2(1430, 40), Vector2(120, 46), "QUIT", game.quit_game)
 	first.grab_focus()
 	queue_redraw()
 
-func show_garage(focus_group: String = "vehicle") -> void:
+func show_garage(_focus_group: String = "driver") -> void:
 	game.enter_garage()
 	scene_mode = "garage"
-	clear(menu_root)
-	clear(modal_root)
-	garage_buttons.clear()
-	menu_root.show()
 	hud_root.hide()
-	panel(menu_root,Vector2.ZERO,Vector2(668,900),Color("081622f5"))
-	text_at(menu_root,Vector2(46,32),Vector2(580,28),"ASTRA MOTOR CLUB  //  COLOMBO 2026",17,gold,true)
-	text_at(menu_root,Vector2(43,69),Vector2(580,65),"THE PIT SHOP",53,Color.WHITE,true)
-	text_at(menu_root,Vector2(48,145),Vector2(420,30),"01  /  PICK YOUR PERSONALITY",17,accent,true)
-	text_at(menu_root,Vector2(540,145),Vector2(85,30),"%02d / %02d" % [game.selected_driver+1,game.ROSTER.size()],17,gold,true)
-	var driver_buttons: Array[Button] = []
-	for i in game.ROSTER.size():
-		var racer: Dictionary = game.ROSTER[i]
-		var driver_words: String = racer.name.to_upper().replace("SHAVEN LEO","SHAVEN\nLEO")
-		var b := button(menu_root,Vector2(48+i*117,185),Vector2(108,72),driver_words,choose_driver.bind(i))
-		b.add_theme_font_size_override("font_size",20)
-		b.tooltip_text = racer.name + " — " + racer.tagline
-		b.set_meta("selected",i==game.selected_driver)
-		if i==game.selected_driver: b.add_theme_stylebox_override("normal",style(Color("164952"),gold))
-		driver_buttons.append(b)
-		garage_buttons.append(b)
-	text_at(menu_root,Vector2(48,270),Vector2(577,34),game.ROSTER[game.selected_driver].tagline,17,muted)
-	text_at(menu_root,Vector2(48,321),Vector2(470,30),"02  /  CHOOSE YOUR MACHINE",17,accent,true)
-	text_at(menu_root,Vector2(540,321),Vector2(85,30),"%02d / %02d" % [game.selected_kart+1,game.KARTS.size()],17,gold,true)
-	var vehicle_buttons: Array[Button] = []
-	for i in game.KARTS.size():
-		var vehicle: Dictionary = game.KARTS[i]
-		var b := button(menu_root,Vector2(48+(i%3)*195,365+(i/3)*86),Vector2(186,74),vehicle.name.to_upper(),choose_vehicle.bind(i))
-		b.add_theme_font_size_override("font_size",21 if vehicle.name.length()<14 else 18)
-		b.tooltip_text = "%s | Speed %.1f | Grip %.1f | Launch %.1f" % [vehicle.name,vehicle.speed,vehicle.grip,vehicle.accel]
-		b.set_meta("selected",i==game.selected_kart)
-		if i==game.selected_kart: b.add_theme_stylebox_override("normal",style(Color("164952"),gold))
-		vehicle_buttons.append(b)
-		garage_buttons.append(b)
-	text_at(menu_root,Vector2(48,639),Vector2(570,34),"YOUR COMBO. YOUR COAST.",22,gold,true)
-	text_at(menu_root,Vector2(48,678),Vector2(580,55),"Every racer. Every ride. Mix it up and chase the podium.",17,muted)
-	text_at(menu_root,Vector2(48,730),Vector2(580,27),"ARROWS / STICK  SELECT     ENTER / A  CONFIRM",14,accent,true)
-	var race_button := button(menu_root,Vector2(48,778),Vector2(430,66),"LET'S MAKE SOME NOISE  →",game.start_race,true)
-	race_button.add_theme_font_size_override("font_size",24)
-	var back_button := button(menu_root,Vector2(495,778),Vector2(129,66),"BACK",game.return_menu)
-	garage_buttons.append(race_button)
-	garage_buttons.append(back_button)
-	# Explicit spatial focus routes keep every combination accessible with a controller.
-	for i in driver_buttons.size():
-		focus_link(driver_buttons[i],"left",driver_buttons[posmod(i-1,driver_buttons.size())])
-		focus_link(driver_buttons[i],"right",driver_buttons[(i+1)%driver_buttons.size()])
-		focus_link(driver_buttons[i],"top",race_button)
-		focus_link(driver_buttons[i],"bottom",vehicle_buttons[mini(2,int(round(i*2.0/maxi(1,driver_buttons.size()-1))))])
-	for i in vehicle_buttons.size():
-		var row := i/3
-		var col := i%3
-		var row_start := row*3
-		focus_link(vehicle_buttons[i],"left",vehicle_buttons[row_start+posmod(col-1,mini(3,vehicle_buttons.size()-row_start))])
-		focus_link(vehicle_buttons[i],"right",vehicle_buttons[row_start+(col+1)%mini(3,vehicle_buttons.size()-row_start)])
-		focus_link(vehicle_buttons[i],"top",vehicle_buttons[i-3] if i>=3 else driver_buttons[mini(driver_buttons.size()-1,int(round(col*(driver_buttons.size()-1)/2.0)))])
-		focus_link(vehicle_buttons[i],"bottom",vehicle_buttons[i+3] if i+3<vehicle_buttons.size() else (race_button if col<2 else back_button))
-	focus_link(race_button,"right",back_button)
-	focus_link(race_button,"left",back_button)
-	focus_link(back_button,"left",race_button)
-	focus_link(back_button,"right",race_button)
-	focus_link(race_button,"top",vehicle_buttons[maxi(0,vehicle_buttons.size()-3)])
-	focus_link(back_button,"top",vehicle_buttons.back())
-	focus_link(race_button,"bottom",driver_buttons[game.selected_driver])
-	focus_link(back_button,"bottom",driver_buttons[game.selected_driver])
-	if focus_group=="driver": driver_buttons[game.selected_driver].grab_focus()
-	else: vehicle_buttons[game.selected_kart].grab_focus()
-	text_at(menu_root,Vector2(741,56),Vector2(790,72),game.ROSTER[game.selected_driver].name.to_upper(),56,Color.WHITE,true)
-	text_at(menu_root,Vector2(745,137),Vector2(800,44),game.KARTS[game.selected_kart].name.to_upper(),31,gold,true)
-	text_at(menu_root,Vector2(747,189),Vector2(790,31),"%d RACERS  ×  %d MACHINES  =  %d WAYS TO PLAY" % [game.ROSTER.size(),game.KARTS.size(),game.ROSTER.size()*game.KARTS.size()],16,accent,true)
-	var stats: Array = [game.KARTS[game.selected_kart].speed,game.KARTS[game.selected_kart].grip,game.KARTS[game.selected_kart].accel]
-	for j in range(3):
-		text_at(menu_root,Vector2(1043,699+j*43),Vector2(190,30),["TOP SPEED","CORNER GRIP","LAUNCH POWER"][j],16,muted,true)
-		var bar := ProgressBar.new()
-		bar.position = Vector2(1242,710+j*43)
-		bar.size = Vector2(260,11)
-		bar.show_percentage = false
-		bar.value = stats[j]*20.0
-		bar.add_theme_stylebox_override("background",style(Color("18304b"),Color.TRANSPARENT,4))
-		bar.add_theme_stylebox_override("fill",style(accent if j==1 else gold,Color.TRANSPARENT,4))
-		menu_root.add_child(bar)
+	clear(modal_root)
+	clear(menu_root)
+	menu_root.show()
+	garage_selector = preload("res://scenes/ModularCarSelector.tscn").instantiate()
+	garage_selector.configure(game.catalog,game.catalog.drivers[game.selected_driver].id,game.catalog.vehicles[game.selected_kart].id,game.reduced_motion)
+	menu_root.add_child(garage_selector)
+	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
+		game.selected_driver=game.catalog.driver_index(d)
+		game.selected_kart=game.catalog.vehicle_index(v)
+		game.preview=garage_selector.assembly
+		game.save_settings()
+		play_arcade_cue("select"))
+	garage_selector.race_requested.connect(func(d: StringName,v: StringName):
+		game.selected_driver=game.catalog.driver_index(d)
+		game.selected_kart=game.catalog.vehicle_index(v)
+		game.save_settings()
+		game.start_race())
+	garage_selector.back_requested.connect(game.return_menu)
+	game.preview=garage_selector.assembly
+	garage_selector.driver_buttons[game.selected_driver%6].grab_focus()
 	queue_redraw()
 
 func modal(title: String, subtitle: String = "") -> void:
@@ -345,6 +287,7 @@ func show_race() -> void:
 	display_speed = 0.0
 	display_nitro = 1.0
 	menu_root.hide()
+	if is_instance_valid(garage_selector): garage_selector.hide()
 	clear(modal_root)
 	clear(hud_root)
 	labels.clear()
@@ -524,16 +467,6 @@ static func speed_line_strength(speed_mps: float,boosting: bool,active: bool,red
 	return maxf(1.0 if boosting and speed_mps>8 else 0.0,smoothstep(150.0,180.0,absf(speed_mps)*3.6)*.65)
 
 func _draw() -> void:
-	if scene_mode=="garage":
-		draw_line(Vector2(668,28),Vector2(668,868),Color(accent,.36),2,true)
-		draw_line(Vector2(48,307),Vector2(624,307),Color(accent,.24),1,true)
-		draw_line(Vector2(48,627),Vector2(624,627),Color(accent,.24),1,true)
-		for b in garage_buttons:
-			if not is_instance_valid(b) or not b.get_meta("selected",false): continue
-			var r := Rect2(b.position-Vector2(3,3),b.size+Vector2(6,6))
-			draw_rect(r,Color(gold,.55),false,2)
-			draw_line(r.position,r.position+Vector2(22,0),accent,3,true)
-			draw_line(r.end-Vector2(22,0),r.end,accent,3,true)
-		return
+	if scene_mode=="garage": return
 	if scene_mode!="race" or not game or not game.player or photo_mode: return
 	LeoTelemetry.draw(self)

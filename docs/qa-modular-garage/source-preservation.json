@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "errors": [],
+  "originals_hashed": 9,
+  "astra_geometry_track_files_identical": 78,
+  "source_paths": [
+    "cars_glb/2011_dacia_duster.glb",
+    "cars_glb/cyberpunk_car.glb",
+    "cars_glb/cyberpunk_hovercar.glb",
+    "cars_glb/dacia_Bigster.glb",
+    "cars_glb/mclaren_mp425.glb",
+    "cars_glb/pony_cartoon.glb",
+    "cars_glb/tuk_tuk_colombo.glb",
+    "driver_glb/mario_driver.glb",
+    "driver_glb/Shaven_Leo_driver.glb"
+  ],
+  "car_contract": "All POSITION/NORMAL/TEXCOORD accessors, embedded image bytes and material assignments retained; index partitioning only. Pony Ground_SG two-triangle presentation floor excluded.",
+  "driver_contract": "Source UV/material binding retained through Blender; seated/standing poses baked. Generated Icosphere armature display helper excluded.",
+  "helmet_png_sha256": "045bcb9ad808166c72969e45631554f7fde22cf536cf9706f383138771f1aa8c"
+}

@@ -1,0 +1,13 @@
+{
+  "version": "1.5.0",
+  "branch": "ModularGarage",
+  "godot": "4.7.2 .NET",
+  "architecture": "Windows x86_64",
+  "exe_sha256": "8c7d78ece1aef8e58f8f7f8856c57332129a267b98d65cca20420d9ed02d206a",
+  "runtime_bundled": true,
+  "terrain_library_bundled": true,
+  "commit": "7baf4e13cc1ca798147ef422e31d029e77ef5de6",
+  "zip_sha256": "908f44831529d5f3c1d8cdb30077816350958202e77e47679d47cd42b516900b",
+  "zip_bytes": 619384093,
+  "exe_bytes": 591579064
+}

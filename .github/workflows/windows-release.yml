@@ -1,0 +1,100 @@
+name: Windows build and release
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set build version
+        shell: pwsh
+        run: |
+          $version='1.5.0'
+          if ('${{ github.ref_type }}' -eq 'tag') {$version='${{ github.ref_name }}'.TrimStart('v')}
+          "BUILD_VERSION=$version" >> $env:GITHUB_ENV
+      - name: Install checksum-pinned dependencies
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build | Out-Null
+          python -m pip install numpy==2.2.6 Pillow==11.2.1
+          ./tools/setup_windows.ps1
+      - name: Validate source preservation
+        run: python tools/verify_modular_sources.py
+      - name: Validate catalog and gameplay
+        shell: pwsh
+        run: |
+          foreach ($test in @('modular_catalog_test','modular_drive_test','modular_presentation_test','modular_fleet_race')) {
+            & ./tools/run_godot.ps1 --headless --script "res://tests/$test.gd" '--' --drive-test
+            if ($LASTEXITCODE -ne 0) {throw "Failed $test"}
+          }
+      - name: Export game and launcher
+        shell: pwsh
+        run: |
+          ./tools/build_modular_release.ps1
+          ./tools/build_launcher.ps1 -Version $env:BUILD_VERSION
+          python tools/package_modular.py --version $env:BUILD_VERSION
+          ./tools/build_installer.ps1 -Version $env:BUILD_VERSION
+          python tools/package_modular.py --version $env:BUILD_VERSION --checksums-only
+      - name: Verify extracted offline package
+        shell: pwsh
+        run: |
+          $folder=Resolve-Path 'build/qa-modular-garage-fresh/Leo Racer Modular Garage'
+          $launcher=Join-Path $folder 'Leo Racer Launcher.exe'
+          $p=Start-Process -FilePath $launcher -ArgumentList '--self-test' -PassThru -Wait -WindowStyle Hidden
+          if ($p.ExitCode -ne 0) {throw 'Launcher self-test failed'}
+          # Hosted runners have no Vulkan GPU. Hardware Vulkan/GL acceptance is
+          # recorded separately in docs/MODULAR_GARAGE_VALIDATION.md.
+          $exe=Join-Path $folder 'Leo Racer.exe'
+          $p=Start-Process -FilePath $exe -ArgumentList @('--headless','--','--smoke-test') -PassThru -Wait -WindowStyle Hidden
+          if ($p.ExitCode -ne 0) {throw 'Extracted game smoke test failed'}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages
+          path: |
+            dist/*
+            docs/qa-modular-garage/*.json
+          retention-days: 14
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/ModularGarage'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-packages
+          path: release
+      - name: Publish validated release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then
+            tag="v1.5.0"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo 'Stable release already exists; branch CI completed.'
+              exit 0
+            fi
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA"
+          fi
+          args=()
+          if [[ "$tag" == *-rc* ]]; then args+=(--prerelease); fi
+          gh release create "$tag" release/dist/* --target "$GITHUB_SHA" --title "Leo Racer $tag" --notes-file docs/RELEASE_NOTES.md "${args[@]}"
+          gh release upload "$tag" docs/qa-modular-garage/garage-1920x1080.png docs/qa-modular-garage/model-comparisons.jpg --clobber
