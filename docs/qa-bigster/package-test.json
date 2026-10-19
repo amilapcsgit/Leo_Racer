@@ -1,0 +1,15 @@
+{
+  "stable_install_registry_unchanged": true,
+  "status": "PASS",
+  "settings_unchanged": true,
+  "separate_rc_key": true,
+  "owned_game_removed": true,
+  "unsigned": true,
+  "version": "1.6.0-rc.1",
+  "upgrade": "PASS",
+  "launcher_offline": "PASS",
+  "install": "PASS",
+  "uninstall": "PASS",
+  "nsis": "3.13",
+  "unowned_file_retained": true
+}

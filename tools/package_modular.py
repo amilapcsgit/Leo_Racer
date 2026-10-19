@@ -11,7 +11,7 @@ SUFFIX='BigsterRC' if args.branch=='bigster' else 'ModularGarage'
 if args.checksums_only:
  entries=[]
  for path in sorted(DIST.iterdir()):
-  if path.suffix in ['.zip','.exe'] and args.version in path.name:
+  if path.suffix in ['.zip','.exe','.json'] and args.version in path.name:
    entries.append(hashlib.sha256(path.read_bytes()).hexdigest()+'  '+path.name)
  (DIST/'SHA256SUMS.txt').write_text('\n'.join(entries)+'\n')
  raise SystemExit()
@@ -53,6 +53,7 @@ Duster: 165/198 km/h. Bigster: 180/225 km/h with electric boost and braking rege
 exe_hash=hashlib.sha256((BUILD/'Leo Racer.exe').read_bytes()).hexdigest()
 manifest={'version':args.version,'branch':args.branch,'godot':'4.7.2 .NET','architecture':'Windows x86_64','exe_sha256':exe_hash,'runtime_bundled':True,'terrain_library_bundled':True}
 manifest['commit']=subprocess.check_output(['git','-c','safe.directory='+ROOT.as_posix(),'-C',str(ROOT),'rev-parse','HEAD']).decode().strip()
+manifest['source_tree']=subprocess.check_output(['git','-c','safe.directory='+ROOT.as_posix(),'-C',str(ROOT),'rev-parse','HEAD^{tree}']).decode().strip()
 (BUILD/'build-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
 archive=DIST/f'LeoRacer-Windows-{args.version}-{SUFFIX}.zip'
 with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
@@ -67,6 +68,7 @@ with zipfile.ZipFile(archive) as z:
  assert z.testzip() is None
  z.extractall(fresh)
 manifest.update(zip_sha256=hashlib.sha256(archive.read_bytes()).hexdigest(),zip_bytes=archive.stat().st_size,exe_bytes=(BUILD/'Leo Racer.exe').stat().st_size)
+(DIST/f'BUILDINFO-{args.version}.json').write_text(json.dumps(manifest,indent=2)+'\n')
 (ROOT/('docs/qa-bigster/build-manifest.json' if args.branch=='bigster' else 'docs/qa-modular-garage/build-manifest.json')).write_text(json.dumps(manifest,indent=2)+'\n')
 print(json.dumps(manifest,indent=2))
 print('FRESH_TEST_PATH',fresh/FOLDER)

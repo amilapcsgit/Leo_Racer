@@ -45,14 +45,14 @@ stationary calipers are retained. The hover vehicle remains wheel-free.
   measured-travel wheel animation, recovery, migration and independent GLB import.
 - `qa-bigster/acceptance.json`: carousel persistence, name entry, synthetic Xbox
   inputs, layout at 720p/1080p/ultrawide, speed ceilings, braking regeneration,
-  pause cancellation/continue/new-race and record exclusion.
+  pause cancellation/continue/new-race and record exclusion: **37 checks passed**.
 - `qa-bigster/fleet-race.json`: all sixteen vehicles complete three six-racer
   autonomous races with ordered checkpoints, including the faster Dacias.
 - Driving and presentation regressions: 11 and 24 checks respectively.
 - `qa-bigster/render-profile.json`: warmed-up full six-racer 1080p RTX A1000
   profile: **103.68 FPS average, p95 11.78 ms**, passing both targets.
 - `qa-bigster/package-test.json`: extracted Vulkan/Compatibility and per-user
-  install/upgrade/uninstall results. `stable-download-check.json` also verifies
+  install/upgrade/uninstall results: **all passed**, stable registry and settings unchanged. `stable-download-check.json` also verifies
   the actual public v1.5.0 ZIP hash and both rendering modes.
 
 Synthetic controller events exercise the named Godot Xbox buttons and focus
