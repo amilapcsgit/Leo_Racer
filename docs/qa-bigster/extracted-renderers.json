@@ -1,12 +1,12 @@
 {
-  "vulkan": {
+  "compatibility": {
     "boosts": 0,
     "engine": "4.7.2-stable (official)",
     "errors": [],
     "race_time": 0.0,
     "status": "PASS"
   },
-  "compatibility": {
+  "vulkan": {
     "boosts": 0,
     "engine": "4.7.2-stable (official)",
     "errors": [],

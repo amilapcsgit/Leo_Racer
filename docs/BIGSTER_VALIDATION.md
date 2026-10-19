@@ -34,7 +34,7 @@ and [Bajaj RE](https://cdn.globalbajaj.com/en/Brands/RE/RE4S-CNG).
 Both Dacias use a fixed helmeted Shaven Leo inside, with a separate cabin pose.
 Selected identity and custom name stay independent. Existing open karts use the
 selected driver, with pelvis-anchored human fits. Other supplied vehicles remain
-driver-free. Tire/rim groups use their own uniform scaling, hubs and radii;
+driver-free. Bigster rubber uses 0.93 roughness and zero metallic response; alloy and lamp lenses have separate materials. Tire/rim groups use their own uniform scaling, hubs and radii;
 stationary calipers are retained. The hover vehicle remains wheel-free.
 
 ## Evidence
