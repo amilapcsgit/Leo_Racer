@@ -25,6 +25,10 @@ for s in specs:
         wheelrows.append({'hub':hub.tolist(),'radius_y':float(ex[1]*.5),'radius_z':float(ex[2]*.5)})
     wb=max(w['hub'][2] for w in wheelrows)-min(w['hub'][2] for w in wheelrows)
     if abs(wb-target['wheelbase'])>.012:errors.append(key+': wheelbase')
+    if key=='bigster':
+        rubber=next(m for m in g.doc['materials'] if m.get('name')=='Wheel rubber')['pbrMetallicRoughness']
+        if rubber['metallicFactor']!=0 or rubber['roughnessFactor']<.8:errors.append('Bigster rubber material')
+        if s['material_triangles'].get('Headlamp lens',0)==0 or s['material_triangles'].get('Tail lamp lens',0)==0:errors.append('Bigster lamp material separation')
     original=ROOT/s['source']
     if hashlib.sha256(original.read_bytes()).hexdigest()!=s['source_sha256']:errors.append(key+': stable v1.5 model changed')
     glass=[m for m in g.doc['materials'] if 'glass' in m.get('name','').lower()]

@@ -70,7 +70,7 @@
     "id": "bigster",
     "source": "assets/models/modular/bigster.glb",
     "source_sha256": "041e7e30b7513289efbe107fd9b44ebe53ebcf31dff67e2d25491126534acb79",
-    "prepared_sha256": "e8cabe52cc2b7c20fb4f60b894d2f82ca6d8fa19591f80d78e8798f1ee9b3cc8",
+    "prepared_sha256": "b1e0e246ada2df71df7940aa08e7854eed4111d80b17ee0e6fdbc596de856ade",
     "target_metres": {
       "length": 4.57,
       "width_with_mirrors": 2.069,
@@ -112,10 +112,14 @@
       }
     ],
     "material_triangles": {
-      "Standard00FF99": 992,
-      "Graphite paint": 372,
+      "Standard00FF99": 666,
+      "Graphite paint": 354,
       "Clear automotive glass": 18,
-      "Unpainted trim": 350
+      "Unpainted trim": 350,
+      "Headlamp lens": 18,
+      "Tail lamp lens": 6,
+      "Wheel rubber": 160,
+      "Wheel alloy": 160
     },
     "method": "Axle-station body mapping; independently uniformly scaled tire/rim groups; original triangle topology and UVs retained. Bigster is the supplied 2024-Duster-derived approximation."
   },

@@ -60,6 +60,13 @@ def prepare(key):
     glass=len(mats);mats.append(mat('Clear automotive glass',[.13,.22,.26,.24],rough=.08,glass=True))
     trim=len(mats);mats.append(copy.deepcopy(mats[0]) if key=='bigster' else mat('Textured black trim',[.026,.032,.035,1],rough=.78));mats[-1]['name']='Unpainted trim';mats[-1]['pbrMetallicRoughness'].update(metallicFactor=0,roughnessFactor=.78)
     canopy=len(mats);mats.append(mat('Matte woven canopy',[.025,.025,.023,1],rough=.94))
+    if key=='bigster':
+        tire_mat=len(mats);mats.append(copy.deepcopy(old['materials'][0]) if key=='bigster' else mat('Rubber',[.02,.02,.02,1]))
+        mats[-1].pop('extensions',None);mats[-1]['name']='Wheel rubber';mats[-1]['pbrMetallicRoughness'].update(baseColorFactor=[1,1,1,1],metallicFactor=0,roughnessFactor=.93)
+        alloy_mat=len(mats);mats.append(copy.deepcopy(mats[tire_mat]));mats[-1]['name']='Wheel alloy';mats[-1]['pbrMetallicRoughness'].update(metallicFactor=.82,roughnessFactor=.24)
+        lamp_mat=len(mats);mats.append(copy.deepcopy(mats[tire_mat]));mats[-1]['name']='Headlamp lens';mats[-1]['pbrMetallicRoughness'].update(roughnessFactor=.18);mats[-1]['emissiveFactor']=[.35,.35,.32]
+        if key=='bigster':mats[-1]['emissiveTexture']={'index':0}
+        rear_mat=len(mats);mats.append(copy.deepcopy(mats[lamp_mat]));mats[-1]['name']='Tail lamp lens';mats[-1]['emissiveFactor']=[.8,.04,.02]
     image=np.asarray(Image.open(io.BytesIO(g.image(0))).convert('RGB'))/255. if key=='bigster' else None
     parents={c:i for i,n in enumerate(old['nodes']) for c in n.get('children',[])}
     nodes=[{'name':'VehicleMetres','children':[]}];meshes=[];groups={};counts={}
@@ -84,6 +91,9 @@ def prepare(key):
                 out=(xyz-np.array(w['pivot']))*factor+np.array(nw['pivot']);scale[:]=factor
             assignments=np.full(len(faces),p.get('material',0),int)
             centers=out[faces].mean(1)
+            if key=='bigster' and wheelnum is not None:
+                hub=np.array(newwheels[wheelnum]['pivot']);radial=np.linalg.norm(centers[:,[1,2]]-hub[[1,2]],axis=1)
+                assignments[:]=np.where(radial>newwheels[wheelnum]['radius']*.74,tire_mat,alloy_mat)
             if key=='bigster' and wheelnum is None:
                 uv=g.array(p['attributes']['TEXCOORD_0'])[faces].mean(1)
                 rgb=image[(np.clip(uv[:,1],0,.9999)*image.shape[0]).astype(int),(np.clip(uv[:,0],0,.9999)*image.shape[1]).astype(int)]
@@ -97,6 +107,8 @@ def prepare(key):
                 assignments[(brightness>.58)&(spread<.15)]=paint
                 assignments[brightness<.14]=trim
                 assignments[win]=glass
+                assignments[(centers[:,2]<-1.9)&(centers[:,1]>.55)&(centers[:,1]<1.10)&(np.abs(centers[:,0])>.43)&(brightness>.65)&(spread<.15)]=lamp_mat
+                assignments[(centers[:,2]>1.95)&(rgb[:,0]>rgb[:,1]*1.8)&(rgb[:,0]>.35)]=rear_mat
             if key=='colombo_tuk' and wheelnum is None:
                 assignments[(centers[:,1]>1.28)&(centers[:,2]>-.8)]=canopy
             for mi in np.unique(assignments):
