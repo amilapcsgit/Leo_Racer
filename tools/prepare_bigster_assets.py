@@ -170,6 +170,8 @@ def prepare(key):
     return {'id':key,'source':source.relative_to(ROOT).as_posix(),'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'prepared_sha256':hashlib.sha256((OUT/f'{key}.glb').read_bytes()).hexdigest(),'target_metres':{'length':length,'width_with_mirrors':width,'height':height,'wheelbase':wb},'wheels':newwheels,'material_triangles':counts,'method':'Axle-station body mapping; independently uniformly scaled tire/rim groups; original triangle topology and UVs retained. Bigster is the supplied 2024-Duster-derived approximation.'}
 
 if __name__=='__main__':
-    result=[prepare(k) for k in ['duster','bigster','colombo_tuk']]
+    existing=json.loads((OUT/'derivative-specs.json').read_text())
+    finished=next((s for s in existing if s['id']=='bigster' and s.get('runtime_revision')),None)
+    result=[finished if k=='bigster' and finished else prepare(k) for k in ['duster','bigster','colombo_tuk']]
     (OUT/'derivative-specs.json').write_text(json.dumps(result,indent=2),encoding='utf8')
     print(json.dumps(result,indent=2))

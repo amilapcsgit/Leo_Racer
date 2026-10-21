@@ -1,23 +1,29 @@
-# Leo Racer v1.6.0-rc.1 — Bigster
+# Leo Racer 1.6.0 — Bigster Extreme
 
-Six drivers, sixteen machines and a persistent arcade carousel in the Colombo
-workshop. Adds custom names, an Xbox-operated name keyboard, and Pause → Change
-Car with Continue / New Race / Cancel. Mid-race swaps cannot set best-time records.
+Replaces the earlier Bigster approximation with the repaired gray Extreme model:
+wide four-row copper grille, revised bumpers and rear quarter glass, black roof,
+closed panoramic glass and Tagasan wheels. The game derivative has 69,652
+triangles and is 4.94 MB, with portable PBR materials and four independently
+animated wheels. The SUV is 30% larger in-game, with matching driver and collision
+size. Corrected local wheel pivots prevent orbiting during driving; brake calipers
+steer without spinning with the tires.
 
-Download **LeoRacer-Setup-1.6.0-rc.1.exe** for a separate per-user RC installation, or the portable
-ZIP. Open **Leo Racer Launcher.exe**, then choose Play or Compatibility Mode.
-The complete .NET runtime is included. Playing works offline; Downloads / Updates
-opens this release page. Settings and race records survive upgrades and uninstall.
+Six driver identities, sixteen machines, custom names, controller name entry,
+and the persistent garage remain available. Pause → Change Car retains progress;
+changed races cannot set best-time records. Bigster retains its 180 / 225 km/h
+normal / boosted arcade settings, electric boost and braking regeneration.
 
-Windows x64; Vulkan recommended, OpenGL Compatibility fallback available. These
-initial binaries are unsigned. Verify downloads against SHA256SUMS.txt.
+Download **LeoRacer-Setup-1.6.0.exe** for the stable per-user installation, or
+**LeoRacer-Windows-1.6.0-Bigster.zip** for portable play. Run **Leo Racer Launcher.exe**.
+The .NET runtime is included; playing works offline. Settings and records survive
+upgrades. The previous 1.6 RC remains a separate installation.
 
-White 2011 Duster: 165 / 198 km/h. Graphite Bigster approximation: 180 / 225 km/h,
-electric boost and modest braking regeneration. Both show helmeted Shaven Leo in
-their cabins. The supplied tuk-tuk now has correct proportions and matte canopy.
-Tires stay circular and use individual rolling radii. All source inputs and the
-stable v1.5 release remain intact.
+Windows x64; Vulkan recommended, OpenGL Compatibility fallback available.
+Binaries are unsigned. Verify downloads against **SHA256SUMS.txt**.
 
-Source is on `bigster`. See docs/BIGSTER_VALIDATION.md and
-docs/MODULAR_GARAGE_ONBOARDING.md for validation and editable asset setup. Third-party
-asset notices ship inside licenses/. GitHub also provides source ZIP/TAR archives.
+This is a simplified game derivative of the supplied Duster-based Blender model;
+the editable detailed master remains separate. The sunroof is closed in the game
+asset. See **docs/BIGSTER_RUNTIME_REPLACEMENT.md** and
+**docs/qa-bigster-replacement/** for current geometry and integration evidence.
+Original models and previous releases remain available. Component notices ship
+inside **licenses/**. Source is on the `bigster` branch and `v1.6.0` tag.

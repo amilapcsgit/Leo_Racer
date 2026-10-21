@@ -1,3 +1,7 @@
+> Historical v1.6 RC evidence below. The stable 1.6.0 release replaces its Bigster
+> asset; current measurements, captures and limits are in
+> [BIGSTER_RUNTIME_REPLACEMENT.md](BIGSTER_RUNTIME_REPLACEMENT.md).
+
 # v1.6.0-rc.1 — Bigster upgrade
 
 Stable v1.5.0 remains available on `ModularGarage` and its release tag. `bigster`

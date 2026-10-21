@@ -105,7 +105,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	chassis = visual.get_node("Chassis")
 	driver = visual.get_node_or_null("Driver")
 	for binding in definition.wheels:
-		if not binding.steering: rear_tire_positions.append(binding.pivot)
+		if not binding.steering: rear_tire_positions.append(chassis.transform * binding.pivot)
 		attach_binding(binding)
 	var collision := CollisionShape3D.new()
 	var shape := BoxShape3D.new()

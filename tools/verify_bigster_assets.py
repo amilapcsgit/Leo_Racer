@@ -14,7 +14,8 @@ for s in specs:
                 result.append(points(world[i],g.array(p['attributes']['POSITION'])[np.unique(g.array(p['indices']))]))
         for child in n.get('children',[]):result.extend(geometry(child))
         return result
-    xyz=np.concatenate(geometry(0));extent=np.ptp(xyz,axis=0);target=s['target_metres']
+    scene=g.doc['scenes'][g.doc.get('scene',0)]
+    xyz=np.concatenate([a for index in scene['nodes'] for a in geometry(index)]);extent=np.ptp(xyz,axis=0);target=s['target_metres']
     if abs(extent[2]-target['length'])>.012 or abs(extent[1]-target['height'])>.015 or abs(extent[0]-target['width_with_mirrors'])>.02:errors.append(key+': measured exterior dimensions')
     wheelrows=[]
     for wi,w in enumerate(s['wheels']):
@@ -28,12 +29,21 @@ for s in specs:
     if key=='bigster':
         rubber=next(m for m in g.doc['materials'] if m.get('name')=='Wheel rubber')['pbrMetallicRoughness']
         if rubber['metallicFactor']!=0 or rubber['roughnessFactor']<.8:errors.append('Bigster rubber material')
-        if s['material_triangles'].get('Headlamp lens',0)==0 or s['material_triangles'].get('Tail lamp lens',0)==0:errors.append('Bigster lamp material separation')
+        counts={}
+        for mesh in g.doc['meshes']:
+            for primitive in mesh['primitives']:
+                name=g.doc['materials'][primitive['material']]['name']
+                counts[name]=counts.get(name,0)+g.doc['accessors'][primitive['indices']]['count']//3
+        lamps=('Headlamp white','Tail lamp red') if s.get('runtime_revision') else ('Headlamp lens','Tail lamp lens')
+        if any(counts.get(name,0)==0 for name in lamps):errors.append('Bigster lamp material separation')
+        if counts!=s['material_triangles']:errors.append('Bigster material geometry differs from recorded derivative')
+        if hashlib.sha256((ROOT/'assets/models/bigster/bigster.glb').read_bytes()).hexdigest()!=s['prepared_sha256']:errors.append('Bigster prepared asset hash')
     original=ROOT/s['source']
     if hashlib.sha256(original.read_bytes()).hexdigest()!=s['source_sha256']:errors.append(key+': stable v1.5 model changed')
     glass=[m for m in g.doc['materials'] if 'glass' in m.get('name','').lower()]
     if not glass or not all(m.get('alphaMode')=='BLEND' and 'KHR_materials_transmission' not in m.get('extensions',{}) for m in glass):errors.append(key+': compatibility glass')
     rows.append({'id':key,'measured_width_height_length':extent.tolist(),'wheelbase':wb,'wheels':wheelrows,'glass':'alpha blend, no transmission dependency'})
-result={'status':'PASS' if not errors else 'FAIL','errors':errors,'vehicles':rows,'note':'Bigster is a proportion-corrected approximation of the supplied body, not a newly licensed authentic Bigster model.'}
-(ROOT/'docs/qa-bigster/asset-measurements.json').write_text(json.dumps(result,indent=2))
+result={'status':'PASS' if not errors else 'FAIL','errors':errors,'vehicles':rows,'note':'Bigster is the simplified repaired Duster-derived master. Authored mirror width is 2.042437 m; nominal reference width is 2.069 m. Master width was preserved.'}
+out=ROOT/'docs/qa-bigster-replacement';out.mkdir(parents=True,exist_ok=True)
+(out/'asset-measurements.json').write_text(json.dumps(result,indent=2))
 print(json.dumps(result,indent=2));sys.exit(bool(errors))

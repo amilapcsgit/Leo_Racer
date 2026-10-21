@@ -6,8 +6,9 @@ ROOT=Path(__file__).resolve().parent.parent
 BUILD=ROOT/'build/ModularGarage'
 DIST=ROOT/'dist'
 DIST.mkdir(exist_ok=True)
-FOLDER='Leo Racer Bigster RC' if args.branch=='bigster' else 'Leo Racer Modular Garage'
-SUFFIX='BigsterRC' if args.branch=='bigster' else 'ModularGarage'
+candidate='-rc' in args.version
+FOLDER=('Leo Racer Bigster RC' if candidate else 'Leo Racer') if args.branch=='bigster' else 'Leo Racer Modular Garage'
+SUFFIX=('BigsterRC' if candidate else 'Bigster') if args.branch=='bigster' else 'ModularGarage'
 if args.checksums_only:
  entries=[]
  for path in sorted(DIST.iterdir()):
@@ -44,7 +45,7 @@ Source and setup: https://github.com/amilapcsgit/Leo_Racer/tree/{args.branch}
 Component notices are in licenses/. See source docs/MODULAR_GARAGE_VALIDATION.md
 for verification results and engine cleanup-warning notes.
 
-Bigster RC: LB/RB cycles cars in the garage. Use the name keyboard with A.
+Bigster Extreme: LB/RB cycles cars in the garage. Use the name keyboard with A.
 Pause > Change Car retains the race. Continue swaps only your car; changed
 races cannot set records. Start New Race restarts; Back cancels the changes.
 Duster: 165/198 km/h. Bigster: 180/225 km/h with electric boost and braking regen.

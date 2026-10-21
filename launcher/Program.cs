@@ -29,7 +29,7 @@ internal sealed class Launcher : Form {
         var crest = Image.FromStream(source!);
         Controls.Add(new PictureBox { Image=crest, SizeMode=PictureBoxSizeMode.Zoom, Bounds=new Rectangle(12,55,350,350) });
         Controls.Add(new Label {Text="LEO RACER",Font=new Font("Segoe UI",30,FontStyle.Bold),Bounds=new Rectangle(380,57,380,64)});
-        string version = "1.5.0";
+        string version = "1.6.0";
         try { using var info=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"build-manifest.json")));version=info.RootElement.GetProperty("version").GetString()!; } catch { }
         Controls.Add(new Label {Text=$"INSTALLED  v{version}\nCOLOMBO GRAND PRIX",ForeColor=Color.FromArgb(202,167,84),Bounds=new Rectangle(385,132,355,64)});
         AddButton("PLAY  →",214,true,()=>Play(false));

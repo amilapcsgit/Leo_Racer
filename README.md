@@ -1,12 +1,12 @@
 # Leo Racer — Colombo 2026
 
-A local Windows arcade kart racer set around a stylized Colombo coast, Fort streets, tropical gardens, and the Lotus Tower. **Version 1.4.0 / branch `astra`** expands the circuit to 1.9 km with Port City esses, harbor hairpin, lagoon causeway, sculpted dunes and garden hills. Five drivers and nine vehicles include Shaven Leo, two Formula racers, Lion GT, Racing Tuk-Tuk and Party Bus. Luminous advertising, generated road paint, arcade audio, launch boosts and slipstream rewards bring the coast to life.
+A local Windows arcade kart racer set around a stylized Colombo coast, Fort streets, tropical gardens, and the Lotus Tower. **Version 1.6.0 / branch `bigster`** includes six driver identities, sixteen vehicles, a controller-friendly garage and Pause → Change Car. The new gray Bigster Extreme uses the repaired Blender body, black panoramic roof, copper details and Tagasan wheels. The 1.9 km circuit retains Port City esses, harbor hairpin, lagoon causeway, sculpted dunes and garden hills.
 
-![Colombo gameplay](docs/qa-astra/captures/05-coast.png)
+![Bigster Extreme in the garage](docs/qa-bigster-replacement/garage.png)
 
 ## Play
 
-Extract the entire **LeoRacer-Windows-v1.4-Astra.zip** folder and run **Play Leo Racer.cmd** or **Leo Racer.exe**. Keep the accompanying `.NET` data directory and Terrain3D DLL beside the executable. Neither Godot nor a .NET installation is required to play.
+Download **LeoRacer-Setup-1.6.0.exe** or extract the entire **LeoRacer-Windows-1.6.0-Bigster.zip** folder, then run **Leo Racer Launcher.exe**. Keep the accompanying `.NET` data directory and Terrain3D DLL beside the executable. Neither Godot nor a .NET installation is required to play. [Downloads](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v1.6.0).
 
 Use **Play Compatibility Mode.cmd** if Vulkan is unavailable. Compatibility mode uses simpler effects. The previous Sri Lanka v1.3 and Colombo v1.2 branches/releases remain available for rollback.
 
@@ -21,7 +21,7 @@ Use **Play Compatibility Mode.cmd** if Vulkan is unavailable. Compatibility mode
 | Pause | Esc or P | Start |
 | Hide HUD for photos | F8 | — |
 
-Race three laps against five opponents. Tap accelerate on the final countdown beat for a launch boost. Recharge nitro through drifting and by slipstreaming behind another moving racer. Hold drift through steering corrections, then release a charged drift for a mini-turbo; longer charges earn SUPER DRIFT. Eight boost pads reward a flowing racing line. Recovery preserves ordered checkpoints, and a kart stuck under throttle resets safely after three seconds. All five drivers can drive all nine vehicles.
+Race three laps against five opponents. Tap accelerate on the final countdown beat for a launch boost. Recharge nitro through drifting and by slipstreaming behind another moving racer. Hold drift through steering corrections, then release a charged drift for a mini-turbo; longer charges earn SUPER DRIFT. Eight boost pads reward a flowing racing line. Recovery preserves ordered checkpoints, and a kart stuck under throttle resets safely after three seconds. Six identities and sixteen vehicles share the catalog; closed Dacias retain their fixed helmeted driver. Pause → Change Car retains race progress; changed races cannot set records.
 
 **Reduced Motion** in Settings disables camera kicks, roll, shake, and recovery distortion while retaining useful visual feedback. Existing preferences are preserved. Astra uses a separate best-time record for its longer route.
 

@@ -70,10 +70,10 @@
     "id": "bigster",
     "source": "assets/models/modular/bigster.glb",
     "source_sha256": "041e7e30b7513289efbe107fd9b44ebe53ebcf31dff67e2d25491126534acb79",
-    "prepared_sha256": "b1e0e246ada2df71df7940aa08e7854eed4111d80b17ee0e6fdbc596de856ade",
+    "prepared_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
     "target_metres": {
       "length": 4.57,
-      "width_with_mirrors": 2.069,
+      "width_with_mirrors": 2.0424370765686035,
       "height": 1.712,
       "wheelbase": 2.702
     },
@@ -112,16 +112,45 @@
       }
     ],
     "material_triangles": {
-      "Standard00FF99": 666,
-      "Graphite paint": 354,
-      "Clear automotive glass": 18,
-      "Unpainted trim": 350,
-      "Headlamp lens": 18,
-      "Tail lamp lens": 6,
-      "Wheel rubber": 160,
-      "Wheel alloy": 160
+      "Lamp lens": 230,
+      "Gray paint": 7264,
+      "Dark cladding": 26733,
+      "Gloss black trim": 3658,
+      "Black roof": 3732,
+      "Machined alloy": 4252,
+      "Satin silver": 362,
+      "Cabin dark": 601,
+      "Tail lamp red": 142,
+      "Seat fabric": 4429,
+      "Headlamp white": 432,
+      "Plate EU blue": 376,
+      "Badge and plate white": 312,
+      "Plate lettering": 1785,
+      "Copper accents": 5101,
+      "Front glass": 178,
+      "Privacy glass": 344,
+      "Panoramic glass": 505,
+      "Wheel rubber": 9216
     },
-    "method": "Axle-station body mapping; independently uniformly scaled tire/rim groups; original triangle topology and UVs retained. Bigster is the supplied 2024-Duster-derived approximation."
+    "method": "Simplified repaired Duster-derived Bigster Extreme master. Static body/cabin merged; dense tyre tread replaced with circular grooved tyres; wheels uniformly fitted to existing RC radius/pivots. Authored body width preserved; no whole-body stretch. Historical modular source remains unchanged.",
+    "runtime_revision": "v4-reference-fix-game-1",
+    "source_master_sha256": "ee1b8969a4149628e3610df869072e10977510ca8c114b404cd21817af5ecaa5",
+    "source_master": "bigster_extreme_gray.blend (separate editable v4 reference fix master)",
+    "nominal_mirror_width_metres": 2.069,
+    "runtime": {
+      "triangles": 69652,
+      "glb_bytes": 4940972,
+      "materials": 19,
+      "textures": 0,
+      "sunroof": "closed static",
+      "forward": "-Z",
+      "up": "+Y",
+      "wheel_radius": 0.355,
+      "catalog_y_offset": 0.104,
+      "game_scale": 1.3,
+      "game_wheel_radius": 0.4615,
+      "binding_space": "unscaled Chassis local; normalization applies scale once"
+    }
   },
   {
     "id": "colombo_tuk",

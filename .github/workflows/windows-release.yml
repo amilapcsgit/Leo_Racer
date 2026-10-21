@@ -23,7 +23,7 @@ jobs:
       - name: Set build version
         shell: pwsh
         run: |
-          $version='1.6.0-rc.1'
+          $version='1.6.0'
           if ('${{ github.ref_type }}' -eq 'tag') {$version='${{ github.ref_name }}'.TrimStart('v')}
           "BUILD_VERSION=$version" >> $env:GITHUB_ENV
       - name: Install checksum-pinned dependencies
@@ -42,7 +42,7 @@ jobs:
       - name: Validate catalog and gameplay
         shell: pwsh
         run: |
-          foreach ($test in @('modular_catalog_test','modular_drive_test','modular_presentation_test','modular_fleet_race','bigster_acceptance')) {
+          foreach ($test in @('bigster_replacement_test','modular_catalog_test','modular_drive_test','modular_presentation_test','modular_fleet_race','bigster_acceptance')) {
             & ./tools/run_godot.ps1 --headless --script "res://tests/$test.gd" '--' --drive-test
             if ($LASTEXITCODE -ne 0) {throw "Failed $test"}
           }
@@ -57,7 +57,8 @@ jobs:
       - name: Verify extracted offline package
         shell: pwsh
         run: |
-          $folder=Resolve-Path 'build/qa-bigster-fresh/Leo Racer Bigster RC'
+          $name=if ($env:BUILD_VERSION.Contains('-rc')) {'Leo Racer Bigster RC'} else {'Leo Racer'}
+          $folder=Resolve-Path "build/qa-bigster-fresh/$name"
           $launcher=Join-Path $folder 'Leo Racer Launcher.exe'
           $p=Start-Process -FilePath $launcher -ArgumentList '--self-test' -PassThru -Wait -WindowStyle Hidden
           if ($p.ExitCode -ne 0) {throw 'Launcher self-test failed'}
@@ -73,6 +74,7 @@ jobs:
             dist/*
             docs/qa-modular-garage/*.json
             docs/qa-bigster/*.json
+            docs/qa-bigster-replacement/*.json
           retention-days: 14
   publish:
     needs: build
@@ -93,9 +95,9 @@ jobs:
         run: |
           tag="${GITHUB_REF_NAME}"
           if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then
-            tag="v1.6.0-rc.1"
+            tag="v1.6.0"
             if gh release view "$tag" >/dev/null 2>&1; then
-              echo 'Release candidate already exists; branch CI completed.'
+              echo 'Release already exists; branch CI completed.'
               exit 0
             fi
             gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA"
@@ -103,4 +105,4 @@ jobs:
           args=()
           if [[ "$tag" == *-rc* ]]; then args+=(--prerelease --latest=false); fi
           gh release create "$tag" release/dist/* --target "$GITHUB_SHA" --title "Leo Racer $tag" --notes-file docs/RELEASE_NOTES.md "${args[@]}"
-          gh release upload "$tag" docs/qa-bigster/garage-1920x1080.png docs/qa-bigster/white-duster.png docs/qa-bigster/grey-bigster.png docs/qa-bigster/acceptance.json docs/qa-bigster/render-profile.json --clobber
+          gh release upload "$tag" docs/qa-bigster-replacement/garage.png docs/qa-bigster-replacement/replacement.json docs/qa-bigster-replacement/asset-measurements.json docs/qa-bigster/acceptance.json --clobber
