@@ -73,6 +73,8 @@ jobs:
           $exe=Join-Path $folder 'Leo Racer.exe'
           $p=Start-Process -FilePath $exe -ArgumentList @('--headless','--','--smoke-test') -PassThru -Wait -WindowStyle Hidden
           if ($p.ExitCode -ne 0) {throw 'Extracted game smoke test failed'}
+          $smoke=Get-Content (Join-Path $folder 'smoke-test.json') -Raw | ConvertFrom-Json
+          if ($smoke.status -ne 'PASS') {throw 'Extracted smoke report did not pass'}
       - uses: actions/upload-artifact@v4
         with:
           name: windows-packages
