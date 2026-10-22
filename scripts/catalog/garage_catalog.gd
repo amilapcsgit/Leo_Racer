@@ -46,5 +46,6 @@ func problems() -> PackedStringArray:
 	ids.clear()
 	for d in drivers:
 		if d.id.is_empty() or ids.has(d.id) or not d.seated_model or not d.standing_model or not d.setup_complete: errors.append("Incomplete driver: "+String(d.id))
+		if not d.cabin_model and vehicles.any(func(v):return v.driver_policy==VehicleDefinition.DriverPolicy.CABIN):errors.append("Missing cabin pose: "+String(d.id))
 		ids[d.id]=true
 	return errors

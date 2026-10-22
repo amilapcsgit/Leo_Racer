@@ -34,6 +34,7 @@ func run() -> void:
  for kart in game.karts:
   var bigster: bool=kart.vehicle_key=="bigster"
   check(is_equal_approx(kart.max_speed,50. if bigster else 165./3.6) and is_equal_approx(kart.boosted_ceiling(),62.5 if bigster else 55.) and kart.acceleration==18. and kart.handling==1.,"Resolved human/AI performance "+kart.vehicle_key)
+ check(game.ranking_rows().size()==2 and game.ranking_rows()[0].driver==String(game.player.visual.get_meta("driver_id")),"Main session rows resolve selected driver identity")
  check(game.ranking_store==null,"Diagnostic scene cannot open personal database")
  game.save_ranking_results();check(game.rankings_written and game.ranking_message.begins_with("DIAGNOSTIC"),"Main race excludes diagnostic writes")
  game.hud.show_rankings();await process_frame;check(game.hud.modal_root.get_child_count()==1,"Rankings screen handles unavailable database")

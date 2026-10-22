@@ -819,7 +819,7 @@ func run_smoke_checks() -> void:
 	check(paused and get_tree().paused and garage_from_pause,"Packaged pause garage retains the frozen race")
 	check(swap_player_vehicle(&"mario",&"duster","PACKAGED PILOT"),"Packaged Continue swaps only the player")
 	check(player.next_gate==retained_gate and race_time==retained_time and karts[1]==retained_opponent and race_modified,"Packaged swap preserves race state and excludes records")
-	check(player.driver.get_meta("visible_driver_id")==&"human" and player.visual.get_meta("driver_id")==&"mario","Packaged Dacia shows helmet driver with independent identity")
+	check(player.driver.get_meta("visible_driver_id")==&"mario" and player.visual.get_meta("driver_id")==&"mario","Packaged Dacia shows selected Mario cabin driver")
 	start_race()
 	check(player.next_gate == 0 and player.lap == 1 and boost_count == 0, "Restart clears checkpoint lap and boost state")
 	hud.show_garage()
@@ -956,12 +956,16 @@ func save_ranking_results() -> void:
 		ranking_message="DIAGNOSTIC RUN / RECORDS NOT SAVED";return
 	if not ranking_store:
 		ranking_message="RANKINGS SAVE FAILED / Racing is still available.";return
-	var rows: Array=[]
-	for slot in human_count:
-		var local:=local_players[slot]
-		var kart:=local.kart
-		rows.append({"finished":kart.finished,"retired":kart.retired,"next_gate":kart.next_gate,"race_time":kart.finish_time,"best_lap":local.best_lap,"profile_id":local.profile_id,"name":kart.racer_name,"driver":kart.driver_key,"vehicle":kart.vehicle_key,"class_id":LeoRaceRules.resolve(kart.definition).class_id,"place":player_place(slot)})
+	var rows:=ranking_rows()
 	var count: int=ranking_store.save_session(session_id,human_count,rows,false,false)
 	ranking_message="RANKINGS SAVE FAILED / Racing is still available. Existing data retained." if count<0 else "OFFLINE RANKINGS / %d RESULTS SAVED" % count
 	if count>0 and player.finished:
 		best_time=player.finish_time if best_time<=0 else minf(best_time,player.finish_time)
+
+func ranking_rows() -> Array:
+	var rows: Array=[]
+	for slot in human_count:
+		var local:=local_players[slot]
+		var kart:=local.kart
+		rows.append({"finished":kart.finished,"retired":kart.retired,"next_gate":kart.next_gate,"race_time":kart.finish_time,"best_lap":local.best_lap,"profile_id":local.profile_id,"name":kart.racer_name,"driver":String(kart.visual.get_meta("driver_id")),"vehicle":kart.vehicle_key,"class_id":LeoRaceRules.resolve(kart.definition).class_id,"place":player_place(slot)})
+	return rows

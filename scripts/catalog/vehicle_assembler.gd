@@ -14,11 +14,13 @@ static func assemble(vehicle: VehicleDefinition, racer: DriverDefinition) -> Nod
 	if vehicle.driver_policy!=VehicleDefinition.DriverPolicy.IDENTITY_ONLY:
 		if vehicle.driver_policy==VehicleDefinition.DriverPolicy.FIXED:
 			racer=GarageCatalog.shared().driver(vehicle.fixed_driver_id)
-		var driver := (vehicle.fixed_driver_model if vehicle.driver_policy==VehicleDefinition.DriverPolicy.FIXED and vehicle.fixed_driver_model else racer.seated_model).instantiate() as Node3D
+		var cabin:=vehicle.driver_policy==VehicleDefinition.DriverPolicy.CABIN
+		var model: PackedScene=racer.cabin_model if cabin else (vehicle.fixed_driver_model if vehicle.driver_policy==VehicleDefinition.DriverPolicy.FIXED and vehicle.fixed_driver_model else racer.seated_model)
+		var driver := model.instantiate() as Node3D
 		driver.name = "Driver"
 		driver.set_meta("visible_driver_id",racer.id)
 		var fit: Transform3D=vehicle.driver_fits.get(String(racer.id),vehicle.seat)
-		driver.transform = fit * racer.orientation * driver.transform
+		driver.transform = fit * (Transform3D.IDENTITY if cabin else racer.orientation) * driver.transform
 		root.add_child(driver)
 		if racer.material_albedo: bind_albedo(driver,racer.material_name,racer.material_albedo)
 		for key in racer.material_bindings:

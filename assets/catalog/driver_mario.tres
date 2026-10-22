@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DriverDefinition" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="DriverDefinition" load_steps=6 format=3]
 
 
 
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://assets/models/modular/driver_mario_seated.glb" id="2"]
 [ext_resource type="PackedScene" path="res://assets/models/modular/driver_mario_standing.glb" id="3"]
 [ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/driver_mario.png" id="thumb"]
+
+[ext_resource type="PackedScene" path="res://assets/models/cabin/driver_mario_cabin.glb" id="cabin"]
 
 [resource]
 script = ExtResource("1")
@@ -16,4 +18,5 @@ seated_model = ExtResource("2")
 standing_model = ExtResource("3")
 portrait = ExtResource("thumb")
 orientation = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0.2)
+cabin_model = ExtResource("cabin")
 setup_complete = true

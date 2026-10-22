@@ -1,0 +1,80 @@
+{
+  "captures": true,
+  "checks": 63,
+  "errors": [],
+  "fits": [
+    {
+      "bounds_max": "(-0.031633, 1.523809, 0.401536)",
+      "bounds_min": "(-0.708367, 0.612, -0.617214)",
+      "driver": "hedgehog",
+      "vehicle": "duster"
+    },
+    {
+      "bounds_max": "(0.0172, 1.5844, 0.118)",
+      "bounds_min": "(-0.7572, 0.612, -0.617214)",
+      "driver": "lion",
+      "vehicle": "duster"
+    },
+    {
+      "bounds_max": "(0.03172, 1.4392, 0.118)",
+      "bounds_min": "(-0.77172, 0.612, -0.617214)",
+      "driver": "elephant",
+      "vehicle": "duster"
+    },
+    {
+      "bounds_max": "(-0.118, 1.503576, 0.1)",
+      "bounds_min": "(-0.622, 0.62, -0.610195)",
+      "driver": "parrot",
+      "vehicle": "duster"
+    },
+    {
+      "bounds_max": "(-0.137973, 1.470852, 0.054918)",
+      "bounds_min": "(-0.60203, 0.353426, -1.02865)",
+      "driver": "human",
+      "vehicle": "duster"
+    },
+    {
+      "bounds_max": "(-0.10587, 1.564134, 0.139604)",
+      "bounds_min": "(-0.634131, 0.47728, -0.632258)",
+      "driver": "mario",
+      "vehicle": "duster"
+    },
+    {
+      "bounds_max": "(-0.031633, 1.523809, 0.401536)",
+      "bounds_min": "(-0.708367, 0.612, -0.617214)",
+      "driver": "hedgehog",
+      "vehicle": "bigster"
+    },
+    {
+      "bounds_max": "(0.0172, 1.5844, 0.118)",
+      "bounds_min": "(-0.7572, 0.612, -0.617214)",
+      "driver": "lion",
+      "vehicle": "bigster"
+    },
+    {
+      "bounds_max": "(0.03172, 1.4392, 0.118)",
+      "bounds_min": "(-0.77172, 0.612, -0.617214)",
+      "driver": "elephant",
+      "vehicle": "bigster"
+    },
+    {
+      "bounds_max": "(-0.118, 1.503576, 0.1)",
+      "bounds_min": "(-0.622, 0.62, -0.610195)",
+      "driver": "parrot",
+      "vehicle": "bigster"
+    },
+    {
+      "bounds_max": "(-0.137973, 1.470852, 0.054918)",
+      "bounds_min": "(-0.60203, 0.353426, -1.02865)",
+      "driver": "human",
+      "vehicle": "bigster"
+    },
+    {
+      "bounds_max": "(-0.10587, 1.564134, 0.139604)",
+      "bounds_min": "(-0.634131, 0.47728, -0.632258)",
+      "driver": "mario",
+      "vehicle": "bigster"
+    }
+  ],
+  "status": "PASS"
+}

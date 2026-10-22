@@ -20,6 +20,7 @@ func run() -> void:
 			for child in kart.visual.get_children():child.set_process(false)
 			check((kart.driver!=null)==(v.driver_policy!=VehicleDefinition.DriverPolicy.IDENTITY_ONLY),"Driver policy "+String(d.id)+" / "+String(v.id))
 			if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED:check(kart.driver.get_meta("visible_driver_id")==&"human" and kart.visual.get_meta("driver_id")==d.id,"Fixed helmet driver and independent identity")
+			if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN:check(kart.driver.get_meta("visible_driver_id")==d.id,"Selected cabin driver "+String(d.id))
 			check(kart.wheels.size()==v.wheels.size(),"Wheel count "+String(v.id))
 			var expected:=0 if v.hovering else (3 if v.id==&"colombo_tuk" else 4)
 			check(kart.wheels.size()==expected,"Wheel topology "+String(v.id))

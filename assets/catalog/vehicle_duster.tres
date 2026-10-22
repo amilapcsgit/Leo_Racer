@@ -57,7 +57,7 @@ max_speed = 45.8333333333
 acceleration = 18
 handling = 1
 seat = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-driver_policy = 2
+driver_policy = 3
 preserve_materials = true
 setup_complete = true
 preview_target = Vector3(0, 0.8064, 0)
@@ -68,12 +68,12 @@ normalization = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)
 
 boosted_speed = 55.0
 
-fixed_driver_id = &"human"
+
 
 ai_lateral_acceleration = 13.5
 
-driver_fits = {"human": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37, 0.70, -0.08)}
+driver_fits = {"human": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37000, 0.70000, -0.08000), "mario": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37000, 0.70000, -0.08000), "hedgehog": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37000, 0.70000, -0.08000), "lion": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37000, 0.70000, -0.08000), "elephant": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37000, 0.70000, -0.08000), "parrot": Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.37000, 0.70000, -0.08000)}
 
 camera_height = 0.35
 
-fixed_driver_model = ExtResource("cabin")
+

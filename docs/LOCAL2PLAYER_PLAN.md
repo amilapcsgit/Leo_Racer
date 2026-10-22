@@ -25,7 +25,7 @@ Stable release and read-only sources must remain unchanged.
 3. Two-player race state, owned inputs, pause, finish, retirement: COMPLETE. 15 race checks pass; 26 input, 96 catalog, 11 driving and 37 garage acceptance checks pass. Recovery separates humans and barriers account for vehicle footprint.
 4. Lobby, owned garage editing, shared-world split view, per-player HUD and results: COMPLETE. 21 presentation checks pass at 720p/1080p/ultrawide including Vulkan captures; 15 race, 37 garage and 24 legacy presentation checks pass.
 5. Balanced performance and SQLite rankings: COMPLETE. 24 checks pass, including transactions, duplicate prevention, ordering/filtering, persistence, DNF/modified/diagnostic exclusion and corrupt-file preservation. Locked NuGet dependencies include Windows SQLite native support. Legacy best_time_astra remains untouched. Garage and AI use the same resolved rules as humans.
-6. Cabin models and fits for six drivers in both Dacias: pending.
+6. Cabin models and fits for six drivers in both Dacias: COMPLETE. 63 fit/identity/scale checks, 96 catalog combinations (2687 assertions), 229 Bigster wheel/geometry checks and 25 ranking checks pass. Vulkan front/side/pose captures cover all twelve combinations; contact sheets are committed. Static cartoon source components retain materials and proportions, with glove/arm positions adapted to the wheel; Mario uses a baked seated source rig and the existing human cabin pose is retained. CABIN appended as enum 3. Original kart assets and Bigster GLB unchanged.
 7. Regression, collision, rendering/performance and offline development package: pending.
 
 ## Verification

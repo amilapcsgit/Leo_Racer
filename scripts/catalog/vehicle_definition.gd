@@ -1,7 +1,7 @@
 @tool
 class_name VehicleDefinition
 extends Resource
-enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED }
+enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var id: StringName
 @export var display_name := "New vehicle"
 @export var model: PackedScene

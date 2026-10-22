@@ -1,0 +1,9 @@
+{
+  "bounds": "[P: (-1.021219, 0.0, -2.204), S: (2.042437, 1.712023, 4.569087)]",
+  "captures": false,
+  "checks": 229,
+  "errors": [],
+  "material_count": 19,
+  "status": "PASS",
+  "triangles": 69652
+}

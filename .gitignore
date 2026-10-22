@@ -51,3 +51,10 @@ assets/models/bigster/*.png
 assets/models/bigster/*.jpg
 assets/models/bigster/*.png.import
 assets/models/bigster/*.jpg.import
+
+# Re-extracted embedded cabin textures and full-resolution local QA frames.
+assets/models/cabin/*.png
+assets/models/cabin/*.png.import
+docs/qa-local2player/*.png.import
+docs/qa-local2player/*.jpg.import
+docs/qa-local2player/cabin-*.png
