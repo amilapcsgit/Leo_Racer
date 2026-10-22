@@ -7,6 +7,7 @@ var body: VBoxContainer
 var status: Label
 var live: Dictionary = {}
 func _ready() -> void:
+ theme=load("res://assets/config/local_ui_theme.tres")
  process_mode = Node.PROCESS_MODE_ALWAYS
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  var margin := MarginContainer.new(); margin.add_theme_constant_override("margin_left",40);margin.add_theme_constant_override("margin_right",40);margin.add_theme_constant_override("margin_top",24);margin.add_theme_constant_override("margin_bottom",24);add_child(margin)
@@ -73,3 +74,7 @@ func _process(_dt: float) -> void:
   if is_instance_valid(live[action]):live[action].text="%.2f" % p.value(action)
 func _exit_tree() -> void:
  if router and router.binding_changed.is_connected(refresh):router.binding_changed.disconnect(refresh)
+
+func _input(event: InputEvent) -> void:
+ if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE and router.capture_slot<0:
+  closed.emit();get_viewport().set_input_as_handled()

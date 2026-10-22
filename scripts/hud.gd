@@ -25,6 +25,7 @@ var arcade_audio: AudioStreamPlayer
 var arcade_streams := {}
 var interaction_buttons: Array[Button] = []
 var garage_buttons: Array[Button] = []
+var local_lobby: LeoLocalLobby
 var garage_selector: ModularCarSelector
 var last_ready := true
 var last_drift_charged := false
@@ -186,8 +187,9 @@ func show_menu() -> void:
 	title.add_theme_color_override("font_outline_color", ink)
 	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), "ASTRA // COLOMBO COAST", 29, Color.WHITE, true)
 	text_at(menu_root, Vector2(89, 417), Vector2(620, 65), "More coast. More corners. One wild harbour circuit.", 20, muted)
-	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "LET'S RACE     →", game.start_race, true)
-	button(menu_root,Vector2(500,600),Vector2(220,62),"CONTROLS",show_controls)
+	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "1 PLAYER MODE    →", game.start_single_player, true)
+	button(menu_root,Vector2(500,507),Vector2(389,76),"2 PLAYER MODE",game.open_local_lobby,true)
+	button(menu_root,Vector2(500,600),Vector2(389,62),"CONTROLS",show_controls)
 	button(menu_root, Vector2(88, 600), Vector2(389, 62), "GARAGE & RACERS", show_garage)
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
@@ -199,13 +201,21 @@ func show_menu() -> void:
 
 func show_garage(_focus_group: String = "driver") -> void:
 	var retaining:=_focus_group=="pause"
+	var from_lobby:=_focus_group=="lobby"
+	if not retaining and not from_lobby:game.selected_player_slot=0
+	var local: LeoLocalPlayer=game.local_players[game.selected_player_slot]
+	if game.selected_player_slot==0:
+		local.driver_id=game.catalog.drivers[game.selected_driver].id
+		local.vehicle_id=game.catalog.vehicles[game.selected_kart].id
+		local.player_name=game.custom_player_name
 	game.enter_garage(retaining)
 	scene_mode="garage";hud_root.hide();clear(modal_root);clear(menu_root);menu_root.show()
 	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
-	garage_selector.configure(game.catalog,game.catalog.drivers[game.selected_driver].id,game.catalog.vehicles[game.selected_kart].id,game.reduced_motion)
-	garage_selector.custom_name=game.custom_player_name
-	garage_selector.race_context=retaining
+	garage_selector.configure(game.catalog,local.driver_id,local.vehicle_id,game.reduced_motion)
+	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining
+	if game.human_count==2:garage_selector.input_device=game.input_router.players[game.selected_player_slot].device
 	menu_root.add_child(garage_selector)
+	if from_lobby:garage_selector.race_button.text="SAVE / BACK TO TWO PLAYER"
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
 		game.preview=garage_selector.assembly
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
@@ -213,13 +223,16 @@ func show_garage(_focus_group: String = "driver") -> void:
 	garage_selector.name_changed.connect(func(value: String):
 		if not retaining:game.apply_garage_selection(garage_selector.driver_id,garage_selector.vehicle_id,value))
 	garage_selector.race_requested.connect(func(d: StringName,v: StringName):
-		game.apply_garage_selection(d,v,garage_selector.custom_name);game.start_race())
+		game.apply_garage_selection(d,v,garage_selector.custom_name)
+		if from_lobby:game.open_local_lobby()
+		else:game.start_race())
 	garage_selector.continue_requested.connect(func(d: StringName,v: StringName):game.swap_player_vehicle(d,v,garage_selector.custom_name))
 	garage_selector.back_requested.connect(func():
 		if retaining:game.cancel_pause_garage()
+		elif from_lobby:game.open_local_lobby()
 		else:game.return_menu())
 	game.preview=garage_selector.assembly
-	garage_selector.driver_buttons[game.selected_driver].grab_focus()
+	garage_selector.driver_buttons[game.catalog.driver_index(local.driver_id)].grab_focus()
 	queue_redraw()
 
 func modal(title: String, subtitle: String = "") -> void:
@@ -294,6 +307,8 @@ func show_race() -> void:
 	last_ready = true
 	last_drift_charged = false
 	ready_flash = 0.0
+	if game.human_count==2:
+		hud_root.hide();speed_overlay.hide();queue_redraw();return
 	hud_root.show()
 	labels.position = text_at(hud_root, Vector2(65, 46), Vector2(170, 80), "1", 76, accent, true)
 	labels.position.add_theme_constant_override("outline_size",1)
@@ -360,14 +375,26 @@ func announce(words: String, duration: float = 1.8) -> void:
 	announcement_time = duration
 
 func pause_menu() -> void:
-	modal("TAKE A BREATHER", "Your island lap will be right here.")
-	button(modal_root,Vector2(482,320),Vector2(634,60),"RESUME RACE",game.toggle_pause,true).grab_focus()
-	button(modal_root,Vector2(482,398),Vector2(634,60),"CHANGE CAR",func():show_garage("pause"))
-	button(modal_root,Vector2(482,476),Vector2(634,60),"RESTART RACE",game.start_race)
-	button(modal_root,Vector2(482,554),Vector2(634,60),"SETTINGS",show_settings)
-	button(modal_root,Vector2(482,632),Vector2(634,60),"MAIN MENU",game.return_menu)
+	modal("TAKE A BREATHER",game.disconnect_message if not game.disconnect_message.is_empty() else "Both racers pause together." if game.human_count==2 else "Your island lap will be right here.")
+	button(modal_root,Vector2(482,320),Vector2(634,55),"RESUME RACE",game.toggle_pause,true).grab_focus()
+	if game.human_count==2:
+		button(modal_root,Vector2(482,386),Vector2(310,55),"CHANGE P1 CAR",func():game.selected_player_slot=0;show_garage("pause"))
+		button(modal_root,Vector2(806,386),Vector2(310,55),"CHANGE P2 CAR",func():game.selected_player_slot=1;show_garage("pause"))
+		button(modal_root,Vector2(482,452),Vector2(634,55),"DEVICE & CONTROLS",show_controls)
+		button(modal_root,Vector2(482,518),Vector2(634,55),"RESTART RACE",game.start_race)
+		button(modal_root,Vector2(482,584),Vector2(310,55),"RETIRE P1",func():game.retire_player(0))
+		button(modal_root,Vector2(806,584),Vector2(310,55),"RETIRE P2",func():game.retire_player(1))
+		button(modal_root,Vector2(482,650),Vector2(634,55),"SETTINGS",show_settings)
+		button(modal_root,Vector2(482,716),Vector2(634,55),"MAIN MENU",game.return_menu)
+	else:
+		button(modal_root,Vector2(482,398),Vector2(634,60),"CHANGE CAR",func():game.selected_player_slot=0;show_garage("pause"))
+		button(modal_root,Vector2(482,476),Vector2(634,60),"RESTART RACE",game.start_race)
+		button(modal_root,Vector2(482,554),Vector2(634,60),"SETTINGS",show_settings)
+		button(modal_root,Vector2(482,632),Vector2(634,60),"MAIN MENU",game.return_menu)
 
 func show_results() -> void:
+	if game.human_count==2:
+		show_local_results();return
 	scene_mode = "results"
 	hud_root.hide()
 	clear(modal_root)
@@ -391,6 +418,8 @@ func show_results() -> void:
 	queue_redraw()
 
 func _process(dt: float) -> void:
+	if scene_mode=="race" and game.human_count==2:
+		hud_root.hide();speed_overlay.hide();return
 	var visual_dt := 0.0 if game and game.paused else dt
 	time += visual_dt
 	ready_flash = maxf(0.0,ready_flash-visual_dt)
@@ -470,12 +499,32 @@ static func speed_line_strength(speed_mps: float,boosting: bool,active: bool,red
 
 func _draw() -> void:
 	if scene_mode=="garage": return
-	if scene_mode!="race" or not game or not game.player or photo_mode: return
+	if scene_mode!="race" or not game or not game.player or photo_mode or game.human_count==2: return
 	LeoTelemetry.draw(self)
 
-func show_controls() -> void:
-	var panel := LeoControlsPanel.new()
-	panel.router = game.input_router
-	clear(modal_root)
-	modal_root.add_child(panel)
-	panel.closed.connect(func():panel.queue_free())
+func show_controls(slot: int = 0) -> void:
+	var controls:=LeoControlsPanel.new();controls.router=game.input_router;controls.slot=slot
+	clear(modal_root);modal_root.add_child(controls)
+	controls.closed.connect(func():
+		clear(modal_root)
+		if game.paused:pause_menu())
+
+
+func show_lobby() -> void:
+	scene_mode="lobby";hud_root.hide();speed_overlay.hide();clear(menu_root);clear(modal_root);menu_root.show()
+	local_lobby=LeoLocalLobby.new();local_lobby.game=game;menu_root.add_child(local_lobby)
+func show_local_results() -> void:
+	scene_mode="results";hud_root.hide();clear(modal_root);backdrop(modal_root,.9)
+	panel(modal_root,Vector2(230,65),Vector2(1140,770),Color("091a34"))
+	text_at(modal_root,Vector2(280,95),Vector2(1040,60),"TWO PLAYER / COLOMBO RESULTS",37,gold,true)
+	for slot in 2:
+		var local: LeoLocalPlayer=game.local_players[slot]
+		var kart:=local.kart
+		text_at(modal_root,Vector2(280+slot*540,175),Vector2(520,90),"P%d / %s\n%s  /  BEST LAP %s" % [slot+1,kart.racer_name,game.format_time(kart.finish_time) if kart.finished else "DNF",game.format_time(local.best_lap) if local.best_lap<99999 else "--"],22,accent if slot==0 else gold,true)
+	var order: Array=game.ranking()
+	for i in order.size():
+		var kart: LeoKart=order[i]
+		text_at(modal_root,Vector2(280,320+i*48),Vector2(1020,44),"%d   %s    %s    %s" % [i+1,kart.racer_name,game.catalog.vehicle(StringName(kart.vehicle_key)).display_name,game.format_time(kart.finish_time) if kart.finished else "DNF"],22,gold if kart.is_player else Color.WHITE)
+	if game.race_modified:text_at(modal_root,Vector2(280,640),Vector2(1020,35),"MODIFIED RACE / RECORDS NOT SAVED",20,gold)
+	button(modal_root,Vector2(280,720),Vector2(480,65),"RACE AGAIN",game.try_start_local_race,true).grab_focus()
+	button(modal_root,Vector2(800,720),Vector2(480,65),"BACK TO LOBBY",game.open_local_lobby)

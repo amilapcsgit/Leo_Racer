@@ -1,5 +1,6 @@
 extends Node3D
 
+var split_view: LeoSplitRaceView
 var input_router: LeoInputRouter
 var local_players: Array[LeoLocalPlayer] = [LeoLocalPlayer.new(0),LeoLocalPlayer.new(1)]
 var human_count := 1
@@ -103,6 +104,12 @@ func _ready() -> void:
 	hud = LeoHUD.new()
 	hud.game = self
 	layer.add_child(hud)
+	split_view=LeoSplitRaceView.new();split_view.game=self;layer.add_child(split_view);layer.move_child(split_view,0)
+	var second_feedback=load("res://scripts/RaceFeedbackBridge.cs").new()
+	second_feedback.name="Player2Feedback";second_feedback.process_mode=Node.PROCESS_MODE_PAUSABLE;add_child(second_feedback)
+	second_feedback.configure(art_profile.camera_boost_peak,art_profile.camera_boost_hold);second_feedback.set_reduced_motion(reduced_motion)
+	local_players[1].feedback=second_feedback
+	feedback.process_mode=Node.PROCESS_MODE_PAUSABLE
 	return_menu()
 	if test_mode or "--show-race" in args:
 		start_race()
@@ -338,6 +345,7 @@ func select_kart(index: int) -> void:
 	save_settings()
 
 func remove_racers() -> void:
+	if split_view:split_view.activate(false)
 	if feedback: feedback.reset_feedback()
 	camera_roll = 0.0
 	for kart in karts:
@@ -400,6 +408,7 @@ func start_race() -> void:
 	cam_heading=player.rotation.y;camera.fov=63
 	camera.position=player.position+Vector3(sin(cam_heading),0,cos(cam_heading))*9+Vector3.UP*5
 	camera.look_at(player.position+Vector3.UP*1.2)
+	if split_view:split_view.activate(human_count==2)
 	hud.show_race()
 
 func on_gate(kart: LeoKart, gate: int) -> void:
@@ -443,6 +452,7 @@ func on_recover(kart: LeoKart) -> void:
 func set_reduced_motion(value: bool) -> void:
 	reduced_motion = value
 	if feedback: feedback.set_reduced_motion(value)
+	if local_players[1].feedback:local_players[1].feedback.set_reduced_motion(value)
 	save_settings()
 
 func finish_race() -> void:
@@ -453,6 +463,7 @@ func finish_race() -> void:
 		for kart in karts:
 			if not kart.is_player: check(kart.finished, "AI %s completes all three laps without stalling" % kart.racer_name)
 	state = "results"
+	if split_view:split_view.set_frozen(true)
 	for local in local_players:
 		if local.feedback:local.feedback.reset_feedback()
 	for kart in karts: kart.active = false
@@ -471,6 +482,7 @@ func ranking() -> Array:
 	result.sort_custom(func(a: LeoKart, b: LeoKart):
 		if a.finished and b.finished: return a.finish_time < b.finish_time
 		if a.finished != b.finished: return a.finished
+		if a.retired != b.retired:return not a.retired
 		return a.progress > b.progress)
 	return result
 
@@ -547,6 +559,8 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	camera_roll=0.;slipstream_time=0.;cam_heading=heading
 	apply_garage_selection(d,v,player_name)
 	paused=false;get_tree().paused=false
+	input_router.clear_all()
+	if split_view:split_view.set_frozen(false)
 	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
 	return true
 
@@ -559,6 +573,7 @@ func toggle_pause() -> void:
 				if not problem.is_empty():disconnect_message=problem;hud.show_controls();return
 	paused=not paused;get_tree().paused=paused
 	input_router.clear_all()
+	if split_view:split_view.set_frozen(paused)
 	if paused:hud.pause_menu()
 	else:hud.clear(hud.modal_root);disconnect_message=""
 
@@ -851,6 +866,7 @@ func _on_local_command(slot: int, action: String) -> void:
 	var local:=local_players[slot]
 	var kart:=local.kart
 	if action=="pause_race":
+		if garage_from_pause and slot!=selected_player_slot:return
 		if garage_from_pause:cancel_pause_garage()
 		else:toggle_pause()
 		return
@@ -872,7 +888,7 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	var pose: Transform3D=kart.get_global_transform_interpolated()
 	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
 	var behind:=Vector3(sin(local.heading),0,cos(local.heading))
-	view.position=pose.origin+behind*(6.4+absf(kart.speed)*.012)+Vector3.UP*(3.1+kart.camera_height_offset)
+	view.position=pose.origin+behind*(6.4+absf(kart.speed)*.012+(maxf(0.,kart.definition.collision_size.z-4.)*.5 if human_count==2 else 0.))+Vector3.UP*(3.1+kart.camera_height_offset)
 	view.look_at(pose.origin-behind*6.+Vector3.UP*(1.85+kart.camera_height_offset*.5))
 	if local.feedback:
 		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
@@ -884,3 +900,26 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 func test_input(action: String, strength: float = 1., slot: int = 0) -> void:
 	if not diagnostics_mode and not smoke_mode and not test_mode and not "--drive-test" in OS.get_cmdline_user_args():return
 	input_router.players[slot].inject_test(action,strength)
+
+func start_single_player() -> void:
+	human_count=1;selected_player_slot=0;input_router.active_slots=1
+	var problem:=input_router.ready_problem(0)
+	if not problem.is_empty():disconnect_message=problem;hud.show_controls(0);return
+	start_race()
+func open_local_lobby() -> void:
+	return_menu()
+	human_count=2;input_router.active_slots=2;input_router.clear_all()
+	local_players[0].driver_id=catalog.drivers[selected_driver].id
+	local_players[0].vehicle_id=catalog.vehicles[selected_kart].id
+	local_players[0].player_name=custom_player_name
+	state="lobby";hud.show_lobby()
+func try_start_local_race() -> bool:
+	for slot in 2:
+		var problem:=input_router.ready_problem(slot)
+		if not problem.is_empty():
+			disconnect_message=problem
+			if is_instance_valid(hud.local_lobby):hud.local_lobby.status.text=problem
+			return false
+	human_count=2
+	start_race()
+	return true

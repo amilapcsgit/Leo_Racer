@@ -23,7 +23,7 @@ Stable release and read-only sources must remain unchanged.
 1. Branch/recovery notes/development CI: COMPLETE (this commit).
 2. Independent input profiles, binding UI, persistence, wheel calibration: COMPLETE. 26 input checks, 96 catalog combinations and 11 driving checks pass. Race-loop ownership hookup follows in checkpoint 3.
 3. Two-player race state, owned inputs, pause, finish, retirement: COMPLETE. 15 race checks pass; 26 input, 96 catalog, 11 driving and 37 garage acceptance checks pass. Recovery separates humans and barriers account for vehicle footprint.
-4. Lobby, split view, per-player HUD and results: pending.
+4. Lobby, owned garage editing, shared-world split view, per-player HUD and results: COMPLETE. 21 presentation checks pass at 720p/1080p/ultrawide including Vulkan captures; 15 race, 37 garage and 24 legacy presentation checks pass.
 5. Balanced performance and SQLite rankings: pending.
 6. Cabin models and fits for six drivers in both Dacias: pending.
 7. Regression, collision, rendering/performance and offline development package: pending.

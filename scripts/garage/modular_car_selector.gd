@@ -6,6 +6,7 @@ signal name_changed(value: String)
 signal continue_requested(driver_id: StringName, vehicle_id: StringName)
 signal back_requested
 var custom_name := ""
+var input_device := -2
 var race_context := false
 var name_field: LineEdit
 var race_button: Button
@@ -233,6 +234,8 @@ func activate_controller_focus() -> void:
 
 func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree() or not ui:return
+	if input_device!=-2 and (event is InputEventJoypadButton or event is InputEventJoypadMotion) and event.device!=input_device:
+		get_viewport().set_input_as_handled();return
 	var input_viewport:=get_viewport()
 	if keyboard.visible:
 		if (event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_B) or (event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE):close_keyboard(true);input_viewport.set_input_as_handled()
