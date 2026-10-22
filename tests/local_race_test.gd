@@ -1,0 +1,51 @@
+extends SceneTree
+var errors: Array[String]=[]
+var checks:=0
+func _initialize() -> void:run.call_deferred()
+func check(ok: bool,message: String) -> void:
+ checks+=1
+ if not ok:errors.append(message);push_error(message)
+func ticks(n: int) -> void:
+ for i in n:await physics_frame
+func run() -> void:
+ var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame
+ game.diagnostics_mode=true;game.human_count=2
+ game.input_router.assign(1,"gamepad",17,false)
+ game.selected_kart=game.catalog.vehicle_index(&"bigster")
+ game.local_players[1].vehicle_id=&"duster";game.local_players[1].player_name="SECOND PILOT"
+ game.start_race();game.state="race"
+ for kart in game.karts:kart.active=true
+ for i in range(2,6):game.karts[i].active=false
+ var a: LeoKart=game.karts[0];var b: LeoKart=game.karts[1]
+ check(game.karts.size()==6 and a.is_player and b.is_player,"Two humans and four AI")
+ check(a.control_input!=b.control_input and a.control_input==game.input_router.players[0],"Independent providers")
+ check(b.racer_name=="SECOND PILOT" and b.vehicle_key=="duster","Second player identity and vehicle")
+ game.test_input("accelerate",1.,0);await ticks(75)
+ check(a.speed>10 and absf(b.speed)<.1,"P1 throttle cannot drive P2")
+ game.test_input("accelerate",0.,0);game.test_input("accelerate",1.,1);await ticks(75)
+ check(b.speed>10,"P2 accelerates independently")
+ game.local_players[0].lap_started=10.;game.local_players[1].lap_started=22.;game.race_time=70.
+ game.on_gate(a,8);game.on_gate(b,8)
+ check(is_equal_approx(game.local_players[0].best_lap,60.) and is_equal_approx(game.local_players[1].best_lap,48.),"Independent lap timing")
+ a.next_gate=7;b.next_gate=7;a.recover();b.recover();await ticks(2)
+ check(a.next_gate==7 and b.next_gate==7,"Recovery retains ordered gates")
+ check(a.position.distance_to(b.position)>2.,"Simultaneous recovery uses separate safe lanes")
+ var before_a:=a.position;var before_b:=b.position;var time: float=game.race_time
+ game.toggle_pause();await create_timer(.08,true,false,true).timeout
+ check(game.paused and a.position==before_a and b.position==before_b and game.race_time==time,"Shared pause freezes both racers")
+ game.toggle_pause()
+ game.input_router._connection(17,false)
+ check(game.paused and not game.disconnect_message.is_empty(),"Device loss pauses both humans")
+ game.input_router.assign(1,"gamepad",17,false);game.toggle_pause()
+ game.race_time=100.;game.on_gate(a,24);game._process(.1)
+ check(a.finished and game.state=="race" and b.active,"First finisher does not stop P2")
+ check(a.collision_layer==0 and a.collision_mask==1,"Finished car cannot block active player")
+ game.race_time=120.;game.on_gate(b,24);game._process(.01)
+ check(game.state=="results" and b.finished,"Results wait for both humans")
+ game.start_race();game.state="race";game.karts[0].active=true;game.karts[1].active=true
+ game.retire_player(0);check(game.karts[0].retired and game.state=="race","P1 retirement lets P2 continue")
+ game.retire_player(1);check(game.state=="results","Both retire ends the race")
+ var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
+ FileAccess.open("res://docs/qa-local2player/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ print("LOCAL_RACE_TEST ",report)
+ game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

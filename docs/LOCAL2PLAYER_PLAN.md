@@ -22,7 +22,7 @@ Stable release and read-only sources must remain unchanged.
 
 1. Branch/recovery notes/development CI: COMPLETE (this commit).
 2. Independent input profiles, binding UI, persistence, wheel calibration: COMPLETE. 26 input checks, 96 catalog combinations and 11 driving checks pass. Race-loop ownership hookup follows in checkpoint 3.
-3. Two-player race state, pause, finish, retirement: pending.
+3. Two-player race state, owned inputs, pause, finish, retirement: COMPLETE. 15 race checks pass; 26 input, 96 catalog, 11 driving and 37 garage acceptance checks pass. Recovery separates humans and barriers account for vehicle footprint.
 4. Lobby, split view, per-player HUD and results: pending.
 5. Balanced performance and SQLite rankings: pending.
 6. Cabin models and fits for six drivers in both Dacias: pending.

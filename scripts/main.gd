@@ -1,6 +1,11 @@
 extends Node3D
 
 var input_router: LeoInputRouter
+var local_players: Array[LeoLocalPlayer] = [LeoLocalPlayer.new(0),LeoLocalPlayer.new(1)]
+var human_count := 1
+var selected_player_slot := 0
+var disconnect_message := ""
+var session_id := ""
 var catalog: GarageCatalog
 var ROSTER: Array = []
 var KARTS: Array = []
@@ -67,6 +72,8 @@ func _ready() -> void:
 	input_router = LeoInputRouter.new()
 	input_router.name = "PlayerInputs"
 	add_child(input_router)
+	input_router.command.connect(_on_local_command)
+	input_router.device_lost.connect(_on_device_lost)
 	if not test_mode and not smoke_mode and not diagnostics_mode and "--drive-test" not in args: load_settings()
 	circuit = LeoCircuit.new()
 	build_world()
@@ -357,83 +364,81 @@ func return_menu() -> void:
 func start_race() -> void:
 	garage_from_pause=false
 	race_modified=false
+	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	showroom_lighting(false)
-	get_tree().paused = false
-	paused = false
+	get_tree().paused=false;paused=false
 	remove_racers()
-	stage.hide()
-	world.show()
-	environment.background_mode = Environment.BG_SKY
-	state = "countdown"
-	countdown = 3.6
-	race_time = 0
-	lap_start = 0
-	best_lap = 99999
-	boost_count = 0
-	wrong_way_time = 0
-	launch_charged = false
-	horn_cooldown = 0
-	slipstream_time = 0
-	slipstream_cooldown = 0
-	last_beep = -1
-	for i in range(6):
-		var kart := LeoKart.new()
-		kart.process_mode = Node.PROCESS_MODE_PAUSABLE
-		add_child(kart)
-		var driver_index := selected_driver if i == 0 else i % ROSTER.size()
-		var color_index: int = selected_kart if i == 0 else (selected_kart+i*3) % catalog.vehicles.size()
-		kart.setup(circuit, i, i == 0, ROSTER[driver_index].animal, KARTS[color_index].color)
-		kart.racer_name = ROSTER[driver_index].name
-		if i==0 and not custom_player_name.strip_edges().is_empty():kart.racer_name=custom_player_name.strip_edges()
-		kart.max_speed *= 1.0 if i==0 else .96
-		kart.place(-8.0 - (i / 2) * 5.5, -3.2 if i % 2 == 0 else 3.2)
-		kart.gate_crossed.connect(on_gate)
-		kart.boosted.connect(on_boost)
-		kart.impacted.connect(on_impact)
-		kart.recovered.connect(on_recover)
+	stage.hide();world.show()
+	environment.background_mode=Environment.BG_SKY
+	state="countdown";countdown=3.6;race_time=0;lap_start=0;best_lap=99999;boost_count=0
+	wrong_way_time=0;launch_charged=false;horn_cooldown=0;slipstream_time=0;slipstream_cooldown=0;last_beep=-1
+	local_players[0].driver_id=catalog.drivers[selected_driver].id
+	local_players[0].vehicle_id=catalog.vehicles[selected_kart].id
+	local_players[0].player_name=custom_player_name
+	input_router.active_slots=human_count;input_router.clear_all()
+	for local in local_players:local.reset_race()
+	var row_span:=0.
+	for vehicle in catalog.vehicles:row_span=maxf(row_span,vehicle.collision_size.z+1.2)
+	for i in 6:
+		var kart:=LeoKart.new();kart.process_mode=Node.PROCESS_MODE_PAUSABLE;add_child(kart)
+		var d: StringName=local_players[i].driver_id if i<human_count else catalog.drivers[i%catalog.drivers.size()].id
+		var v: StringName=local_players[i].vehicle_id if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()].id
+		kart.setup(circuit,i,i<human_count,String(d),String(v))
+		kart.racer_name=catalog.driver(d).display_name
+		if i<human_count:
+			var local:=local_players[i]
+			local.kart=kart;kart.local_slot=i;kart.control_input=input_router.players[i]
+			if not local.player_name.strip_edges().is_empty():kart.racer_name=local.player_name.strip_edges()
+			local.heading=kart.rotation.y
+			if kart.engine and human_count==2:kart.engine.volume_db-=3.
+		kart.place(-8.-(i/2)*row_span,-3.2 if i%2==0 else 3.2)
+		kart.gate_crossed.connect(on_gate);kart.boosted.connect(on_boost);kart.impacted.connect(on_impact);kart.recovered.connect(on_recover)
 		karts.append(kart)
-	player = karts[0]
-	if test_mode: player.auto_drive = true
-	cam_heading = player.rotation.y
-	camera.fov = 63
-	camera.position = player.position + Vector3(sin(cam_heading), 0, cos(cam_heading)) * 9 + Vector3.UP * 5
-	camera.look_at(player.position + Vector3.UP * 1.2)
+	player=karts[0]
+	local_players[0].camera=camera;local_players[0].feedback=feedback
+	if test_mode:player.auto_drive=true
+	cam_heading=player.rotation.y;camera.fov=63
+	camera.position=player.position+Vector3(sin(cam_heading),0,cos(cam_heading))*9+Vector3.UP*5
+	camera.look_at(player.position+Vector3.UP*1.2)
 	hud.show_race()
 
 func on_gate(kart: LeoKart, gate: int) -> void:
-	if gate > 0 and gate % LeoCircuit.GATES == 0:
-		if kart.is_player:
-			best_lap = minf(best_lap, race_time - lap_start)
-			lap_start = race_time
-			if gate < 24:
-				hud.announce("FINAL LAP!" if gate == 16 else "LAP 2  /  KEEP IT FLOWING", 2.2)
-				hud.play_arcade_cue("lap")
-		if gate == 24 and not kart.finished:
-			kart.finished = true
-			kart.finish_time = race_time
-			kart.active = false
-			if kart.is_player:
-				finish_place = player_place()
-				state = "finishing"
-				hud.announce("FINISH!   /   BRING IT HOME", 8.0)
-				finish_sound.play()
+	var local:=state_for(kart)
+	if gate>0 and gate%LeoCircuit.GATES==0 and local:
+		local.best_lap=minf(local.best_lap,race_time-local.lap_started)
+		local.lap_started=race_time
+		if gate<24:
+			announce_player(local.slot,"FINAL LAP!" if gate==16 else "LAP 2 / KEEP IT FLOWING",2.2)
+			hud.play_arcade_cue("lap")
+		if local.slot==0:best_lap=local.best_lap;lap_start=local.lap_started
+	if gate==24 and not kart.finished and not kart.retired:
+		kart.finished=true;kart.finish_time=race_time;kart.active=false;kart.boost_time=0
+		kart.collision_layer=0;kart.collision_mask=1
+		if local:
+			announce_player(local.slot,"FINISHED / WAITING FOR OTHER RACERS",8.)
+			finish_sound.play()
+			if local.slot==0:finish_place=ranking().find(kart)+1
+			if human_count==1:state="finishing"
 
 func on_boost(kart: LeoKart, source: String) -> void:
-	if kart.is_player:
-		feedback.play_boost(source,kart.boost_time)
-		boost_count += 1
-		hud.announce(source, 1.1)
+	var local:=state_for(kart)
+	if local:
+		local.boost_count+=1
+		if local.feedback:local.feedback.play_boost(source,kart.boost_time)
+		if local.slot==0:boost_count=local.boost_count
+		announce_player(local.slot,source,1.1)
 
 func on_impact(kart: LeoKart, _point: Vector3, _normal: Vector3, strength: float) -> void:
-	if kart.is_player: feedback.play_impact(strength)
+	var local:=state_for(kart)
+	if local and local.feedback:local.feedback.play_impact(strength)
 
 func on_recover(kart: LeoKart) -> void:
-	if kart.is_player:
-		feedback.play_recover()
-		cam_heading = kart.rotation.y
-		camera_roll = 0.0
-		slipstream_time = 0.0
-		hud.announce("BACK ON TRACK",1.2)
+	var local:=state_for(kart)
+	if local:
+		if local.feedback:local.feedback.play_recover()
+		local.heading=kart.rotation.y;local.roll=0.;local.slipstream_time=0.
+		if local.slot==0:cam_heading=kart.rotation.y;camera_roll=0.;slipstream_time=0.
+		announce_player(local.slot,"BACK ON TRACK",1.2)
 
 func set_reduced_motion(value: bool) -> void:
 	reduced_motion = value
@@ -448,9 +453,10 @@ func finish_race() -> void:
 		for kart in karts:
 			if not kart.is_player: check(kart.finished, "AI %s completes all three laps without stalling" % kart.racer_name)
 	state = "results"
-	feedback.reset_feedback()
+	for local in local_players:
+		if local.feedback:local.feedback.reset_feedback()
 	for kart in karts: kart.active = false
-	if not race_modified and (best_time <= 0 or player.finish_time < best_time):
+	if human_count==1 and player.finished and not race_modified and (best_time <= 0 or player.finish_time < best_time):
 		best_time = player.finish_time
 		save_settings()
 	hud.show_results()
@@ -468,13 +474,14 @@ func ranking() -> Array:
 		return a.progress > b.progress)
 	return result
 
-func player_place() -> int:
-	return ranking().find(player) + 1
+func player_place(slot: int = 0) -> int:
+	return ranking().find(local_players[slot].kart if local_players[slot].kart else player)+1
 
 func apply_garage_selection(d: StringName,v: StringName,player_name: String) -> void:
-	selected_driver=catalog.driver_index(d)
-	selected_kart=catalog.vehicle_index(v)
-	custom_player_name=player_name.strip_edges().left(32)
+	var local:=local_players[selected_player_slot]
+	local.driver_id=d;local.vehicle_id=v;local.player_name=player_name.strip_edges().left(32)
+	if selected_player_slot==0:
+		selected_driver=catalog.driver_index(d);selected_kart=catalog.vehicle_index(v);custom_player_name=local.player_name
 	save_settings()
 
 func cancel_pause_garage() -> void:
@@ -486,12 +493,15 @@ func cancel_pause_garage() -> void:
 	hud.pause_menu()
 
 func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> bool:
-	if not garage_from_pause or not paused or not is_instance_valid(player):return false
-	var old:=player
+	if not garage_from_pause or not paused or not is_instance_valid(local_players[selected_player_slot].kart):return false
+	var local:=local_players[selected_player_slot]
+	var old:=local.kart
+	if old.finished or old.retired:return false
 	var fresh:=LeoKart.new()
 	fresh.process_mode=Node.PROCESS_MODE_PAUSABLE
 	add_child(fresh)
 	fresh.setup(circuit,old.racer_id,true,String(d),String(v))
+	fresh.local_slot=selected_player_slot;fresh.control_input=input_router.players[selected_player_slot]
 	var query:=PhysicsShapeQueryParameters3D.new()
 	var shape:=BoxShape3D.new();shape.size=fresh.definition.collision_size
 	query.shape=shape;query.collision_mask=3;query.exclude=[old.get_rid(),fresh.get_rid()]
@@ -529,114 +539,92 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	fresh.gate_crossed.connect(on_gate);fresh.boosted.connect(on_boost);fresh.impacted.connect(on_impact);fresh.recovered.connect(on_recover)
 	fresh.reset_physics_interpolation()
 	old.effects._recover(old);old.stop_audio();remove_child(old);old.queue_free()
-	karts[0]=fresh;player=fresh
+	karts[karts.find(old)]=fresh;local.kart=fresh
+	if selected_player_slot==0:player=fresh
 	race_modified=true;garage_from_pause=false
-	feedback.reset_feedback();camera_roll=0.;slipstream_time=0.;cam_heading=heading
+	if local.feedback:local.feedback.reset_feedback()
+	local.roll=0.;local.slipstream_time=0.;local.heading=heading
+	camera_roll=0.;slipstream_time=0.;cam_heading=heading
 	apply_garage_selection(d,v,player_name)
 	paused=false;get_tree().paused=false
 	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
 	return true
 
 func toggle_pause() -> void:
-	if state not in ["race", "countdown"]: return
-	paused = not paused
-	get_tree().paused = paused
-	if paused: hud.pause_menu()
-	else: hud.clear(hud.modal_root)
+	if state not in ["race","countdown","finishing"]:return
+	if paused and not diagnostics_mode:
+		for slot in human_count:
+			if local_players[slot].kart and not local_players[slot].kart.finished and not local_players[slot].kart.retired:
+				var problem:=input_router.ready_problem(slot)
+				if not problem.is_empty():disconnect_message=problem;hud.show_controls();return
+	paused=not paused;get_tree().paused=paused
+	input_router.clear_all()
+	if paused:hud.pause_menu()
+	else:hud.clear(hud.modal_root);disconnect_message=""
 
 func _unhandled_input(event: InputEvent) -> void:
-	if garage_from_pause:
-		if event.is_action_pressed("pause_race"):cancel_pause_garage()
-		return
-	if event.is_action_pressed("accelerate") and state=="countdown" and countdown>0 and countdown<=1.05 and not paused:
-		launch_charged = true
-	if event.is_action_pressed("horn") and player and state=="race" and not paused and horn_cooldown<=0:
-		horn_cooldown = .8
-		hud.play_arcade_cue("bus_horn" if player.vehicle_key=="race_bus" else "tuk_horn")
-	if event.is_action_pressed("pause_race"):
-		if hud.modal_root.get_child_count() > 0 and not paused and state in ["menu", "garage"]: hud.clear(hud.modal_root)
-		elif state == "garage": return_menu()
-		else: toggle_pause()
-	if event.is_action_pressed("recover") and player and state == "race" and not paused:
-		player.recover()
-		hud.announce("BACK ON TRACK", 1.2)
-	if event.is_action_pressed("photo"):
-		hud.photo_mode = not hud.photo_mode
-		hud.hud_root.visible = not hud.photo_mode
+	if input_router.capture_slot>=0:return
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_ESCAPE:
+		if garage_from_pause:cancel_pause_garage()
+		elif hud.modal_root.get_child_count()>0 and state in ["menu","garage"]:hud.clear(hud.modal_root)
+		elif state=="garage":return_menu()
+		else:toggle_pause()
 
 func _process(dt: float) -> void:
-	clock += dt
-	if state == "garage":
-		pass
-	if paused: return
-	if state == "countdown":
-		countdown -= dt
-		var beat := int(ceil(countdown))
-		if beat != last_beep and beat <= 3 and beat > 0:
-			last_beep = beat
-			countdown_sound.play()
-		if countdown <= 0:
-			state = "race"
-			go_sound.play()
-			for kart in karts: kart.active = true
-			if launch_charged: player.boost(.9,"PERFECT LAUNCH")
-	elif state == "race":
-		race_time += dt
-		horn_cooldown = maxf(0,horn_cooldown-dt)
+	clock+=dt
+	if paused:return
+	if state=="countdown":
+		countdown-=dt
+		var beat:=int(ceil(countdown))
+		if beat!=last_beep and beat<=3 and beat>0:last_beep=beat;countdown_sound.play()
+		if countdown<=0:
+			state="race";go_sound.play()
+			for kart in karts:kart.active=true
+			for slot in human_count:
+				if local_players[slot].launch_charged:local_players[slot].kart.boost(.9,"PERFECT LAUNCH")
+	elif state in ["race","finishing"]:
+		race_time+=dt
 		update_slipstream(dt)
-		var direction := -player.global_basis.z * signf(player.speed)
-		if direction.dot(circuit.direction(player.last_s)) < -.25 and absf(player.speed) > 3:
-			wrong_way_time += dt
-		else: wrong_way_time = 0
-	elif state == "finishing":
-		race_time += dt
-		var all_finished := true
-		for kart in karts:
-			if not kart.finished: all_finished = false
-		if all_finished or race_time-player.finish_time > (70.0 if test_mode or diagnostics_mode else 4.0): finish_race()
-	if state in ["countdown", "race", "finishing"] and player:
-		var pose := player.get_global_transform_interpolated()
-		cam_heading = lerp_angle(cam_heading, pose.basis.get_euler().y, 1.0-exp(-dt*6.0))
-		var behind := Vector3(sin(cam_heading),0,cos(cam_heading))
-		camera.position = pose.origin+behind*(6.4+absf(player.speed)*.012)+Vector3.UP*(3.1+player.camera_height_offset)
-		camera.look_at(pose.origin-behind*6.0+Vector3.UP*(1.85+player.camera_height_offset*.5))
-		feedback.set_boost_active(player.boost_time>0 and player.active)
-		var base_fov := 63.0+absf(player.speed)*.1
-		camera.fov = lerpf(camera.fov,base_fov+float(feedback.get_fov_offset()),1.0-exp(-dt*12.0))
-		var roll_target := 0.0 if reduced_motion else -player.steer*deg_to_rad(art_profile.camera_roll_degrees)*clampf(absf(player.speed)/36.0,0,1)
-		camera_roll = lerpf(camera_roll,roll_target,1.0-exp(-dt*6.0))
-		camera.rotate_object_local(Vector3.FORWARD,camera_roll+float(feedback.get_shake_roll()))
-		camera.position += camera.global_basis*Vector3(feedback.get_shake_offset())
-		for kart in karts:
-			if not kart.is_player:
-				kart.visual.visible = (kart.position - player.position).dot(-player.global_basis.z) > -3.0 or kart.position.distance_to(camera.position) > 7.0
+		for slot in human_count:
+			var local:=local_players[slot]
+			var kart:=local.kart
+			if not kart:continue
+			local.horn_cooldown=maxf(0.,local.horn_cooldown-dt)
+			local.announcement_time=maxf(0.,local.announcement_time-dt)
+			var direction: Vector3=-kart.global_basis.z*signf(kart.speed)
+			if kart.active and direction.dot(circuit.direction(kart.last_s))<-.25 and absf(kart.speed)>3:local.wrong_way+=dt
+			else:local.wrong_way=0.
+		if human_count==2 and humans_done():finish_race()
+		elif human_count==1 and state=="finishing":
+			var all_finished:=karts.all(func(kart):return kart.finished or kart.retired)
+			if player.retired or all_finished or race_time-player.finish_time>(70. if test_mode or diagnostics_mode else 4.):finish_race()
+	if state in ["countdown","race","finishing"] and player:
+		for slot in human_count:update_local_camera(local_players[slot],dt)
+		wrong_way_time=local_players[0].wrong_way
 	if smoke_mode:
-		test_tick += 1
-		if test_tick == 30: run_smoke_checks()
-	if test_mode and state in ["race","finishing"] and race_time > circuit.length*3/15.0:
-		test_errors.append("Autonomous race exceeded route-scaled time limit")
-		complete_test()
+		test_tick+=1
+		if test_tick==30:run_smoke_checks()
+	if test_mode and state in ["race","finishing"] and race_time>circuit.length*3/15.:
+		test_errors.append("Autonomous race exceeded route-scaled time limit");complete_test()
 
 func update_slipstream(dt: float) -> void:
-	slipstream_cooldown = maxf(0,slipstream_cooldown-dt)
-	var drafting := false
-	if player.active and absf(player.wheel_motion_speed)>16:
-		var forward := -player.global_basis.z
-		for other in karts:
-			if other==player or not other.active: continue
-			var gap := other.position-player.position
-			var ahead := gap.dot(forward)
-			var lateral := absf(gap.dot(player.global_basis.x))
-			if ahead>5 and ahead<19 and lateral<2.4 and forward.dot(-other.global_basis.z)>.85:
-				drafting = true
-				break
-	if drafting:
-		slipstream_time += dt
-		player.boost_fuel = minf(1,player.boost_fuel+dt*.13)
-		if slipstream_time>.8 and slipstream_cooldown<=0:
-			hud.announce("SLIPSTREAM  //  NITRO CHARGING",1.4)
-			slipstream_cooldown = 5.0
-	else: slipstream_time = 0.0
+	for slot in human_count:
+		var local:=local_players[slot]
+		var kart:=local.kart
+		if not kart:continue
+		local.slipstream_cooldown=maxf(0.,local.slipstream_cooldown-dt)
+		var drafting:=false
+		if kart.active and absf(kart.wheel_motion_speed)>16:
+			var forward: Vector3=-kart.global_basis.z
+			for other in karts:
+				if other==kart or not other.active:continue
+				var gap: Vector3=other.position-kart.position
+				if gap.dot(forward)>5 and gap.dot(forward)<19 and absf(gap.dot(kart.global_basis.x))<2.4 and forward.dot(-other.global_basis.z)>.85:drafting=true;break
+		if drafting:
+			local.slipstream_time+=dt;kart.boost_fuel=minf(1.,kart.boost_fuel+dt*.13)
+			if local.slipstream_time>.8 and local.slipstream_cooldown<=0:announce_player(slot,"SLIPSTREAM / NITRO CHARGING",1.4);local.slipstream_cooldown=5.
+		else:local.slipstream_time=0.
+	slipstream_time=local_players[0].slipstream_time;slipstream_cooldown=local_players[0].slipstream_cooldown
 
 func make_sound(file: String, volume: float) -> AudioStreamPlayer:
 	var p := AudioStreamPlayer.new()
@@ -674,6 +662,7 @@ func save_settings() -> void:
 	cfg.set_value("game","vehicle_id",String(catalog.vehicles[selected_kart].id))
 	cfg.set_value("game","custom_player_name",custom_player_name.strip_edges())
 	cfg.set_value("game", "best_time_astra", best_time)
+	for local in local_players:cfg.set_value("local_players",str(local.slot),local.selection())
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
 	cfg.save("user://leo_racer.cfg")
@@ -689,6 +678,9 @@ func load_settings() -> void:
 		selected_kart = selection.y
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
 		best_time = cfg.get_value("game", "best_time_astra", 0.0)
+		for local in local_players:
+			var data: Variant=cfg.get_value("local_players",str(local.slot),{})
+			if data is Dictionary:local.restore(data,catalog)
 		if cfg.get_value("display", "fullscreen", false): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(master_volume, .0001)))
 
@@ -826,3 +818,69 @@ func complete_test() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	get_tree().quit(0 if test_errors.is_empty() else 1)
+
+func state_for(kart: LeoKart) -> LeoLocalPlayer:
+	for local in local_players:
+		if local.kart==kart:return local
+	return null
+func humans_done() -> bool:
+	for slot in human_count:
+		var kart:=local_players[slot].kart
+		if not kart or (not kart.finished and not kart.retired):return false
+	return true
+func announce_player(slot: int, text: String, duration: float = 1.8) -> void:
+	var local:=local_players[slot]
+	local.announcement=text;local.announcement_time=duration
+	if slot==0:hud.announce(text,duration)
+func retire_player(slot: int) -> void:
+	var kart:=local_players[slot].kart
+	if not kart or kart.finished or kart.retired:return
+	kart.retired=true;kart.active=false;kart.boost_time=0;kart.collision_layer=0;kart.collision_mask=1
+	announce_player(slot,"RETIRED / DNF",999.)
+	if human_count==1:state="finishing"
+	if humans_done():
+		get_tree().paused=false;paused=false
+		finish_race()
+func _on_device_lost(slot: int) -> void:
+	if state in ["countdown","race","finishing"]:
+		disconnect_message="PLAYER %d DISCONNECTED / reassign controls or retire" % (slot+1)
+		if not paused:toggle_pause()
+		announce_player(slot,disconnect_message,999.)
+func _on_local_command(slot: int, action: String) -> void:
+	if slot>=human_count:return
+	var local:=local_players[slot]
+	var kart:=local.kart
+	if action=="pause_race":
+		if garage_from_pause:cancel_pause_garage()
+		else:toggle_pause()
+		return
+	if paused:return
+	if action=="accelerate" and state=="countdown" and countdown>0 and countdown<=1.05:
+		local.launch_charged=true
+		if slot==0:launch_charged=true
+	if not kart or state!="race" or not kart.active:return
+	if action=="recover":kart.recover()
+	if action=="horn" and local.horn_cooldown<=0:
+		local.horn_cooldown=.8;hud.play_arcade_cue("bus_horn" if kart.vehicle_key=="race_bus" else "tuk_horn")
+	if action=="photo":
+		local.photo=not local.photo
+		if slot==0 and human_count==1:hud.photo_mode=local.photo;hud.hud_root.visible=not local.photo
+func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
+	if not is_instance_valid(local.camera) or not is_instance_valid(local.kart):return
+	var kart:=local.kart
+	var view:=local.camera
+	var pose: Transform3D=kart.get_global_transform_interpolated()
+	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
+	var behind:=Vector3(sin(local.heading),0,cos(local.heading))
+	view.position=pose.origin+behind*(6.4+absf(kart.speed)*.012)+Vector3.UP*(3.1+kart.camera_height_offset)
+	view.look_at(pose.origin-behind*6.+Vector3.UP*(1.85+kart.camera_height_offset*.5))
+	if local.feedback:
+		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
+		view.fov=lerpf(view.fov,63.+absf(kart.speed)*.1+float(local.feedback.get_fov_offset()),1.-exp(-dt*12.))
+		var target:=0. if reduced_motion else -kart.steer*deg_to_rad(art_profile.camera_roll_degrees)*clampf(absf(kart.speed)/36.,0.,1.)
+		local.roll=lerpf(local.roll,target,1.-exp(-dt*6.))
+		view.rotate_object_local(Vector3.FORWARD,local.roll+float(local.feedback.get_shake_roll()))
+		view.position+=view.global_basis*Vector3(local.feedback.get_shake_offset())
+func test_input(action: String, strength: float = 1., slot: int = 0) -> void:
+	if not diagnostics_mode and not smoke_mode and not test_mode and not "--drive-test" in OS.get_cmdline_user_args():return
+	input_router.players[slot].inject_test(action,strength)

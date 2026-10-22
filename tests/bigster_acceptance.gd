@@ -73,13 +73,13 @@ func run() -> void:
 		game.selected_kart=game.catalog.vehicle_index(id);game.start_race();game.state="race";game.player.active=true
 		for k in game.karts:
 			if k!=game.player:k.active=false;k.set_physics_process(false)
-		game.player.place(80,0);game.player.boost_cooldown=20.;Input.action_press("accelerate");await ticks(220)
+		game.player.place(80,0);game.player.boost_cooldown=20.;game.test_input("accelerate",1.);await ticks(220)
 		check(absf(game.player.speed-game.player.max_speed)<.3,String(id)+" normal ceiling: "+str(game.player.speed*3.6)+" km/h")
 		game.player.boost(1.6,"TEST");await ticks(36)
 		check(absf(game.player.speed-game.player.boosted_ceiling())<.4,String(id)+" uses vehicle-specific boost ceiling")
-		Input.action_release("accelerate")
+		game.test_input("accelerate",0.)
 		if id==&"bigster":
-			game.player.boost_fuel=.1;Input.action_press("brake");await ticks(30);Input.action_release("brake")
+			game.player.boost_fuel=.1;game.test_input("brake",1.);await ticks(30);game.test_input("brake",0.)
 			check(game.player.boost_time==0 and game.player.boost_fuel>.125,"Bigster braking cancels boost and modestly regenerates charge")
 	game.start_race();game.state="race";game.player.active=true;game.player.place(600,0)
 	game.player.progress=game.circuit.length+600;game.player.next_gate=11;game.player.lap=2;game.player.speed=60;game.player.boost(1.6,"TEST")

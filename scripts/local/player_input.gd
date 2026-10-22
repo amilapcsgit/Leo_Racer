@@ -9,6 +9,7 @@ var keys: Dictionary = {}
 var buttons: Dictionary = {}
 var axes: Dictionary = {}
 var pending: Dictionary = {}
+var test_values: Dictionary = {}
 func _init(input_kind: String = "keyboard") -> void: reset_defaults(input_kind)
 func reset_defaults(input_kind: String) -> void:
  kind = input_kind
@@ -27,13 +28,13 @@ func reset_defaults(input_kind: String) -> void:
    set_axis("brake",JOY_AXIS_TRIGGER_LEFT,0.,1.,.05)
  clear()
 func clear() -> void:
- keys.clear(); buttons.clear(); axes.clear(); pending.clear()
+ keys.clear(); buttons.clear(); axes.clear(); pending.clear(); test_values.clear()
 func set_axis(action: String, index: int, rest: float, pressed: float, deadzone: float = .03, sensitivity: float = 1.) -> bool:
  if absf(pressed-rest) < .1: return false
  bindings[action] = [{"type":"axis","index":index,"rest":rest,"pressed":pressed,"deadzone":clampf(deadzone,0.,.5),"sensitivity":clampf(sensitivity,.25,3.)}]
  return true
 func value(action: String) -> float:
- var result := 0.
+ var result := float(test_values.get(action,0.))
  for binding in bindings.get(action,[]):
   var n := int(binding.get("index",0))
   match str(binding.get("type","")):
@@ -97,3 +98,8 @@ func restore(data: Dictionary) -> void:
    bindings[action] = valid
  device = -1
  clear()
+
+func inject_test(action: String, strength: float) -> void:
+ var before := value(action)
+ test_values[action] = clampf(strength,0.,1.)
+ if before<=.5 and strength>.5: pending[action]=true

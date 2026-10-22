@@ -14,6 +14,8 @@ var racer_id := 0
 var racer_name := "Sonic"
 var is_player := false
 var control_input: LeoPlayerInput
+var local_slot := -1
+var retired := false
 var active := false
 var finished := false
 var finish_time := 0.0
@@ -285,8 +287,24 @@ func place(distance: float, lane: float) -> void:
 
 func recover() -> void:
 	var safe := maxf(0, (next_gate - 1) * circuit.length / LeoCircuit.GATES) + 2.0
-	var lane := 0.0 if is_player else ai_lane
-	position = circuit.sample(safe, lane) + Vector3.UP * .2
+	var lane := (-3.2 if local_slot==0 else 3.2) if local_slot>=0 else (0.0 if is_player else ai_lane)
+	var chosen := circuit.sample(safe,lane)+Vector3.UP*.2
+	if is_inside_tree() and definition:
+		var query:=PhysicsShapeQueryParameters3D.new()
+		var recovery_shape:=BoxShape3D.new();recovery_shape.size=definition.collision_size
+		query.shape=recovery_shape;query.collision_mask=2;query.exclude=[get_rid()]
+		var found:=false
+		for setback in [0.,3.,6.]:
+			for candidate in [lane,-lane,0.,-5.5,5.5]:
+				var point:=circuit.sample(safe-setback,candidate)+Vector3.UP*.2
+				var facing:=circuit.direction(safe-setback)
+				var basis:=Basis(Vector3.UP,atan2(-facing.x,-facing.z))
+				query.transform=Transform3D(basis,point+basis*definition.collision_position)
+				if get_world_3d().direct_space_state.intersect_shape(query,1).is_empty():
+					chosen=point;safe-=setback;found=true;break
+			if found:break
+		if not found:return
+	position = chosen
 	var t := circuit.direction(safe)
 	rotation.y = atan2(-t.x, -t.z)
 	progress = safe
@@ -400,9 +418,12 @@ func _physics_process(dt: float) -> void:
 	var projection := circuit.project(position, nearest_index)
 	nearest_index = projection.index
 	var offset: float = projection.offset
-	if absf(offset) > 9.1:
+	var track_normal:=Vector3(-projection.tangent.z,0,projection.tangent.x)
+	var footprint:=absf(global_basis.x.dot(track_normal))*definition.collision_size.x*.5+absf(global_basis.z.dot(track_normal))*definition.collision_size.z*.5
+	var lane_limit:=maxf(3.,LeoCircuit.WIDTH*.5-footprint-.15)
+	if absf(offset) > lane_limit:
 		var normal := Vector3(-projection.tangent.z, 0, projection.tangent.x) * signf(offset)
-		position -= normal * (absf(offset) - 9.1)
+		position -= normal * (absf(offset) - lane_limit)
 		velocity -= normal * maxf(0, velocity.dot(normal))
 		speed *= .985
 		if is_player and bump_cooldown <= 0 and speed > 12:
