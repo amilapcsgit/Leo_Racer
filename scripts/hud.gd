@@ -195,7 +195,7 @@ func show_menu() -> void:
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
 	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "LOTUS COAST    /    3 LAPS    /    6 RACERS", 17, Color("d8e7ef"), true)
-	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "LOCAL2PLAYER  //  DEVELOPMENT", 17, accent, true)
+	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "v1.7.0  //  LOCAL TWO PLAYER", 17, accent, true)
 	button(menu_root, Vector2(1430, 40), Vector2(120, 46), "QUIT", game.quit_game)
 	first.grab_focus()
 	queue_redraw()

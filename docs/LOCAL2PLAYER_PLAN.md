@@ -44,3 +44,7 @@ Cabin captures must cover all twelve combinations and tire-center regression rem
 Read this journal and `git log --oneline -10`; inspect `git status` before edits.
 Only complete tested checkpoints are pushed; note any unfinished work below before ending a turn.
 GitHub: amilapcsgit/Leo_Racer, branch local2player. Base main/bigster releases remain intact.
+
+## 1.7 release follow-up
+
+The user requested a public GitHub 1.7 release. `release/1.7.0` promotes this milestone with versioned installer/portable packages, updated release notes and a gated publication job. The 1.6 tag and assets remain unchanged. The development CI failure was an SDK download EOF before tests; the direct Microsoft blob mirror has the same verified SHA256 and downloads now use bounded HTTP/1.1 retries.

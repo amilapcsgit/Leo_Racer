@@ -7,8 +7,8 @@ BUILD=ROOT/'build/ModularGarage'
 DIST=ROOT/'dist'
 DIST.mkdir(exist_ok=True)
 candidate='-rc' in args.version
-FOLDER=('Leo Racer Bigster RC' if candidate else 'Leo Racer') if args.branch=='bigster' else 'Leo Racer Modular Garage'
-SUFFIX=('BigsterRC' if candidate else 'Bigster') if args.branch=='bigster' else 'ModularGarage'
+FOLDER=('Leo Racer Bigster RC' if candidate else 'Leo Racer') if args.branch=='bigster' else ('Leo Racer' if args.branch=='local2player' else 'Leo Racer Modular Garage')
+SUFFIX=('BigsterRC' if candidate else 'Bigster') if args.branch=='bigster' else ('Local2Player' if args.branch=='local2player' else 'ModularGarage')
 if args.checksums_only:
  entries=[]
  for path in sorted(DIST.iterdir()):
@@ -20,6 +20,7 @@ assert (BUILD/'Leo Racer.exe').is_file()
 assert (BUILD/'Leo Racer Launcher.exe').is_file()
 assert (BUILD/'data_LeoRacer_windows_x86_64/LeoRacer.dll').is_file()
 assert (BUILD/'libterrain.windows.release.x86_64.dll').is_file()
+if args.branch=='local2player':assert (BUILD/'data_LeoRacer_windows_x86_64/e_sqlite3.dll').is_file()
 for name in ['coreclr.dll','hostfxr.dll','hostpolicy.dll','System.Private.CoreLib.dll']:
  assert list((BUILD/'data_LeoRacer_windows_x86_64').rglob(name)), 'Missing bundled runtime: '+name
 shutil.copytree(ROOT/'licenses',BUILD/'licenses',dirs_exist_ok=True)
@@ -39,20 +40,28 @@ Use Play Compatibility Mode.cmd if Vulkan is unavailable.
 Three laps of the 1.9 km circuit, six racers, six drivers and sixteen vehicles.
 Tap accelerate on the final countdown beat for a launch boost.
 Slipstream behind another racer to recharge nitro. Hold/release drift for turbo.
-Existing preferences are retained; Astra has a separate best-time record.
+2 PLAYER MODE: vertical split screen, P1 left and P2 right; two humans and four AI.
+CONTROLS: remap keyboard/pad/wheel actions and calibrate steering/pedal axes.
+One keyboard player maximum. Each controller or wheel belongs to one player.
+A disconnected device pauses the race. Identical pads require owner confirmation.
+RANKINGS: named offline SQLite race/lap rankings, separated by mode/speed class.
+Legacy v1.6 bests are displayed separately; DNF, changed and diagnostic races are excluded.
+All six selected drivers are visibly seated in Duster and Bigster.
+Physical Logitech Formula Force EX compatibility is unverified; no force feedback.
+Existing preferences and records are retained.
 
-Source and setup: https://github.com/amilapcsgit/Leo_Racer/tree/{args.branch}
-Component notices are in licenses/. See source docs/MODULAR_GARAGE_VALIDATION.md
+Source and setup: https://github.com/amilapcsgit/Leo_Racer/tree/v{args.version}
+Component notices are in licenses/. See source docs/LOCAL2PLAYER_VALIDATION.md
 for verification results and engine cleanup-warning notes.
 
 Bigster Extreme: LB/RB cycles cars in the garage. Use the name keyboard with A.
-Pause > Change Car retains the race. Continue swaps only your car; changed
+Pause > Change Car retains the race. Continue swaps the targeted player's car; changed
 races cannot set records. Start New Race restarts; Back cancels the changes.
 Duster: 165/198 km/h. Bigster: 180/225 km/h with electric boost and braking regen.
 
 ''')
 exe_hash=hashlib.sha256((BUILD/'Leo Racer.exe').read_bytes()).hexdigest()
-manifest={'version':args.version,'branch':args.branch,'godot':'4.7.2 .NET','architecture':'Windows x86_64','exe_sha256':exe_hash,'runtime_bundled':True,'terrain_library_bundled':True}
+manifest={'version':args.version,'branch':args.branch,'godot':'4.7.2 .NET','architecture':'Windows x86_64','exe_sha256':exe_hash,'runtime_bundled':True,'terrain_library_bundled':True,'sqlite_native_bundled':(BUILD/'data_LeoRacer_windows_x86_64/e_sqlite3.dll').is_file()}
 manifest['commit']=subprocess.check_output(['git','-c','safe.directory='+ROOT.as_posix(),'-C',str(ROOT),'rev-parse','HEAD']).decode().strip()
 manifest['source_tree']=subprocess.check_output(['git','-c','safe.directory='+ROOT.as_posix(),'-C',str(ROOT),'rev-parse','HEAD^{tree}']).decode().strip()
 (BUILD/'build-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')

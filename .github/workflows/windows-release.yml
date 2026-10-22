@@ -23,9 +23,18 @@ jobs:
       - name: Set build version
         shell: pwsh
         run: |
-          $version='1.6.0'
+          $version='1.7.0'
           if ('${{ github.ref_type }}' -eq 'tag') {$version='${{ github.ref_name }}'.TrimStart('v')}
           "BUILD_VERSION=$version" >> $env:GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
       - name: Install checksum-pinned dependencies
         shell: pwsh
         run: |
@@ -42,23 +51,20 @@ jobs:
       - name: Validate catalog and gameplay
         shell: pwsh
         run: |
-          foreach ($test in @('bigster_replacement_test','modular_catalog_test','modular_drive_test','modular_presentation_test','modular_fleet_race','bigster_acceptance')) {
-            & ./tools/run_godot.ps1 --headless --script "res://tests/$test.gd" '--' --drive-test
-            if ($LASTEXITCODE -ne 0) {throw "Failed $test"}
-          }
+          ./tools/check_local2player.ps1
       - name: Export game and launcher
         shell: pwsh
         run: |
           ./tools/build_modular_release.ps1
           ./tools/build_launcher.ps1 -Version $env:BUILD_VERSION
-          python tools/package_modular.py --branch bigster --version $env:BUILD_VERSION
+          python tools/package_modular.py --branch local2player --version $env:BUILD_VERSION
           ./tools/build_installer.ps1 -Version $env:BUILD_VERSION
-          python tools/package_modular.py --branch bigster --version $env:BUILD_VERSION --checksums-only
+          python tools/package_modular.py --branch local2player --version $env:BUILD_VERSION --checksums-only
       - name: Verify extracted offline package
         shell: pwsh
         run: |
           $name=if ($env:BUILD_VERSION.Contains('-rc')) {'Leo Racer Bigster RC'} else {'Leo Racer'}
-          $folder=Resolve-Path "build/qa-bigster-fresh/$name"
+          $folder=Resolve-Path "build/qa-modular-garage-fresh/$name"
           $launcher=Join-Path $folder 'Leo Racer Launcher.exe'
           $p=Start-Process -FilePath $launcher -ArgumentList '--self-test' -PassThru -Wait -WindowStyle Hidden
           if ($p.ExitCode -ne 0) {throw 'Launcher self-test failed'}
@@ -75,10 +81,11 @@ jobs:
             docs/qa-modular-garage/*.json
             docs/qa-bigster/*.json
             docs/qa-bigster-replacement/*.json
+            docs/qa-local2player/*.json
           retention-days: 14
   publish:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/bigster'
+    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/release/1.7.0'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -94,15 +101,20 @@ jobs:
         shell: bash
         run: |
           tag="${GITHUB_REF_NAME}"
-          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then
-            tag="v1.6.0"
-            if gh release view "$tag" >/dev/null 2>&1; then
-              echo 'Release already exists; branch CI completed.'
-              exit 0
-            fi
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then tag="v1.7.0"; fi
+          if tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha' 2>/dev/null); then
+            if [[ "$tag_sha" != "$GITHUB_SHA" ]]; then echo 'Existing tag points to different source; refusing to overwrite it.'; exit 1; fi
+          else
             gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA"
           fi
-          args=()
-          if [[ "$tag" == *-rc* ]]; then args+=(--prerelease --latest=false); fi
-          gh release create "$tag" release/dist/* --target "$GITHUB_SHA" --title "Leo Racer $tag" --notes-file docs/RELEASE_NOTES.md "${args[@]}"
-          gh release upload "$tag" docs/qa-bigster-replacement/garage.png docs/qa-bigster-replacement/replacement.json docs/qa-bigster-replacement/asset-measurements.json docs/qa-bigster/acceptance.json --clobber
+          if existing=$(gh release view "$tag" --json isDraft --jq '.isDraft' 2>/dev/null); then
+            if [[ "$existing" == "false" ]]; then echo 'Validated release is already public.'; exit 0; fi
+          else
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Leo Racer $tag" --notes-file docs/RELEASE_NOTES.md --draft
+          fi
+          gh release upload "$tag" release/dist/* docs/qa-local2player/garage-sheet.jpg docs/qa-local2player/regressions.json docs/qa-local2player/performance-forward_plus.json docs/qa-local2player/performance-gl_compatibility.json --clobber
+          if [[ "$tag" == *-rc* ]]; then
+            gh release edit "$tag" --draft=false --prerelease --latest=false
+          else
+            gh release edit "$tag" --draft=false --latest
+          fi

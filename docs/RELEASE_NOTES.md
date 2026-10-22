@@ -1,29 +1,40 @@
-# Leo Racer 1.6.0 — Bigster Extreme
+# Leo Racer 1.7.0 — Local Two Player
 
-Replaces the earlier Bigster approximation with the repaired gray Extreme model:
-wide four-row copper grille, revised bumpers and rear quarter glass, black roof,
-closed panoramic glass and Tagasan wheels. The game derivative has 69,652
-triangles and is 4.94 MB, with portable PBR materials and four independently
-animated wheels. The SUV is 30% larger in-game, with matching driver and collision
-size. Corrected local wheel pivots prevent orbiting during driving; brake calipers
-steer without spinning with the tires.
+Race together on one PC: **P1 left, P2 right**, two human racers plus four AI,
+three laps around Colombo Coast. Each player chooses their own name, car,
+driver and controls. Either player can pause; the second player keeps racing
+after the first finishes.
 
-Six driver identities, sixteen machines, custom names, controller name entry,
-and the persistent garage remain available. Pause → Change Car retains progress;
-changed races cannot set best-time records. Bigster retains its 180 / 225 km/h
-normal / boosted arcade settings, electric boost and braking regeneration.
+- **CONTROLS:** saved keyboard/controller remapping and raw joystick/wheel
+  calibration. Use one keyboard plus a controller/wheel, or two separate devices.
+  Only one keyboard player is allowed. Disconnect pauses the race; indistinguishable
+  controllers require owner confirmation.
+- **RANKINGS:** named offline race-time and lap-time records, filtered by mode,
+  speed class and vehicle. Legacy 1.6 bests remain separate. DNF, modified races
+  and diagnostics never set new records. SQLite and its Windows runtime are included.
+- **Balanced racing:** standard vehicles and Duster use 165/198 km/h; Bigster
+  keeps 180/225 km/h, electric boost and braking regeneration. Everyone uses
+  18 m/s² acceleration and handling 1.0.
+- **All six drivers in both Dacias:** Sonic, Leo, Ellie, Rio, Shaven Leo and Mario
+  now appear seated inside Duster and Bigster. Bigster retains its approved
+  130% game size and corrected wheel rotation centers.
+- Safer grid spacing, footprint-aware barriers and recovery, non-blocking
+  finished cars, and player-targeted Pause → Change Car. Changed races are
+  excluded from rankings.
 
-Download **LeoRacer-Setup-1.6.0.exe** for the stable per-user installation, or
-**LeoRacer-Windows-1.6.0-Bigster.zip** for portable play. Run **Leo Racer Launcher.exe**.
-The .NET runtime is included; playing works offline. Settings and records survive
-upgrades. The previous 1.6 RC remains a separate installation.
+Download **LeoRacer-Setup-1.7.0.exe** to install/update, or
+**LeoRacer-Windows-1.7.0-Local2Player.zip** for portable play. Extract the whole
+folder and run **Leo Racer Launcher.exe**. No editor, .NET SDK or database server
+is required. **SHA256SUMS.txt** verifies every package; the binaries are unsigned.
 
-Windows x64; Vulkan recommended, OpenGL Compatibility fallback available.
-Binaries are unsigned. Verify downloads against **SHA256SUMS.txt**.
+Windows x64. Vulkan recommended; OpenGL Compatibility mode is available.
+RTX A1000 1080p split-screen measurements averaged 99.7 FPS Vulkan and 82.9 FPS
+Compatibility (45-second samples; not a guaranteed minimum).
 
-This is a simplified game derivative of the supplied Duster-based Blender model;
-the editable detailed master remains separate. The sunroof is closed in the game
-asset. See **docs/BIGSTER_RUNTIME_REPLACEMENT.md** and
-**docs/qa-bigster-replacement/** for current geometry and integration evidence.
-Original models and previous releases remain available. Component notices ship
-inside **licenses/**. Source is on the `bigster` branch and `v1.6.0` tag.
+Logitech Formula Force EX **physical compatibility remains unverified** because
+hardware was unavailable. Input tests used simulated Godot device events; wheel
+force feedback is not included. Colombo HDRI and the broader collision overhaul
+remain future work.
+
+Source and verification: `v1.7.0`, `docs/LOCAL2PLAYER_VALIDATION.md` and
+`docs/qa-local2player/`. Version 1.6 remains available in previous GitHub releases.

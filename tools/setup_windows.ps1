@@ -11,7 +11,15 @@ function Get-PinnedArchive([string]$name) {
     $entry=$lock.files | Where-Object {$_.file -eq $name}
     if (-not $entry) {throw "Unpinned dependency: $name"}
     $cache=Join-Path $localTools $name
-    if (-not (Test-Path -LiteralPath $cache)) {Invoke-WebRequest -Uri $entry.url -OutFile $cache}
+    if (-not (Test-Path -LiteralPath $cache)) {
+        Write-Host "Downloading checksum-pinned $name"
+        # HTTP/1.1 avoids the intermittent .NET HTTP/2 EOF seen on hosted Windows.
+        $partial=$cache+'.partial'
+        & curl.exe --http1.1 --fail --location --silent --show-error --retry 4 --retry-all-errors --connect-timeout 30 --max-time 300 --output $partial $entry.url
+        if ($LASTEXITCODE -ne 0) {throw "Download failed: $name"}
+        if ((Get-FileHash -LiteralPath $partial -Algorithm SHA256).Hash.ToLower() -ne $entry.sha256) {throw "Checksum mismatch: $name"}
+        Move-Item -LiteralPath $partial -Destination $cache -Force
+    }
     if ((Get-FileHash -LiteralPath $cache -Algorithm SHA256).Hash.ToLower() -ne $entry.sha256) {throw "Checksum mismatch: $name"}
     return $cache
 }

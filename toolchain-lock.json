@@ -14,7 +14,7 @@
     },
     {
       "file": "dotnet-sdk.zip",
-      "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.426/dotnet-sdk-8.0.426-win-x64.zip",
+      "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/8.0.426/dotnet-sdk-8.0.426-win-x64.zip",
       "sha256": "b2523f881c97e13234e9b3905fe9978831b84e52f8115ba397d31203d2e022ce"
     },
     {
