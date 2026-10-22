@@ -1,5 +1,6 @@
 extends Node3D
 
+var input_router: LeoInputRouter
 var catalog: GarageCatalog
 var ROSTER: Array = []
 var KARTS: Array = []
@@ -63,6 +64,9 @@ func _ready() -> void:
 	for d in catalog.drivers: ROSTER.append({"name":d.display_name,"animal":String(d.id),"tagline":d.tagline})
 	for v in catalog.vehicles: KARTS.append({"name":v.display_name,"color":String(v.id),"speed":(v.max_speed-29.)/.9,"grip":(v.handling-.8)/.05,"accel":(v.acceleration-13.)/1.2,"top":v.max_speed})
 	configure_input()
+	input_router = LeoInputRouter.new()
+	input_router.name = "PlayerInputs"
+	add_child(input_router)
 	if not test_mode and not smoke_mode and not diagnostics_mode and "--drive-test" not in args: load_settings()
 	circuit = LeoCircuit.new()
 	build_world()

@@ -13,6 +13,7 @@ var circuit: LeoCircuit
 var racer_id := 0
 var racer_name := "Sonic"
 var is_player := false
+var control_input: LeoPlayerInput
 var active := false
 var finished := false
 var finish_time := 0.0
@@ -324,10 +325,10 @@ func _physics_process(dt: float) -> void:
 	var ai_speed := max_speed
 	if active:
 		if is_player and not auto_drive:
-			throttle = Input.get_axis("brake", "accelerate")
-			desired_steer = Input.get_axis("left", "right")
-			want_drift = Input.is_action_pressed("drift") and absf(speed) > 12 and (drifting or absf(desired_steer) > .12)
-			if Input.is_action_just_pressed("boost") and boost_fuel >= 1:
+			throttle = control_input.throttle() if control_input else Input.get_axis("brake", "accelerate")
+			desired_steer = control_input.steering() if control_input else Input.get_axis("left", "right")
+			want_drift = (control_input.value("drift")>.5 if control_input else Input.is_action_pressed("drift")) and absf(speed) > 12 and (drifting or absf(desired_steer) > .12)
+			if (control_input.consume("boost") if control_input else Input.is_action_just_pressed("boost")) and boost_fuel >= 1:
 				boost_fuel = 0
 				boost(1.6, "HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
 		else:

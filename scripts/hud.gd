@@ -186,7 +186,8 @@ func show_menu() -> void:
 	title.add_theme_color_override("font_outline_color", ink)
 	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), "ASTRA // COLOMBO COAST", 29, Color.WHITE, true)
 	text_at(menu_root, Vector2(89, 417), Vector2(620, 65), "More coast. More corners. One wild harbour circuit.", 20, muted)
-	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "LET'S RACE     â†’", game.start_race, true)
+	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "LET'S RACE     →", game.start_race, true)
+	button(menu_root,Vector2(500,600),Vector2(220,62),"CONTROLS",show_controls)
 	button(menu_root, Vector2(88, 600), Vector2(389, 62), "GARAGE & RACERS", show_garage)
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
@@ -230,7 +231,7 @@ func modal(title: String, subtitle: String = "") -> void:
 
 func show_guide() -> void:
 	modal("FIND YOUR FLOW", "A little sideways. A lot faster.")
-	var lines := [["WASD / ARROWS", "Accelerate, brake & steer"], ["SPACE + STEER", "Hold a drift. Release after the sparks for a boost."], ["LEFT SHIFT", "Nitro: use a full meter for a burst of speed."], ["H / CONTROLLER B", "Honk your ride's horn. Own the harbour."], ["R", "Recover at your last checkpoint"], ["ESC / P", "Pause, resume & restart"], ["CONTROLLER", "Left stick steer Â· RT drive Â· LT brake Â· A drift Â· X nitro"]]
+	var lines := [["WASD / ARROWS", "Accelerate, brake & steer"], ["SPACE + STEER", "Hold a drift. Release after the sparks for a boost."], ["LEFT SHIFT", "Nitro: use a full meter for a burst of speed."], ["H / CONTROLLER B", "Honk your ride's horn. Own the harbour."], ["R", "Recover at your last checkpoint"], ["ESC / P", "Pause, resume & restart"], ["CONTROLLER", "Left stick steer · RT drive · LT brake · A drift · X nitro"]]
 	for i in lines.size():
 		text_at(modal_root, Vector2(482, 299 + i * 49), Vector2(620, 26), lines[i][0], 16, gold, true)
 		text_at(modal_root, Vector2(482, 321 + i * 49), Vector2(660, 28), lines[i][1], 16, muted)
@@ -374,7 +375,7 @@ func show_results() -> void:
 	panel(modal_root, Vector2(370, 65), Vector2(860, 770), Color("091a34f5"))
 	text_at(modal_root, Vector2(430, 101), Vector2(750, 32), "COLOMBO GRAND PRIX   /   LOTUS COAST", 18, accent, true)
 	text_at(modal_root, Vector2(425, 149), Vector2(780, 85), "ISLAND CHAMPION!" if game.finish_place == 1 else "WHAT A RIDE!", 55, gold, true)
-	text_at(modal_root, Vector2(430, 246), Vector2(760, 35), "YOUR TIME  %s     â€¢     BEST  %s" % [game.format_time(game.player.finish_time), game.format_time(game.best_time)], 22, Color.WHITE, true)
+	text_at(modal_root, Vector2(430, 246), Vector2(760, 35), "YOUR TIME  %s     •     BEST  %s" % [game.format_time(game.player.finish_time), game.format_time(game.best_time)], 22, Color.WHITE, true)
 	if game.race_modified:text_at(modal_root,Vector2(432,282),Vector2(750,22),"MODIFIED RACE  /  RECORD NOT SAVED",15,gold,true)
 	text_at(modal_root, Vector2(432, 306), Vector2(760, 28), "POS        RACER                                         RACE TIME", 16, muted, true)
 	var order: Array = game.ranking()
@@ -385,7 +386,7 @@ func show_results() -> void:
 		text_at(modal_root, Vector2(526, 351 + i * 47), Vector2(375, 38), k.racer_name + ("  /  YOU" if k.is_player else ""), 24, Color.WHITE, true)
 		text_at(modal_root, Vector2(962, 351 + i * 47), Vector2(220, 38), game.format_time(k.finish_time) if k.finished else "%dm BEHIND" % int(game.circuit.length * 3 - k.progress), 22, muted)
 	text_at(modal_root, Vector2(432, 663), Vector2(750, 32), "BEST LAP  %s     /     %d BOOSTS" % [game.format_time(game.best_lap), game.boost_count], 19, accent, true)
-	button(modal_root, Vector2(430, 735), Vector2(350, 62), "RACE AGAIN  â†’", game.start_race, true).grab_focus()
+	button(modal_root, Vector2(430, 735), Vector2(350, 62), "RACE AGAIN  →", game.start_race, true).grab_focus()
 	button(modal_root, Vector2(803, 735), Vector2(365, 62), "BACK TO GARAGE", show_garage)
 	queue_redraw()
 
@@ -471,3 +472,10 @@ func _draw() -> void:
 	if scene_mode=="garage": return
 	if scene_mode!="race" or not game or not game.player or photo_mode: return
 	LeoTelemetry.draw(self)
+
+func show_controls() -> void:
+	var panel := LeoControlsPanel.new()
+	panel.router = game.input_router
+	clear(modal_root)
+	modal_root.add_child(panel)
+	panel.closed.connect(func():panel.queue_free())

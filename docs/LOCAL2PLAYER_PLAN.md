@@ -21,7 +21,7 @@ Stable release and read-only sources must remain unchanged.
 ## Checkpoints
 
 1. Branch/recovery notes/development CI: COMPLETE (this commit).
-2. Independent inputs, binding UI, persistence, wheel calibration: pending.
+2. Independent input profiles, binding UI, persistence, wheel calibration: COMPLETE. 26 input checks, 96 catalog combinations and 11 driving checks pass. Race-loop ownership hookup follows in checkpoint 3.
 3. Two-player race state, pause, finish, retirement: pending.
 4. Lobby, split view, per-player HUD and results: pending.
 5. Balanced performance and SQLite rankings: pending.
