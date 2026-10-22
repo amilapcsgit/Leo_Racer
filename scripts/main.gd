@@ -414,6 +414,10 @@ func start_race() -> void:
 		kart.gate_crossed.connect(on_gate);kart.boosted.connect(on_boost);kart.impacted.connect(on_impact);kart.recovered.connect(on_recover)
 		karts.append(kart)
 	player=karts[0]
+	if ranking_store and not diagnostic_run():
+		best_time=0.
+		for row in ranking_store.best_times(human_count,LeoRaceRules.resolve(player.definition).class_id,"",false):
+			if row.profile_id==local_players[0].profile_id:best_time=float(row.race_ms)/1000.;break
 	local_players[0].camera=camera;local_players[0].feedback=feedback
 	if test_mode:player.auto_drive=true
 	cam_heading=player.rotation.y;camera.fov=63
@@ -515,6 +519,14 @@ func cancel_pause_garage() -> void:
 
 func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> bool:
 	if not garage_from_pause or not paused or not is_instance_valid(local_players[selected_player_slot].kart):return false
+	if not diagnostics_mode:
+		for slot in human_count:
+			var assigned:=local_players[slot].kart
+			if assigned and not assigned.finished and not assigned.retired:
+				var problem:=input_router.ready_problem(slot)
+				if not problem.is_empty():
+					hud.garage_selector.policy.text=problem+" Back to pause and reassign controls before continuing."
+					return false
 	var local:=local_players[selected_player_slot]
 	var old:=local.kart
 	if old.finished or old.retired:return false
@@ -585,7 +597,11 @@ func toggle_pause() -> void:
 	input_router.clear_all()
 	if split_view:split_view.set_frozen(paused)
 	if paused:hud.pause_menu()
-	else:hud.clear(hud.modal_root);disconnect_message=""
+	else:
+		hud.clear(hud.modal_root)
+		for local in local_players:
+			if local.announcement==disconnect_message:local.announcement="";local.announcement_time=0.
+		disconnect_message=""
 
 func _unhandled_input(event: InputEvent) -> void:
 	if input_router.capture_slot>=0:return
@@ -714,7 +730,8 @@ func load_settings() -> void:
 
 func format_time(seconds: float) -> String:
 	if seconds > 9999: return "--:--.---"
-	return "%02d:%02d.%03d" % [int(seconds) / 60, int(seconds) % 60, int(fmod(seconds, 1) * 1000)]
+	var milliseconds:=roundi(seconds*1000.)
+	return "%02d:%02d.%03d" % [milliseconds/60000,(milliseconds/1000)%60,milliseconds%1000]
 
 func quit_game() -> void:
 	stop_all_audio()
@@ -834,6 +851,19 @@ func run_smoke_checks() -> void:
 	selected_kart = 0
 	return_menu()
 	check(state == "menu" and karts.is_empty(), "Return to menu frees race instances")
+	# Export smoke also loads shared-world split presentation and the bundled
+	# Windows SQLite engine using a throwaway file, never the personal store.
+	human_count=2;selected_kart=catalog.vehicle_index(&"bigster");start_race()
+	check(karts[0].is_player and karts[1].is_player and split_view.visible,"Packaged two-human shared-world views load")
+	check(split_view.views[0].world_3d==get_world_3d() and split_view.views[1].world_3d==get_world_3d(),"Packaged split cameras share one physics world")
+	var database=load("res://scripts/LocalRankingStore.cs").new()
+	var temporary:=ProjectSettings.globalize_path("user://offline-smoke-%d.sqlite3" % Time.get_ticks_usec())
+	check(database.open_store(temporary),"Packaged native SQLite engine opens offline")
+	var row:={"finished":true,"retired":false,"next_gate":25,"race_time":300.,"best_lap":90.,"profile_id":"offline-smoke","name":"OFFLINE PILOT","driver":"mario","vehicle":"bigster","class_id":"suv180","place":1}
+	check(database.save_session("offline-smoke",2,[row],false,false)==1 and database.best_times(2,"suv180","",false).size()==1,"Packaged SQLite transaction and query work offline")
+	database.close_store()
+	for suffix in ["","-wal","-shm"]:DirAccess.remove_absolute(temporary+suffix)
+	return_menu()
 	complete_test()
 
 func complete_test() -> void:

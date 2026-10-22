@@ -18,6 +18,10 @@ try {
     if ($LASTEXITCODE -ne 0) {throw '.NET bridge build failed'}
     & "$PSScriptRoot/brand_template.ps1"
     New-Item -ItemType Directory -Force -Path (Split-Path $Output -Parent) | Out-Null
-    & "$PSScriptRoot/run_godot.ps1" --headless --export-release 'Windows Desktop' $Output
-    if ($LASTEXITCODE -ne 0) {throw 'Windows export failed'}
+    $exportLog=Join-Path $project 'build/development-export-check.log'
+    & "$PSScriptRoot/run_godot.ps1" --headless --export-release 'Windows Desktop' $Output 2>&1 | Tee-Object -FilePath $exportLog
+    if ($LASTEXITCODE -ne 0 -or (Select-String -Path $exportLog -Pattern 'Export .NET Project: Failed|SCRIPT ERROR' -Quiet)) {throw 'Windows or .NET export failed'}
+    $folder=Split-Path $Output -Parent
+    if (-not (Get-ChildItem $folder -Recurse -Filter 'LeoRacer.dll')) {throw 'Export is missing .NET assemblies'}
+    if (-not (Get-ChildItem $folder -Recurse -Filter 'e_sqlite3.dll')) {throw 'Export is missing Windows native SQLite'}
 } finally {Pop-Location}

@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "archive": "LeoRacer-local2player-development.zip",
+  "sha256": "9b914a7989ae5812b3ca16054d02e9c737adc691ec4904680dbcbd4ee6d1b7ac",
+  "bytes": 586558327,
+  "extracted_offline_smoke": {
+    "boosts": 0,
+    "engine": "4.7.2-stable (official)",
+    "errors": [],
+    "race_time": 0.0,
+    "status": "PASS"
+  },
+  "native_sqlite_bundled": true,
+  "stable_release_unchanged": true
+}

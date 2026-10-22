@@ -1,0 +1,10 @@
+{
+  "checks": 18,
+  "errors": [],
+  "renderer": "forward_plus",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "status": "PASS"
+}

@@ -6,6 +6,7 @@ var slot := 0
 var body: VBoxContainer
 var status: Label
 var live: Dictionary = {}
+var pending_device: Dictionary = {}
 func _ready() -> void:
  theme=load("res://assets/config/local_ui_theme.tres")
  process_mode = Node.PROCESS_MODE_ALWAYS
@@ -44,7 +45,9 @@ func refresh() -> void:
  devices.select(selected)
  devices.item_selected.connect(func(index: int):
   var data: Dictionary=devices.get_item_metadata(index)
-  if not router.assign(slot,data.kind,data.device):status.text=router.last_error)
+  if data.kind!="keyboard" and ambiguous_device(int(data.device)):
+   pending_device=data;status.text="CONFIRM PLAYER %d: press any button on the selected device #%d. Escape cancels." % [slot+1,int(data.device)]
+  elif not router.assign(slot,data.kind,data.device):status.text=router.last_error)
  status=label(router.last_error if not router.last_error.is_empty() else "Release controls before rebinding. Press Escape to cancel. One keyboard player maximum.")
  status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
  var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(scroll)
@@ -75,6 +78,26 @@ func _process(_dt: float) -> void:
 func _exit_tree() -> void:
  if router and router.binding_changed.is_connected(refresh):router.binding_changed.disconnect(refresh)
 
+func ambiguous_device(id: int) -> bool:
+ var identity:=router.fingerprint(id)
+ var matches:=0
+ for device in Input.get_connected_joypads():
+  if router.fingerprint(device)==identity:matches+=1
+ if matches>1:return true
+ for index in 2:
+  if index!=slot and router.players[index].kind!="keyboard" and router.players[index].identity==identity:return true
+ return false
+
 func _input(event: InputEvent) -> void:
+ if not pending_device.is_empty():
+  if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE:
+   pending_device={};refresh()
+  elif event is InputEventJoypadButton and event.pressed and event.device==int(pending_device.device):
+   var data:=pending_device;pending_device={}
+   if not router.assign(slot,data.kind,data.device):status.text=router.last_error
+  get_viewport().set_input_as_handled();return
+ if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+  var p:=router.players[slot]
+  if router.capture_slot<0 and (p.kind=="keyboard" or event.device!=p.device):get_viewport().set_input_as_handled();return
  if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE and router.capture_slot<0:
   closed.emit();get_viewport().set_input_as_handled()

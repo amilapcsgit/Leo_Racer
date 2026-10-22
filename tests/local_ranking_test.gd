@@ -30,6 +30,7 @@ func run() -> void:
  var corrupt:=path+".corrupt";var file:=FileAccess.open(corrupt,FileAccess.WRITE);file.store_string("KEEP EXISTING DATA");file.close()
  check(not store.open_store(corrupt) and FileAccess.get_file_as_string(corrupt)=="KEEP EXISTING DATA","Corrupt database preserved")
  var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame;game.diagnostics_mode=true
+ check(game.format_time(320.2)=="05:20.200","Ranking timestamps round to exact milliseconds")
  game.human_count=2;game.start_race()
  for kart in game.karts:
   var bigster: bool=kart.vehicle_key=="bigster"

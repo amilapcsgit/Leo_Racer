@@ -1,0 +1,44 @@
+{
+  "checks": 10,
+  "errors": [],
+  "first_finish_interval_seen": true,
+  "full_race": [
+    {
+      "finished": true,
+      "name": "Sonic",
+      "next_gate": 25,
+      "time": 160.868614
+    },
+    {
+      "finished": true,
+      "name": "Player 2",
+      "next_gate": 25,
+      "time": 149.007493999998
+    },
+    {
+      "finished": true,
+      "name": "Ellie",
+      "next_gate": 25,
+      "time": 147.021445999998
+    },
+    {
+      "finished": true,
+      "name": "Rio",
+      "next_gate": 25,
+      "time": 150.993541999998
+    },
+    {
+      "finished": true,
+      "name": "Shaven Leo",
+      "next_gate": 25,
+      "time": 150.221189999998
+    },
+    {
+      "finished": true,
+      "name": "Mario",
+      "next_gate": 25,
+      "time": 150.717701999998
+    }
+  ],
+  "status": "PASS"
+}

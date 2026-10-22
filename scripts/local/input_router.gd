@@ -65,17 +65,12 @@ func save_profiles() -> Error:
 func load_profiles() -> void:
  var cfg := ConfigFile.new()
  if cfg.load(settings_path) != OK: return
- var claimed: Array[int] = []
  for i in players.size():
   var data: Variant = cfg.get_value("player_%d" % i,"profile",{})
   if data is Dictionary and not data.is_empty(): players[i].restore(data)
-  var p := players[i]
-  if p.kind == "keyboard": continue
-  var matches: Array[int] = []
-  for id in Input.get_connected_joypads():
-   if fingerprint(id) == p.identity and not id in claimed: matches.append(id)
-  if matches.size() == 1:
-   p.device = matches[0]; claimed.append(p.device)
+ var identities: Dictionary={}
+ for id in Input.get_connected_joypads():identities[id]=fingerprint(id)
+ restore_assignments(Input.get_connected_joypads(),identities)
  if players[0].kind == "keyboard" and players[1].kind == "keyboard": players[1].reset_defaults("gamepad")
 func start_capture(slot: int, action: String) -> void:
  capture_slot = slot; capture_action = action
@@ -105,3 +100,18 @@ func _capture(event: InputEvent) -> void:
   p.bindings[capture_action] = [binding]
   cancel_capture(); save_profiles(); binding_changed.emit()
  get_viewport().set_input_as_handled()
+
+func restore_assignments(devices: Array[int], identities: Dictionary) -> void:
+ # Compare against ALL saved owners and ALL connected devices. A lone plugged-in
+ # twin still cannot identify itself as P1 or P2 when both saved GUIDs match.
+ for slot in players.size():
+  var p:=players[slot]
+  if p.kind=="keyboard":continue
+  p.device=-1;p.clear()
+  var duplicate_owner:=false
+  for other in players:
+   if other!=p and other.kind!="keyboard" and other.identity==p.identity:duplicate_owner=true
+  var matches: Array[int]=[]
+  for id in devices:
+   if identities.get(id,{})==p.identity:matches.append(id)
+  if not duplicate_owner and matches.size()==1 and not p.identity.is_empty():p.device=matches[0]

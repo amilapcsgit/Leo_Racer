@@ -21,6 +21,11 @@ public partial class LocalRankingStore : RefCounted
                 DefaultTimeout = 3, Pooling = false
             }.ToString());
             connection.Open();
+            using (var version = connection.CreateCommand()) {
+                version.CommandText = "PRAGMA user_version";
+                if (Convert.ToInt32(version.ExecuteScalar()) > 1)
+                    throw new InvalidOperationException("This ranking database belongs to a newer game version.");
+            }
             using var command = connection.CreateCommand();
             command.CommandText = @"
 PRAGMA foreign_keys=ON;

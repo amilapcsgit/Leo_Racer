@@ -31,12 +31,11 @@ jobs:
         shell: pwsh
         run: |
           ./tools/build_modular_release.ps1 -Output 'build/Local2Player/Leo Racer.exe'
-          Copy-Item licenses build/Local2Player/licenses -Recurse
-          'Unpublished local2player development build. Extract the complete folder. Stable 1.6 remains separate.' | Set-Content 'build/Local2Player/README.txt'
+          ./tools/package_local2player.ps1 -SkipBuild
       - uses: actions/upload-artifact@v4
         with:
           name: LeoRacer-local2player-development
           path: |
-            build/Local2Player/
+            build/LeoRacer-local2player-development.zip
             docs/qa-local2player/*.json
           retention-days: 14

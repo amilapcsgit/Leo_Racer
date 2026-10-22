@@ -36,7 +36,7 @@ func run() -> void:
 	motion=InputEventJoypadMotion.new();motion.axis=JOY_AXIS_LEFT_X;motion.axis_value=0.;Input.parse_input_event(motion)
 	joy(JOY_BUTTON_A);await process_frame;check(selector.driver_id==&"elephant","Xbox A activates the focused driver")
 	selector.set_selection(&"mario",&"duster")
-	check(selector.assembly.get_meta("driver_id")==&"mario" and selector.assembly.get_node("Driver").get_meta("visible_driver_id")==&"human","Dacia keeps selected identity and fixed helmeted driver")
+	check(selector.assembly.get_meta("driver_id")==&"mario" and selector.assembly.get_node("Driver").get_meta("visible_driver_id")==&"mario","Dacia keeps selected identity and visible Mario cabin driver")
 	check(selector.stats.text.contains("165 KM/H"),"Duster displays real normal ceiling")
 	selector.cycle_vehicle(-1);check(selector.vehicle_id==&"race_bus","Previous cycles catalog order")
 	selector.set_selection(&"human",game.catalog.vehicles.back().id);joy(JOY_BUTTON_RIGHT_SHOULDER);await process_frame

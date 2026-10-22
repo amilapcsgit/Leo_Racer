@@ -42,7 +42,29 @@ func run() -> void:
  check(router.players[1].device==-1,"Runtime device IDs are not persisted")
  router.assign(0,"gamepad",17,false);router.feed(axis(17,0,1.));router._connection(17,false)
  check(router.players[0].device==-1 and router.players[0].steering()==0.,"Disconnect clears and unassigns")
+ router.players[0].kind="gamepad";router.players[1].kind="gamepad"
+ var twin:={"guid":"same-guid","name":"Xbox Controller","serial":""}
+ router.players[0].identity=twin;router.players[1].identity=twin
+ router.restore_assignments([7],{7:twin})
+ check(router.players[0].device==-1 and router.players[1].device==-1,"Lone identical controller requires explicit owner confirmation")
+ router.restore_assignments([7,8],{7:twin,8:twin})
+ check(router.players[0].device==-1 and router.players[1].device==-1,"Identical controllers never silently exchange players")
+ router.players[1].identity={"guid":"wheel","name":"Formula Force EX","serial":"123"}
+ router.restore_assignments([7,9],{7:twin,9:router.players[1].identity})
+ check(router.players[0].device==7 and router.players[1].device==9,"Distinct saved devices restore independent ownership")
  router.clear_all();check(router.players[1].throttle()==0.,"Clear cannot leave pedal held")
+ router.players[0].reset_defaults("keyboard");router.players[0].device=-1
+ router.start_capture(0,"horn");router._capture(key(KEY_J))
+ check(router.players[0].bindings.horn[0].index==KEY_J and router.capture_slot==-1,"Keyboard remap captures the actual key")
+ router.feed(key(KEY_H));check(not router.players[0].consume("horn"),"Old binding is no longer active")
+ router.feed(key(KEY_J));check(router.players[0].consume("horn"),"New binding activates the action")
+ router.players[1].reset_defaults("wheel");router.players[1].device=18
+ router.start_capture(1,"accelerate");router._capture(axis(17,5,-.9))
+ check(router.capture_slot==1,"Wrong device cannot bind another player's action")
+ router._capture(axis(18,5,-.9))
+ check(router.players[1].bindings.accelerate[0].index==5 and router.players[1].bindings.accelerate[0].pressed<-.8,"Wheel learns actual pedal axis and direction")
+ router.start_capture(1,"brake");router._capture(key(KEY_ESCAPE))
+ check(router.capture_slot==-1 and router.players[1].value("accelerate")==0.,"Escape cancels capture and clears held inputs")
  var panel:=LeoControlsPanel.new();panel.router=router;root.add_child(panel);await process_frame
  check(panel.live.size()==10,"Controls expose every driving action")
  panel.slot=1;panel.refresh();check(panel.live.size()==10,"Second-player controls are editable")

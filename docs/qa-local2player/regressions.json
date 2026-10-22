@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "suites": {
+    "input": {
+      "status": "PASS",
+      "checks": 35
+    },
+    "race": {
+      "status": "PASS",
+      "checks": 21
+    },
+    "presentation": {
+      "status": "PASS",
+      "checks": 21
+    },
+    "presentation-compatibility": {
+      "status": "PASS",
+      "checks": 21
+    },
+    "rankings": {
+      "status": "PASS",
+      "checks": 26
+    },
+    "drivers": {
+      "status": "PASS",
+      "checks": 63
+    },
+    "integration": {
+      "status": "PASS",
+      "checks": 10
+    },
+    "catalog": {
+      "status": "PASS",
+      "checks": 2687
+    },
+    "bigster-wheel-regression": {
+      "status": "PASS",
+      "checks": 229
+    },
+    "single-drive": {
+      "status": "PASS",
+      "checks": 11
+    },
+    "single-presentation": {
+      "status": "PASS",
+      "checks": 24
+    },
+    "single-acceptance": {
+      "status": "PASS",
+      "checks": 37
+    },
+    "visual-acceptance": {
+      "status": "PASS",
+      "checks": 18
+    },
+    "offline-package": {
+      "status": "PASS",
+      "checks": null
+    }
+  },
+  "source_verification": "PASS",
+  "stable_tag": "v1.6.0",
+  "stable_commit": "8654b6ecf5026ecff3049eb95d04e9987f75eb04",
+  "package_sha256": "9b914a7989ae5812b3ca16054d02e9c737adc691ec4904680dbcbd4ee6d1b7ac"
+}

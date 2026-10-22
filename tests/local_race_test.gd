@@ -37,6 +37,7 @@ func run() -> void:
  game.input_router._connection(17,false)
  check(game.paused and not game.disconnect_message.is_empty(),"Device loss pauses both humans")
  game.input_router.assign(1,"gamepad",17,false);game.toggle_pause()
+ check(game.local_players[1].announcement_time==0.,"Reassignment removes the disconnected HUD message")
  game.race_time=100.;game.on_gate(a,24);game._process(.1)
  check(a.finished and game.state=="race" and b.active,"First finisher does not stop P2")
  check(a.collision_layer==0 and a.collision_mask==1,"Finished car cannot block active player")
@@ -45,6 +46,22 @@ func run() -> void:
  game.start_race();game.state="race";game.karts[0].active=true;game.karts[1].active=true
  game.retire_player(0);check(game.karts[0].retired and game.state=="race","P1 retirement lets P2 continue")
  game.retire_player(1);check(game.state=="results","Both retire ends the race")
+ game.start_race();game.countdown=.8
+ game._on_local_command(0,"accelerate");game._process(1.)
+ check(game.karts[0].boost_time>0 and game.karts[1].boost_time==0,"Countdown launch charge belongs only to the triggering player")
+ game.start_race();game.state="race"
+ var first: LeoKart=game.karts[0];var second: LeoKart=game.karts[1]
+ first.active=true;second.active=true;first.place(100.,0.);second.place(112.,0.)
+ first.wheel_motion_speed=20.;second.wheel_motion_speed=20.;first.boost_fuel=.2;second.boost_fuel=.2
+ game.update_slipstream(.5)
+ check(first.boost_fuel>.2 and second.boost_fuel==.2,"Slipstream regeneration belongs to the trailing human")
+ first.speed=20.;second.speed=-20.;game._process(.6)
+ check(game.local_players[1].wrong_way>.5 and game.local_players[0].wrong_way==0.,"Wrong-way feedback is independent")
+ game.selected_player_slot=1;game.toggle_pause();game.hud.show_garage("pause")
+ check(game.swap_player_vehicle(&"mario",&"blue","SECOND SWAP") and game.karts[0]==first and game.karts[1]!=second and game.local_players[1].kart==game.karts[1],"Pause car swap targets only P2")
+ game.toggle_pause();game.hud.show_garage("pause");game.input_router.players[1].device=-1;game.diagnostics_mode=false
+ check(not game.swap_player_vehicle(&"mario",&"duster","MISSING DEVICE") and game.paused,"Car change cannot bypass mandatory device reassignment")
+ game.diagnostics_mode=true
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
  FileAccess.open("res://docs/qa-local2player/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RACE_TEST ",report)

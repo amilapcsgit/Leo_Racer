@@ -58,3 +58,9 @@ assets/models/cabin/*.png.import
 docs/qa-local2player/*.png.import
 docs/qa-local2player/*.jpg.import
 docs/qa-local2player/cabin-*.png
+
+# Full-size captures are local evidence; compact reviewed sheets are committed.
+docs/qa-local2player/garage-*.jpg
+docs/qa-local2player/driving-*.jpg
+!docs/qa-local2player/garage-sheet.jpg
+!docs/qa-local2player/driving-sheet.jpg
