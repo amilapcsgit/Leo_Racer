@@ -16,6 +16,8 @@ var is_player := false
 var control_input: LeoPlayerInput
 var local_slot := -1
 var retired := false
+var race_boost_ceiling := 0.
+var race_ai_lateral_acceleration := -1.
 var active := false
 var finished := false
 var finish_time := 0.0
@@ -329,6 +331,7 @@ func boost(duration: float, source: String) -> void:
 	if is_player and boost_sound: boost_sound.play()
 
 func boosted_ceiling() -> float:
+	if race_boost_ceiling>0:return race_boost_ceiling
 	return definition.boosted_speed*(max_speed/definition.max_speed) if definition and definition.boosted_speed>0 else max_speed*1.4
 
 func _physics_process(dt: float) -> void:
@@ -359,10 +362,11 @@ func _physics_process(dt: float) -> void:
 			desired_steer = clampf(-error * 2.2, -1, 1)
 			var bend := absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s + 22), Vector3.UP))
 			ai_speed = max_speed * lerpf(1.0, .67, clampf(bend / 1.0, 0, 1))
-			if definition.ai_lateral_acceleration>0:
+			var lateral_limit: float=race_ai_lateral_acceleration if race_ai_lateral_acceleration>=0 else definition.ai_lateral_acceleration
+			if lateral_limit>0:
 				var braking_look:=maxf(26.,absf(speed)*1.25)
 				var preview_bend:=absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s+braking_look),Vector3.UP))
-				ai_speed=minf(ai_speed,sqrt(definition.ai_lateral_acceleration*braking_look/maxf(preview_bend,.001)))
+				ai_speed=minf(ai_speed,sqrt(lateral_limit*braking_look/maxf(preview_bend,.001)))
 				bend=maxf(bend,preview_bend)
 			throttle = 1 if speed < ai_speed else .15
 			if boost_fuel >= 1 and bend < .2 and next_gate > 1:

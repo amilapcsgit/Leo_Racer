@@ -81,7 +81,9 @@ $env:NUGET_PACKAGES=Join-Path $localTools 'nuget'
 $env:DOTNET_CLI_TELEMETRY_OPTOUT='1'
 Push-Location $project
 try {
-    & $sdk build LeoRacer.sln --nologo
+    & $sdk restore LeoRacer.csproj --locked-mode
+    if ($LASTEXITCODE -ne 0) {throw 'Locked dependency restore failed'}
+    & $sdk build LeoRacer.sln --nologo --no-restore
     if ($LASTEXITCODE -ne 0) {throw 'C# build failed'}
     & $engine --headless --editor --import --quit --path $project
     if ($LASTEXITCODE -ne 0) {throw 'Godot import failed'}

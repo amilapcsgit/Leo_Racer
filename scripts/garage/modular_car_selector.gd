@@ -184,7 +184,7 @@ func refresh_labels() -> void:
 	name_field.placeholder_text="ENTER DRIVER NAME  /  "+d.display_name.to_upper()
 	identity.text="%d RACERS × %d MACHINES // YOUR COMBO. YOUR COAST."%[catalog.drivers.size(),catalog.vehicles.size()]
 	caption.text=d.tagline
-	stats.text="TOP SPEED     %03d KM/H\nCORNER GRIP   %.2f\nLAUNCH POWER  %.1f M/S²"%[roundi(v.max_speed*3.6),v.handling,v.acceleration]
+	stats.text="TOP SPEED     %03d KM/H\nCORNER GRIP   %.2f\nLAUNCH POWER  %.1f M/S²"%[roundi(float(LeoRaceRules.resolve(v).max_speed)*3.6),float(LeoRaceRules.resolve(v).handling),float(LeoRaceRules.resolve(v).acceleration)]
 	policy.text="HELMETED SHAVEN LEO // FIXED CABIN DRIVER" if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED else ("IDENTITY + PORTRAIT // DRIVER-FREE BODY" if v.driver_policy==VehicleDefinition.DriverPolicy.IDENTITY_ONLY else "OPEN COCKPIT // LIVE DRIVER")
 	for i in driver_buttons.size():
 		var card:=driver_buttons[i];var selected:=catalog.drivers[i].id==driver_id

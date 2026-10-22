@@ -190,6 +190,7 @@ func show_menu() -> void:
 	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "1 PLAYER MODE    →", game.start_single_player, true)
 	button(menu_root,Vector2(500,507),Vector2(389,76),"2 PLAYER MODE",game.open_local_lobby,true)
 	button(menu_root,Vector2(500,600),Vector2(389,62),"CONTROLS",show_controls)
+	button(menu_root,Vector2(500,678),Vector2(389,57),"RANKINGS",show_rankings)
 	button(menu_root, Vector2(88, 600), Vector2(389, 62), "GARAGE & RACERS", show_garage)
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
@@ -403,7 +404,7 @@ func show_results() -> void:
 	text_at(modal_root, Vector2(430, 101), Vector2(750, 32), "COLOMBO GRAND PRIX   /   LOTUS COAST", 18, accent, true)
 	text_at(modal_root, Vector2(425, 149), Vector2(780, 85), "ISLAND CHAMPION!" if game.finish_place == 1 else "WHAT A RIDE!", 55, gold, true)
 	text_at(modal_root, Vector2(430, 246), Vector2(760, 35), "YOUR TIME  %s     •     BEST  %s" % [game.format_time(game.player.finish_time), game.format_time(game.best_time)], 22, Color.WHITE, true)
-	if game.race_modified:text_at(modal_root,Vector2(432,282),Vector2(750,22),"MODIFIED RACE  /  RECORD NOT SAVED",15,gold,true)
+	text_at(modal_root,Vector2(432,282),Vector2(750,22),game.ranking_message,15,gold,true)
 	text_at(modal_root, Vector2(432, 306), Vector2(760, 28), "POS        RACER                                         RACE TIME", 16, muted, true)
 	var order: Array = game.ranking()
 	for i in order.size():
@@ -525,6 +526,12 @@ func show_local_results() -> void:
 	for i in order.size():
 		var kart: LeoKart=order[i]
 		text_at(modal_root,Vector2(280,320+i*48),Vector2(1020,44),"%d   %s    %s    %s" % [i+1,kart.racer_name,game.catalog.vehicle(StringName(kart.vehicle_key)).display_name,game.format_time(kart.finish_time) if kart.finished else "DNF"],22,gold if kart.is_player else Color.WHITE)
-	if game.race_modified:text_at(modal_root,Vector2(280,640),Vector2(1020,35),"MODIFIED RACE / RECORDS NOT SAVED",20,gold)
+	text_at(modal_root,Vector2(280,640),Vector2(1020,35),game.ranking_message,18,gold)
 	button(modal_root,Vector2(280,720),Vector2(480,65),"RACE AGAIN",game.try_start_local_race,true).grab_focus()
 	button(modal_root,Vector2(800,720),Vector2(480,65),"BACK TO LOBBY",game.open_local_lobby)
+
+func show_rankings() -> void:
+	clear(modal_root)
+	var screen:=LeoRankingsPanel.new()
+	screen.game=game
+	modal_root.add_child(screen)

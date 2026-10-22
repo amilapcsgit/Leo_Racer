@@ -38,7 +38,7 @@ func run() -> void:
 	game.test_input("right",0.)
 	game.test_input("accelerate",0.)
 	game.test_input("brake",1.)
-	await ticks(70)
+	await ticks(100) # The balanced 165 km/h class needs up to 1.5 seconds to brake.
 	verify(p.speed < 1, "Brake stops forward motion")
 	await ticks(80)
 	verify(p.speed < -5, "Holding brake engages reverse")

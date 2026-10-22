@@ -7,6 +7,10 @@ var human_count := 1
 var selected_player_slot := 0
 var disconnect_message := ""
 var session_id := ""
+var ranking_store: RefCounted
+var rankings_written := false
+var ranking_message := ""
+var legacy_best_time := 0.0
 var catalog: GarageCatalog
 var ROSTER: Array = []
 var KARTS: Array = []
@@ -68,14 +72,19 @@ func _ready() -> void:
 	for arg in args:
 		if arg.begins_with("--capture-"): diagnostics_mode = true
 	for d in catalog.drivers: ROSTER.append({"name":d.display_name,"animal":String(d.id),"tagline":d.tagline})
-	for v in catalog.vehicles: KARTS.append({"name":v.display_name,"color":String(v.id),"speed":(v.max_speed-29.)/.9,"grip":(v.handling-.8)/.05,"accel":(v.acceleration-13.)/1.2,"top":v.max_speed})
+	for v in catalog.vehicles:
+		var rules:=LeoRaceRules.resolve(v)
+		KARTS.append({"name":v.display_name,"color":String(v.id),"speed":(rules.max_speed-29.)/.9,"grip":(rules.handling-.8)/.05,"accel":(rules.acceleration-13.)/1.2,"top":rules.max_speed})
 	configure_input()
 	input_router = LeoInputRouter.new()
 	input_router.name = "PlayerInputs"
 	add_child(input_router)
 	input_router.command.connect(_on_local_command)
 	input_router.device_lost.connect(_on_device_lost)
-	if not test_mode and not smoke_mode and not diagnostics_mode and "--drive-test" not in args: load_settings()
+	if not diagnostic_run():
+		load_settings()
+		open_rankings()
+		save_settings()
 	circuit = LeoCircuit.new()
 	build_world()
 	build_stage()
@@ -373,6 +382,7 @@ func start_race() -> void:
 	garage_from_pause=false
 	race_modified=false
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
+	rankings_written=false;ranking_message=""
 	showroom_lighting(false)
 	get_tree().paused=false;paused=false
 	remove_racers()
@@ -392,6 +402,7 @@ func start_race() -> void:
 		var d: StringName=local_players[i].driver_id if i<human_count else catalog.drivers[i%catalog.drivers.size()].id
 		var v: StringName=local_players[i].vehicle_id if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()].id
 		kart.setup(circuit,i,i<human_count,String(d),String(v))
+		LeoRaceRules.apply(kart)
 		kart.racer_name=catalog.driver(d).display_name
 		if i<human_count:
 			var local:=local_players[i]
@@ -467,9 +478,7 @@ func finish_race() -> void:
 	for local in local_players:
 		if local.feedback:local.feedback.reset_feedback()
 	for kart in karts: kart.active = false
-	if human_count==1 and player.finished and not race_modified and (best_time <= 0 or player.finish_time < best_time):
-		best_time = player.finish_time
-		save_settings()
+	save_ranking_results()
 	hud.show_results()
 	print("RACE_FINISHED | place=%d | time=%.3f | checkpoints=%d | boosts=%d" % [finish_place, player.finish_time, player.next_gate, boost_count])
 	if test_mode: complete_test()
@@ -513,6 +522,7 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	fresh.process_mode=Node.PROCESS_MODE_PAUSABLE
 	add_child(fresh)
 	fresh.setup(circuit,old.racer_id,true,String(d),String(v))
+	LeoRaceRules.apply(fresh)
 	fresh.local_slot=selected_player_slot;fresh.control_input=input_router.players[selected_player_slot]
 	var query:=PhysicsShapeQueryParameters3D.new()
 	var shape:=BoxShape3D.new();shape.size=fresh.definition.collision_size
@@ -676,7 +686,7 @@ func save_settings() -> void:
 	cfg.set_value("game","driver_id",String(catalog.drivers[selected_driver].id))
 	cfg.set_value("game","vehicle_id",String(catalog.vehicles[selected_kart].id))
 	cfg.set_value("game","custom_player_name",custom_player_name.strip_edges())
-	cfg.set_value("game", "best_time_astra", best_time)
+	# Legacy 1.6 best_time_astra is deliberately preserved in the loaded config.
 	for local in local_players:cfg.set_value("local_players",str(local.slot),local.selection())
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
@@ -692,11 +702,14 @@ func load_settings() -> void:
 		selected_driver = selection.x
 		selected_kart = selection.y
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
-		best_time = cfg.get_value("game", "best_time_astra", 0.0)
+		legacy_best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		for local in local_players:
 			var data: Variant=cfg.get_value("local_players",str(local.slot),{})
 			if data is Dictionary:local.restore(data,catalog)
 		if cfg.get_value("display", "fullscreen", false): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	if local_players[0].profile_id==local_players[1].profile_id or local_players[1].profile_id.is_empty():
+		local_players[1].profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
+	if local_players[0].profile_id.is_empty():local_players[0].profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(master_volume, .0001)))
 
 func format_time(seconds: float) -> String:
@@ -923,3 +936,32 @@ func try_start_local_race() -> bool:
 	human_count=2
 	start_race()
 	return true
+
+func diagnostic_run() -> bool:
+	return test_mode or smoke_mode or diagnostics_mode or "--drive-test" in OS.get_cmdline_user_args()
+
+func open_rankings() -> bool:
+	if diagnostic_run():return false
+	if not ranking_store:ranking_store=load("res://scripts/LocalRankingStore.cs").new()
+	var ok: bool=ranking_store.open_store(ProjectSettings.globalize_path("user://rankings.sqlite3"))
+	ranking_message="" if ok else "RANKINGS SAVE FAILED / Racing is still available. Your existing data is retained."
+	return ok
+
+func save_ranking_results() -> void:
+	if rankings_written:return
+	rankings_written=true
+	if race_modified:
+		ranking_message="MODIFIED RACE / RECORDS NOT SAVED";return
+	if diagnostic_run():
+		ranking_message="DIAGNOSTIC RUN / RECORDS NOT SAVED";return
+	if not ranking_store:
+		ranking_message="RANKINGS SAVE FAILED / Racing is still available.";return
+	var rows: Array=[]
+	for slot in human_count:
+		var local:=local_players[slot]
+		var kart:=local.kart
+		rows.append({"finished":kart.finished,"retired":kart.retired,"next_gate":kart.next_gate,"race_time":kart.finish_time,"best_lap":local.best_lap,"profile_id":local.profile_id,"name":kart.racer_name,"driver":kart.driver_key,"vehicle":kart.vehicle_key,"class_id":LeoRaceRules.resolve(kart.definition).class_id,"place":player_place(slot)})
+	var count: int=ranking_store.save_session(session_id,human_count,rows,false,false)
+	ranking_message="RANKINGS SAVE FAILED / Racing is still available. Existing data retained." if count<0 else "OFFLINE RANKINGS / %d RESULTS SAVED" % count
+	if count>0 and player.finished:
+		best_time=player.finish_time if best_time<=0 else minf(best_time,player.finish_time)

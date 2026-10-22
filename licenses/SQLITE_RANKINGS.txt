@@ -1,0 +1,6 @@
+SQLite rankings dependencies (packages.lock.json pins versions and content hashes):
+Microsoft.Data.Sqlite/Core 8.0.22: MIT, Microsoft Corporation.
+SQLitePCLRaw 2.1.6: Apache-2.0, Copyright 2014-2023 SourceGear, LLC.
+e_sqlite3 native engine: SQLite public domain, https://sqlite.org/copyright.html.
+System.Memory 4.5.3: MIT, .NET Foundation. See Microsoft-DotNet-LICENSE.txt.
+Windows x64 e_sqlite3.dll is bundled by the .NET export, so offline play needs no SQLite installation.

@@ -14,7 +14,7 @@ try {
     $env:DOTNET_CLI_HOME=Join-Path $project 'build/dotnet-home'
     $env:NUGET_PACKAGES=Join-Path $project '.tools/nuget'
     $env:MSBUILDDISABLENODEREUSE='1'
-    & (Join-Path $sdk 'dotnet.exe') build LeoRacer.csproj -c Debug
+    & (Join-Path $sdk 'dotnet.exe') build LeoRacer.csproj -c Debug -p:RestoreLockedMode=true
     if ($LASTEXITCODE -ne 0) {throw '.NET bridge build failed'}
     & "$PSScriptRoot/brand_template.ps1"
     New-Item -ItemType Directory -Force -Path (Split-Path $Output -Parent) | Out-Null
