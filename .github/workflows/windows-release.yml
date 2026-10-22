@@ -1,7 +1,7 @@
 name: Windows build and release
 on:
   push:
-    branches: ['**']
+    branches: ['**', '!local2player']
     tags: ['v*']
   workflow_dispatch:
 permissions:

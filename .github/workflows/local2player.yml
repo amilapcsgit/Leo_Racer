@@ -1,0 +1,42 @@
+name: Local two-player development
+on:
+  push:
+    branches: [local2player]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: local2player-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare pinned toolchain
+        shell: pwsh
+        run: |
+          python -m pip install numpy==2.2.6 Pillow==11.2.1
+          ./tools/setup_windows.ps1
+      - name: Validate development checkpoint
+        shell: pwsh
+        run: ./tools/check_local2player.ps1
+      - name: Export unpublished development game
+        shell: pwsh
+        run: |
+          ./tools/build_modular_release.ps1 -Output 'build/Local2Player/Leo Racer.exe'
+          Copy-Item licenses build/Local2Player/licenses -Recurse
+          'Unpublished local2player development build. Extract the complete folder. Stable 1.6 remains separate.' | Set-Content 'build/Local2Player/README.txt'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LeoRacer-local2player-development
+          path: |
+            build/Local2Player/
+            docs/qa-local2player/*.json
+          retention-days: 14
