@@ -1,0 +1,109 @@
+{
+  "asset_api": 1,
+  "authoring": {
+    "plugin": "Road Generator",
+    "road_points": 22,
+    "version": "0.9.5"
+  },
+  "course_revision": 1,
+  "description": "5.5 km through Galle Face, Fort, commercial streets and Lotus / Beira gardens.",
+  "exclusions": [
+    {
+      "name": "Galle Face Green",
+      "polygon": [
+        [
+          -840,
+          -520
+        ],
+        [
+          -615,
+          -520
+        ],
+        [
+          -615,
+          570
+        ],
+        [
+          -840,
+          570
+        ]
+      ]
+    },
+    {
+      "name": "Lake",
+      "polygon": [
+        [
+          170,
+          -110
+        ],
+        [
+          430,
+          -110
+        ],
+        [
+          430,
+          160
+        ],
+        [
+          170,
+          160
+        ]
+      ]
+    },
+    {
+      "name": "Custom architecture garden",
+      "polygon": [
+        [
+          -300,
+          140
+        ],
+        [
+          140,
+          140
+        ],
+        [
+          140,
+          590
+        ],
+        [
+          -300,
+          590
+        ]
+      ]
+    }
+  ],
+  "format": 1,
+  "id": "colombo_city",
+  "landmarks": [
+    {
+      "id": "lotus_tower",
+      "position": [
+        32,
+        0.07,
+        -58
+      ]
+    },
+    {
+      "id": "galle_face_green",
+      "position": [
+        -730,
+        0,
+        25
+      ]
+    },
+    {
+      "id": "custom_architecture",
+      "position": [
+        -110,
+        0,
+        330
+      ]
+    }
+  ],
+  "lighting": "res://assets/config/colombo-city.tres",
+  "name": "Colombo City Grand Prix",
+  "packs": [],
+  "route": "route.json",
+  "scene": "res://assets/tracks/colombo_city/course.scn",
+  "world_kind": "city"
+}

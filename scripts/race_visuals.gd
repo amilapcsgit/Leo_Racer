@@ -74,11 +74,14 @@ static func build_signs(world: Node3D, circuit: LeoCircuit) -> Node3D:
 	root.name = "RaceSigns"
 	world.add_child(root)
 	# The beam is centred at z=72, so each label sits outside its own face.
-	label(root,"LEO RACER",Vector3(-90,8.12,72.67),0,10.5,Color("ffdc66"))
-	label(root,"LEO RACER",Vector3(-90,8.12,71.33),PI,10.5,Color("ffdc66"))
+	var start:=circuit.sample(6)+Vector3.UP*8.12
+	var forward:=circuit.direction(6);var yaw:=atan2(-forward.x,-forward.z)
+	label(root,"LEO RACER",start-forward*.67,yaw,10.5,Color("ffdc66"))
+	label(root,"LEO RACER",start+forward*.67,yaw+PI,10.5,Color("ffdc66"))
 	var navy := flat_material(Color("10243f"),.12)
 	var gold := flat_material(Color("ffbd35"),.32)
-	var words := ["LOTUS COAST", "FORT QUARTER", "COLOMBO GRAND PRIX", "ISLAND ENERGY", "CHASE THE COAST", "LOTUS PLAZA"]
+	var words: Array=[]
+	for sector in circuit.sectors:words.append(String(sector.name))
 	for i in words.size():
 		var s := circuit.length*(.12+i*.14)
 		var t := circuit.direction(s)

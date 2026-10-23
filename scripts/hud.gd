@@ -545,4 +545,5 @@ func show_tracks() -> void:
 		var track: LeoTrackDefinition=game.tracks[i]
 		button(modal_root,Vector2(260,235+i*120),Vector2(1080,70),"%s  /  %.1f KM" % [track.display_name.to_upper(),float(track.route.length)/1000.],func():await game.select_track(track.id),track.id==game.chosen_track_id)
 		text_at(modal_root,Vector2(270,310+i*120),Vector2(1040,35),String(track.metadata.get("description","")),18,muted)
+	text_at(modal_root,Vector2(270,685),Vector2(1060,30),"Map reference: © OpenStreetMap contributors / ODbL · openstreetmap.org/copyright",16,muted)
 	button(modal_root,Vector2(260,740),Vector2(400,60),"BACK",func():clear(modal_root)).grab_focus()

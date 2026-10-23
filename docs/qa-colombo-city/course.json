@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "checks": {
+    "length_5_to_6_km": true,
+    "flat": true,
+    "spacing_under_2_01m": true,
+    "continuous_sampling": true,
+    "minimum_radius_22m": true,
+    "no_crossings": true,
+    "distinct_arms_clear_50m": true,
+    "widths_match_samples": true,
+    "width_18_to_24m": true
+  },
+  "length_m": 5499.99501037598,
+  "samples": 2750,
+  "minimum_radius_m": 54.90005495137861,
+  "nonlocal_center_clearance_m": 112.10177963354988,
+  "crossings": [],
+  "sample_gap_m": [
+    1.9998046530008406,
+    2.00007948307772
+  ],
+  "route_sha256": "9684ffdc1c49dcc127774231d66fa98a0a72207c0760d5c086202f5642ff9aa9"
+}

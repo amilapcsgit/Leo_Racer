@@ -19,7 +19,7 @@ var ROSTER: Array = []
 var KARTS: Array = []
 var tracks: Array[LeoTrackDefinition] = []
 var track_definition: LeoTrackDefinition
-var chosen_track_id := "astra_coast"
+var chosen_track_id := "colombo_city"
 var circuit: LeoCircuit
 var world: Node3D
 var karts: Array[LeoKart] = []
@@ -97,7 +97,7 @@ func _ready() -> void:
 	tracks=LeoTrackDefinition.discover()
 	if tracks.is_empty():
 		loading.show_failure("No compatible tracks are installed.",func():get_tree().reload_current_scene(),quit_game);return
-	if not diagnostic_run() and chosen_track_id=="astra_coast" and tracks.any(func(t):return t.id=="colombo_city"):chosen_track_id="colombo_city"
+	if diagnostic_run():chosen_track_id="astra_coast"
 	for arg in args:
 		if arg.begins_with("--track="):chosen_track_id=arg.trim_prefix("--track=")
 	track_definition=tracks[0]
@@ -274,6 +274,13 @@ func build_world() -> void:
 	sun.directional_shadow_blend_splits = true
 	world.add_child(sun)
 	LeoColomboWorld.environment_setup(environment,sun,art_profile)
+	if track_definition.world_kind()=="city":
+		environment.ssr_enabled=false;environment.volumetric_fog_enabled=false
+		environment.ssao_radius=1.;environment.ssao_intensity=.7
+		sun.directional_shadow_max_distance=110.
+		var day:=ProceduralSkyMaterial.new();day.sky_top_color=art_profile.sky_top;day.sky_horizon_color=art_profile.sky_horizon
+		day.ground_bottom_color=Color("506563");day.ground_horizon_color=art_profile.sky_horizon
+		var daylight:=Sky.new();daylight.sky_material=day;environment.sky=daylight
 	LeoRaceVisuals.build_boosts(world,circuit)
 	LeoRaceVisuals.build_signs(world,circuit)
 	if track_definition.world_kind()=="astra":LeoAstraDecals.build(world,circuit)
@@ -379,7 +386,7 @@ func enter_garage(retain_race: bool=false) -> void:
 
 func showroom_lighting(enabled: bool) -> void:
 	environment.fog_enabled = not enabled
-	environment.volumetric_fog_enabled = not enabled and RenderingServer.get_current_rendering_method()=="forward_plus"
+	environment.volumetric_fog_enabled = not enabled and track_definition.world_kind()=="astra" and RenderingServer.get_current_rendering_method()=="forward_plus"
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR if enabled else Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_color = Color("558fa2")
 	environment.ambient_light_energy = .55 if enabled else art_profile.ambient_energy
