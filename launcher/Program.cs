@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace LeoRacerLauncher;
 internal static class Program {
-    private static string GamePath => Path.Combine(AppContext.BaseDirectory, File.Exists(Path.Combine(AppContext.BaseDirectory, "LeoRacer.exe")) ? "LeoRacer.exe" : "Leo Racer.exe");
+    internal static string GamePath => Path.Combine(AppContext.BaseDirectory, File.Exists(Path.Combine(AppContext.BaseDirectory, "LeoRacer.exe")) ? "LeoRacer.exe" : "Leo Racer.exe");
 
     [STAThread] static void Main(string[] args) {
         ApplicationConfiguration.Initialize();
@@ -44,7 +44,7 @@ internal sealed class Launcher : Form {
         b.FlatAppearance.BorderColor=Color.FromArgb(205,164,71);b.Click+=(_,_)=>action();Controls.Add(b);
     }
     void Play(bool compatibility) {
-        try { Process.Start(new ProcessStartInfo(GamePath) {WorkingDirectory=AppContext.BaseDirectory,UseShellExecute=false,Arguments=compatibility?"--rendering-method gl_compatibility --rendering-driver opengl3":""}); }
+        try { Process.Start(new ProcessStartInfo(Program.GamePath) {WorkingDirectory=AppContext.BaseDirectory,UseShellExecute=false,Arguments=compatibility?"--rendering-method gl_compatibility --rendering-driver opengl3":""}); }
         catch(Exception e) {MessageBox.Show(this,"Keep the complete game folder beside this launcher.\n\n"+e.Message,"Unable to start Leo Racer",MessageBoxButtons.OK,MessageBoxIcon.Error);}
     }
 }
