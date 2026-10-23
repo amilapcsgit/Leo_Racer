@@ -424,7 +424,7 @@ func _physics_process(dt: float) -> void:
 	var offset: float = projection.offset
 	var track_normal:=Vector3(-projection.tangent.z,0,projection.tangent.x)
 	var footprint:=absf(global_basis.x.dot(track_normal))*definition.collision_size.x*.5+absf(global_basis.z.dot(track_normal))*definition.collision_size.z*.5
-	var lane_limit:=maxf(3.,LeoCircuit.WIDTH*.5-footprint-.15)
+	var lane_limit:=maxf(3.,circuit.width_at(projection.distance)*.5-footprint-.15)
 	if absf(offset) > lane_limit:
 		var normal := Vector3(-projection.tangent.z, 0, projection.tangent.x) * signf(offset)
 		position -= normal * (absf(offset) - lane_limit)

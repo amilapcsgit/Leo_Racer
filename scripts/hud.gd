@@ -185,7 +185,7 @@ func show_menu() -> void:
 	title = text_at(menu_root, Vector2(78, 223), Vector2(600, 140), "RACER", 118, accent, true)
 	title.add_theme_constant_override("outline_size", 5)
 	title.add_theme_color_override("font_outline_color", ink)
-	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), "ASTRA // COLOMBO COAST", 29, Color.WHITE, true)
+	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), game.track_definition.display_name.to_upper(), 29, Color.WHITE, true)
 	text_at(menu_root, Vector2(89, 417), Vector2(620, 65), "More coast. More corners. One wild harbour circuit.", 20, muted)
 	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "1 PLAYER MODE    →", game.start_single_player, true)
 	button(menu_root,Vector2(500,507),Vector2(389,76),"2 PLAYER MODE",game.open_local_lobby,true)
@@ -194,8 +194,9 @@ func show_menu() -> void:
 	button(menu_root, Vector2(88, 600), Vector2(389, 62), "GARAGE & RACERS", show_garage)
 	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
 	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
-	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "LOTUS COAST    /    3 LAPS    /    6 RACERS", 17, Color("d8e7ef"), true)
+	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "%.1f KM    /    3 LAPS    /    6 RACERS" % [game.circuit.length/1000.], 17, Color("d8e7ef"), true)
 	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "v1.7.0  //  LOCAL TWO PLAYER", 17, accent, true)
+	button(menu_root,Vector2(918,678),Vector2(389,57),"SELECT TRACK",show_tracks)
 	button(menu_root, Vector2(1430, 40), Vector2(120, 46), "QUIT", game.quit_game)
 	first.grab_focus()
 	queue_redraw()
@@ -319,7 +320,7 @@ func show_race() -> void:
 	labels.lap = text_at(hud_root,Vector2(325,48),Vector2(200,52),"1 / 3",42,accent,true)
 	labels.timer = text_at(hud_root,Vector2(325,106),Vector2(215,30),"00:00.000",21,Color.WHITE)
 	text_at(hud_root,Vector2(326,140),Vector2(180,25),"LAP // RACE TIME",14,muted,true)
-	text_at(hud_root,Vector2(590,36),Vector2(575,35),"ASTRA // COLOMBO COAST",21,Color("bce7e7"),true)
+	text_at(hud_root,Vector2(590,36),Vector2(575,35),game.track_definition.display_name.to_upper(),21,Color("bce7e7"),true)
 	labels.sector = text_at(hud_root,Vector2(755,77),Vector2(400,28),"COASTAL PROMENADE",16,gold,true)
 	labels.progress = text_at(hud_root,Vector2(595,106),Vector2(270,25),"LAP PROGRESS  0%",14,muted,true)
 	labels.corner = text_at(hud_root,Vector2(858,106),Vector2(300,25),"",14,accent,true)
@@ -401,7 +402,7 @@ func show_results() -> void:
 	clear(modal_root)
 	backdrop(modal_root, .68)
 	panel(modal_root, Vector2(370, 65), Vector2(860, 770), Color("091a34f5"))
-	text_at(modal_root, Vector2(430, 101), Vector2(750, 32), "COLOMBO GRAND PRIX   /   LOTUS COAST", 18, accent, true)
+	text_at(modal_root, Vector2(430, 101), Vector2(750, 32), game.track_definition.display_name.to_upper()+" / THREE LAPS", 18, accent, true)
 	text_at(modal_root, Vector2(425, 149), Vector2(780, 85), "ISLAND CHAMPION!" if game.finish_place == 1 else "WHAT A RIDE!", 55, gold, true)
 	text_at(modal_root, Vector2(430, 246), Vector2(760, 35), "YOUR TIME  %s     •     BEST  %s" % [game.format_time(game.player.finish_time) if game.player.finished else "DNF", game.format_time(game.best_time) if game.best_time>0 else "--"], 22, Color.WHITE, true)
 	text_at(modal_root,Vector2(432,282),Vector2(750,22),game.ranking_message,15,gold,true)
@@ -535,3 +536,13 @@ func show_rankings() -> void:
 	var screen:=LeoRankingsPanel.new()
 	screen.game=game
 	modal_root.add_child(screen)
+
+func show_tracks() -> void:
+	clear(modal_root)
+	var background:=ColorRect.new();background.color=Color("091a28");background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);modal_root.add_child(background)
+	text_at(modal_root,Vector2(260,120),Vector2(1100,60),"CHOOSE YOUR CIRCUIT",40,accent,true)
+	for i in game.tracks.size():
+		var track: LeoTrackDefinition=game.tracks[i]
+		button(modal_root,Vector2(260,235+i*120),Vector2(1080,70),"%s  /  %.1f KM" % [track.display_name.to_upper(),float(track.route.length)/1000.],func():await game.select_track(track.id),track.id==game.chosen_track_id)
+		text_at(modal_root,Vector2(270,310+i*120),Vector2(1040,35),String(track.metadata.get("description","")),18,muted)
+	button(modal_root,Vector2(260,740),Vector2(400,60),"BACK",func():clear(modal_root)).grab_focus()

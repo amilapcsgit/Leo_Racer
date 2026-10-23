@@ -1,0 +1,12 @@
+{
+  "format": 1,
+  "asset_api": 1,
+  "id": "astra_coast",
+  "name": "Astra Lotus Coast",
+  "course_revision": 1,
+  "route": "route.json",
+  "world_kind": "astra",
+  "lighting": "res://assets/config/astra.tres",
+  "description": "The original 1.9 km coast, harbour and garden circuit.",
+  "packs": []
+}

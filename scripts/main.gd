@@ -17,6 +17,9 @@ var legacy_best_time := 0.0
 var catalog: GarageCatalog
 var ROSTER: Array = []
 var KARTS: Array = []
+var tracks: Array[LeoTrackDefinition] = []
+var track_definition: LeoTrackDefinition
+var chosen_track_id := "astra_coast"
 var circuit: LeoCircuit
 var world: Node3D
 var karts: Array[LeoKart] = []
@@ -91,7 +94,20 @@ func _ready() -> void:
 		load_settings()
 		open_rankings()
 		save_settings()
-	circuit = LeoCircuit.new()
+	tracks=LeoTrackDefinition.discover()
+	if tracks.is_empty():
+		loading.show_failure("No compatible tracks are installed.",func():get_tree().reload_current_scene(),quit_game);return
+	if not diagnostic_run() and chosen_track_id=="astra_coast" and tracks.any(func(t):return t.id=="colombo_city"):chosen_track_id="colombo_city"
+	for arg in args:
+		if arg.begins_with("--track="):chosen_track_id=arg.trim_prefix("--track=")
+	track_definition=tracks[0]
+	for candidate in tracks:
+		if candidate.id==chosen_track_id:track_definition=candidate;break
+	chosen_track_id=track_definition.id
+	if not track_definition.mount():
+		loading.show_failure(track_definition.error,func():get_tree().reload_current_scene(),quit_game);return
+	art_profile=track_definition.profile()
+	circuit = LeoCircuit.new(track_definition)
 	await build_world()
 	loading.stage("Preparing interface…",85)
 	await get_tree().process_frame
@@ -185,16 +201,25 @@ func build_world() -> void:
 		var scenery: Node3D = load(art_profile.world_model).instantiate()
 		world.add_child(scenery)
 		polish_materials(scenery)
-	loading.stage("Building city streets…",40)
-	await get_tree().process_frame
-	var city := LeoCity.new()
-	world.add_child(city)
-	city.setup(circuit,art_profile)
-	loading.stage("Preparing coast and race surface…",55)
-	await get_tree().process_frame
-	var colombo := LeoAstraWorld.new()
-	world.add_child(colombo)
-	colombo.setup(circuit,art_profile)
+	if track_definition.world_kind()=="astra":
+		loading.stage("Building city streets…",40)
+		await get_tree().process_frame
+		var city := LeoCity.new()
+		world.add_child(city)
+		city.setup(circuit,art_profile)
+		loading.stage("Preparing coast and race surface…",55)
+		await get_tree().process_frame
+		var colombo := LeoAstraWorld.new()
+		world.add_child(colombo)
+		colombo.setup(circuit,art_profile)
+	else:
+		loading.stage("Loading course and scenery…",45)
+		var scene_path:=String(track_definition.metadata.get("scene",""))
+		var scene:=await LeoAssets.scene_async(scene_path,get_tree())
+		if scene:world.add_child(scene.instantiate())
+		var scenery: Node3D=load("res://scripts/content/city_streamer.gd").new()
+		world.add_child(scenery)
+		await scenery.setup(self,track_definition)
 	loading.stage("Loading landmarks…",70)
 	await get_tree().process_frame
 	var tower: Node3D = load(art_profile.landmark_model).instantiate()
@@ -206,9 +231,9 @@ func build_world() -> void:
 	var ground := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
-	box.size = Vector3(1000,1,1000)
+	box.size = Vector3(circuit.bounds.size.x+500.,1,circuit.bounds.size.z+500.)
 	shape.shape = box
-	shape.position = Vector3(75,-.49,-50)
+	shape.position = Vector3(circuit.bounds.get_center().x,-.49,circuit.bounds.get_center().z)
 	ground.add_child(shape)
 	world.add_child(ground)
 	var env_node := WorldEnvironment.new()
@@ -238,7 +263,7 @@ func build_world() -> void:
 	environment.fog_density = .0007
 	environment.fog_sky_affect = .05
 	env_node.environment = environment
-	add_child(env_node)
+	world.add_child(env_node)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-28,-145,0)
 	sun.light_color = Color("ffe0af")
@@ -247,12 +272,12 @@ func build_world() -> void:
 	sun.directional_shadow_max_distance = 180
 	sun.shadow_bias = .04
 	sun.directional_shadow_blend_splits = true
-	add_child(sun)
+	world.add_child(sun)
 	LeoColomboWorld.environment_setup(environment,sun,art_profile)
 	LeoRaceVisuals.build_boosts(world,circuit)
 	LeoRaceVisuals.build_signs(world,circuit)
-	LeoAstraDecals.build(world,circuit)
-	if ResourceLoader.exists("res://assets/models/kenney/decoration-tents.glb"):
+	if track_definition.world_kind()=="astra":LeoAstraDecals.build(world,circuit)
+	if track_definition.world_kind()=="astra" and ResourceLoader.exists("res://assets/models/kenney/decoration-tents.glb"):
 		for i in range(3):
 			var tent: Node3D = load("res://assets/models/kenney/decoration-tents.glb").instantiate()
 			tent.position = Vector3(-61+i*8,.03,82)
@@ -389,8 +414,8 @@ func return_menu() -> void:
 	stage.hide()
 	world.show()
 	environment.background_mode = Environment.BG_SKY
-	camera.position = Vector3(-110, 25, 110)
-	camera.look_at(Vector3(0, 15, -25))
+	camera.position = circuit.sample(0)+Vector3(-20,25,35)
+	camera.look_at(circuit.sample(35)+Vector3.UP*12.)
 	hud.show_menu()
 
 func start_race() -> void:
@@ -406,7 +431,7 @@ func start_race() -> void:
 		loading.stage("Preparing racers %d / 6…"%[i+1],15.+float(i+1)*12.)
 		await get_tree().process_frame
 	garage_from_pause=false
-	race_modified=false
+	race_modified=track_definition.modified or LeoAssets.modified_rules
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	rankings_written=false;ranking_message=""
 	showroom_lighting(false)
@@ -442,7 +467,7 @@ func start_race() -> void:
 	player=karts[0]
 	if ranking_store and not diagnostic_run():
 		best_time=0.
-		for row in ranking_store.best_times(human_count,LeoRaceRules.resolve(player.definition).class_id,"",false):
+		for row in ranking_store.best_times_for_track(human_count,LeoRaceRules.resolve(player.definition).class_id,"",false,track_definition.id,track_definition.revision):
 			if row.profile_id==local_players[0].profile_id:best_time=float(row.race_ms)/1000.;break
 	local_players[0].camera=camera;local_players[0].feedback=feedback
 	if test_mode:player.auto_drive=true
@@ -724,6 +749,7 @@ func save_settings() -> void:
 	if test_mode or smoke_mode or diagnostics_mode or "--drive-test" in OS.get_cmdline_user_args(): return
 	var cfg := ConfigFile.new()
 	cfg.load("user://leo_racer.cfg")
+	cfg.set_value("game","track_id",chosen_track_id)
 	cfg.set_value("audio", "volume", master_volume)
 	cfg.set_value("audio", "music", music_enabled)
 	cfg.set_value("game", "driver", selected_driver)
@@ -747,6 +773,7 @@ func load_settings() -> void:
 		selected_driver = selection.x
 		selected_kart = selection.y
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
+		chosen_track_id=cfg.get_value("game","track_id","colombo_city")
 		legacy_best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		for local in local_players:
 			var data: Variant=cfg.get_value("local_players",str(local.slot),{})
@@ -1016,7 +1043,7 @@ func save_ranking_results() -> void:
 	if not ranking_store:
 		ranking_message="RANKINGS SAVE FAILED / Racing is still available.";return
 	var rows:=ranking_rows()
-	var count: int=ranking_store.save_session(session_id,human_count,rows,false,false)
+	var count: int=ranking_store.save_session_for_track(session_id,human_count,rows,false,false,track_definition.id,track_definition.revision)
 	ranking_message="RANKINGS SAVE FAILED / Racing is still available. Existing data retained." if count<0 else "OFFLINE RANKINGS / %d RESULTS SAVED" % count
 	if count>0 and player.finished:
 		best_time=player.finish_time if best_time<=0 else minf(best_time,player.finish_time)
@@ -1028,3 +1055,19 @@ func ranking_rows() -> Array:
 		var kart:=local.kart
 		rows.append({"finished":kart.finished,"retired":kart.retired,"next_gate":kart.next_gate,"race_time":kart.finish_time,"best_lap":local.best_lap,"profile_id":local.profile_id,"name":kart.racer_name,"driver":String(kart.visual.get_meta("driver_id")),"vehicle":kart.vehicle_key,"class_id":LeoRaceRules.resolve(kart.definition).class_id,"place":player_place(slot)})
 	return rows
+
+func select_track(id: String) -> bool:
+	if state not in ["menu","garage","lobby"]:return false
+	var target: LeoTrackDefinition
+	for candidate in tracks:
+		if candidate.id==id:target=candidate;break
+	if not target:return false
+	loading.stage("Checking "+target.display_name+"…",10)
+	await get_tree().process_frame
+	if not target.mount():
+		loading.show_failure(target.error,func():select_track(id),func():loading.hide());return false
+	state="loading";remove_racers();world.free()
+	track_definition=target;chosen_track_id=id;circuit=LeoCircuit.new(target);art_profile=target.profile();best_time=0.
+	await build_world()
+	for overlay in split_view.overlays:overlay.rebuild_map()
+	loading.hide();save_settings();return_menu();return true

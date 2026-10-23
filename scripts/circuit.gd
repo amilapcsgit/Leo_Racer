@@ -1,6 +1,10 @@
 class_name LeoCircuit
 extends RefCounted
 
+var definition: LeoTrackDefinition
+var widths: Array = []
+var bounds := AABB()
+var _cells: Dictionary = {}
 var points: PackedVector3Array
 var length: float
 var step: float
@@ -10,15 +14,32 @@ var boosts: Array = []
 var sectors: Array = []
 var features: Dictionary = {}
 
-func _init() -> void:
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/track-astra.json"))
-	length = float(data.length)
-	for p in data.points:
-		points.append(Vector3(p[0], p[1], p[2]))
-	step = length / points.size()
-	boosts = data.boosts
-	sectors = data.get("sectors",[])
-	features = data.get("features",{})
+func _init(track: LeoTrackDefinition = null) -> void:
+	definition=track
+	var data: Dictionary
+	if track:data=track.route
+	else:data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/track-astra.json"))
+	length=float(data.length)
+	for p in data.points:points.append(Vector3(p[0],p[1],p[2]))
+	step=length/points.size();boosts=data.get("boosts",[]);sectors=data.get("sectors",[]);features=data.get("features",{})
+	widths=data.get("widths",[])
+	if widths.size()!=points.size():widths.resize(points.size());widths.fill(float(data.get("width",18.)))
+	bounds=AABB(points[0],Vector3.ZERO)
+	for i in points.size():
+		bounds=bounds.expand(points[i])
+		var a:=Vector2(points[i].x,points[i].z)
+		var next:=points[(i+1)%points.size()]
+		var b:=Vector2(next.x,next.z)
+		var low:Vector2i=Vector2i((a.min(b)/64.).floor());var high:Vector2i=Vector2i((a.max(b)/64.).floor())
+		for x in range(low.x,high.x+1):
+			for y in range(low.y,high.y+1):
+				var key:=Vector2i(x,y)
+				if not _cells.has(key):_cells[key]=[]
+				_cells[key].append(i)
+
+func width_at(distance: float) -> float:
+	var f:=fposmod(distance,length)/step;var i:=int(f)
+	return lerpf(float(widths[i]),float(widths[(i+1)%points.size()]),f-i)
 
 func sector_name(distance: float) -> String:
 	var fraction := fposmod(distance,length)/length
@@ -42,10 +63,15 @@ func project(p: Vector3, hint: int = -1) -> Dictionary:
 	var best := INF
 	var best_i := 0
 	var best_t := 0.0
-	var span := points.size() if hint < 0 else 36
-	var start := 0 if hint < 0 else hint - 18
-	for j in range(start, start + span):
-		var i := posmod(j, points.size())
+	var candidates: Array=[]
+	if hint>=0:
+		for j in range(hint-18,hint+18):candidates.append(posmod(j,points.size()))
+	else:
+		var key:=Vector2i(floori(p.x/64.),floori(p.z/64.))
+		for x in range(-1,2):
+			for y in range(-1,2):candidates.append_array(_cells.get(key+Vector2i(x,y),[]))
+		if candidates.is_empty():candidates=range(points.size())
+	for i in candidates:
 		var a := points[i]
 		var ab := points[(i + 1) % points.size()] - a
 		var t := clampf((p - a).dot(ab) / ab.length_squared(), 0, 1)
@@ -55,6 +81,7 @@ func project(p: Vector3, hint: int = -1) -> Dictionary:
 			best = d
 			best_i = i
 			best_t = t
+	if hint>=0 and best>1600.:return project(p,-1)
 	var s := (best_i + best_t) * step
 	var center := sample(s)
 	var tangent := direction(s)

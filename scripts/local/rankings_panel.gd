@@ -1,6 +1,7 @@
 class_name LeoRankingsPanel
 extends Control
 var game: Node3D
+var track: OptionButton
 var mode: OptionButton
 var performance: OptionButton
 var vehicle: OptionButton
@@ -15,15 +16,20 @@ func _ready() -> void:
  for side in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+side,45)
  add_child(margin)
  var box:=VBoxContainer.new();box.add_theme_constant_override("separation",18);margin.add_child(box)
- var title:=Label.new();title.text="OFFLINE RANKINGS / COLOMBO COAST";title.add_theme_font_size_override("font_size",36);box.add_child(title)
+ var title:=Label.new();title.text="OFFLINE RANKINGS";title.add_theme_font_size_override("font_size",36);box.add_child(title)
  var filters:=HBoxContainer.new();filters.add_theme_constant_override("separation",16);box.add_child(filters)
+ track=OptionButton.new()
+ for i in game.tracks.size():
+  var course: LeoTrackDefinition=game.tracks[i];track.add_item(course.display_name+" / r"+str(course.revision))
+  if course.id==game.chosen_track_id:track.select(i)
+ filters.add_child(track)
  mode=OptionButton.new();mode.add_item("1 PLAYER",1);mode.add_item("2 PLAYERS",2);filters.add_child(mode)
  performance=OptionButton.new();performance.add_item("165 KM/H CLASS");performance.add_item("BIGSTER / 180 KM/H");filters.add_child(performance)
  vehicle=OptionButton.new();vehicle.add_item("ALL VEHICLES")
  for v in game.catalog.vehicles:vehicle.add_item(v.display_name)
  filters.add_child(vehicle)
  metric=OptionButton.new();metric.add_item("RACE TIME");metric.add_item("BEST LAP");filters.add_child(metric)
- for filter in [mode,performance,vehicle,metric]:filter.item_selected.connect(func(_i):refresh())
+ for filter in [track,mode,performance,vehicle,metric]:filter.item_selected.connect(func(_i):refresh())
  status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(status)
  var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
  entries=VBoxContainer.new();entries.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(entries)
@@ -36,7 +42,7 @@ func refresh() -> void:
  for child in entries.get_children():entries.remove_child(child);child.queue_free()
  var selected_vehicle: String="" if vehicle.selected==0 else String(game.catalog.vehicles[vehicle.selected-1].id)
  var rows: Array=[]
- if game.ranking_store:rows=game.ranking_store.best_times(mode.get_selected_id(),"standard165" if performance.selected==0 else "suv180",selected_vehicle,metric.selected==1)
+ if game.ranking_store:rows=game.ranking_store.best_times_for_track(mode.get_selected_id(),"standard165" if performance.selected==0 else "suv180",selected_vehicle,metric.selected==1,game.tracks[track.selected].id,game.tracks[track.selected].revision)
  status.text="Best eligible result per player / balanced_v1 / three laps. DNF and car swaps excluded."
  if not game.ranking_store or not game.ranking_store.get_error().is_empty():
   status.text="Rankings unavailable. Racing remains available; existing data is retained. Use RETRY DATABASE."

@@ -23,6 +23,9 @@ func _ready() -> void:
  countdown=make_label(100);countdown.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
  boost=ProgressBar.new();boost.max_value=1.;boost.show_percentage=false;add_child(boost)
  var fill:=StyleBoxFlat.new();fill.bg_color=Color("67d6db") if slot==0 else Color("e8b976");boost.add_theme_stylebox_override("fill",fill)
+ rebuild_map()
+func rebuild_map() -> void:
+ map_points.clear();map_min=Vector2(INF,INF);map_max=Vector2(-INF,-INF)
  for point in game.circuit.points:
   var p:=Vector2(point.x,point.z);map_min=map_min.min(p);map_max=map_max.max(p)
  for point in game.circuit.points:map_points.append(map_position(Vector3(point)))
