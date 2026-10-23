@@ -59,3 +59,18 @@ shop entrances are grounded, upper storeys supported, flat/pitched roofs capped.
 Shared module scenes retain source UV/materials. Headless recipe loading and roof
 placement checks pass under Godot 4.7.2. District prototype captures follow with
 the baked placement checkpoint, using the same reviewed recipes.
+
+## Completed checkpoint 3
+
+1,265 assembled buildings (633 secondary-row), 204 skyline towers, 140 palms
+and 180 reused railing pieces. Four district types; minimum footprint-to-road
+clearance 7.09 m. Existing Colombo route/course and all protected assets retain
+their hashes. Persistent low-detail district hulls cover streamed detail.
+
+Bounded 5 m terrain mesh samples, matching tile-edge normals, shaped shoreline
+and lake, separate water materials, seeded short-range grass and batched seawall.
+Terrain checks cover 8,250 road/pavement samples and clockwise visible faces.
+Both-player streaming: 35 checks pass; 57 cells, 15 initially resident, cache 12.
+Three reloads retain 1,363 nodes and approximately 392 MB static allocations;
+last two samples differ by 18 KB. Existing engine cleanup warnings persist with
+exit 0, as at baseline. Reviewed prototype: districts-prototype.jpg.

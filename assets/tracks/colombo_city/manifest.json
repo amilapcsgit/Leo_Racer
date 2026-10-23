@@ -77,8 +77,30 @@
   "lighting": "res://assets/config/colombo-city.tres",
   "name": "Colombo City Grand Prix",
   "packs": [],
+  "preview": "preview.png",
   "route": "route.json",
   "scene": "res://assets/tracks/colombo_city/course.scn",
-  "world_kind": "city",
-  "preview": "preview.png"
+  "visual_content": {
+    "module_inventory": "res://assets/models/colombo_city/modules.json",
+    "parcels": "placements.json",
+    "recipes": "res://assets/models/colombo_city/recipes.json",
+    "revision": 2,
+    "shoreline": {
+      "coast_x": -853.0,
+      "lake_center": [
+        300,
+        25
+      ],
+      "lake_radius": 125.0,
+      "lake_water_y": -0.17,
+      "water_y": -0.42
+    },
+    "terrain": {
+      "grid_m": 5,
+      "noise_seed": 35,
+      "runtime_generation": false,
+      "tile_m": 200
+    }
+  },
+  "world_kind": "city"
 }

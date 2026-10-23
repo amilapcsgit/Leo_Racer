@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "buildings": 1265,
+  "skyline": 204,
+  "palms": 140,
+  "railings": 180,
+  "minimum_building_road_edge_clearance_m": 7.090848750574292,
+  "premade_building_variants": 31,
+  "assembled_recipes": 12,
+  "secondary_row_buildings": 633,
+  "districts": [
+    "commercial",
+    "fort",
+    "lotus_beira",
+    "waterfront"
+  ],
+  "exclusions": [
+    "Galle Face Green",
+    "Lake",
+    "Custom architecture garden",
+    "Lotus Tower"
+  ]
+}

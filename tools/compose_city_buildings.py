@@ -46,7 +46,7 @@ for name,ground,upper,floors,pitched,bays in styles:
     height=max(p['position'][1]+modules[int(p['module'].split('_')[1])]['height']*p['scale_xyz'][1] for p in components)
     recipes.append({'id':'colombo_'+name,'path':'res://'+(folder/(name+'.tscn')).relative_to(ROOT).as_posix(),
         'width':width,'height':height,'depth':depth+(1.8 if ground==46 else .4),'front_axis':'+Z',
-        'floors':floors+1,'pitched':pitched,'components':components,'entrance':True,'complete_roof':True})
+        'floors':floors+1,'ground_module':ground,'pitched':pitched,'components':components,'entrance':True,'complete_roof':True})
 data={'format':2,'recipes':recipes,'units':'metres','floor_height':3.2,'seed':23102026}
 (OUT/'recipes.json').write_text(json.dumps(data,indent=2)+'\n')
 manifest=json.loads((OUT/'manifest.json').read_text())

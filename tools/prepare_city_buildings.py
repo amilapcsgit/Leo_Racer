@@ -144,4 +144,9 @@ def prepare_legacy():
     print('CITY_BUILDINGS',len(manifest['buildings']),'reusable models;',len(manifest['props']),'infrastructure pieces;',len(list(TEXTURES.glob('*.png'))),'shared textures')
 
 if __name__ == "__main__":
-    prepare_legacy()
+    import subprocess,sys
+    if '--legacy-extraction' in sys.argv:
+        prepare_legacy()
+    else:
+        for tool in ('audit_city_modules.py','compose_city_buildings.py'):
+            subprocess.run([sys.executable,str(ROOT/'tools'/tool)],check=True)

@@ -218,6 +218,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 2,
+      "ground_module": 8,
       "pitched": false,
       "components": [
         {
@@ -344,6 +345,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 3,
+      "ground_module": 6,
       "pitched": false,
       "components": [
         {
@@ -502,6 +504,7 @@
       "depth": 9.224,
       "front_axis": "+Z",
       "floors": 2,
+      "ground_module": 46,
       "pitched": false,
       "components": [
         {
@@ -644,6 +647,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 1,
+      "ground_module": 4,
       "pitched": true,
       "components": [
         {
@@ -722,6 +726,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 3,
+      "ground_module": 8,
       "pitched": false,
       "components": [
         {
@@ -880,6 +885,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 2,
+      "ground_module": 6,
       "pitched": true,
       "components": [
         {
@@ -990,6 +996,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 2,
+      "ground_module": 8,
       "pitched": false,
       "components": [
         {
@@ -1228,6 +1235,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 4,
+      "ground_module": 6,
       "pitched": false,
       "components": [
         {
@@ -1594,6 +1602,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 1,
+      "ground_module": 4,
       "pitched": false,
       "components": [
         {
@@ -1768,6 +1777,7 @@
       "depth": 7.824000000000001,
       "front_axis": "+Z",
       "floors": 4,
+      "ground_module": 8,
       "pitched": false,
       "components": [
         {
@@ -2134,6 +2144,7 @@
       "depth": 9.224,
       "front_axis": "+Z",
       "floors": 3,
+      "ground_module": 46,
       "pitched": false,
       "components": [
         {
@@ -2308,6 +2319,7 @@
       "depth": 9.224,
       "front_axis": "+Z",
       "floors": 1,
+      "ground_module": 46,
       "pitched": true,
       "components": [
         {

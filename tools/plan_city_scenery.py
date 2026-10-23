@@ -13,71 +13,99 @@ p=np.array(route['points'])[:,[0,2]];n=len(p);step=route['length']/n
 t=np.roll(p,-2,axis=0)-np.roll(p,1,axis=0);t/=np.linalg.norm(t,axis=1)[:,None]
 normal=np.stack([-t[:,1],t[:,0]],axis=1);width=np.array(route['widths'])
 exclusions=[('Galle Face Green',(-840,-520,-615,570)),('Lake',(168,-112,432,162)),('Custom architecture garden',(-170,250,-50,410)),('Lotus Tower',(-3,-95,68,-21))]
-occupied=[];placements=[];minimum_clearance=1e9
+occupied={};placements=[];parcels=[];minimum_clearance=1e9
 
-def overlap(center,axes,half,other_center,other_axes,other_half,gap=1.5):
-    delta=other_center-center
-    for axis in [*axes,*other_axes]:
-        if abs(delta@axis)>sum(abs(axis@a)*h for a,h in zip(axes,half))+sum(abs(axis@a)*h for a,h in zip(other_axes,other_half))+gap:return False
+def overlap(center,axes,half,c,a,h,gap=.35):
+    delta=c-center
+    for axis in [*axes,*a]:
+        if abs(delta@axis)>sum(abs(axis@v)*r for v,r in zip(axes,half))+sum(abs(axis@v)*r for v,r in zip(a,h))+gap:return False
     return True
 
 def fit(center,yaw,w,d):
     global minimum_clearance
     axes=np.array([[math.cos(yaw),-math.sin(yaw)],[math.sin(yaw),math.cos(yaw)]])
-    half=np.array([w,d])/2+1.
-    delta=p-center;local=delta@axes.T
-    distance=np.linalg.norm(np.maximum(abs(local)-half,0),axis=1)-width/2
-    clearance=float(distance.min())
-    if clearance<4.:return False
+    half=np.array([w,d])/2+.15
+    clearance=float((np.linalg.norm(np.maximum(abs((p-center)@axes.T)-half,0),axis=1)-width/2).min())
+    if clearance<5.5 or center[0]-max(w,d)/2<-843:return False
     for _,(x0,z0,x1,z1) in exclusions:
         if overlap(center,axes,half,np.array([(x0+x1)/2,(z0+z1)/2]),np.eye(2),np.array([x1-x0,z1-z0])/2):return False
-    for c,a,h in occupied:
-        if overlap(center,axes,half,c,a,h):return False
-    occupied.append((center,axes,half));minimum_clearance=min(minimum_clearance,clearance)
+    key=tuple(np.floor(center/80).astype(int))
+    for x in range(key[0]-2,key[0]+3):
+        for z in range(key[1]-2,key[1]+3):
+            for c,a,h in occupied.get((x,z),[]):
+                if overlap(center,axes,half,c,a,h):return False
+    occupied.setdefault(key,[]).append((center,axes,half));minimum_clearance=min(minimum_clearance,clearance)
     return True
 
-def place(entry,center,yaw,scale=1.,kind='building',always=False):
-    placements.append({'asset':entry['path'],'position':[float(center[0]),0,float(center[1])],'yaw':yaw,'scale':scale,
-                       'kind':kind,'always':always,'tint':[rng.uniform(.91,1.),rng.uniform(.91,1.),rng.uniform(.91,1.),1.]})
+palette=[[.94,.94,.91,1],[.82,.88,.83,1],[.92,.85,.75,1],[.83,.84,.81,1],[.97,.92,.81,1]]
+recipes=[b for b in library['buildings'] if 'components' in b]
+towers=[b for b in library['buildings'] if 'tower' in b['id'] and b['height']<100.]
 
-low=[b for b in library['buildings'] if 'lowrise' in b['id']]
-towers=[b for b in library['buildings'] if 'tower' in b['id'] and b['height']<90.]
-for side in [-1.,1.]:
-    s=22.
-    while s<route['length']-30:
-        i=int(s/step)%n;fraction=s/route['length']
-        options=towers if .35<fraction<.55 else low
-        entry=rng.choice(options);scale=rng.uniform(.86,1.08)
+def place(entry,center,yaw,scale=1.,kind='building',always=False,district='skyline',row=0):
+    tint=rng.choice(palette) if kind=='building' else [1,1,1,1]
+    if 'components' not in entry:
+        placements.append({'asset':entry['path'],'position':[float(center[0]),0,float(center[1])],'yaw':yaw,'scale':scale,'kind':kind,'always':always,'tint':tint});return
+    parcel_id=len(parcels)
+    parcels.append({'id':parcel_id,'recipe':entry['id'],'center':center.tolist(),'yaw':yaw,'width':entry['width'],'height':entry['height'],'depth':entry['depth'],'district':district,'row':row,'tint':tint})
+    c=math.cos(yaw);ss=math.sin(yaw)
+    for i,part in enumerate(entry['components']):
+        x,y,z=part['position'];px=center[0]+c*x+ss*z;pz=center[1]-ss*x+c*z
+        placements.append({'asset':part['asset'],'position':[float(px),y,float(pz)],'yaw':yaw+part['yaw'],'scale':1.,'scale_xyz':part['scale_xyz'],
+          'kind':'building' if i==0 else 'module','role':part['role'],'parcel':parcel_id,'always':False,'tint':tint})
+    if entry.get('ground_module')!=46:
+        for bay in range(round(entry['width']/6.912)):
+            x=(bay-(entry['width']/6.912-1)/2)*6.912;z=3.79
+            key=['ceylon-tea','island-bakery','coast-cafe','fort-market'][(parcel_id+bay)%4]
+            placements.append({'asset':'res://assets/signs/colombo/'+key+'.svg',
+                'position':[float(center[0]+c*x+ss*z),3.20,float(center[1]-ss*x+c*z)],
+                'yaw':yaw,'scale':1.,'kind':'shop_sign','parcel':parcel_id,'always':False,'tint':[1,1,1,1]})
+
+def district_at(point):
+    if point[0]<-560:return 'waterfront'
+    if point[1]<-400:return 'fort'
+    if point[0]>250:return 'commercial'
+    return 'lotus_beira'
+
+for row in range(2):
+ for side in [-1.,1.]:
+    s=16.;index=0
+    while s<route['length']-20:
+        i=int(s/step)%n;district=district_at(p[i])
+        options=[r for r in recipes if (r['floors']>=2 if district in ('fort','commercial') else True)]
+        entry=rng.choice(options);w=entry['width'];d=entry['depth']
+        i=int((s+w/2)/step)%n
         front=-normal[i]*side;yaw=math.atan2(front[0],front[1])
-        offset=width[i]/2+12.+entry['depth']*scale/2
-        center=p[i]+normal[i]*side*offset
-        # Sea-side frontage is open throughout the waterfront district.
-        if not (center[0]<-570 and side<0) and fit(center,yaw,entry['width']*scale,entry['depth']*scale):place(entry,center,yaw,scale)
-        s+=entry['width']*scale+10.
+        center=p[i]+normal[i]*side*(width[i]/2+7.8+d/2+row*19.)
+        if not (p[i,0]<-560 and center[0]<p[i,0]) and fit(center,yaw,w,d):place(entry,center,yaw,district=district,row=row)
+        # Narrow joins form terraces; wider breaks every six frontages become alleys.
+        s+=w+(.95 if index%6 else 7.);index+=1
 
-# Persistent low-polygon skyline silhouettes, never a second overlapping skin.
-for x in range(-440,1050,120):
-    for z in range(-1120,1100,120):
-        center=np.array([x+rng.uniform(-12,12),z+rng.uniform(-12,12)])
-        if center[0]<-570 or float(np.linalg.norm(p-center,axis=1).min())<115:continue
-        entry=rng.choice(towers);yaw=rng.choice([0.,math.pi/2,math.pi,math.pi*1.5]);scale=rng.uniform(.8,1.35)
-        if fit(center,yaw,entry['width']*scale,entry['depth']*scale):place(entry,center,yaw,scale,'skyline',True)
+# Cluster the skyline behind streets, with broad gaps for protected landmark views.
+for x in range(-380,1050,110):
+ for z in range(-1120,1100,110):
+    center=np.array([x+rng.uniform(-22,22),z+rng.uniform(-22,22)])
+    if float(np.linalg.norm(p-center,axis=1).min())<95:continue
+    if -100<center[0]<100 and -220<center[1]<180:continue
+    entry=rng.choice(towers);yaw=rng.choice([0.,math.pi/2,math.pi,math.pi*1.5]);scale=rng.uniform(.78,1.32)
+    if fit(center,yaw,entry['width']*scale,entry['depth']*scale):place(entry,center,yaw,scale,'skyline',True)
 
-for s in np.arange(10,route['length'],30):
-    i=int(s/step)%n;yaw=rng.random()*math.tau
+modules={m['source_node_index']:m for m in json.loads((ROOT/'assets/models/colombo_city/modules.json').read_text())['modules']}
+for index,s in enumerate(np.arange(14,route['length'],36)):
+    i=int(s/step)%n;yaw=math.atan2(t[i,0],t[i,1])
     for side in [-1.,1.]:
-        center=p[i]+normal[i]*side*(width[i]/2+8.)
-        if float(np.linalg.norm(p-center,axis=1).min())<width[i]/2+4:continue
-        path=f'res://assets/models/srilanka/phoenix_{int(s/30)%3}_lod.glb'
-        placements.append({'asset':path,'position':[float(center[0]),0,float(center[1])],'yaw':yaw,'scale':rng.uniform(.72,.95),'kind':'palm','always':False,'tint':[1,1,1,1]})
-
-# Galle Face remains open lawn; palm rows frame its sea and road edges.
+        center=p[i]+normal[i]*side*(width[i]/2+3.7)
+        if center[0]<-848:continue
+        # Existing palms remain, with fewer identical pairs and space for shop doors.
+        if index%3==0:
+            placements.append({'asset':f'res://assets/models/srilanka/phoenix_{(index//3)%3}_lod.glb','position':[float(center[0]),0,float(center[1])],'yaw':rng.random()*math.tau,'scale':rng.uniform(.68,.88),'kind':'palm','always':False,'tint':[1,1,1,1]})
+        else:
+            m=modules[44 if index%3==1 else rng.choice([58,60,62])]
+            placements.append({'asset':m['path'],'position':[float(center[0]),.04,float(center[1])],'yaw':yaw+(math.pi if side<0 else 0),'scale':.75,'kind':'street_prop','always':False,'tint':[1,1,1,1]})
 for x in [-824.,-637.]:
-    for z in range(-480,550,42):
-        placements.append({'asset':'res://assets/models/srilanka/phoenix_1_lod.glb','position':[x,0,z],'yaw':rng.random()*math.tau,'scale':.85,'kind':'palm','always':False,'tint':[1,1,1,1]})
-
-for i in range(250):
-    angle=i*math.tau/250.;radius=135.;center=np.array([300+math.cos(angle)*radius,25+math.sin(angle)*radius])
+ for z in range(-480,550,55):
+    placements.append({'asset':'res://assets/models/srilanka/phoenix_1_lod.glb','position':[x,0,z],'yaw':rng.random()*math.tau,'scale':rng.uniform(.76,.94),'kind':'palm','always':False,'tint':[1,1,1,1]})
+for i in range(180):
+    angle=i*math.tau/180.;center=np.array([300+math.cos(angle)*135.,25+math.sin(angle)*135.])
     entry=library['props'][i%len(library['props'])]
     placements.append({'asset':entry['path'],'position':[float(center[0]),.48,float(center[1])],'yaw':math.atan2(-math.sin(angle),math.cos(angle)),'scale':1.,'kind':'railing','always':False,'tint':[1,1,1,1]})
 
@@ -101,11 +129,11 @@ for label in labels:
     (SIGNS/(name+'.svg')).write_text(svg,encoding='utf-8')
 
 data={'format':1,'cell_size':200,'placements':placements,'exclusions':[{'name':name,'bounds':list(bounds)} for name,bounds in exclusions],
-      'minimum_building_road_edge_clearance_m':minimum_clearance,'signs':[str(p.relative_to(ROOT)).replace('\\','/') for p in sorted(SIGNS.glob('*.svg'))]}
+      'parcels':parcels,'module_recipes':'res://assets/models/colombo_city/recipes.json','minimum_building_road_edge_clearance_m':minimum_clearance,'signs':[str(p.relative_to(ROOT)).replace('\\','/') for p in sorted(SIGNS.glob('*.svg'))]}
 (OUT/'placements.json').write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
 report={'status':'PASS','buildings':sum(e['kind']=='building' for e in placements),'skyline':sum(e['kind']=='skyline' for e in placements),
         'palms':sum(e['kind']=='palm' for e in placements),'railings':sum(e['kind']=='railing' for e in placements),
-        'minimum_building_road_edge_clearance_m':minimum_clearance,'premade_building_variants':len(library['buildings']),
+        'minimum_building_road_edge_clearance_m':minimum_clearance,'premade_building_variants':len(library['buildings']),'assembled_recipes':len(recipes),'secondary_row_buildings':sum(x['row']==1 for x in parcels),'districts':sorted({x['district'] for x in parcels}),
         'exclusions':[name for name,_ in exclusions]}
 (ROOT/'docs/qa-colombo-city/placement.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
 print(json.dumps(report,indent=2))
