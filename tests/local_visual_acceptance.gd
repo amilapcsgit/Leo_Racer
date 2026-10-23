@@ -11,7 +11,7 @@ func capture(label: String) -> void:
  root.get_texture().get_image().save_jpg("res://docs/qa-local2player/"+label+".jpg",.88)
 func run() -> void:
  root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size)
- game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame;game.diagnostics_mode=true
+ game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame;game.diagnostics_mode=true
  game.hud.show_garage()
  for v in [&"duster",&"bigster"]:
   for d in game.catalog.drivers:
@@ -26,7 +26,7 @@ func run() -> void:
  game.human_count=2;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"duster"
  for d in game.catalog.drivers:
   game.selected_driver=game.catalog.driver_index(d.id);game.local_players[1].driver_id=d.id
-  game.start_race();game.state="race"
+  await game.start_race();game.state="race"
   for k in game.karts:k.active=true;k.auto_drive=true
   for i in 30:await physics_frame
   check(game.karts[0].driver.get_meta("visible_driver_id")==d.id and game.karts[1].driver.get_meta("visible_driver_id")==d.id,"Driving cabin identities "+String(d.id))

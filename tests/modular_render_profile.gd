@@ -36,7 +36,7 @@ func run() -> void:
 	Engine.max_fps = 120
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	game.diagnostics_mode = true
 	game.selected_kart=15
@@ -176,7 +176,7 @@ func finish() -> void:
 	quit(0 if file != null else 1)
 
 func start_demanding_race() -> void:
-	game.start_race()
+	await game.start_race()
 	var vehicles := [&"blue",&"formula_blue",&"roadster_gold",&"race_bus",&"hover"]
 	for i in range(1,6):
 		var old: LeoKart=game.karts[i]

@@ -13,7 +13,7 @@ func capture(name: String) -> void:
  await frame();await RenderingServer.frame_post_draw
  root.get_texture().get_image().save_png("res://docs/qa-local2player/"+name+".png")
 func run() -> void:
- game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await frame();game.diagnostics_mode=true
+ game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await frame();game.diagnostics_mode=true
  var labels:=[]
  for button in game.hud.menu_root.find_children("*","Button",true,false):labels.append(button.text)
  check("2 PLAYER MODE" in labels and "CONTROLS" in labels,"Menu exposes multiplayer and controls")
@@ -27,7 +27,7 @@ func run() -> void:
  check(game.local_players[1].driver_id==&"hedgehog" and game.local_players[1].vehicle_id==&"bigster","P2 garage edits own selection")
  game.open_local_lobby();game.selected_driver=game.catalog.driver_index(&"human");game.selected_kart=game.catalog.vehicle_index(&"bigster")
  game.custom_player_name="LEFT PILOT";game.local_players[1].player_name="RIGHT PILOT";game.local_players[1].vehicle_id=&"duster"
- game.start_race();game.state="race"
+ await game.start_race();game.state="race"
  for kart in game.karts:kart.active=true;kart.set_physics_process(false)
  await frame()
  check(game.split_view.visible,"Split view active")
@@ -51,7 +51,7 @@ func run() -> void:
  check(game.hud.scene_mode=="results" and game.state=="results","Shared two-player results")
  await capture("split-results")
  game.return_menu();check(not game.split_view.visible and game.camera.current,"Menu restores full-window camera")
- game.human_count=1;game.start_race();check(not game.split_view.visible and game.camera.current,"Single-player stays full width")
+ game.human_count=1;await game.start_race();check(not game.split_view.visible and game.camera.current,"Single-player stays full width")
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"renderer":RenderingServer.get_current_rendering_method(),"captures":"--visual-test" in OS.get_cmdline_user_args()}
  FileAccess.open("res://docs/qa-local2player/presentation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_PRESENTATION_TEST ",report)

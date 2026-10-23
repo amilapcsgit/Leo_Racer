@@ -18,8 +18,8 @@ Branch: colombo-city. Published releases are not modified or republished.
 
 ## Checkpoints
 
-1. Branch and baseline: IN PROGRESS.
-2. External assets, loading and installer: pending.
+1. Branch and baseline: COMPLETE. Protected hashes recorded, original source/Bigster checks and 35 input checks pass; five baseline Vulkan section captures in build/city-baseline. Prior released RTX A1000 baseline: 99.7 FPS Vulkan / 82.9 Compatibility.
+2. External assets, loading and installer: COMPLETE. External category packs deduplicate byte-identical resources; 109,579,776-byte engine executable, 10,665,664-byte core in initial trial. 12 asset-contract checks, 96 driver/vehicle combinations (2687 assertions), 21 race checks, 21 presentation checks and 11 driving checks pass. Exported offline smoke passes, including split views and native SQLite. Installer creates hybrid content folders and has a separate Development installation identity. Main/preview loading is asynchronous; direct scene tests await initialization. Resource cleanup warnings are retained in logs, not counted as functional passes.
 3. Track definitions, selection and ranking migration: pending.
 4. Expanded baked course and driving: pending.
 5. Colombo building library, landmarks, streaming and daylight: pending.

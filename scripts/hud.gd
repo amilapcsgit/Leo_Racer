@@ -438,7 +438,7 @@ func _process(dt: float) -> void:
 		b.modulate = Color(brightness,brightness,brightness,1.0)
 		var target_scale := Vector2.ONE*(1.018 if focused and motion else 1.0)
 		b.scale = b.scale.lerp(target_scale,1.0-exp(-visual_dt*16.0))
-	if scene_mode == "race" and not labels.is_empty():
+	if scene_mode == "race" and not labels.is_empty() and is_instance_valid(game.player):
 		var p: LeoKart = game.player
 		var actual_speed := absf(p.wheel_motion_speed)
 		speed_overlay.visible = not photo_mode

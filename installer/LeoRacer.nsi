@@ -7,12 +7,20 @@ Unicode true
 !ifndef CHANNEL
 !define CHANNEL "False"
 !endif
+!ifndef BUILD_ROOT
+!define BUILD_ROOT "..\build\ModularGarage"
+!endif
+!ifdef DEVELOPMENT
+!define APP_NAME "Leo Racer Development"
+!define APP_KEY "LeoRacerDevelopment"
+!else
 !if "${CHANNEL}" == "True"
 !define APP_NAME "Leo Racer RC"
 !define APP_KEY "LeoRacerRC"
 !else
 !define APP_NAME "Leo Racer"
 !define APP_KEY "LeoRacer"
+!endif
 !endif
 Name "${APP_NAME} ${VERSION}"
 OutFile "..\dist\LeoRacer-Setup-${VERSION}.exe"
@@ -36,7 +44,14 @@ Section "Leo Racer (required)"
   SectionIn RO
   SetShellVarContext current
   SetOutPath "$INSTDIR"
-  File /r "..\build\ModularGarage\*.*"
+  File /r "${BUILD_ROOT}\*.*"
+  ; Empty override folders also exist on a clean hybrid-content installation.
+  CreateDirectory "$INSTDIR\GameAssets\textures"
+  CreateDirectory "$INSTDIR\GameAssets\vehicles"
+  CreateDirectory "$INSTDIR\GameAssets\roads"
+  CreateDirectory "$INSTDIR\GameAssets\signs"
+  CreateDirectory "$INSTDIR\GameAssets\glb"
+  CreateDirectory "$INSTDIR\GameAssets\tracks"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\${APP_KEY}" "InstallDir" "$INSTDIR"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayName" "${APP_NAME}"

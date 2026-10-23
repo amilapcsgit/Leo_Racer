@@ -4,7 +4,11 @@ extends Resource
 enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var id: StringName
 @export var display_name := "New vehicle"
-@export var model: PackedScene
+@export var model_path := ""
+@export var fixed_driver_model_path := ""
+@export var model: PackedScene:
+	get:
+		return model if model else LeoAssets.scene(model_path)
 @export var normalization := Transform3D.IDENTITY
 @export var wheels: Array[WheelBinding] = []
 @export var collision_size := Vector3(2.15,1.4,3.5)
@@ -24,7 +28,9 @@ enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var driver_policy: DriverPolicy = DriverPolicy.SEATED
 @export var seat := Transform3D.IDENTITY
 @export var fixed_driver_id: StringName
-@export var fixed_driver_model: PackedScene
+@export var fixed_driver_model: PackedScene:
+	get:
+		return fixed_driver_model if fixed_driver_model else (LeoAssets.scene(fixed_driver_model_path) if not fixed_driver_model_path.is_empty() else null)
 ## Optional pelvis-anchored fits keyed by driver identity.
 @export var driver_fits: Dictionary = {}
 @export var hovering := false

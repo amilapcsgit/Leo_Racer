@@ -19,9 +19,9 @@ func press_launch(remaining: float) -> void:
 	game._unhandled_input(event)
 func run() -> void:
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
-	game.start_race()
+	await game.start_race()
 	press_launch(2)
 	verify(not game.launch_charged,"Early throttle does not award a perfect launch")
 	press_launch(.4)
@@ -90,7 +90,7 @@ func run() -> void:
 	verify(recoveries>=1,"Prolonged immobility under throttle safely recovers the player")
 	verify(p.next_gate==1,"Automatic recovery cannot skip an ordered checkpoint")
 	wall.queue_free()
-	game.start_race()
+	await game.start_race()
 	verify(not game.launch_charged and game.slipstream_time==0 and game.horn_cooldown==0,"Restart clears launch, drafting and horn state")
 	var data := {"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"floor_impacts":hits,"automatic_recoveries":recoveries}
 	FileAccess.open("res://docs/qa-astra/playability.json",FileAccess.WRITE).store_string(JSON.stringify(data,"  "))

@@ -14,8 +14,8 @@ func overlap(a: LeoKart,b: LeoKart) -> bool:
   if hit.collider==b:return true
  return false
 func run() -> void:
- game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame;game.diagnostics_mode=true;game.human_count=2;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"duster"
- game.start_race();game.state="race";await ticks(2)
+ game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame;game.diagnostics_mode=true;game.human_count=2;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"duster"
+ await game.start_race();game.state="race";await ticks(2)
  var a: LeoKart=game.karts[0];var b: LeoKart=game.karts[1]
  var clear_spawn:=true
  for i in game.karts.size():
@@ -35,7 +35,7 @@ func run() -> void:
  check(absf(projection.offset)+a.definition.collision_size.x*.5<=LeoCircuit.WIDTH*.5+.05,"Large SUV stays inside footprint-adjusted barrier")
  game.race_time=100.;game.on_gate(a,24);check(a.collision_layer==0,"Finished SUV is non-blocking")
  # A full shared-world race: diagnostic acceleration of wall time only.
- game.start_race();game.state="race"
+ await game.start_race();game.state="race"
  for kart in game.karts:kart.active=true;kart.auto_drive=true
  Engine.time_scale=8.;Engine.max_physics_steps_per_frame=32
  var deadline:=Time.get_ticks_msec()+100000

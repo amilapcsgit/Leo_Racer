@@ -26,6 +26,8 @@ var driver_id: StringName = &"hedgehog"
 var vehicle_id: StringName = &"blue"
 var reduced_motion := false
 var assembly: Node3D
+var selection_generation := 0
+signal preview_ready
 var driver_buttons: Array[Button] = []
 var ui: Control
 var title: Label
@@ -267,12 +269,21 @@ func set_selection(d: StringName,v: StringName) -> void:
 	var changed:=vehicle_id!=v
 	driver_id=d;vehicle_id=v
 	if not is_node_ready():return
+	selection_generation+=1
+	var generation:=selection_generation
+	var car:=catalog.vehicle(v)
+	var racer:=catalog.driver(d)
+	if not car.model_path.is_empty():await LeoAssets.scene_async(car.model_path,get_tree())
+	var driver_path:=racer.cabin_model_path if car.driver_policy==VehicleDefinition.DriverPolicy.CABIN else racer.seated_model_path
+	if not driver_path.is_empty():await LeoAssets.scene_async(driver_path,get_tree())
+	if generation!=selection_generation or not is_inside_tree():return
 	if is_instance_valid(assembly):showroom.remove_child(assembly);assembly.queue_free()
 	assembly=VehicleAssembler.assemble(catalog.vehicle(v),catalog.driver(d));showroom.add_child(assembly)
 	base_distance=catalog.vehicle(v).preview_distance;target=catalog.vehicle(v).preview_target
 	if changed:reset_view()
 	else:update_camera()
 	refresh_labels()
+	preview_ready.emit()
 
 func choose_driver(id: StringName) -> void:
 	set_selection(id,vehicle_id);selection_changed.emit(driver_id,vehicle_id)

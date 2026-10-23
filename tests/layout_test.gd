@@ -12,9 +12,9 @@ func run() -> void:
 		viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 		root.add_child(viewport)
 		var game: Node3D = load("res://scenes/main.tscn").instantiate()
-		viewport.add_child(game)
+		viewport.add_child(game);await game.initialization_finished
 		await process_frame
-		game.start_race()
+		await game.start_race()
 		game.state = "capture"
 		game.race_time = 3.0
 		for kart in game.karts: kart.set_physics_process(false)

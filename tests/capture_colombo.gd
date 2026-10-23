@@ -12,7 +12,7 @@ func capture(label: String) -> void:
 	print("CAPTURE ",label," ",image.get_size())
 func run() -> void:
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	await capture("menu")
 	game.hud.show_guide()
@@ -23,7 +23,7 @@ func run() -> void:
 	game.hud.show_settings()
 	await capture("settings")
 	game.hud.clear(game.hud.modal_root)
-	game.start_race()
+	await game.start_race()
 	game.state = "capture"
 	game.race_time = 3.0
 	for kart in game.karts: kart.set_physics_process(false)

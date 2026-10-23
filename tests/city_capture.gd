@@ -2,13 +2,13 @@ extends SceneTree
 var game: Node3D
 func _initialize() -> void: run.call_deferred()
 func run() -> void:
-	game=load("res://scenes/main.tscn").instantiate();root.add_child(game)
+	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished
 	await process_frame;await process_frame
 	if "--baseline" in OS.get_cmdline_user_args():
 		game.diagnostics_mode=true
 	else:
 		if game.has_method("select_track"):await game.select_track("colombo_city")
-	game.start_race();game.state="capture"
+	await game.start_race();game.state="capture"
 	for kart in game.karts:kart.set_physics_process(false)
 	var folder:="res://build/city-baseline" if "--baseline" in OS.get_cmdline_user_args() else "res://build/city-captures"
 	DirAccess.make_dir_recursive_absolute(folder)

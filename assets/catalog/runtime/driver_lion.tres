@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="DriverDefinition" load_steps=6 format=3]
+
+
+
+[ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/driver_lion.glb" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/driver_lion.png" id="thumb"]
+
+
+[resource]
+script = ExtResource("1")
+id = &"lion"
+display_name = "Leo"
+tagline = "A little lion with a roaring racing heart."
+seated_model = ExtResource("2")
+standing_model_path = "res://assets/models/driver_lion.glb"
+portrait = ExtResource("thumb")
+cabin_model_path = "res://assets/models/cabin/driver_lion_cabin.glb"
+setup_complete = true

@@ -5,10 +5,10 @@ var finishing := false
 func _initialize() -> void: run.call_deferred()
 func run() -> void:
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	game.diagnostics_mode = true
-	game.start_race()
+	await game.start_race()
 	for j in range(3):
 		var id := 6+j
 		var kart := LeoKart.new()

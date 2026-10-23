@@ -3,7 +3,7 @@ class_name GarageCatalog
 extends Resource
 @export var vehicles: Array[VehicleDefinition] = []
 @export var drivers: Array[DriverDefinition] = []
-const PATH := "res://assets/catalog/catalog.tres"
+const PATH := "res://assets/catalog/runtime/catalog.tres"
 const LEGACY_DRIVERS := ["hedgehog","lion","elephant","parrot","human"]
 const LEGACY_VEHICLES := ["blue","coral","aqua","pink","formula_blue","formula_red","roadster_gold","race_tuk","race_bus"]
 

@@ -100,7 +100,7 @@ func run() -> void:
  var captured := "--capture" in OS.get_cmdline_user_args()
  if captured:
   var game: Node3D = load("res://scenes/main.tscn").instantiate()
-  root.add_child(game)
+  root.add_child(game);await game.initialization_finished
   await process_frame
   game.diagnostics_mode = true
   game.hud.show_garage()
@@ -128,7 +128,7 @@ func run() -> void:
    selector.viewport.get_texture().get_image().save_png(OUT + label + ".png")
   game.selected_kart = game.catalog.vehicle_index(&"bigster")
   game.selected_driver = game.catalog.driver_index(&"human")
-  game.start_race()
+  await game.start_race()
   game.state = "race"
   game.player.active = true
   game.player.auto_drive = true

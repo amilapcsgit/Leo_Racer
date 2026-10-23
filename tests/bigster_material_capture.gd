@@ -4,7 +4,7 @@ func shot(name_text: String) -> void:
  await process_frame;await process_frame;await RenderingServer.frame_post_draw
  root.get_texture().get_image().save_png("res://docs/qa-bigster/"+name_text+".png")
 func run() -> void:
- var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame
+ var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
  game.diagnostics_mode=true;game.hud.show_garage()
  var selector: ModularCarSelector=game.hud.garage_selector;selector.set_selection(&"human",&"bigster");selector.reduced_motion=true
  for resolution in [Vector2i(1280,720),Vector2i(1920,1080),Vector2i(2560,1080)]:

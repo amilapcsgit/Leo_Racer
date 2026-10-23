@@ -7,12 +7,12 @@ var errors: Array[String]=[]
 var advancing := false
 func _initialize() -> void:run.call_deferred()
 func run() -> void:
-	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame
+	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
 	game.diagnostics_mode=true
 	Engine.time_scale=6
 	start_batch()
 func start_batch() -> void:
-	game.selected_kart=(batch*6)%16;game.selected_driver=batch%6;game.start_race()
+	game.selected_kart=(batch*6)%16;game.selected_driver=batch%6;await game.start_race()
 	for i in range(1,6):
 		var old: LeoKart=game.karts[i];game.karts.remove_at(i);old.stop_audio();old.free()
 		var v: VehicleDefinition=game.catalog.vehicles[(batch*6+i)%16]

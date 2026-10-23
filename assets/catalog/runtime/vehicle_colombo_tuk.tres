@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+
+[ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/catalog/wheel_binding.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/vehicle_colombo_tuk.png" id="thumb"]
+
+[sub_resource type="Resource" id="w0"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_0")])
+steering = true
+pivot = Vector3(0.00000077, 0.28320000, -1.00000000)
+radius = 0.203200000
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w1"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_1")])
+steering = false
+pivot = Vector3(-0.51500000, 0.28320000, 1.00000000)
+radius = 0.203200000
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w2"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_2")])
+steering = false
+pivot = Vector3(0.51500000, 0.28320000, 1.00000000)
+radius = 0.203200000
+axle = Vector3(1, 0, 0)
+
+
+[resource]
+script = ExtResource("1")
+id = &"colombo_tuk"
+display_name = "Colombo Tuk-Tuk"
+model_path = "res://assets/models/bigster/colombo_tuk.glb"
+wheels = Array[ExtResource("2")]([SubResource("w0"), SubResource("w1"), SubResource("w2")])
+collision_size = Vector3(1.3000, 1.7000, 2.6350)
+collision_position = Vector3(0, 0.9300, 0)
+max_speed = 33
+acceleration = 18
+handling = 1
+seat = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+driver_policy = 1
+preserve_materials = true
+setup_complete = true
+camera_height = 0.35
+preview_target = Vector3(0, 0.8160, 0)
+preview_distance = 8.0
+exhausts = PackedVector3Array(-0.42, 0.40, 1.2121, 0.42, 0.40, 1.2121)
+thumbnail = ExtResource("thumb")
+normalization = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)

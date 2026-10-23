@@ -19,7 +19,7 @@ func ticks(count: int) -> void:
 	for i in count:await physics_frame
 func run() -> void:
 	captures="--visual-test" in OS.get_cmdline_user_args()
-	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame
+	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
 	game.diagnostics_mode=true;game.hud.show_garage()
 	var selector: ModularCarSelector=game.hud.garage_selector
 	var persistent:=selector.ui.get_instance_id();var field:=selector.name_field.get_instance_id()
@@ -70,7 +70,7 @@ func run() -> void:
 	selector.reduced_motion=true;var yaw:=selector.yaw;selector._process(8.);check(selector.yaw==yaw,"Reduced Motion suppresses showroom rotation")
 	selector.hide();check(selector.viewport.render_target_update_mode==SubViewport.UPDATE_DISABLED,"Hidden preview suspends rendering");selector.show()
 	for id in [&"duster",&"bigster"]:
-		game.selected_kart=game.catalog.vehicle_index(id);game.start_race();game.state="race";game.player.active=true
+		game.selected_kart=game.catalog.vehicle_index(id);await game.start_race();game.state="race";game.player.active=true
 		for k in game.karts:
 			if k!=game.player:k.active=false;k.set_physics_process(false)
 		game.player.place(80,0);game.player.boost_cooldown=20.;game.test_input("accelerate",1.);await ticks(220)
@@ -81,7 +81,7 @@ func run() -> void:
 		if id==&"bigster":
 			game.player.boost_fuel=.1;game.test_input("brake",1.);await ticks(30);game.test_input("brake",0.)
 			check(game.player.boost_time==0 and game.player.boost_fuel>.125,"Bigster braking cancels boost and modestly regenerates charge")
-	game.start_race();game.state="race";game.player.active=true;game.player.place(600,0)
+	await game.start_race();game.state="race";game.player.active=true;game.player.place(600,0)
 	game.player.progress=game.circuit.length+600;game.player.next_gate=11;game.player.lap=2;game.player.speed=60;game.player.boost(1.6,"TEST")
 	game.race_time=84.125;game.best_time=500.
 	var old: LeoKart=game.player;var old_selection:=Vector2i(game.selected_driver,game.selected_kart)
@@ -98,7 +98,7 @@ func run() -> void:
 	check(game.karts.slice(1)==opponents and game.player.speed<=game.player.max_speed and game.player.boost_time==0,"Swap retains opponents, clamps speed and clears boost")
 	check(game.race_modified and not game.paused and not paused and game.player.racer_name=="TEST PILOT","Modified race resumes with custom name")
 	game.player.finish_time=100.;game.finish_race();check(game.best_time==500.,"Mid-race vehicle changes cannot update best-time records")
-	game.start_race();check(not game.race_modified and game.player.next_gate==0 and game.race_time==0,"Start New Race resets the race normally")
+	await game.start_race();check(not game.race_modified and game.player.next_gate==0 and game.race_time==0,"Start New Race resets the race normally")
 	game.toggle_pause();game.hud.show_garage("pause");selector=game.hud.garage_selector;selector.race_requested.emit(&"human",&"bigster")
 	check(not game.paused and game.state=="countdown" and game.player.vehicle_key=="bigster","Pause garage New Race applies the new selection")
 	game.return_menu();game.hud.show_garage();joy(JOY_BUTTON_B);await process_frame

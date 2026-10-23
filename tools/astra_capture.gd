@@ -45,7 +45,7 @@ func run() -> void:
 		var previous: Variant = JSON.parse_string(FileAccess.get_file_as_string(old_manifest))
 		if previous is Dictionary: previous_captures = previous.get("captures",[])
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	# Freeze the menu/garage camera and showroom rotation for matching images.
 	game.set_process(false)
@@ -62,7 +62,7 @@ func run() -> void:
 		game.hud.show_garage()
 		await capture("garage-%02d-%s"%[i+1,String(game.KARTS[i].color)],.5)
 	game.selected_kart = 4
-	game.start_race()
+	await game.start_race()
 	for kart in game.karts: kart.set_physics_process(false)
 	frame_track(.002)
 	await capture("04-countdown")
@@ -154,7 +154,7 @@ func run() -> void:
 	await capture("19-results")
 	for vehicle in [7,8]:
 		game.selected_kart = vehicle
-		game.start_race()
+		await game.start_race()
 		game.state = "capture"
 		game.race_time = 54.447
 		for kart in game.karts: kart.set_physics_process(false)

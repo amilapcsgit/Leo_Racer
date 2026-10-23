@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+
+
+[ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/catalog/wheel_binding.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/vehicle_hover.png" id="thumb"]
+
+[resource]
+script = ExtResource("1")
+id = &"hover"
+display_name = "Neon Hover"
+model_path = "res://assets/models/modular/hover.glb"
+wheels = Array[ExtResource("2")]([])
+collision_size = Vector3(2.2, 1.6657443, 4.2)
+collision_position = Vector3(0.0, 0.9128722, 0.0)
+max_speed = 33
+acceleration = 18
+handling = 1
+seat = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+driver_policy = 1
+preserve_materials = true
+setup_complete = true
+preview_target = Vector3(0, 0.8328721690682401, 0)
+preview_distance = 10.813692522254213
+exhausts = PackedVector3Array(-0.5, 0.5, 2.9491888697056945, 0.5, 0.5, 2.9491888697056945)
+hovering = true
+thumbnail = ExtResource("thumb")
+normalization = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)

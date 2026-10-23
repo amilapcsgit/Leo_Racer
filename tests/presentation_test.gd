@@ -10,9 +10,9 @@ func verify(ok: bool,message: String) -> void:
 	if not ok: errors.append(message)
 func run() -> void:
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
-	game.start_race()
+	await game.start_race()
 	game.state = "race"
 	for kart in game.karts: kart.set_physics_process(false)
 	game.player.active = true
@@ -70,7 +70,7 @@ func run() -> void:
 	verify(game.feedback.get_shake_roll()==0,"Reduced Motion suppresses shake roll")
 	verify(game.feedback.get_recover_glitch()==0,"Reduced Motion suppresses screen distortion")
 	game.set_reduced_motion(false)
-	game.start_race()
+	await game.start_race()
 	await process_frame
 	verify(game.feedback.get_child_count()==0,"Restart removes transient Rokojori sequences")
 	game.return_menu()

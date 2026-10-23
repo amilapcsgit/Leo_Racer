@@ -29,9 +29,9 @@ func run() -> void:
  store.close_store();check(store.save_session("closed",2,rows,false,false)==-1,"Unavailable database fails without stopping game")
  var corrupt:=path+".corrupt";var file:=FileAccess.open(corrupt,FileAccess.WRITE);file.store_string("KEEP EXISTING DATA");file.close()
  check(not store.open_store(corrupt) and FileAccess.get_file_as_string(corrupt)=="KEEP EXISTING DATA","Corrupt database preserved")
- var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame;game.diagnostics_mode=true
+ var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame;game.diagnostics_mode=true
  check(game.format_time(320.2)=="05:20.200","Ranking timestamps round to exact milliseconds")
- game.human_count=2;game.start_race()
+ game.human_count=2;await game.start_race()
  for kart in game.karts:
   var bigster: bool=kart.vehicle_key=="bigster"
   check(is_equal_approx(kart.max_speed,50. if bigster else 165./3.6) and is_equal_approx(kart.boosted_ceiling(),62.5 if bigster else 55.) and kart.acceleration==18. and kart.handling==1.,"Resolved human/AI performance "+kart.vehicle_key)

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DriverDefinition" load_steps=6 format=3]
+
+
+
+[ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/models/modular/helmet_driver.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/driver_human.png" id="thumb"]
+
+
+[resource]
+script = ExtResource("1")
+id = &"human"
+display_name = "Shaven Leo"
+tagline = "Helmet on. Heart racing. Full throttle."
+seated_model_path = "res://assets/models/bigster/driver_human_seated.glb"
+standing_model_path = "res://assets/models/modular/driver_human_standing.glb"
+material_name = "Wolf3D_Headwear"
+material_albedo = ExtResource("4")
+portrait = ExtResource("thumb")
+orientation = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+cabin_model_path = "res://assets/models/bigster/driver_human_cabin.glb"
+setup_complete = true

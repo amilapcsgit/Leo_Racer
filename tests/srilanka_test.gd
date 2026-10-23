@@ -8,7 +8,7 @@ func verify(ok: bool,message: String) -> void:
 	print(("PASS " if ok else "FAIL ")+message)
 func run() -> void:
 	var game: Node3D=load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	var sri: LeoSriLankaWorld=game.world.find_child("SriLanka2026",true,false)
 	verify(sri!=null,"Supplied Sri Lanka scenery replaces the presentation world")
@@ -31,7 +31,7 @@ func run() -> void:
 	verify(is_equal_approx(LeoHUD.speed_line_strength(180.0/3.6,false,true,false),.65),"Speed-line cruise envelope reaches its bounded maximum")
 	verify(LeoHUD.speed_line_strength(55,true,true,false)==1,"Boost takes the stronger envelope without stacking")
 	verify(LeoHUD.speed_line_strength(55,true,true,true)==0,"Reduced Motion suppresses screen speed lines")
-	game.start_race()
+	await game.start_race()
 	game.state="race"
 	for kart in game.karts:kart.set_physics_process(false)
 	game.player.boost_fuel=.5

@@ -12,7 +12,7 @@ func _initialize() -> void:
 
 func run() -> void:
 	var game: Node3D = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	verify(ProjectSettings.get_setting("physics/common/physics_interpolation"),"Physics interpolation is enabled")
 	verify(game.camera.physics_interpolation_mode == Node.PHYSICS_INTERPOLATION_MODE_OFF,"Chase camera uses explicit rendered pose without double interpolation")

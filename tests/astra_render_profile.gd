@@ -35,10 +35,10 @@ func run() -> void:
 	Engine.max_fps = 120
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	game.diagnostics_mode = true
-	game.start_race()
+	await game.start_race()
 	game.player.auto_drive = true
 	# Profile moving race rendering throughout; countdown/UI loading is warmed up.
 	game.state = "race"
@@ -48,7 +48,7 @@ func run() -> void:
 	await create_timer(WARMUP_SECONDS, true, false, true).timeout
 	await RenderingServer.frame_post_draw
 	game.diagnostics_mode = true
-	game.start_race()
+	await game.start_race()
 	game.player.auto_drive = true
 	game.state = "race"
 	for kart in game.karts: kart.active = true

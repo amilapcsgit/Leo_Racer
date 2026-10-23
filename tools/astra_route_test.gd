@@ -72,7 +72,7 @@ func _route_geometry(c: LeoCircuit) -> void:
 	measurements.merge({"lap_m":c.length,"samples":c.points.size(),"min_radius_m":min_radius,"sample_min_m":min_spacing,"sample_max_m":max_spacing,"nonlocal_segment_clearance_m":min_clearance,"crossings":crossings,"max_lane_error_m":lane_error,"max_projection_distance_error_m":projection_distance_error})
 func run() -> void:
 	var game: Node3D=load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
 	var c: LeoCircuit=game.circuit
 	_route_geometry(c)

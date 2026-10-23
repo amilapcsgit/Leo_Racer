@@ -17,9 +17,9 @@ func ticks(count: int) -> void:
 
 func run() -> void:
 	game = load("res://scenes/main.tscn").instantiate()
-	root.add_child(game)
+	root.add_child(game);await game.initialization_finished
 	await process_frame
-	game.start_race()
+	await game.start_race()
 	game.state = "race"
 	for kart in game.karts:
 		kart.active = false
@@ -76,7 +76,7 @@ func run() -> void:
 	await create_timer(.15, true).timeout
 	verify(p.position == frozen_position and game.race_time == frozen_time, "Paused race freezes both timer and kart physics")
 	game.toggle_pause()
-	game.start_race()
+	await game.start_race()
 	verify(game.player.speed == 0 and game.player.boost_fuel == 1 and game.player.next_gate == 0, "Restart resets speed nitro and race progress")
 	game.stop_all_audio()
 	game.return_menu()

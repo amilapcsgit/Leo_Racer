@@ -1,0 +1,57 @@
+{
+  "exe_bytes": 109579776,
+  "core_bytes": 10665664,
+  "packs": [
+    {
+      "id": "glb/shared-scenery",
+      "file": "glb/shared-scenery.pck",
+      "sha256": "9dd9faa4b822ac4a8dc0b068b196e35bb58ebef59d76abb461ff11d1bd670285",
+      "bytes": 18983092
+    },
+    {
+      "id": "roads/terrain",
+      "file": "roads/terrain.pck",
+      "sha256": "640440b1212636d94f70a234f98780657318f66572d889d8b3d73fedc9b83cfc",
+      "bytes": 46140
+    },
+    {
+      "id": "textures/art",
+      "file": "textures/art.pck",
+      "sha256": "740e071f3d2f7e7ada00c43e92679acd682af4d8991140fb92f92435be488964",
+      "bytes": 235724
+    },
+    {
+      "id": "textures/audio",
+      "file": "textures/audio.pck",
+      "sha256": "58fa50940de87ee76ae2aa36edbd0b841d34a9daaf58418065fd93efbe8d6c92",
+      "bytes": 513204
+    },
+    {
+      "id": "textures/imported",
+      "file": "textures/imported.pck",
+      "sha256": "308132698e6a33f1380d83f75bf6e1a33fdf7a488450a72892708a9259554d8a",
+      "bytes": 180561376
+    },
+    {
+      "id": "textures/surfaces",
+      "file": "textures/surfaces.pck",
+      "sha256": "afa3e95d59031431ee2ffec1c0de08deceb32b941bbdc8071c0e4fb7ca1592c8",
+      "bytes": 4280
+    },
+    {
+      "id": "tracks/astra_coast/scenery",
+      "file": "tracks/astra_coast/scenery.pck",
+      "sha256": "a82b0c0d239c1940926ce1f48faf44ee47ffcfeccd8a465f5dc72d48782b904d",
+      "bytes": 23268
+    },
+    {
+      "id": "vehicles/roster",
+      "file": "vehicles/roster.pck",
+      "sha256": "f6920c2b80be4ba3aa37229fcc263837cd902e7bf5e40f74d8f5657ba1cbab25",
+      "bytes": 44113956
+    }
+  ],
+  "installed_bytes": 460984087,
+  "original_pack_bytes": 514167145,
+  "resources": 3655
+}

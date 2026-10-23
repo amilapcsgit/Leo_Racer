@@ -8,12 +8,12 @@ func check(ok: bool,message: String) -> void:
 func ticks(n: int) -> void:
  for i in n:await physics_frame
 func run() -> void:
- var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame
+ var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
  game.diagnostics_mode=true;game.human_count=2
  game.input_router.assign(1,"gamepad",17,false)
  game.selected_kart=game.catalog.vehicle_index(&"bigster")
  game.local_players[1].vehicle_id=&"duster";game.local_players[1].player_name="SECOND PILOT"
- game.start_race();game.state="race"
+ await game.start_race();game.state="race"
  for kart in game.karts:kart.active=true
  for i in range(2,6):game.karts[i].active=false
  var a: LeoKart=game.karts[0];var b: LeoKart=game.karts[1]
@@ -43,13 +43,13 @@ func run() -> void:
  check(a.collision_layer==0 and a.collision_mask==1,"Finished car cannot block active player")
  game.race_time=120.;game.on_gate(b,24);game._process(.01)
  check(game.state=="results" and b.finished,"Results wait for both humans")
- game.start_race();game.state="race";game.karts[0].active=true;game.karts[1].active=true
+ await game.start_race();game.state="race";game.karts[0].active=true;game.karts[1].active=true
  game.retire_player(0);check(game.karts[0].retired and game.state=="race","P1 retirement lets P2 continue")
  game.retire_player(1);check(game.state=="results","Both retire ends the race")
- game.start_race();game.countdown=.8
+ await game.start_race();game.countdown=.8
  game._on_local_command(0,"accelerate");game._process(1.)
  check(game.karts[0].boost_time>0 and game.karts[1].boost_time==0,"Countdown launch charge belongs only to the triggering player")
- game.start_race();game.state="race"
+ await game.start_race();game.state="race"
  var first: LeoKart=game.karts[0];var second: LeoKart=game.karts[1]
  first.active=true;second.active=true;first.place(100.,0.);second.place(112.,0.)
  first.wheel_motion_speed=20.;second.wheel_motion_speed=20.;first.boost_fuel=.2;second.boost_fuel=.2

@@ -1,4 +1,7 @@
 extends Node3D
+signal initialization_finished
+var initialized := false
+var loading: LeoLoadingScreen
 
 var split_view: LeoSplitRaceView
 var input_router: LeoInputRouter
@@ -65,6 +68,9 @@ var slipstream_cooldown := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	loading=LeoLoadingScreen.new();add_child(loading)
+	await get_tree().process_frame
+	loading.stage("Loading garage catalog…",25)
 	catalog = GarageCatalog.shared()
 	var args := OS.get_cmdline_user_args()
 	test_mode = "--race-test" in args
@@ -86,7 +92,9 @@ func _ready() -> void:
 		open_rankings()
 		save_settings()
 	circuit = LeoCircuit.new()
-	build_world()
+	await build_world()
+	loading.stage("Preparing interface…",85)
+	await get_tree().process_frame
 	build_stage()
 	camera = Camera3D.new()
 	camera.fov = 63
@@ -120,15 +128,16 @@ func _ready() -> void:
 	local_players[1].feedback=second_feedback
 	feedback.process_mode=Node.PROCESS_MODE_PAUSABLE
 	return_menu()
+	initialized=true;loading.hide();initialization_finished.emit()
 	if test_mode or "--show-race" in args:
-		start_race()
+		await start_race()
 		if test_mode:
 			player.auto_drive = true
 			Engine.time_scale = 6
 	if "--show-garage" in args: hud.show_garage()
 	if "--capture-menu" in args: capture_later("menu")
 	if "--capture-race" in args:
-		start_race()
+		await start_race()
 		player.auto_drive = true
 		capture_later("race", 8.0)
 	if "--capture-garage" in args:
@@ -136,7 +145,7 @@ func _ready() -> void:
 		capture_later("garage", 3.0)
 	if "--capture-results" in args:
 		capture_results = true
-		start_race()
+		await start_race()
 		player.auto_drive = true
 		Engine.time_scale = 4
 	if "--capture-overview" in args:
@@ -176,12 +185,18 @@ func build_world() -> void:
 		var scenery: Node3D = load(art_profile.world_model).instantiate()
 		world.add_child(scenery)
 		polish_materials(scenery)
+	loading.stage("Building city streets…",40)
+	await get_tree().process_frame
 	var city := LeoCity.new()
 	world.add_child(city)
 	city.setup(circuit,art_profile)
+	loading.stage("Preparing coast and race surface…",55)
+	await get_tree().process_frame
 	var colombo := LeoAstraWorld.new()
 	world.add_child(colombo)
 	colombo.setup(circuit,art_profile)
+	loading.stage("Loading landmarks…",70)
+	await get_tree().process_frame
 	var tower: Node3D = load(art_profile.landmark_model).instantiate()
 	tower.position = art_profile.landmark_position
 	tower.scale = Vector3.ONE * art_profile.landmark_scale
@@ -379,6 +394,17 @@ func return_menu() -> void:
 	hud.show_menu()
 
 func start_race() -> void:
+	state="loading";loading.stage("Preparing racers…",15)
+	get_tree().paused=false
+	remove_racers()
+	for i in 6:
+		var v:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
+		var d:=catalog.drivers[selected_driver] if i==0 else (catalog.driver(local_players[i].driver_id) if i<human_count else catalog.drivers[i%catalog.drivers.size()])
+		if not v.model_path.is_empty():await LeoAssets.scene_async(v.model_path,get_tree())
+		var driver_path:=d.cabin_model_path if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else d.seated_model_path
+		if not driver_path.is_empty():await LeoAssets.scene_async(driver_path,get_tree())
+		loading.stage("Preparing racers %d / 6…"%[i+1],15.+float(i+1)*12.)
+		await get_tree().process_frame
 	garage_from_pause=false
 	race_modified=false
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
@@ -424,6 +450,7 @@ func start_race() -> void:
 	camera.position=player.position+Vector3(sin(cam_heading),0,cos(cam_heading))*9+Vector3.UP*5
 	camera.look_at(player.position+Vector3.UP*1.2)
 	if split_view:split_view.activate(human_count==2)
+	loading.hide()
 	hud.show_race()
 
 func on_gate(kart: LeoKart, gate: int) -> void:
@@ -604,6 +631,7 @@ func toggle_pause() -> void:
 		disconnect_message=""
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not initialized:return
 	if input_router.capture_slot>=0:return
 	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode==KEY_ESCAPE:
 		if garage_from_pause:cancel_pause_garage()
@@ -612,6 +640,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:toggle_pause()
 
 func _process(dt: float) -> void:
+	if not initialized:return
 	clock+=dt
 	if paused:return
 	if state=="countdown":
@@ -755,7 +784,7 @@ func capture_later(label: String, wait: float = 2.0) -> void:
 	if not test_mode: quit_game()
 
 func capture_tour() -> void:
-	start_race()
+	await start_race()
 	state = "tour"
 	hud.photo_mode = true
 	hud.hud_root.hide()
@@ -803,7 +832,7 @@ func run_smoke_checks() -> void:
 		var s: float = circuit.length * fraction
 		var projection := circuit.project(circuit.sample(s, 4))
 		check(absf(projection.offset - 4) < .15, "Projection and lane offset agree at %.2f" % fraction)
-	start_race()
+	await start_race()
 	check(karts.size() == 6 and player.is_player, "Six racers spawn with one local player")
 	check(player.wheels.size() == 4, "Four animated wheel pivots are imported")
 	check(player.get_child_count() >= 4, "Visuals collision and audio are attached")
@@ -837,7 +866,7 @@ func run_smoke_checks() -> void:
 	check(swap_player_vehicle(&"mario",&"duster","PACKAGED PILOT"),"Packaged Continue swaps only the player")
 	check(player.next_gate==retained_gate and race_time==retained_time and karts[1]==retained_opponent and race_modified,"Packaged swap preserves race state and excludes records")
 	check(player.driver.get_meta("visible_driver_id")==&"mario" and player.visual.get_meta("driver_id")==&"mario","Packaged Dacia shows selected Mario cabin driver")
-	start_race()
+	await start_race()
 	check(player.next_gate == 0 and player.lap == 1 and boost_count == 0, "Restart clears checkpoint lap and boost state")
 	hud.show_garage()
 	check(state == "garage" and is_instance_valid(hud.garage_selector), "Garage shows modular preview")
@@ -853,7 +882,7 @@ func run_smoke_checks() -> void:
 	check(state == "menu" and karts.is_empty(), "Return to menu frees race instances")
 	# Export smoke also loads shared-world split presentation and the bundled
 	# Windows SQLite engine using a throwaway file, never the personal store.
-	human_count=2;selected_kart=catalog.vehicle_index(&"bigster");start_race()
+	human_count=2;selected_kart=catalog.vehicle_index(&"bigster");await start_race()
 	check(karts[0].is_player and karts[1].is_player and split_view.visible,"Packaged two-human shared-world views load")
 	check(split_view.views[0].world_3d==get_world_3d() and split_view.views[1].world_3d==get_world_3d(),"Packaged split cameras share one physics world")
 	var database=load("res://scripts/LocalRankingStore.cs").new()
@@ -948,7 +977,7 @@ func start_single_player() -> void:
 	human_count=1;selected_player_slot=0;input_router.active_slots=1
 	var problem:=input_router.ready_problem(0)
 	if not problem.is_empty():disconnect_message=problem;hud.show_controls(0);return
-	start_race()
+	await start_race()
 func open_local_lobby() -> void:
 	return_menu()
 	human_count=2;input_router.active_slots=2;input_router.clear_all()
@@ -964,7 +993,7 @@ func try_start_local_race() -> bool:
 			if is_instance_valid(hud.local_lobby):hud.local_lobby.status.text=problem
 			return false
 	human_count=2
-	start_race()
+	await start_race()
 	return true
 
 func diagnostic_run() -> bool:

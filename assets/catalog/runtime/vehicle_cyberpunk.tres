@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="VehicleDefinition" format=3]
+
+
+[ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/catalog/wheel_binding.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/vehicle_cyberpunk.png" id="thumb"]
+
+[sub_resource type="Resource" id="w0"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_0")])
+steering = true
+pivot = Vector3(0.8661273, 0.49598660, -1.6222109)
+radius = 0.39028227837356594
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w1"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_1")])
+steering = true
+pivot = Vector3(-0.8966014, 0.49598660, -1.6222108)
+radius = 0.3902822504645441
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w2"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_2")])
+steering = false
+pivot = Vector3(0.8661273, 0.47028230, 1.3028684)
+radius = 0.39028227897995293
+axle = Vector3(1, 0, 0)
+
+[sub_resource type="Resource" id="w3"]
+script = ExtResource("2")
+rotating_groups = Array[NodePath]([NodePath("wheel_3")])
+steering = false
+pivot = Vector3(-0.8966008, 0.47028230, 1.3028688)
+radius = 0.39028225082012186
+axle = Vector3(1, 0, 0)
+
+
+[resource]
+script = ExtResource("1")
+id = &"cyberpunk"
+display_name = "Cyberpunk GT"
+model_path = "res://assets/models/modular/cyberpunk.glb"
+wheels = Array[ExtResource("2")]([SubResource("w0"), SubResource("w1"), SubResource("w2"), SubResource("w3")])
+collision_size = Vector3(2.2, 1.456331, 4.2)
+collision_position = Vector3(0.0, 0.8081655, 0.0)
+max_speed = 33
+acceleration = 18
+handling = 1
+seat = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+driver_policy = 1
+preserve_materials = true
+setup_complete = true
+preview_target = Vector3(0, 0.7281655207095064, 0)
+preview_distance = 8.311618269534128
+exhausts = PackedVector3Array(-0.5, 0.5, 2.266804982600217, 0.5, 0.5, 2.266804982600217)
+thumbnail = ExtResource("thumb")
+normalization = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 0)

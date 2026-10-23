@@ -10,9 +10,9 @@ func _initialize() -> void:run.call_deferred()
 func run() -> void:
  root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size);root.content_scale_size=Vector2i.ZERO
  Engine.max_fps=120;DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
- game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await process_frame
+ game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
  game.diagnostics_mode=true;game.human_count=2;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.selected_driver=game.catalog.driver_index(&"mario");game.local_players[1].vehicle_id=&"duster"
- game.start_race();game.state="race"
+ await game.start_race();game.state="race"
  for kart in game.karts:kart.active=true;kart.auto_drive=true
  await create_timer(6.,true,false,true).timeout
  started=Time.get_ticks_usec();last=started;collecting=true
