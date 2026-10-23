@@ -1,0 +1,69 @@
+{
+  "base": "ac37cc6",
+  "protected_sha256": {
+    "assets/track-astra.json": "2c12a1ce95b03853031de69fb94336d435600d29541410de8efbff54673828ec",
+    "assets/catalog/vehicle_bigster.tres": "f2f95d946a26a319b398ef7f597b7ef9779e7abec3de7b342fd81cd65eaaff48",
+    "assets/models/srilanka/lotus_tower.glb": "f8f608c0d18fb0201fe7f293d1618728e126849d9d4b6ab6b7b462caf0ac0f6c",
+    "assets/models/bigster/bigster.glb": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+    "assets/models/bigster/colombo_tuk.glb": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
+    "assets/models/bigster/driver_human_cabin.glb": "84c557a656dd09718e34870d92a86ea024dff410038c3ddf72e8052eef4c562e",
+    "assets/models/bigster/driver_human_seated.glb": "90b45a7a36b2f15b601c415bbce8d56c8f72459fafe336e7673ae7a9d0997ac1",
+    "assets/models/bigster/duster.glb": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+    "assets/models/astra/driver_human.glb": "3f2362b003d984a05c407b1366c4c0a7ae90b30d3a96e1f0761ffd8c87952a42",
+    "assets/models/astra/kart_formula_blue.glb": "d9bb41c33ae5e2ba695f7162165065a3d9bdcb6094a76a851f71a930931637ba",
+    "assets/models/astra/kart_formula_red.glb": "0991af23884e31c76f9a4d04101b0b59570da170447cea01ec3bc33589acae63",
+    "assets/models/astra/kart_race_bus.glb": "809237545e8ba34de782da0c1383b3e670479b26d54df697ae8413c9b74dec62",
+    "assets/models/astra/kart_race_tuk.glb": "26863f467ca0fecbecba3ea232484209188138716b3bcd1f8d1ca9146916ef1f",
+    "assets/models/astra/kart_roadster_gold.glb": "a8f2abbed820be931001ad70685b2f3777c6b60198af5115bad1edb44bfd522f"
+  },
+  "preserved_architecture": [
+    {
+      "file": "assets/models/srilanka/world.glb",
+      "sha256": "9ac0978c2512aeb346645fa56ee2cf4a76344d6ac259b1c9a7185a6fe367a16c",
+      "nodes": [
+        "GroundPreserved",
+        "RoadPreserved",
+        "ArchitecturePreserved"
+      ]
+    },
+    {
+      "file": "assets/models/lotus_coast.glb",
+      "sha256": "afb21bca9e1cb81f3ebb03b7e6601b5afafd91d0eebb04bdd3a261098675272d",
+      "nodes": [
+        "LotusCoast_Static"
+      ]
+    }
+  ],
+  "landmarks": [
+    "AuthenticLotusTower",
+    "Galle Face Green",
+    "Independence pavilion",
+    "Lotus garden"
+  ],
+  "baseline_packages": {
+    "build/Astra/Leo Racer.exe": 518839784,
+    "build/Colombo/Leo Racer.exe": 178464304,
+    "build/launcher/Leo Racer Launcher.exe": 164998665,
+    "build/Local2Player/Leo Racer.exe": 624375104,
+    "build/ModularGarage/Leo Racer Launcher.exe": 164998665,
+    "build/ModularGarage/Leo Racer.exe": 624375120,
+    "build/SriLanka/Leo Racer.exe": 499752120,
+    "build/local2player-offline-0f4909294b7e4ff19a1c0415af4c0f5d/Local2Player/Leo Racer.exe": 624375104,
+    "build/local2player-offline-357e20212bee4814a28409559ef04984/Local2Player/Leo Racer.exe": 624374800,
+    "build/local2player-offline-a675700c71d346c390a8a53e2cf2c479/Local2Player/Leo Racer.exe": 624374848,
+    "build/local2player-offline-extracted/Local2Player/Leo Racer.exe": 624371560,
+    "build/public-v1.5/Leo Racer Modular Garage/Leo Racer Launcher.exe": 164998665,
+    "build/public-v1.5/Leo Racer Modular Garage/Leo Racer.exe": 595306440,
+    "build/qa-astra-fresh/Leo Racer Astra/Leo Racer.exe": 518839784,
+    "build/qa-bigster-fresh/Leo Racer/Leo Racer Launcher.exe": 164998665,
+    "build/qa-bigster-fresh/Leo Racer/Leo Racer.exe": 619613144,
+    "build/qa-bigster-fresh/Leo Racer Bigster RC/Leo Racer Launcher.exe": 164998675,
+    "build/qa-bigster-fresh/Leo Racer Bigster RC/Leo Racer.exe": 616965848,
+    "build/qa-fresh/Leo Racer Colombo/Leo Racer.exe": 178464304,
+    "build/qa-modular-garage-fresh/Leo Racer/Leo Racer Launcher.exe": 164998665,
+    "build/qa-modular-garage-fresh/Leo Racer/Leo Racer.exe": 624375120,
+    "build/qa-modular-garage-fresh/Leo Racer Modular Garage/Leo Racer Launcher.exe": 164998665,
+    "build/qa-modular-garage-fresh/Leo Racer Modular Garage/Leo Racer.exe": 591579064,
+    "build/qa-srilanka-fresh/Leo Racer Sri Lanka/Leo Racer.exe": 499752120
+  }
+}
