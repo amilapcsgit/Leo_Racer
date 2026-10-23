@@ -1,0 +1,80 @@
+{
+  "base": "e20c7ed",
+  "sha256": {
+    "assets/tracks/colombo_city/route.json": "9684ffdc1c49dcc127774231d66fa98a0a72207c0760d5c086202f5642ff9aa9",
+    "assets/tracks/colombo_city/course.scn": "9d2a0d7640dbcce93c7a8efbc2c131f24070ce1e3aa5fa6fae59d8792907aa4c",
+    "assets/track-astra.json": "2c12a1ce95b03853031de69fb94336d435600d29541410de8efbff54673828ec",
+    "assets/catalog/vehicle_bigster.tres": "f2f95d946a26a319b398ef7f597b7ef9779e7abec3de7b342fd81cd65eaaff48",
+    "assets/models/srilanka/lotus_tower.glb": "f8f608c0d18fb0201fe7f293d1618728e126849d9d4b6ab6b7b462caf0ac0f6c",
+    "assets/models/colombo_city/custom_architecture.glb": "e25508ea304d7da157aa277049eb7c85abeb22a9e35558cd07dc89c4ca95ec37",
+    "assets/models/bigster/bigster.glb": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+    "assets/models/bigster/colombo_tuk.glb": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
+    "assets/models/bigster/driver_human_cabin.glb": "84c557a656dd09718e34870d92a86ea024dff410038c3ddf72e8052eef4c562e",
+    "assets/models/bigster/driver_human_seated.glb": "90b45a7a36b2f15b601c415bbce8d56c8f72459fafe336e7673ae7a9d0997ac1",
+    "assets/models/bigster/duster.glb": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595"
+  },
+  "landmarks": [
+    {
+      "id": "lotus_tower",
+      "position": [
+        32.0,
+        0.07,
+        -58.0
+      ]
+    },
+    {
+      "id": "galle_face_green",
+      "position": [
+        -730.0,
+        0.0,
+        25.0
+      ]
+    },
+    {
+      "id": "custom_architecture",
+      "position": [
+        -110.0,
+        0.0,
+        330.0
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "name": "Galle Face Green",
+      "bounds": [
+        -840,
+        -520,
+        -615,
+        570
+      ]
+    },
+    {
+      "name": "Lake",
+      "bounds": [
+        168,
+        -112,
+        432,
+        162
+      ]
+    },
+    {
+      "name": "Custom architecture garden",
+      "bounds": [
+        -170,
+        250,
+        -50,
+        410
+      ]
+    },
+    {
+      "name": "Lotus Tower",
+      "bounds": [
+        -3,
+        -95,
+        68,
+        -21
+      ]
+    }
+  ]
+}

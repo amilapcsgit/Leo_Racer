@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/bsubard/Godot-3D-Infinite-Procedural-Terrain-With-Trees-and-Grass",
+  "commit": "71ff8c816839a8e45c1900c37d1671286371ed89",
+  "license": "MIT",
+  "upstream_godot": "4.4",
+  "files": {
+    "Chunk.gd": "0a337c7dfb16eace7e6994391ae7e2a3d44b30d468204b998dfd82f21fb90327",
+    "Chunk.gdshader": "2a99199016acadf43c515c67698cff8a464244c9d327598e0f784ec5302609fe",
+    "ChunkManager.gd": "39cb5b53e25c79da9ade4e49fd428326b47980591ba46b238ba084b433767d2f",
+    "grass.gdshader": "64f2237583d3f9864e7609e901a44aa4469e9df3ca479e55e50d3f7946397ad4",
+    "LICENSE": "0f94f4c7e5410943dc35d7b0fc50fc25ff8b004e6072e58348c4ebe0c64a6924",
+    "README.md": "b3d7ac9c3500f4e4d83d81d6a89abc9f778562531432a1b240ad0def7e6b9570"
+  }
+}

@@ -90,53 +90,58 @@ def export(g,node_index,scale,name,category,faces=None):
     target=OUT/(name+'.glb');target.write_bytes(payload)
     entry={'id':name,'path':'res://'+target.relative_to(ROOT).as_posix(),'width':float((high[0]-low[0])*scale),'height':float((high[1]-low[1])*scale),'depth':float((high[2]-low[2])*scale),'triangles':triangles,'source_node':node.get('name'),'source':g.path.name,'sha256':hashlib.sha256(payload).hexdigest()}
     manifest[category].append(entry)
+    return entry
 
-for filename,prefix,scale in [('city_game_ready_free.glb','colombo_lowrise',6.),('low-poly_city_buildings.glb','colombo_tower',40.)]:
-    g=GLB(INPUT/filename);manifest['sources'].append({'file':filename,'sha256':hashlib.sha256(g.path.read_bytes()).hexdigest(),**g.doc['asset']['extras']})
-    world=g.worlds();count=0
+def prepare_legacy():
+    for filename,prefix,scale in [('city_game_ready_free.glb','colombo_lowrise',6.),('low-poly_city_buildings.glb','colombo_tower',40.)]:
+        g=GLB(INPUT/filename);manifest['sources'].append({'file':filename,'sha256':hashlib.sha256(g.path.read_bytes()).hexdigest(),**g.doc['asset']['extras']})
+        world=g.worlds();count=0
+        for i,node in enumerate(g.doc['nodes']):
+            if 'mesh' not in node:continue
+            xyz=np.concatenate([points(world[i],g.array(p['attributes']['POSITION'])) for p in g.doc['meshes'][node['mesh']]['primitives']]);size=np.ptp(xyz,axis=0)
+            if prefix.endswith('lowrise'):
+                if size[1]<1.9 or size[0]<3.5:continue
+            elif size[1]<.35 or size[0]<.12:continue
+            export(g,i,scale,f'{prefix}_{count:02d}','buildings');count+=1
+
+    g=GLB(INPUT/'city_infrastructure_map_3.glb')
+    manifest['sources'].append({'file':g.path.name,'sha256':hashlib.sha256(g.path.read_bytes()).hexdigest(),**g.doc['asset']['extras']})
     for i,node in enumerate(g.doc['nodes']):
-        if 'mesh' not in node:continue
-        xyz=np.concatenate([points(world[i],g.array(p['attributes']['POSITION'])) for p in g.doc['meshes'][node['mesh']]['primitives']]);size=np.ptp(xyz,axis=0)
-        if prefix.endswith('lowrise'):
-            if size[1]<1.9 or size[0]<3.5:continue
-        elif size[1]<.35 or size[0]<.12:continue
-        export(g,i,scale,f'{prefix}_{count:02d}','buildings');count+=1
+        if 'Railing' not in node.get('name',''):continue
+        primitive=g.doc['meshes'][node['mesh']]['primitives'][0]
+        xyz=g.array(primitive['attributes']['POSITION']);indices=g.array(primitive['indices']).reshape(-1,3)
+        world=points(g.worlds()[i],xyz)
+        for part in components(world,indices):
+            faces=indices[part];size=np.ptp(world[np.unique(faces)],axis=0)
+            if 2<max(size[0],size[2])<35 and .3<size[1]<5:
+                export(g,i,1.,f'colombo_railing_{len(manifest["props"]):02d}','props',faces)
+                if len(manifest['props'])>=4:break
+        if len(manifest['props'])>=4:break
 
-g=GLB(INPUT/'city_infrastructure_map_3.glb')
-manifest['sources'].append({'file':g.path.name,'sha256':hashlib.sha256(g.path.read_bytes()).hexdigest(),**g.doc['asset']['extras']})
-for i,node in enumerate(g.doc['nodes']):
-    if 'Railing' not in node.get('name',''):continue
-    primitive=g.doc['meshes'][node['mesh']]['primitives'][0]
-    xyz=g.array(primitive['attributes']['POSITION']);indices=g.array(primitive['indices']).reshape(-1,3)
-    world=points(g.worlds()[i],xyz)
-    for part in components(world,indices):
-        faces=indices[part];size=np.ptp(world[np.unique(faces)],axis=0)
-        if 2<max(size[0],size[2])<35 and .3<size[1]<5:
-            export(g,i,1.,f'colombo_railing_{len(manifest["props"]):02d}','props',faces)
-            if len(manifest['props'])>=4:break
-    if len(manifest['props'])>=4:break
+    # Recover original custom architecture without ground or obsolete road triangles.
+    original=GLB(ROOT/'assets/models/srilanka/world.glb')
+    architecture=next(i for i,m in enumerate(original.doc['meshes']) if m.get('name')=='ArchitecturePreserved')
+    # Recover the exact pavilion and reflecting pool, excluding obsolete race furniture.
+    retained=[];retained_triangles=0
+    for primitive in original.doc['meshes'][architecture]['primitives']:
+        xyz=original.array(primitive['attributes']['POSITION']);faces=original.array(primitive['indices']).reshape(-1,3);tri=xyz[faces]
+        pavilion=(np.abs(tri[:,:,0]).max(axis=1)<26)&(tri[:,:,2].min(axis=1)>22)&(tri[:,:,2].max(axis=1)<46)
+        pool=((tri[:,:,0]**2+(tri[:,:,2]+25)**2).max(axis=1)<25.1**2)&(tri[:,:,1].max(axis=1)<1.)
+        selected=faces[pavilion|pool]
+        if not len(selected):continue
+        used,remap=np.unique(selected,return_inverse=True);part=copy.deepcopy(primitive);part['attributes']={}
+        for key,index in primitive['attributes'].items():
+            attribute=original.doc['accessors'][index]
+            part['attributes'][key]=original.accessor(original.array(index)[used],attribute['type'],attribute['componentType'])
+        part['indices']=original.accessor(remap.reshape(-1));retained.append(part);retained_triangles+=len(selected)
+    original.doc['meshes']=[{'name':'PavilionAndReflectingPoolPreserved','primitives':retained}]
+    original.doc['nodes']=[{'name':'CustomColomboArchitecturePreserved','mesh':0}];original.doc['scenes']=[{'nodes':[0]}];original.doc['scene']=0
+    manifest['custom_architecture']={'retained_triangles':retained_triangles,'source':'assets/models/srilanka/world.glb','treatment':'Exact retained vertex attributes and triangles; obsolete track, start arch, boulders, sails and track furniture excluded.'}
+    original.save(OUT/'custom_architecture.glb')
 
-# Recover original custom architecture without ground or obsolete road triangles.
-original=GLB(ROOT/'assets/models/srilanka/world.glb')
-architecture=next(i for i,m in enumerate(original.doc['meshes']) if m.get('name')=='ArchitecturePreserved')
-# Recover the exact pavilion and reflecting pool, excluding obsolete race furniture.
-retained=[];retained_triangles=0
-for primitive in original.doc['meshes'][architecture]['primitives']:
-    xyz=original.array(primitive['attributes']['POSITION']);faces=original.array(primitive['indices']).reshape(-1,3);tri=xyz[faces]
-    pavilion=(np.abs(tri[:,:,0]).max(axis=1)<26)&(tri[:,:,2].min(axis=1)>22)&(tri[:,:,2].max(axis=1)<46)
-    pool=((tri[:,:,0]**2+(tri[:,:,2]+25)**2).max(axis=1)<25.1**2)&(tri[:,:,1].max(axis=1)<1.)
-    selected=faces[pavilion|pool]
-    if not len(selected):continue
-    used,remap=np.unique(selected,return_inverse=True);part=copy.deepcopy(primitive);part['attributes']={}
-    for key,index in primitive['attributes'].items():
-        attribute=original.doc['accessors'][index]
-        part['attributes'][key]=original.accessor(original.array(index)[used],attribute['type'],attribute['componentType'])
-    part['indices']=original.accessor(remap.reshape(-1));retained.append(part);retained_triangles+=len(selected)
-original.doc['meshes']=[{'name':'PavilionAndReflectingPoolPreserved','primitives':retained}]
-original.doc['nodes']=[{'name':'CustomColomboArchitecturePreserved','mesh':0}];original.doc['scenes']=[{'nodes':[0]}];original.doc['scene']=0
-manifest['custom_architecture']={'retained_triangles':retained_triangles,'source':'assets/models/srilanka/world.glb','treatment':'Exact retained vertex attributes and triangles; obsolete track, start arch, boulders, sails and track furniture excluded.'}
-original.save(OUT/'custom_architecture.glb')
+    (OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (ROOT/'licenses/colombo-buildings.txt').write_text('Colombo City building and infrastructure library\n\n'+ '\n\n'.join(f'{s["title"]}\nAuthor: {s["author"]}\nSource: {s["source"]}\nLicense: {s["license"]}\nChanges: separated reusable meshes, metre normalization, ground-level origins, shared resized textures; original UVs/material assignments retained.' for s in manifest['sources'])+'\n\nCC BY 4.0: https://creativecommons.org/licenses/by/4.0/\n',encoding='utf-8')
+    print('CITY_BUILDINGS',len(manifest['buildings']),'reusable models;',len(manifest['props']),'infrastructure pieces;',len(list(TEXTURES.glob('*.png'))),'shared textures')
 
-(OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-(ROOT/'licenses/colombo-buildings.txt').write_text('Colombo City building and infrastructure library\n\n'+ '\n\n'.join(f'{s["title"]}\nAuthor: {s["author"]}\nSource: {s["source"]}\nLicense: {s["license"]}\nChanges: separated reusable meshes, metre normalization, ground-level origins, shared resized textures; original UVs/material assignments retained.' for s in manifest['sources'])+'\n\nCC BY 4.0: https://creativecommons.org/licenses/by/4.0/\n',encoding='utf-8')
-print('CITY_BUILDINGS',len(manifest['buildings']),'reusable models;',len(manifest['props']),'infrastructure pieces;',len(list(TEXTURES.glob('*.png'))),'shared textures')
+if __name__ == "__main__":
+    prepare_legacy()

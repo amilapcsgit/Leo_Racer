@@ -1,0 +1,1216 @@
+{
+  "format": 2,
+  "source_sha256": "b84cf1b265e56690771100440c91e76a53258ff2efd54ba84d50f318160aa142",
+  "source": {
+    "author": "CG Lads (https://sketchfab.com/CGlads)",
+    "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "source": "https://sketchfab.com/3d-models/city-game-ready-free-9095f8bcff1e4c9088ea98a306d5887d",
+    "title": "City Game ready free"
+  },
+  "modules": [
+    {
+      "id": "module_04",
+      "path": "res://assets/models/colombo_city/modules/module_04.glb",
+      "width": 6.536971594831795,
+      "height": 3.6865514421503898,
+      "depth": 3.455317735399884,
+      "triangles": 632,
+      "source_node": "Building.001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "4c7beae5ce89bafc0baadd577d8b15cc2dacb6fbd57ad0d6b6071640147fb142",
+      "source_node_index": 4,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "storefront",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.6866,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_06",
+      "path": "res://assets/models/colombo_city/modules/module_06.glb",
+      "width": 6.536971535162573,
+      "height": 3.6865533922176157,
+      "depth": 3.5563124739290206,
+      "triangles": 632,
+      "source_node": "Building.002_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "ffbdf72927b71807b91cf6b800592826ef9aa336d56ebc786dadbb2a6d1e9aa5",
+      "source_node_index": 6,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "storefront",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.6866,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_08",
+      "path": "res://assets/models/colombo_city/modules/module_08.glb",
+      "width": 6.447487131645179,
+      "height": 3.686551809041248,
+      "depth": 3.455317707309236,
+      "triangles": 580,
+      "source_node": "Building.013_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "99c93e4550b8a7fb64d834e93f07955832e02d64a3a44b2c857cc32ed64fd6ad",
+      "source_node_index": 8,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "storefront",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.6866,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_10",
+      "path": "res://assets/models/colombo_city/modules/module_10.glb",
+      "width": 6.3999998569488525,
+      "height": 3.200000824425837,
+      "depth": 3.2640006297831308,
+      "triangles": 406,
+      "source_node": "Cube_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "ce3f8819dbafa578db39d69fd74b7b3d5fcd53913ec5a1f43e611c49ec940904",
+      "source_node_index": 10,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_12",
+      "path": "res://assets/models/colombo_city/modules/module_12.glb",
+      "width": 6.919520032714601,
+      "height": 3.200000922406953,
+      "depth": 3.719520198115795,
+      "triangles": 352,
+      "source_node": "Cube.002_Plate_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "88d2601647db6a8c76ea5dd36552203036dfbaa89543c89f71e5c2fc3d1220bc",
+      "source_node_index": 12,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_14",
+      "path": "res://assets/models/colombo_city/modules/module_14.glb",
+      "width": 6.919520032714601,
+      "height": 3.2000009224069523,
+      "depth": 4.391493514716186,
+      "triangles": 412,
+      "source_node": "Cube.002_Plate.001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "8c9711d908f8448bec496a14de23ae3e2542bcb84b9a7b85088be97a05c2d342",
+      "source_node_index": 14,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_16",
+      "path": "res://assets/models/colombo_city/modules/module_16.glb",
+      "width": 6.526399848020077,
+      "height": 3.200000849120847,
+      "depth": 4.194932784311994,
+      "triangles": 404,
+      "source_node": "Cube.002_Plate.002_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "df2303e3bf671acdcf7d2e07448f5721d46dd670a6ee23fcac63faf9ea9f9766",
+      "source_node_index": 16,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_18",
+      "path": "res://assets/models/colombo_city/modules/module_18.glb",
+      "width": 6.3999998569488525,
+      "height": 3.2000008312901773,
+      "depth": 3.20000083129018,
+      "triangles": 264,
+      "source_node": "Cube.002_Plate.003_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "8262d12e35109b00af0c8f926a94e1334f62f4ae06a1b090411d47b44a9ffb8b",
+      "source_node_index": 18,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_20",
+      "path": "res://assets/models/colombo_city/modules/module_20.glb",
+      "width": 6.919520032714601,
+      "height": 3.200000904576285,
+      "depth": 3.719520198115795,
+      "triangles": 272,
+      "source_node": "Cube.002_Plate.004_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "bbb204bb70fe2fb6aa888b3daa873b01a3a3f096277928ecacb508a69664c8b0",
+      "source_node_index": 20,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_22",
+      "path": "res://assets/models/colombo_city/modules/module_22.glb",
+      "width": 6.919519651244883,
+      "height": 3.200000904576285,
+      "depth": 3.719520198115795,
+      "triangles": 496,
+      "source_node": "Cube.002_Plate.005_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "3dea00174b5f5ca78993d745d4b1d71280eec5b66de173f5fe94a00d21d6206e",
+      "source_node_index": 22,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_24",
+      "path": "res://assets/models/colombo_city/modules/module_24.glb",
+      "width": 6.919520032714601,
+      "height": 3.200000999943717,
+      "depth": 3.719520198115795,
+      "triangles": 50,
+      "source_node": "Cube.002_Plate.006_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "72c3e20d038ffd7bb9fd4af3ca70cf2d0a8e6e92c82a70d6471b2e4cca68992c",
+      "source_node_index": 24,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_26",
+      "path": "res://assets/models/colombo_city/modules/module_26.glb",
+      "width": 6.91951965124488,
+      "height": 3.200000999943717,
+      "depth": 3.719520198115795,
+      "triangles": 456,
+      "source_node": "Cube.002_Plate.007_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "64da0a6095d1367b7afe2e6114708d30db5937dba11cfe728da66527e6d75b64",
+      "source_node_index": 26,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_28",
+      "path": "res://assets/models/colombo_city/modules/module_28.glb",
+      "width": 6.919520032714601,
+      "height": 0.8757797269735463,
+      "depth": 3.719520198115802,
+      "triangles": 50,
+      "source_node": "Cube.002_Plate.009_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "e4c78456d2ae827763521a31e6b3be4a4a9c4bfb951ee79237e73f9440045266",
+      "source_node_index": 28,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "roof_cap",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8758,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_30",
+      "path": "res://assets/models/colombo_city/modules/module_30.glb",
+      "width": 6.919520032714601,
+      "height": 0.8757797269735463,
+      "depth": 3.719520198115802,
+      "triangles": 58,
+      "source_node": "Cube.002_Plate.010_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "c7e36dfcce15fa17786dcd492bbd8d80248bf9af71795765c8cf661e07d9e9bc",
+      "source_node_index": 30,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "roof_cap",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8758,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_32",
+      "path": "res://assets/models/colombo_city/modules/module_32.glb",
+      "width": 6.919520032714601,
+      "height": 3.200000999943717,
+      "depth": 3.719520198115795,
+      "triangles": 58,
+      "source_node": "Cube.002_Plate.011_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "d3be3cce4acc4acc98ddac22b0e240402cb4f63232709edfaf3a9a60f6610723",
+      "source_node_index": 32,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_34",
+      "path": "res://assets/models/colombo_city/modules/module_34.glb",
+      "width": 6.414465188656777,
+      "height": 3.792449572461945,
+      "depth": 3.577085807614948,
+      "triangles": 3028,
+      "source_node": "Cube.002_Plate.012_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "358b3c81b8d4b1c48efd339584f8c7cfb59d250520e01803ab4404931bcc5802",
+      "source_node_index": 34,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "pitched_roof",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.7924,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_36",
+      "path": "res://assets/models/colombo_city/modules/module_36.glb",
+      "width": 6.3999998569488525,
+      "height": 3.20000083129018,
+      "depth": 3.20000083129018,
+      "triangles": 1019,
+      "source_node": "Cube.003_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "fc53791f6867463681642c21d1f364b52ae945e5eb5a9d9be1b175a15742fd94",
+      "source_node_index": 36,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "upper_floor",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.2,
+          0
+        ]
+      },
+      "compatible_roles": [
+        "upper_floor",
+        "roof_cap",
+        "pitched_roof"
+      ]
+    },
+    {
+      "id": "module_38",
+      "path": "res://assets/models/colombo_city/modules/module_38.glb",
+      "width": 1.764945395120708,
+      "height": 1.235981616162391,
+      "depth": 1.5688407677425136,
+      "triangles": 12,
+      "source_node": "Cube.007_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "58727ac8171b9424ea48e5f1d53ae194b35e49363e6266462487ddf066262d2c",
+      "source_node_index": 38,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.236,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_40",
+      "path": "res://assets/models/colombo_city/modules/module_40.glb",
+      "width": 1.764945395120708,
+      "height": 1.5300014421014596,
+      "depth": 1.5688406683040577,
+      "triangles": 12,
+      "source_node": "Cube.008_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "18db8a0ddcc68cffde36cae63120073a362dca4400e5f98fda0914098afec34e",
+      "source_node_index": 40,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.53,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_42",
+      "path": "res://assets/models/colombo_city/modules/module_42.glb",
+      "width": 1.1897017556346554,
+      "height": 1.0772669375292736,
+      "depth": 1.2761695869279661,
+      "triangles": 12,
+      "source_node": "Cube.009_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "a0bd0344d89849b328bb91a2774907234589b3ced12a78daab34c4fabb236983",
+      "source_node_index": 42,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.0773,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_44",
+      "path": "res://assets/models/colombo_city/modules/module_44.glb",
+      "width": 2.081851760107611,
+      "height": 0.8857115891631957,
+      "depth": 0.8144674953874642,
+      "triangles": 144,
+      "source_node": "Cube.013_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "20d5ba18ac1dcc66e8890d38cd12bce3738294b409ddd7323d1782ed4b07fdb2",
+      "source_node_index": 44,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8857,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_46",
+      "path": "res://assets/models/colombo_city/modules/module_46.glb",
+      "width": 3.64799987268448,
+      "height": 3.6865511549612253,
+      "depth": 1.5098514073439546,
+      "triangles": 1931,
+      "source_node": "Cube.019_Plate_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "75708e1d973a7dd05a2d4c34d9b819cfdec86b743af5bf28035ccce7535204e4",
+      "source_node_index": 46,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "cafe_facade",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          3.6866,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_48",
+      "path": "res://assets/models/colombo_city/modules/module_48.glb",
+      "width": 6.919520032714601,
+      "height": 0.8757791238031776,
+      "depth": 3.71952015845023,
+      "triangles": 58,
+      "source_node": "Object001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "c142c9871dfcc07245a6031c9cf8bd3b0942ca3cbcc28b7ef5d69ced8ab829af",
+      "source_node_index": 48,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "roof_cap",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8758,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_50",
+      "path": "res://assets/models/colombo_city/modules/module_50.glb",
+      "width": 6.919520032714601,
+      "height": 0.8757791238031776,
+      "depth": 3.71952015845023,
+      "triangles": 58,
+      "source_node": "Object002_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "3ec019dd8e85def3a49802353824f510d3a9bc5ff0c3896d08753f30bc5b5596",
+      "source_node_index": 50,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "roof_cap",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8758,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_52",
+      "path": "res://assets/models/colombo_city/modules/module_52.glb",
+      "width": 1.1110165347676741,
+      "height": 1.3734014776666528,
+      "depth": 0.9748758888044677,
+      "triangles": 570,
+      "source_node": "Object006.002_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "6467993c673412c7e3f5f39bc656befd877b88a9da9cb6256e998f81033604d0",
+      "source_node_index": 52,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.3734,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_54",
+      "path": "res://assets/models/colombo_city/modules/module_54.glb",
+      "width": 1.9334990069233102,
+      "height": 2.0954574421277115,
+      "depth": 1.8760810432714046,
+      "triangles": 725,
+      "source_node": "Object007_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "489d6cda2c17ebb7d674cdda3ab37219f6ff2d16ed75c4b48383602f4ba5f8d4",
+      "source_node_index": 54,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          2.0955,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_56",
+      "path": "res://assets/models/colombo_city/modules/module_56.glb",
+      "width": 0.7657419033555272,
+      "height": 0.28584334185939897,
+      "depth": 0.7770768988816359,
+      "triangles": 192,
+      "source_node": "Object008_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "27d8714b0c58ccd325ae4a94cc3a7a9a0e0f418fc78547d6a0002290332c1451",
+      "source_node_index": 56,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.2858,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_58",
+      "path": "res://assets/models/colombo_city/modules/module_58.glb",
+      "width": 1.1419329141265337,
+      "height": 1.1963271670466995,
+      "depth": 1.5663295211995343,
+      "triangles": 1684,
+      "source_node": "Object009_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "d37c62bc33dfa7435f3c77d1912c1db4f0dfa536029071a9238a243cbedb09ef",
+      "source_node_index": 58,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.1963,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_60",
+      "path": "res://assets/models/colombo_city/modules/module_60.glb",
+      "width": 1.1499064781006296,
+      "height": 0.9272962908080828,
+      "depth": 0.8851338903957271,
+      "triangles": 826,
+      "source_node": "Object010_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "306f32fd45caa8ddbce948a28d17d5e753f944e3ab8a3b8715f85d4ff8f3bcfc",
+      "source_node_index": 60,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.9273,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_62",
+      "path": "res://assets/models/colombo_city/modules/module_62.glb",
+      "width": 0.5222398321603862,
+      "height": 0.42807243852562565,
+      "depth": 1.126589314857219,
+      "triangles": 284,
+      "source_node": "Object011_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "e8bf898079826cc067544ad22f74169599b50af81ae5bfe2ae935e459374f7a9",
+      "source_node_index": 62,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.4281,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_64",
+      "path": "res://assets/models/colombo_city/modules/module_64.glb",
+      "width": 0.5050421941207589,
+      "height": 0.41678009881042544,
+      "depth": 0.5050419410921076,
+      "triangles": 212,
+      "source_node": "Object012_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "fabd76b6d8c23214b479b700e8edcb1dd91293a899977e1a4b64de382b3f6362",
+      "source_node_index": 64,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.4168,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_66",
+      "path": "res://assets/models/colombo_city/modules/module_66.glb",
+      "width": 2.279763647621192,
+      "height": 1.91065682382027,
+      "depth": 2.3770567316348967,
+      "triangles": 136,
+      "source_node": "Object013_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "d778d54c18f0fd59a641bdde27a8ac3444da4ed6e2776dd2cad4b6d6d0a83162",
+      "source_node_index": 66,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.9107,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_68",
+      "path": "res://assets/models/colombo_city/modules/module_68.glb",
+      "width": 1.6632333383731521,
+      "height": 0.8332841759250414,
+      "depth": 1.215121140384967,
+      "triangles": 492,
+      "source_node": "Object014_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "ab1d73e28f4c4a1b62afbd5fca9f422ff7d968bdda257fc515f88ee17cf6e275",
+      "source_node_index": 68,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8333,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_70",
+      "path": "res://assets/models/colombo_city/modules/module_70.glb",
+      "width": 1.6632318124942829,
+      "height": 0.8332841759249476,
+      "depth": 1.21512056818039,
+      "triangles": 492,
+      "source_node": "Object015_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "6a66aa13f60bd7ceebf57cca5ae23e2bc63da861f56ffeeb05353b06e591d8e2",
+      "source_node_index": 70,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8333,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_72",
+      "path": "res://assets/models/colombo_city/modules/module_72.glb",
+      "width": 0.3638812937464991,
+      "height": 0.8490672132543978,
+      "depth": 0.36388129374649714,
+      "triangles": 214,
+      "source_node": "Object016_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "62dc503bf087b49386018dd7ff391a000db58ccbdfa024d9e0db58f2435529ed",
+      "source_node_index": 72,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8491,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_74",
+      "path": "res://assets/models/colombo_city/modules/module_74.glb",
+      "width": 0.3536125104066855,
+      "height": 0.7641604219166056,
+      "depth": 0.3536125461694726,
+      "triangles": 214,
+      "source_node": "Object017_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "9dfe00ccaf5a073706d3161f8eb662fc995d228dc33ce89fe215615f4a0b937c",
+      "source_node_index": 74,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.7642,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_76",
+      "path": "res://assets/models/colombo_city/modules/module_76.glb",
+      "width": 0.6033427580443885,
+      "height": 0.808145575219956,
+      "depth": 0.8619180486667475,
+      "triangles": 148,
+      "source_node": "Object018_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "65eeb49a76cec1121d19fdde31216c1646c6c8b3e620ac0e7977f22202e0ca64",
+      "source_node_index": 76,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.8081,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_78",
+      "path": "res://assets/models/colombo_city/modules/module_78.glb",
+      "width": 0.904702357097662,
+      "height": 0.6909912095411102,
+      "depth": 0.6595735379424941,
+      "triangles": 1272,
+      "source_node": "Object019_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "3b5e3ed6d933262f8790858a2f7429f6f466f246cdaf5856b8f1b019a389e6a5",
+      "source_node_index": 78,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.691,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_80",
+      "path": "res://assets/models/colombo_city/modules/module_80.glb",
+      "width": 2.436041300683289,
+      "height": 0.37903039813831757,
+      "depth": 0.26283338799475686,
+      "triangles": 404,
+      "source_node": "Object021_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "e49fbf1cf6832aa4269c0dd00de3f2b0db2cfcdcc3492d194ac847a00a77f1bf",
+      "source_node_index": 80,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.379,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_82",
+      "path": "res://assets/models/colombo_city/modules/module_82.glb",
+      "width": 0.7681427626843829,
+      "height": 1.0319637243989106,
+      "depth": 0.7681431542118187,
+      "triangles": 1096,
+      "source_node": "model_4.001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "d2db5fa3da28525204dd3a0a17070168a8e936d6fcbbfb2ff37ad8aef0a74804",
+      "source_node_index": 82,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          1.032,
+          0
+        ]
+      },
+      "compatible_roles": []
+    },
+    {
+      "id": "module_84",
+      "path": "res://assets/models/colombo_city/modules/module_84.glb",
+      "width": 0.5668836308547726,
+      "height": 0.7615811367209248,
+      "depth": 0.5668836795038477,
+      "triangles": 1096,
+      "source_node": "model_9.001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "4180c3e0e3e638a39dfbbd37ddd5b33ca09a97c66c187606ba8f052a6851ed54",
+      "source_node_index": 84,
+      "metres_per_source_unit": 1.6,
+      "front_axis": "+Z",
+      "role": "prop",
+      "sockets": {
+        "base": [
+          0,
+          0,
+          0
+        ],
+        "top": [
+          0,
+          0.7616,
+          0
+        ]
+      },
+      "compatible_roles": []
+    }
+  ]
+}
