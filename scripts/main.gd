@@ -298,6 +298,14 @@ func build_world() -> void:
 		var day:=ProceduralSkyMaterial.new();day.sky_top_color=art_profile.sky_top;day.sky_horizon_color=art_profile.sky_horizon
 		day.ground_bottom_color=Color("506563");day.ground_horizon_color=art_profile.sky_horizon
 		var daylight:=Sky.new();daylight.sky_material=day;environment.sky=daylight
+		if not art_profile.sky_visual_path.is_empty() and not art_profile.sky_lighting_path.is_empty():
+			var midday:=ShaderMaterial.new();midday.shader=load("res://shaders/city_midday_sky.gdshader")
+			midday.set_shader_parameter("visual_panorama",LeoAssets.texture(art_profile.sky_visual_path))
+			midday.set_shader_parameter("lighting_panorama",LeoAssets.texture(art_profile.sky_lighting_path))
+			midday.set_shader_parameter("horizon_offset",art_profile.sky_horizon_offset)
+			daylight.sky_material=midday
+			daylight.process_mode=Sky.PROCESS_MODE_QUALITY
+			environment.adjustment_saturation=1.0;environment.adjustment_contrast=1.03
 	LeoRaceVisuals.build_boosts(world,circuit)
 	LeoRaceVisuals.build_signs(world,circuit)
 	if track_definition.world_kind()=="astra":LeoAstraDecals.build(world,circuit)

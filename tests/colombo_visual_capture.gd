@@ -26,5 +26,17 @@ func run() -> void:
 		root.get_texture().get_image().save_png(folder+"/view-%02d.png"%i)
 		views.append({"station":i,"distance_m":s,"camera":str(game.camera.position),"forward":str(direction)})
 	FileAccess.open(folder+"/views.json",FileAccess.WRITE).store_string(JSON.stringify(views,"  "))
+	var landmarks:=[{"name":"green-and-coast","eye":Vector3(-600,4,120),"at":Vector3(-850,0,15)},
+		{"name":"seawall","eye":Vector3(-810,4,200),"at":Vector3(-1000,0,60)},
+		{"name":"lotus","eye":Vector3(170,32,130),"at":Vector3(32,65,-58)},
+		{"name":"lake","eye":Vector3(470,11,150),"at":Vector3(300,0,25)},
+		{"name":"pavilion","eye":Vector3(-160,9,380),"at":Vector3(-110,5,330)}]
+	game.player.visible=false
+	for view in landmarks:
+		game.player.position=view.eye;game.camera.position=view.eye;game.camera.look_at(view.at)
+		var streamer=game.world.find_child("ColomboSceneryStreaming",true,false)
+		while streamer.busy:await process_frame
+		await streamer.refresh(true);await create_timer(.3).timeout;await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(folder+"/landmark-"+view.name+".png")
 	print("COLOMBO_VISUAL_CAPTURE_COMPLETE ",phase," views=",views.size())
 	await game.quit_game()

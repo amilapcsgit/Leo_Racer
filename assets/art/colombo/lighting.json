@@ -1,0 +1,16 @@
+{
+  "authoring": "linear procedural atmosphere plus explicit radiance sun",
+  "dimensions": [
+    1024,
+    512
+  ],
+  "format": 1,
+  "generated_visual_is_hdr": false,
+  "peak_linear_radiance": 1801.0732421875,
+  "source": "tools/bake_colombo_lighting.gd",
+  "sun_angles_degrees": [
+    -65,
+    -145,
+    0
+  ]
+}

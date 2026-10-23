@@ -74,3 +74,19 @@ Both-player streaming: 35 checks pass; 57 cells, 15 initially resident, cache 12
 Three reloads retain 1,363 nodes and approximately 392 MB static allocations;
 last two samples differ by 18 KB. Existing engine cleanup warnings persist with
 exit 0, as at baseline. Reviewed prototype: districts-prototype.jpg.
+
+## Completed checkpoint 4
+
+Built-in imagegen panorama is native 1774x887 (2:1); full prompt and provenance
+are in assets/art/colombo/PROVENANCE.md. It is a visual matte, not measured HDR.
+An independent 1024x512 float EXR has peak linear radiance 1801.07. The cubemap
+lighting pass uses that map; the visible sky uses the matte with wrap blending.
+Explicit world bearings keep ocean west, city inland. Sun is high midday at
+(-65,-145,0), restrained bloom, no default SSR or volumetric fog.
+
+The lighting contract passes: 2:1 visual, genuine float values above 100, separate
+shader lighting, disabled expensive effects, unchanged official course revision 1.
+Three older acceptance expectations predated neon_ui: loading heading, the HUD
+update owner, and a removed pause-garage New Race action. Tests now exercise the
+current loading state, actual player HUD, and visible Keep Racing button. Product
+UI and driving behavior are unchanged. Full regressions and package checks follow.

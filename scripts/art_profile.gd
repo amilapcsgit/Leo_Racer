@@ -25,6 +25,9 @@ extends Resource
 @export var bay_fog_density := .008
 @export var foliage_near_distance := 100.0
 @export var foliage_far_distance := 220.0
+@export_file("*.png") var sky_visual_path := ""
+@export_file("*.exr") var sky_lighting_path := ""
+@export var sky_horizon_offset := .017
 @export var transport_positions := PackedVector3Array([Vector3(-71,0,30),Vector3(-72,0,-4),Vector3(112,0,-48),Vector3(58,0,125)])
 @export var reserve_transport_bays := false
 @export var bus_position := Vector3(-71.5,0,53)

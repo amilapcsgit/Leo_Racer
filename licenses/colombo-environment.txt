@@ -1,0 +1,20 @@
+Colombo visual environment, October 2026
+
+Premade building and street-prop source authors/licenses remain listed in
+colombo-buildings.txt. Changes: audited component roles, metre-scale socketed
+assemblies, district layout, material roughness and terracotta roof treatment.
+UVs and source material atlas retained. Original downloaded sources are not shipped.
+
+Terrain authoring is adapted from bsubard's MIT-licensed procedural terrain demo,
+commit 71ff8c816839a8e45c1900c37d1671286371ed89. Full copyright and MIT notice:
+bsubard-terrain-MIT.txt. Baked terrain is finite and offline; no demo controller,
+mountain generator, infinite runtime streaming or demo collision is installed.
+
+Distant Colombo-inspired visual panorama: generated using the built-in imagegen
+tool on 23 October 2026, native 1774x887. No external photograph pixels embedded.
+It is an artistic backdrop rather than captured or surveyed geographic data.
+Lighting EXR: separately authored linear procedural atmosphere and sun radiance.
+The generated PNG is not presented as measured HDR illumination.
+
+Existing Lotus Tower and custom architecture retain their original attribution.
+Existing OpenStreetMap development data attribution remains in the shipped notices.

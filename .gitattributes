@@ -9,3 +9,6 @@
 *.ogg binary
 *.dll binary
 *.zip binary
+*.exr binary
+*.hdr binary
+source_assets/terrain-reference/* -text
