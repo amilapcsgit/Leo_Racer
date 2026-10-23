@@ -1,18 +1,15 @@
-# Leo Racer 2.0.0 â€” Neon UI
+# Leo Racer 2.1.0 — Colombo City
 
-The Pit Shop now features a dimensional six-driver carousel with complete names, responsive arrows, keyboard/controller navigation, and independent Player 1/Player 2 selection. Cyan and gold podium lighting celebrates each completed live preview.
+The 5.5 km Colombo City Grand Prix now has fuller streets and a convincing tropical coast, with complete buildings assembled from the modular kit instead of isolated building parts.
 
-- Reactive neon buttons with glass glints, focus animation, and short star bursts.
-- Animated segmented vehicle statistics and holographic track outlines.
-- Restrained Home parallax and ambient lights; Reduced Motion keeps selection clear without moving effects.
-- Alternating daytime/nighttime loading art, available offline before asset packs mount.
-- Cached procedural UI sounds with four playback voices; existing voice and volume settings retained.
-- Existing Go Race flow, shared-keyboard multiplayer, controller assignments, saves, cars, tracks, and record rules preserved.
+- Twelve building recipes form 1,265 shops, terraces, corner buildings and small apartments across four districts, with secondary streets, props and varied materials.
+- Shaped coastal terrain, seawall, shoreline and separate ocean/lake water; Galle Face Green, Lotus Tower and existing custom landmarks preserved.
+- Bright tropical midday, a generated distant skyline panorama and separately authored floating-point HDR illumination.
+- Scenery streaming considers both players; nearby detail and inexpensive distant silhouettes retain city depth.
+- Both tracks, the neon UI, single-player and split-screen, all vehicles, Bigster scale/wheel pivots, race geometry and existing rankings remain intact.
 
-Download the Windows installer or extract the complete portable ZIP. No Godot, .NET SDK, or internet connection is required. Use Play Compatibility.cmd when Vulkan is unavailable. Verify downloads with SHA256SUMS-2.0.0.txt.
+Download **LeoRacer-Setup-2.1.0.exe** to install, or extract the complete **LeoRacer-2.1.0-win64.zip** and run LeoRacer.exe. Keep GameAssets and the other supplied folders together. No Godot, .NET SDK or network connection is required. Use Play Compatibility.cmd for OpenGL. Verify files with SHA256SUMS-2.1.0.txt. Existing settings and rankings are preserved.
 
-Validation: 211 functional checks and 122 rendered captures across Forward+ and Compatibility at 720p, 1080p, and ultrawide. Same-hardware 1080p GPU measurements added at most 0.063 ms across the measured menu screens versus 1.9.0. Offline ZIP and isolated installer checks cover boot artwork, content mounting, and runtime smoke tests. Full details: docs/qa-neon/validation.json.
+Validation includes three-lap races on both tracks, two-player finishing, input/ranking regressions, twelve Dacia driver fits, Bigster wheel checks, twelve fixed-location comparisons and separated-player streaming. The track has also been manually playtested. Six-racer 1080p split-screen on RTX A1000 measured approximately 120 FPS in Forward+ and Compatibility; an isolated 75 ms Compatibility frame and brief loading insertion spikes remain. Existing Godot teardown diagnostics persist. Physical Logitech wheel compatibility remains unverified.
 
-Physical keyboard rollover, physical controller/wheel reconnection, and Leo's usability playtest remain hands-on checks. Existing engine teardown texture/RID diagnostics remain; final automated checks found no script, shader, or assertion failures.
-
-Includes MIT-licensed sound synthesis from Game Menu Kit Lite, pinned to 08ffb82a46c818962edd4b0e34d4c4b596629760. Its license is retained in licenses/GameMenuKitLite-MIT.txt.
+Asset attribution, licenses and generated-image provenance ship with GameAssets. Detailed measurements and captures: docs/COLOMBO_VISUALS.md and docs/qa-colombo-visuals/.

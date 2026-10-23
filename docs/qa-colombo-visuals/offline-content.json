@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Self-contained game, .NET and Windows SQLite; no duplicate launcher runtime",
+    "Offline catalog, shared packs and both track packs verified",
+    "astra_coast: race, garage, split views and SQLite transactions",
+    "colombo_city: race, garage, split views and SQLite transactions",
+    "Missing required pack produces readable failure",
+    "Corrupt pack produces readable failure",
+    "Missing per-track scenery produces readable failure",
+    "Additional compatible track discovered and raced without executable rebuild"
+  ],
+  "sdk_environment_removed": true,
+  "network_required": false,
+  "folder": "isolated-test-copy/LeoRacer"
+}

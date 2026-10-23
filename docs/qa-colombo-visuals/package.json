@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "branch": "release/2.1.0",
+  "development_only": false,
+  "exe_bytes": 103484928,
+  "core_bytes": 15918476,
+  "shared_assets_bytes": 267021348,
+  "category_pack_bytes": {
+    "audio/shared.pck": 581496,
+    "glb/colombo-buildings.pck": 3147020,
+    "glb/shared-scenery.pck": 18983092,
+    "roads/terrain.pck": 46140,
+    "signs/colombo.pck": 5684,
+    "textures/art.pck": 237348,
+    "textures/imported.pck": 199902172,
+    "textures/surfaces.pck": 4280,
+    "vehicles/roster.pck": 44114116,
+    "tracks/astra_coast/scenery.pck": 24084,
+    "tracks/colombo_city/scenery.pck": 49506600
+  },
+  "track_bytes": {
+    "astra_coast": 52481,
+    "colombo_city": 49657779
+  },
+  "installed_bytes": 523934177,
+  "compressed_bytes": 374935407,
+  "sha256": "c8c29f7108bee4b83dcf8d66db61a8aa16d8c7dc801281c85b3dcfac2dc03fd2",
+  "archive": "dist/LeoRacer-2.1.0-win64.zip",
+  "compiled_resources": 4160,
+  "raw_authoring_sources_shipped": false
+}

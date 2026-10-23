@@ -1,0 +1,2 @@
+c8c29f7108bee4b83dcf8d66db61a8aa16d8c7dc801281c85b3dcfac2dc03fd2  LeoRacer-2.1.0-win64.zip
+61de48ac7c298c9073d9e1ee4522d8e81aa169ee24716c0564ae25238d22f6c2  LeoRacer-Setup-2.1.0.exe

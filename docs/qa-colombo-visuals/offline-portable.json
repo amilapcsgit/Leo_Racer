@@ -1,0 +1,9 @@
+{
+  "archive_sha256": "c8c29f7108bee4b83dcf8d66db61a8aa16d8c7dc801281c85b3dcfac2dc03fd2",
+  "folder": "isolated-test-copy/LeoRacer",
+  "status": "PASS",
+  "boot_art_exit": 0,
+  "sdk_removed": true,
+  "content_exit": 0,
+  "smoke_exit": 0
+}

@@ -1,0 +1,70 @@
+name: Colombo 2.1 release validation
+on:
+  push:
+    branches: [release/2.1.0]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: colombo-2.1-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
+      - name: Prepare pinned tools
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build,dist | Out-Null
+          python -m pip install -r tools/requirements-city.txt
+          ./tools/setup_windows.ps1
+      - name: Validate scenery and preserved gameplay
+        shell: pwsh
+        run: |
+          ./tools/check_colombo_visuals.ps1 -WithGameplay
+      - name: Export release portable package
+        shell: pwsh
+        run: |
+          ./tools/build_ui_release.ps1 -BuildFolder build/ColomboRelease -Version 2.1.0
+          ./tools/verify_ui_package.ps1 -Archive dist/LeoRacer-2.1.0-win64.zip
+          python tools/package_city.py --verify-folder build/ColomboRelease
+          if ($LASTEXITCODE -ne 0) {throw 'Offline content verification failed'}
+          python tools/report_colombo_visuals.py --public-release --folder build/ColomboRelease --archive dist/LeoRacer-2.1.0-win64.zip
+          if ($LASTEXITCODE -ne 0) {throw 'Content size audit failed'}
+      - name: Build and verify installer
+        shell: pwsh
+        run: |
+          ./tools/build_installer.ps1 -Version 2.1.0 -BuildFolder build/ColomboRelease -CityAssets
+          ./tools/verify_ui_installer.ps1 -Version 2.1.0
+          python tools/ui_checksums.py --version 2.1.0
+          if ($LASTEXITCODE -ne 0) {throw 'Checksums failed'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Colombo-2.1-checks
+          path: |
+            docs/qa-colombo-visuals/
+            build/qa-ui/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LeoRacer-2.1-win64
+          path: |
+            dist/LeoRacer-2.1.0-win64.zip
+            dist/LeoRacer-Setup-2.1.0.exe
+            dist/SHA256SUMS-2.1.0.txt
+          retention-days: 14

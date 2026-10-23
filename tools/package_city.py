@@ -51,7 +51,7 @@ def verify(folder,report_path=None):
     # A new manifest/route/scenery folder is discovered by the unchanged executable.
     source=folder/'GameAssets/tracks/colombo_city';addon=source.parent/'offline_addon_test'
     assert not addon.exists();addon.mkdir()
-    for name in ['route.json','cells.json','scenery.pck']:os.link(source/name,addon/name)
+    for name in ['route.json','cells.json','scenery.pck']:shutil.copy2(source/name,addon/name)
     metadata=json.loads((source/'manifest.json').read_text(encoding='utf-8'));metadata.update(id='offline_addon_test',name='Offline Compatible Track')
     (addon/'manifest.json').write_text(json.dumps(metadata),encoding='utf-8')
     try:

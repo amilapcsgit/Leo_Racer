@@ -114,6 +114,24 @@ city p95 13.90 ms / max 136.58 ms; garage preview max 142.87 ms. Insertion spike
 remain visible. Final street and landmark sheets, plus split views at 720p,
 1080p and ultrawide, are in qa-colombo-visuals.
 
-Next: rebuild the committed integration, verify extracted portable content with
-SDK variables removed, exercise both renderers, and record final package sizes.
-Development CI uploads artifacts only and has no publishing job.
+Final 2.1.0 packages passed extracted offline content checks with SDK variables removed, both-track runtime smoke tests, missing/corrupt asset checks, compatible add-on track discovery and isolated installer/uninstaller verification. The development workflow remains artifact-only; the release branch has an independent validation workflow.
+
+## Release 2.1.0
+
+User playtesting approved the track on 23 October 2026 and authorized publication. Release branch `release/2.1.0` carries version metadata and packaging verification; prior public releases remain unchanged. The offline add-on fixture copies files instead of requiring Windows hard-link permissions.
+
+
+Release files: `LeoRacer-2.1.0-win64.zip`, `LeoRacer-Setup-2.1.0.exe` and `SHA256SUMS-2.1.0.txt`. Final byte sizes: executable 103,484,928; core 15,918,476; installed 523,934,177; portable download 374,935,407; installer 374,062,622. Category and per-track breakdowns are in `qa-colombo-visuals/package.json`; verification evidence is in `offline-portable.json`, `offline-content.json` and `offline-installer.json`.
+
+Release verification commands:
+
+```powershell
+./tools/check_colombo_visuals.ps1 -WithGameplay
+./tools/build_ui_release.ps1 -Version 2.1.0 -BuildFolder build/ColomboRelease
+./tools/verify_ui_package.ps1 -Archive dist/LeoRacer-2.1.0-win64.zip
+python tools/package_city.py --verify-folder <extracted-LeoRacer-folder>
+python tools/report_colombo_visuals.py --public-release --folder build/ColomboRelease --archive dist/LeoRacer-2.1.0-win64.zip
+./tools/build_installer.ps1 -Version 2.1.0 -BuildFolder build/ColomboRelease -CityAssets
+./tools/verify_ui_installer.ps1 -Version 2.1.0
+python tools/ui_checksums.py --version 2.1.0
+```
