@@ -939,9 +939,9 @@ func run_smoke_checks() -> void:
 	toggle_pause()
 	check(paused and get_tree().paused, "Pause freezes race physics")
 	hud.show_settings()
-	hud.close_settings()
-	for control in hud.modal_root.get_children():
-		if control is Button and control.text == "RESUME RACE": control.pressed.emit(); break
+	hud.frontend.modal_back.call()
+	for control in hud.modal_root.find_children("*","Button",true,false):
+		if control.text == "Keep Racing": control.pressed.emit(); break
 	check(not paused and not get_tree().paused, "Settings returns to pause menu and Resume restores race physics")
 	set_reduced_motion(true)
 	player.boost(1.5,"TEST REDUCED MOTION")
