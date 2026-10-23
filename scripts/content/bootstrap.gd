@@ -9,7 +9,10 @@ func begin() -> void:
 	await get_tree().process_frame
 	if not OS.has_feature("editor"):
 		var root:=OS.get_executable_path().get_base_dir().path_join("GameAssets")
-		var error:=LeoAssets.configure(root)
+		var validator:=Thread.new()
+		validator.start(func():return LeoAssets.configure(root))
+		while validator.is_alive():await get_tree().process_frame
+		var error:=int(validator.wait_to_finish())
 		if error==OK:error=LeoAssets.mount_packs()
 		if error!=OK:
 			screen.show_failure(LeoAssets.failure,begin,func():get_tree().quit());return

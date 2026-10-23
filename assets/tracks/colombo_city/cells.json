@@ -1,1 +1,483 @@
-{"cells":[]}
+{
+  "cell_size": 200,
+  "cells": [
+    {
+      "center": [
+        -500.0,
+        -700.0
+      ],
+      "id": "-3_-4",
+      "instances": 27,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_-4.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        -900.0
+      ],
+      "id": "-3_-5",
+      "instances": 3,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_-5.scn"
+    },
+    {
+      "center": [
+        -300.0,
+        -900.0
+      ],
+      "id": "-2_-5",
+      "instances": 15,
+      "scene": "res://assets/tracks/colombo_city/cells/-2_-5.scn"
+    },
+    {
+      "center": [
+        -100.0,
+        -900.0
+      ],
+      "id": "-1_-5",
+      "instances": 8,
+      "scene": "res://assets/tracks/colombo_city/cells/-1_-5.scn"
+    },
+    {
+      "center": [
+        -100.0,
+        -700.0
+      ],
+      "id": "-1_-4",
+      "instances": 21,
+      "scene": "res://assets/tracks/colombo_city/cells/-1_-4.scn"
+    },
+    {
+      "center": [
+        100.0,
+        -700.0
+      ],
+      "id": "0_-4",
+      "instances": 23,
+      "scene": "res://assets/tracks/colombo_city/cells/0_-4.scn"
+    },
+    {
+      "center": [
+        300.0,
+        -700.0
+      ],
+      "id": "1_-4",
+      "instances": 29,
+      "scene": "res://assets/tracks/colombo_city/cells/1_-4.scn"
+    },
+    {
+      "center": [
+        500.0,
+        -700.0
+      ],
+      "id": "2_-4",
+      "instances": 4,
+      "scene": "res://assets/tracks/colombo_city/cells/2_-4.scn"
+    },
+    {
+      "center": [
+        500.0,
+        -500.0
+      ],
+      "id": "2_-3",
+      "instances": 36,
+      "scene": "res://assets/tracks/colombo_city/cells/2_-3.scn"
+    },
+    {
+      "center": [
+        500.0,
+        -300.0
+      ],
+      "id": "2_-2",
+      "instances": 36,
+      "scene": "res://assets/tracks/colombo_city/cells/2_-2.scn"
+    },
+    {
+      "center": [
+        500.0,
+        -100.0
+      ],
+      "id": "2_-1",
+      "instances": 29,
+      "scene": "res://assets/tracks/colombo_city/cells/2_-1.scn"
+    },
+    {
+      "center": [
+        300.0,
+        -100.0
+      ],
+      "id": "1_-1",
+      "instances": 85,
+      "scene": "res://assets/tracks/colombo_city/cells/1_-1.scn"
+    },
+    {
+      "center": [
+        100.0,
+        -100.0
+      ],
+      "id": "0_-1",
+      "instances": 47,
+      "scene": "res://assets/tracks/colombo_city/cells/0_-1.scn"
+    },
+    {
+      "center": [
+        100.0,
+        100.0
+      ],
+      "id": "0_0",
+      "instances": 58,
+      "scene": "res://assets/tracks/colombo_city/cells/0_0.scn"
+    },
+    {
+      "center": [
+        300.0,
+        100.0
+      ],
+      "id": "1_0",
+      "instances": 71,
+      "scene": "res://assets/tracks/colombo_city/cells/1_0.scn"
+    },
+    {
+      "center": [
+        300.0,
+        300.0
+      ],
+      "id": "1_1",
+      "instances": 21,
+      "scene": "res://assets/tracks/colombo_city/cells/1_1.scn"
+    },
+    {
+      "center": [
+        500.0,
+        300.0
+      ],
+      "id": "2_1",
+      "instances": 27,
+      "scene": "res://assets/tracks/colombo_city/cells/2_1.scn"
+    },
+    {
+      "center": [
+        700.0,
+        500.0
+      ],
+      "id": "3_2",
+      "instances": 10,
+      "scene": "res://assets/tracks/colombo_city/cells/3_2.scn"
+    },
+    {
+      "center": [
+        500.0,
+        700.0
+      ],
+      "id": "2_3",
+      "instances": 29,
+      "scene": "res://assets/tracks/colombo_city/cells/2_3.scn"
+    },
+    {
+      "center": [
+        300.0,
+        700.0
+      ],
+      "id": "1_3",
+      "instances": 17,
+      "scene": "res://assets/tracks/colombo_city/cells/1_3.scn"
+    },
+    {
+      "center": [
+        300.0,
+        900.0
+      ],
+      "id": "1_4",
+      "instances": 9,
+      "scene": "res://assets/tracks/colombo_city/cells/1_4.scn"
+    },
+    {
+      "center": [
+        100.0,
+        900.0
+      ],
+      "id": "0_4",
+      "instances": 13,
+      "scene": "res://assets/tracks/colombo_city/cells/0_4.scn"
+    },
+    {
+      "center": [
+        -100.0,
+        900.0
+      ],
+      "id": "-1_4",
+      "instances": 9,
+      "scene": "res://assets/tracks/colombo_city/cells/-1_4.scn"
+    },
+    {
+      "center": [
+        -100.0,
+        700.0
+      ],
+      "id": "-1_3",
+      "instances": 17,
+      "scene": "res://assets/tracks/colombo_city/cells/-1_3.scn"
+    },
+    {
+      "center": [
+        -300.0,
+        700.0
+      ],
+      "id": "-2_3",
+      "instances": 25,
+      "scene": "res://assets/tracks/colombo_city/cells/-2_3.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        700.0
+      ],
+      "id": "-3_3",
+      "instances": 24,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_3.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        500.0
+      ],
+      "id": "-3_2",
+      "instances": 13,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_2.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        300.0
+      ],
+      "id": "-3_1",
+      "instances": 13,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_1.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        100.0
+      ],
+      "id": "-3_0",
+      "instances": 12,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_0.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        -100.0
+      ],
+      "id": "-3_-1",
+      "instances": 12,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_-1.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        -300.0
+      ],
+      "id": "-3_-2",
+      "instances": 13,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_-2.scn"
+    },
+    {
+      "center": [
+        -500.0,
+        -500.0
+      ],
+      "id": "-3_-3",
+      "instances": 13,
+      "scene": "res://assets/tracks/colombo_city/cells/-3_-3.scn"
+    },
+    {
+      "center": [
+        -300.0,
+        -700.0
+      ],
+      "id": "-2_-4",
+      "instances": 12,
+      "scene": "res://assets/tracks/colombo_city/cells/-2_-4.scn"
+    },
+    {
+      "center": [
+        100.0,
+        -500.0
+      ],
+      "id": "0_-3",
+      "instances": 8,
+      "scene": "res://assets/tracks/colombo_city/cells/0_-3.scn"
+    },
+    {
+      "center": [
+        300.0,
+        -500.0
+      ],
+      "id": "1_-3",
+      "instances": 4,
+      "scene": "res://assets/tracks/colombo_city/cells/1_-3.scn"
+    },
+    {
+      "center": [
+        300.0,
+        -300.0
+      ],
+      "id": "1_-2",
+      "instances": 12,
+      "scene": "res://assets/tracks/colombo_city/cells/1_-2.scn"
+    },
+    {
+      "center": [
+        100.0,
+        -300.0
+      ],
+      "id": "0_-2",
+      "instances": 1,
+      "scene": "res://assets/tracks/colombo_city/cells/0_-2.scn"
+    },
+    {
+      "center": [
+        500.0,
+        500.0
+      ],
+      "id": "2_2",
+      "instances": 16,
+      "scene": "res://assets/tracks/colombo_city/cells/2_2.scn"
+    },
+    {
+      "center": [
+        100.0,
+        700.0
+      ],
+      "id": "0_3",
+      "instances": 13,
+      "scene": "res://assets/tracks/colombo_city/cells/0_3.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        500.0
+      ],
+      "id": "-4_2",
+      "instances": 9,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_2.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        300.0
+      ],
+      "id": "-4_1",
+      "instances": 11,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_1.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        100.0
+      ],
+      "id": "-4_0",
+      "instances": 12,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_0.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        -100.0
+      ],
+      "id": "-4_-1",
+      "instances": 11,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_-1.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        -300.0
+      ],
+      "id": "-4_-2",
+      "instances": 12,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_-2.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        -500.0
+      ],
+      "id": "-4_-3",
+      "instances": 8,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_-3.scn"
+    },
+    {
+      "center": [
+        -700.0,
+        -700.0
+      ],
+      "id": "-4_-4",
+      "instances": 1,
+      "scene": "res://assets/tracks/colombo_city/cells/-4_-4.scn"
+    },
+    {
+      "center": [
+        -900.0,
+        -500.0
+      ],
+      "id": "-5_-3",
+      "instances": 2,
+      "scene": "res://assets/tracks/colombo_city/cells/-5_-3.scn"
+    },
+    {
+      "center": [
+        -900.0,
+        -300.0
+      ],
+      "id": "-5_-2",
+      "instances": 5,
+      "scene": "res://assets/tracks/colombo_city/cells/-5_-2.scn"
+    },
+    {
+      "center": [
+        -900.0,
+        -100.0
+      ],
+      "id": "-5_-1",
+      "instances": 5,
+      "scene": "res://assets/tracks/colombo_city/cells/-5_-1.scn"
+    },
+    {
+      "center": [
+        -900.0,
+        100.0
+      ],
+      "id": "-5_0",
+      "instances": 5,
+      "scene": "res://assets/tracks/colombo_city/cells/-5_0.scn"
+    },
+    {
+      "center": [
+        -900.0,
+        300.0
+      ],
+      "id": "-5_1",
+      "instances": 4,
+      "scene": "res://assets/tracks/colombo_city/cells/-5_1.scn"
+    },
+    {
+      "center": [
+        -900.0,
+        500.0
+      ],
+      "id": "-5_2",
+      "instances": 4,
+      "scene": "res://assets/tracks/colombo_city/cells/-5_2.scn"
+    },
+    {
+      "center": [
+        500.0,
+        100.0
+      ],
+      "id": "2_0",
+      "instances": 37,
+      "scene": "res://assets/tracks/colombo_city/cells/2_0.scn"
+    }
+  ],
+  "format": 1
+}

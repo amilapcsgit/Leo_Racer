@@ -23,7 +23,9 @@ func _process(dt: float) -> void:
 	elapsed+=dt
 	if spinner:spinner.text=["●  ○  ○","○  ●  ○","○  ○  ●"][int(elapsed*4.)%3]
 func stage(text: String, progress: float) -> void:
-	detail.text=text;bar.value=progress;retry.hide();back.hide();show()
+	caption.text="LEO RACER";detail.text=text;bar.value=progress;retry.hide();back.hide();show()
 func show_failure(message: String, again: Callable, leave: Callable) -> void:
+	for button in [retry,back]:
+		for connection in button.pressed.get_connections():button.pressed.disconnect(connection.callable)
 	caption.text="ASSETS UNAVAILABLE";detail.text=message
 	retry.show();back.show();retry.pressed.connect(again,CONNECT_ONE_SHOT);back.pressed.connect(leave,CONNECT_ONE_SHOT);retry.grab_focus()

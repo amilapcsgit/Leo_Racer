@@ -3,7 +3,6 @@
 
 
 [ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="1"]
-[ext_resource type="PackedScene" path="res://assets/models/driver_hedgehog.glb" id="2"]
 [ext_resource type="Texture2D" path="res://assets/art/garage/thumbnails/driver_hedgehog.png" id="thumb"]
 
 
@@ -12,7 +11,7 @@ script = ExtResource("1")
 id = &"hedgehog"
 display_name = "Sonic"
 tagline = "Blue blur. Big grin. Born for the coast."
-seated_model = ExtResource("2")
+seated_model_path = "res://assets/models/driver_hedgehog.glb"
 standing_model_path = "res://assets/models/driver_hedgehog.glb"
 portrait = ExtResource("thumb")
 cabin_model_path = "res://assets/models/cabin/driver_hedgehog_cabin.glb"

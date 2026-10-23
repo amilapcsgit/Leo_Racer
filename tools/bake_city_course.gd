@@ -1,4 +1,5 @@
 extends SceneTree
+const Instances=preload("res://scripts/content/scene_instances.gd")
 ## Editor-only Road Generator curves become script-free meshes and race data.
 var output:="res://assets/tracks/colombo_city"
 var course: Node3D
@@ -67,9 +68,10 @@ func run() -> void:
 		await process_frame
 	var dashes:=MultiMesh.new();dashes.transform_format=MultiMesh.TRANSFORM_3D
 	var dash_mesh:=BoxMesh.new();dash_mesh.size=Vector3(.16,.012,4.);dash_mesh.material=paint;dashes.mesh=dash_mesh;dashes.instance_count=int(total/12.)
+	var dash_transforms: Array[Transform3D]=[]
 	for i in dashes.instance_count:
-		var s:=float(i)*12.;var t:=route.direction(s);dashes.set_instance_transform(i,Transform3D(Basis(Vector3.UP,atan2(t.x,t.z)),route.sample(s)+Vector3.UP*.058))
-	var dash_node:=MultiMeshInstance3D.new();dash_node.multimesh=dashes;dash_node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;own(dash_node,course)
+		var s:=float(i)*12.;var t:=route.direction(s);dash_transforms.append(Transform3D(Basis(Vector3.UP,atan2(t.x,t.z)),route.sample(s)+Vector3.UP*.058))
+	var dash_node:=MultiMeshInstance3D.new();dash_node.multimesh=dashes;Instances.store(dash_node,dash_transforms);dash_node.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;own(dash_node,course)
 	var checker:=ShaderMaterial.new();checker.shader=load("res://shaders/astra_checkers.gdshader")
 	var finish:=SurfaceTool.new();finish.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var finish_vertices: Array[Vector3]=[route.sample(-3.,-9.),route.sample(-3.,9.),route.sample(3.,9.),route.sample(3.,-9.)]

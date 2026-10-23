@@ -1,102 +1,76 @@
 {
-  "asset_api": 1,
+  "asset_api": 1.0,
   "authoring": {
     "plugin": "Road Generator",
-    "road_points": 22,
+    "road_points": 22.0,
     "version": "0.9.5"
   },
-  "course_revision": 1,
+  "backdrop": "res://assets/tracks/colombo_city/backdrop.scn",
+  "course_revision": 1.0,
   "description": "5.5 km through Galle Face, Fort, commercial streets and Lotus / Beira gardens.",
   "exclusions": [
     {
-      "name": "Galle Face Green",
-      "polygon": [
-        [
-          -840,
-          -520
-        ],
-        [
-          -615,
-          -520
-        ],
-        [
-          -615,
-          570
-        ],
-        [
-          -840,
-          570
-        ]
-      ]
+      "bounds": [
+        -840.0,
+        -520.0,
+        -615.0,
+        570.0
+      ],
+      "name": "Galle Face Green"
     },
     {
-      "name": "Lake",
-      "polygon": [
-        [
-          170,
-          -110
-        ],
-        [
-          430,
-          -110
-        ],
-        [
-          430,
-          160
-        ],
-        [
-          170,
-          160
-        ]
-      ]
+      "bounds": [
+        168.0,
+        -112.0,
+        432.0,
+        162.0
+      ],
+      "name": "Lake"
     },
     {
-      "name": "Custom architecture garden",
-      "polygon": [
-        [
-          -300,
-          140
-        ],
-        [
-          140,
-          140
-        ],
-        [
-          140,
-          590
-        ],
-        [
-          -300,
-          590
-        ]
-      ]
+      "bounds": [
+        -170.0,
+        250.0,
+        -50.0,
+        410.0
+      ],
+      "name": "Custom architecture garden"
+    },
+    {
+      "bounds": [
+        -3.0,
+        -95.0,
+        68.0,
+        -21.0
+      ],
+      "name": "Lotus Tower"
     }
   ],
-  "format": 1,
+  "format": 1.0,
   "id": "colombo_city",
   "landmarks": [
     {
       "id": "lotus_tower",
       "position": [
-        32,
+        32.0,
         0.07,
-        -58
+        -58.0
       ]
     },
     {
       "id": "galle_face_green",
       "position": [
-        -730,
-        0,
-        25
+        -730.0,
+        0.0,
+        25.0
       ]
     },
     {
       "id": "custom_architecture",
       "position": [
-        -110,
-        0,
-        330
+        -110.0,
+        0.0,
+        330.0
       ]
     }
   ],

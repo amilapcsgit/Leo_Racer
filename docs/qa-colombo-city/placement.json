@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "buildings": 295,
+  "skyline": 176,
+  "palms": 416,
+  "railings": 250,
+  "minimum_building_road_edge_clearance_m": 9.088673557236225,
+  "premade_building_variants": 34,
+  "exclusions": [
+    "Galle Face Green",
+    "Lake",
+    "Custom architecture garden",
+    "Lotus Tower"
+  ]
+}

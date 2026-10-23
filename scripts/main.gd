@@ -216,7 +216,13 @@ func build_world() -> void:
 		loading.stage("Loading course and scenery…",45)
 		var scene_path:=String(track_definition.metadata.get("scene",""))
 		var scene:=await LeoAssets.scene_async(scene_path,get_tree())
-		if scene:world.add_child(scene.instantiate())
+		if scene:
+			var node:=scene.instantiate();load("res://scripts/content/scene_instances.gd").restore(node);world.add_child(node)
+		var backdrop_path:=String(track_definition.metadata.get("backdrop",""))
+		if not backdrop_path.is_empty():
+			var backdrop:=await LeoAssets.scene_async(backdrop_path,get_tree())
+			if backdrop:
+				var node:=backdrop.instantiate();load("res://scripts/content/scene_instances.gd").restore(node);world.add_child(node)
 		var scenery: Node3D=load("res://scripts/content/city_streamer.gd").new()
 		world.add_child(scenery)
 		await scenery.setup(self,track_definition)
@@ -290,6 +296,7 @@ func build_world() -> void:
 			tent.position = Vector3(-61+i*8,.03,82)
 			tent.scale = Vector3.ONE*3
 			world.add_child(tent)
+	LeoAssets.apply_overrides(world)
 
 func polish_materials(node: Node, landmark: bool=false) -> void:
 	if node is MeshInstance3D:
@@ -446,7 +453,7 @@ func start_race() -> void:
 	remove_racers()
 	stage.hide();world.show()
 	environment.background_mode=Environment.BG_SKY
-	state="countdown";countdown=3.6;race_time=0;lap_start=0;best_lap=99999;boost_count=0
+	state="loading";countdown=3.6;race_time=0;lap_start=0;best_lap=99999;boost_count=0
 	wrong_way_time=0;launch_charged=false;horn_cooldown=0;slipstream_time=0;slipstream_cooldown=0;last_beep=-1
 	local_players[0].driver_id=catalog.drivers[selected_driver].id
 	local_players[0].vehicle_id=catalog.vehicles[selected_kart].id
@@ -468,9 +475,12 @@ func start_race() -> void:
 			if not local.player_name.strip_edges().is_empty():kart.racer_name=local.player_name.strip_edges()
 			local.heading=kart.rotation.y
 			if kart.engine and human_count==2:kart.engine.volume_db-=3.
-		kart.place(-8.-(i/2)*row_span,-3.2 if i%2==0 else 3.2)
+		var grid: Dictionary=circuit.features.get("grid",{})
+		var lanes: Array=grid.get("lanes",[-3.2,3.2])
+		kart.place(float(grid.get("start",-8.))-(i/2)*row_span,float(lanes[i%2]))
 		kart.gate_crossed.connect(on_gate);kart.boosted.connect(on_boost);kart.impacted.connect(on_impact);kart.recovered.connect(on_recover)
 		karts.append(kart)
+		await get_tree().process_frame
 	player=karts[0]
 	if ranking_store and not diagnostic_run():
 		best_time=0.
@@ -482,6 +492,9 @@ func start_race() -> void:
 	camera.position=player.position+Vector3(sin(cam_heading),0,cos(cam_heading))*9+Vector3.UP*5
 	camera.look_at(player.position+Vector3.UP*1.2)
 	if split_view:split_view.activate(human_count==2)
+	loading.stage("Warming up the race view…",95)
+	for frame in 4:await get_tree().process_frame
+	state="countdown";countdown=3.6
 	loading.hide()
 	hud.show_race()
 
@@ -797,15 +810,15 @@ func format_time(seconds: float) -> String:
 	return "%02d:%02d.%03d" % [milliseconds/60000,(milliseconds/1000)%60,milliseconds%1000]
 
 func quit_game() -> void:
+	if world:
+		var streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
+		if streamer:await streamer.stop()
 	stop_all_audio()
 	get_tree().quit()
 
 func stop_all_audio() -> void:
-	music.stop()
-	click_sound.stop()
-	countdown_sound.stop()
-	go_sound.stop()
-	finish_sound.stop()
+	for sound in [music,click_sound,countdown_sound,go_sound,finish_sound]:
+		if is_instance_valid(sound):sound.stop()
 	for kart in karts: kart.stop_audio()
 
 func capture_later(label: String, wait: float = 2.0) -> void:
@@ -1073,8 +1086,14 @@ func select_track(id: String) -> bool:
 	await get_tree().process_frame
 	if not target.mount():
 		loading.show_failure(target.error,func():select_track(id),func():loading.hide());return false
-	state="loading";remove_racers();world.free()
+	state="loading";remove_racers()
+	var old_streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
+	if old_streamer:await old_streamer.stop()
+	world.free()
 	track_definition=target;chosen_track_id=id;circuit=LeoCircuit.new(target);art_profile=target.profile();best_time=0.
 	await build_world()
 	for overlay in split_view.overlays:overlay.rebuild_map()
 	loading.hide();save_settings();return_menu();return true
+
+func _exit_tree() -> void:
+	LeoAssets.cache.clear();LeoAssets._patched_meshes.clear()

@@ -9,6 +9,7 @@ func write(path: String,data: Dictionary) -> void:FileAccess.open(path,FileAcces
 func run() -> void:
 	var folder:="res://build/asset-contract-test"
 	DirAccess.make_dir_recursive_absolute(folder)
+	DirAccess.remove_absolute(folder+"/catalog.json")
 	check(LeoAssets.configure(folder)==ERR_FILE_NOT_FOUND,"Missing catalog is readable failure")
 	write(folder+"/catalog.json",{"format":99})
 	check(LeoAssets.configure(folder)==ERR_FILE_CORRUPT,"Unsupported catalog rejected")
@@ -30,6 +31,7 @@ func run() -> void:
 	var catalog:=GarageCatalog.shared()
 	check(catalog.vehicles.size()==16 and catalog.drivers.size()==6,"Complete roster remains metadata")
 	check(catalog.vehicles.all(func(v):return not v.model_path.is_empty()),"Vehicle metadata stores paths rather than eager scenes")
+	check(catalog.drivers.all(func(d):return not d.seated_model_path.is_empty() and not d.standing_model_path.is_empty() and not d.cabin_model_path.is_empty()),"All driver poses remain lazy even when seated and standing paths match")
 	var car:=catalog.vehicle(&"bigster")
 	var scene:=await LeoAssets.scene_async(car.model_path,self)
 	check(scene is PackedScene and car.model==scene,"Threaded load resolves protected Bigster")
@@ -38,6 +40,14 @@ func run() -> void:
 	doc.overrides=[{"id":"test-building","file":"building.glb"}];write(folder+"/catalog.json",doc);LeoAssets.configure(folder)
 	var replacement:=LeoAssets.scene("test-building")
 	check(replacement is PackedScene,"Loose GLB override creates a scene")
+	var ui:=LeoLoadingScreen.new();root.add_child(ui);await process_frame
+	var attempts:=[0,0]
+	ui.show_failure("Missing test pack",func():attempts[0]+=1,func():attempts[1]+=1)
+	check(ui.retry.visible and ui.back.visible and ui.detail.text.contains("Missing test pack"),"Missing content exposes readable Retry and Back controls")
+	ui.retry.pressed.emit();ui.show_failure("Still missing",func():attempts[0]+=1,func():attempts[1]+=1);ui.back.pressed.emit()
+	check(attempts==[1,1],"Repeated errors never duplicate recovery callbacks")
+	ui.stage("Loading again",30);check(ui.caption.text=="LEO RACER" and not ui.retry.visible,"Retry restores loading animation state")
+	ui.queue_free()
 	LeoAssets.directory="";LeoAssets.manifest={};LeoAssets.cache.clear();LeoAssets.modified_rules=false
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
 	FileAccess.open("res://docs/qa-colombo-city/assets.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("CITY_ASSETS_TEST ",report)

@@ -1,0 +1,460 @@
+{
+  "format": 1,
+  "buildings": [
+    {
+      "id": "colombo_lowrise_00",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_00.glb",
+      "width": 24.51364348061923,
+      "height": 13.824567908063962,
+      "depth": 12.957441507749564,
+      "triangles": 632,
+      "source_node": "Building.001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "0f273b41de76ac9bfb663c062e9202db29ebacf835effebb68dd664db99826d4"
+    },
+    {
+      "id": "colombo_lowrise_01",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_01.glb",
+      "width": 24.51364325685965,
+      "height": 13.824575220816058,
+      "depth": 13.336171777233826,
+      "triangles": 632,
+      "source_node": "Building.002_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "97b39e1182635ef613f0181e5770d52003ac40996f49b685a7a49e2de55418d2"
+    },
+    {
+      "id": "colombo_lowrise_02",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_02.glb",
+      "width": 24.17807674366942,
+      "height": 13.82456928390468,
+      "depth": 12.957441402409634,
+      "triangles": 580,
+      "source_node": "Building.013_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "5eff7bebe664557e4d3f70635a34facd0dc3959045eda1179186fa402458271f"
+    },
+    {
+      "id": "colombo_lowrise_03",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_03.glb",
+      "width": 23.999999463558197,
+      "height": 12.000003091596888,
+      "depth": 12.24000236168674,
+      "triangles": 406,
+      "source_node": "Cube_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "2d4df852dd86c3e18a93a6ed9f91314d8a351c010991249f1961e862dcfee47e"
+    },
+    {
+      "id": "colombo_lowrise_04",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_04.glb",
+      "width": 25.948200122679754,
+      "height": 12.000003459026074,
+      "depth": 13.948200742934231,
+      "triangles": 352,
+      "source_node": "Cube.002_Plate_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "dd87b50655e09750daa527bc80c90c59554351013fc3e89432a8f716e480857c"
+    },
+    {
+      "id": "colombo_lowrise_05",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_05.glb",
+      "width": 25.948200122679754,
+      "height": 12.000003459026072,
+      "depth": 16.468100680185696,
+      "triangles": 412,
+      "source_node": "Cube.002_Plate.001_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "f8ff5011b6456093549dbe80b36b6a691710c3af2a3060ef2d796cd355124edf"
+    },
+    {
+      "id": "colombo_lowrise_06",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_06.glb",
+      "width": 24.47399943007529,
+      "height": 12.000003184203177,
+      "depth": 15.730997941169974,
+      "triangles": 404,
+      "source_node": "Cube.002_Plate.002_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "df91ce7056a721d7415ce2588a6fb01f6ad5298c6d15c933d3ad58334851eff4"
+    },
+    {
+      "id": "colombo_lowrise_07",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_07.glb",
+      "width": 23.999999463558197,
+      "height": 12.000003117338164,
+      "depth": 12.000003117338174,
+      "triangles": 264,
+      "source_node": "Cube.002_Plate.003_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "157e37e0fbacf872d4cd76a86de4c2ffcab5a4bbb76c926474a78be5ed47ff61"
+    },
+    {
+      "id": "colombo_lowrise_08",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_08.glb",
+      "width": 25.948200122679754,
+      "height": 12.00000339216107,
+      "depth": 13.948200742934231,
+      "triangles": 272,
+      "source_node": "Cube.002_Plate.004_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "9f850afdbe38a7fe04f5557f4b3883496abc86b31a6ec78d0ee240807c60e951"
+    },
+    {
+      "id": "colombo_lowrise_09",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_09.glb",
+      "width": 25.94819869216831,
+      "height": 12.00000339216107,
+      "depth": 13.948200742934231,
+      "triangles": 496,
+      "source_node": "Cube.002_Plate.005_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "639394766ce93911e35dff25d7c628579dea5665bdecbc9667b244d55b9d591a"
+    },
+    {
+      "id": "colombo_lowrise_10",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_10.glb",
+      "width": 25.948200122679754,
+      "height": 12.000003749788938,
+      "depth": 13.948200742934231,
+      "triangles": 50,
+      "source_node": "Cube.002_Plate.006_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "e4e3683391c76f12caf667932fb3cf5177b28e05b04b877c9702da8a474595c0"
+    },
+    {
+      "id": "colombo_lowrise_11",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_11.glb",
+      "width": 25.9481986921683,
+      "height": 12.000003749788938,
+      "depth": 13.948200742934231,
+      "triangles": 456,
+      "source_node": "Cube.002_Plate.007_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "113449131778cb24f731ee9dabbb33099af80f943f1c241b6304d96be3097482"
+    },
+    {
+      "id": "colombo_lowrise_12",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_12.glb",
+      "width": 25.948200122679754,
+      "height": 12.000003749788938,
+      "depth": 13.948200742934231,
+      "triangles": 58,
+      "source_node": "Cube.002_Plate.011_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "35d5f7c03d78c43b9011f86768a86bf77648bb4a5e956a2db29e0809533a2e24"
+    },
+    {
+      "id": "colombo_lowrise_13",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_13.glb",
+      "width": 24.054244457462914,
+      "height": 14.221685896732293,
+      "depth": 13.414071778556055,
+      "triangles": 3028,
+      "source_node": "Cube.002_Plate.012_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "93f6011c77e263b099dda7a667537bfe3b2c629974edb671a28ae4724edcf7a1"
+    },
+    {
+      "id": "colombo_lowrise_14",
+      "path": "res://assets/models/colombo_city/colombo_lowrise_14.glb",
+      "width": 23.999999463558197,
+      "height": 12.000003117338174,
+      "depth": 12.000003117338174,
+      "triangles": 1019,
+      "source_node": "Cube.003_Atlas_0",
+      "source": "city_game_ready_free.glb",
+      "sha256": "373479664a55f21c5480fc73827ad3f06d8dc461dcaa391a5eeb3f0111303ba8"
+    },
+    {
+      "id": "colombo_tower_00",
+      "path": "res://assets/models/colombo_city/colombo_tower_00.glb",
+      "width": 10.067234709034452,
+      "height": 25.559963187124595,
+      "depth": 10.067235782078825,
+      "triangles": 232,
+      "source_node": "Object_4",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "71712096c300a540919d4e1c10106a6fe3bee0b5091a3b88bed73b64d17b9c51"
+    },
+    {
+      "id": "colombo_tower_01",
+      "path": "res://assets/models/colombo_city/colombo_tower_01.glb",
+      "width": 18.77270758152008,
+      "height": 58.41894793789834,
+      "depth": 9.991098046302795,
+      "triangles": 292,
+      "source_node": "Object_6",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "0c000442b133c37f98628bca158d3eb734c4b565691319e1faa4496ad4454253"
+    },
+    {
+      "id": "colombo_tower_02",
+      "path": "res://assets/models/colombo_city/colombo_tower_02.glb",
+      "width": 15.376637202714159,
+      "height": 50.91362953186035,
+      "depth": 13.16703583973114,
+      "triangles": 384,
+      "source_node": "Object_10",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "1b46c4eeaa01fc6e9dba16fef7dd3cafda90e753a79fc8252a689ebf48b7c855"
+    },
+    {
+      "id": "colombo_tower_03",
+      "path": "res://assets/models/colombo_city/colombo_tower_03.glb",
+      "width": 17.38471746444702,
+      "height": 66.48291110992432,
+      "depth": 9.556490182876587,
+      "triangles": 424,
+      "source_node": "Object_12",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "b122ee1c408623d88069ba8c1587e28c7c91f61a244b15270d74ec112e162eed"
+    },
+    {
+      "id": "colombo_tower_04",
+      "path": "res://assets/models/colombo_city/colombo_tower_04.glb",
+      "width": 13.120633190228617,
+      "height": 42.39493804531435,
+      "depth": 13.120633190228617,
+      "triangles": 176,
+      "source_node": "Object_14",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "c8dd93ef79cd4e78c9e3b3578898d946e49009945cfef3474312b9d3aec017ff"
+    },
+    {
+      "id": "colombo_tower_05",
+      "path": "res://assets/models/colombo_city/colombo_tower_05.glb",
+      "width": 15.607995088499038,
+      "height": 33.85818062952256,
+      "depth": 8.673273322873687,
+      "triangles": 412,
+      "source_node": "Object_16",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "8fbd1324b2d619fc968ecca2df8db7811ae7f65a2003a0e69fe5cda25e72d940"
+    },
+    {
+      "id": "colombo_tower_06",
+      "path": "res://assets/models/colombo_city/colombo_tower_06.glb",
+      "width": 17.715318230060078,
+      "height": 36.3606031385909,
+      "depth": 9.466003822836768,
+      "triangles": 540,
+      "source_node": "Object_18",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "394b00b920a5558db746907a1acfd1e626c7f317a28bbd1db08e4ee5d3358ce1"
+    },
+    {
+      "id": "colombo_tower_07",
+      "path": "res://assets/models/colombo_city/colombo_tower_07.glb",
+      "width": 9.578172217933272,
+      "height": 15.961385581705965,
+      "depth": 5.985191141804762,
+      "triangles": 256,
+      "source_node": "Object_20",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "f65ae61549a16716aa54371965418b0a57e934f2c87b18622a5d513aaae30e27"
+    },
+    {
+      "id": "colombo_tower_08",
+      "path": "res://assets/models/colombo_city/colombo_tower_08.glb",
+      "width": 13.916727602481842,
+      "height": 30.437280102817112,
+      "depth": 8.822892904281616,
+      "triangles": 238,
+      "source_node": "Object_22",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "9941bdf1f23a08cb71d845565cf09625e2a6b486f13a006ce7626d79a1dd3392"
+    },
+    {
+      "id": "colombo_tower_09",
+      "path": "res://assets/models/colombo_city/colombo_tower_09.glb",
+      "width": 21.16080802369325,
+      "height": 107.44887366378627,
+      "depth": 18.84773574521816,
+      "triangles": 916,
+      "source_node": "Object_24",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "cdfc61e365fa25633cb9541049c46fabddc610e4bdd237e826cd796ffdbb2aa2"
+    },
+    {
+      "id": "colombo_tower_10",
+      "path": "res://assets/models/colombo_city/colombo_tower_10.glb",
+      "width": 15.0219064950943,
+      "height": 72.00280666351318,
+      "depth": 15.0219064950943,
+      "triangles": 476,
+      "source_node": "Object_28",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "2137a420b5506c8b0607be582b0057243cbb9fa7824ec666e86044f5aed27b75"
+    },
+    {
+      "id": "colombo_tower_11",
+      "path": "res://assets/models/colombo_city/colombo_tower_11.glb",
+      "width": 9.430920728210346,
+      "height": 19.974705825282513,
+      "depth": 14.018010456684848,
+      "triangles": 484,
+      "source_node": "Object_30",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "a1ff04d7dc2864483fee8ac78a87ef33ef3b8894abd56a9f21a6e46949bccad6"
+    },
+    {
+      "id": "colombo_tower_12",
+      "path": "res://assets/models/colombo_city/colombo_tower_12.glb",
+      "width": 16.01206445247419,
+      "height": 56.943340526020734,
+      "depth": 11.551996572919375,
+      "triangles": 444,
+      "source_node": "Object_32",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "fb22aecc42907a862e83af41b74cf8ff90f2144ef3d3bcb14284e8672ae8dd0a"
+    },
+    {
+      "id": "colombo_tower_13",
+      "path": "res://assets/models/colombo_city/colombo_tower_13.glb",
+      "width": 9.578172217933272,
+      "height": 15.961385581705965,
+      "depth": 5.985191141804762,
+      "triangles": 256,
+      "source_node": "Object_34",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "4e24ec1530afbc0d6dd276810ead8f77b143a7b831047aae693739a28df03b2d"
+    },
+    {
+      "id": "colombo_tower_14",
+      "path": "res://assets/models/colombo_city/colombo_tower_14.glb",
+      "width": 10.227664289933713,
+      "height": 18.153185306950093,
+      "depth": 11.588951582222506,
+      "triangles": 248,
+      "source_node": "Object_36",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "1ec7597abc2889aa0430b192a6febc0c99628bf8b8c050bcbd24bcf7885bdc30"
+    },
+    {
+      "id": "colombo_tower_15",
+      "path": "res://assets/models/colombo_city/colombo_tower_15.glb",
+      "width": 5.790210793115236,
+      "height": 15.109639108961055,
+      "depth": 12.25095649663972,
+      "triangles": 216,
+      "source_node": "Object_38",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "d7626bf87f465b4af618d96e213d235b7cae9403dd4ad307718848f729e0225b"
+    },
+    {
+      "id": "colombo_tower_16",
+      "path": "res://assets/models/colombo_city/colombo_tower_16.glb",
+      "width": 7.681522369384766,
+      "height": 29.37050984665575,
+      "depth": 12.947018431082142,
+      "triangles": 174,
+      "source_node": "Object_40",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "c8bd1000349627c30a4cdf68fb9029f07e145f40146d3e85928e713560770ac1"
+    },
+    {
+      "id": "colombo_tower_17",
+      "path": "res://assets/models/colombo_city/colombo_tower_17.glb",
+      "width": 10.067234709034452,
+      "height": 25.559963187124595,
+      "depth": 10.067235782078825,
+      "triangles": 232,
+      "source_node": "Object_42",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "4e9137cc06a0bb5efdcbeb5c0b59584d1b47c3ad942a82d95e3c83cac3fdcbe9"
+    },
+    {
+      "id": "colombo_tower_18",
+      "path": "res://assets/models/colombo_city/colombo_tower_18.glb",
+      "width": 11.58895434854533,
+      "height": 18.153185306950093,
+      "depth": 10.227666448305675,
+      "triangles": 248,
+      "source_node": "Object_46",
+      "source": "low-poly_city_buildings.glb",
+      "sha256": "0d68db549a1321ee78ffb97884bb2006fb7280f02092370d77200191aef818d1"
+    }
+  ],
+  "props": [
+    {
+      "id": "colombo_railing_00",
+      "path": "res://assets/models/colombo_city/colombo_railing_00.glb",
+      "width": 0.23646261799093793,
+      "height": 0.31794353324526087,
+      "depth": 3.217927530206822,
+      "triangles": 24,
+      "source_node": "Plane.001_Railing_0",
+      "source": "city_infrastructure_map_3.glb",
+      "sha256": "2c049b7f2c2cc8fb473934ab42bff0d6ce8c29e4eca50cb9477323df90166279"
+    },
+    {
+      "id": "colombo_railing_01",
+      "path": "res://assets/models/colombo_city/colombo_railing_01.glb",
+      "width": 0.2363888737336879,
+      "height": 0.3179436858420801,
+      "depth": 3.217927530206822,
+      "triangles": 24,
+      "source_node": "Plane.001_Railing_0",
+      "source": "city_infrastructure_map_3.glb",
+      "sha256": "14a0b0713f89b2a8cc02dc02c5553f1e913ca0b728a1c0dc10a12a13dd9621b4"
+    },
+    {
+      "id": "colombo_railing_02",
+      "path": "res://assets/models/colombo_city/colombo_railing_02.glb",
+      "width": 0.23640082429437825,
+      "height": 0.3179439910178544,
+      "depth": 3.217895176388126,
+      "triangles": 24,
+      "source_node": "Plane.001_Railing_0",
+      "source": "city_infrastructure_map_3.glb",
+      "sha256": "98c04ecff38f6160047e25ae78b3bd9bbdf523c191137f67f7b4c8b966103ae4"
+    },
+    {
+      "id": "colombo_railing_03",
+      "path": "res://assets/models/colombo_city/colombo_railing_03.glb",
+      "width": 0.23654801801161796,
+      "height": 0.31793926070896195,
+      "depth": 3.217178720996751,
+      "triangles": 24,
+      "source_node": "Plane.001_Railing_0",
+      "source": "city_infrastructure_map_3.glb",
+      "sha256": "72e20a199d4b4a20709d41ddff44e20ef16faaaab0a9bbdaaf82dd00e5e8e443"
+    }
+  ],
+  "sources": [
+    {
+      "file": "city_game_ready_free.glb",
+      "sha256": "b84cf1b265e56690771100440c91e76a53258ff2efd54ba84d50f318160aa142",
+      "author": "CG Lads (https://sketchfab.com/CGlads)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/city-game-ready-free-9095f8bcff1e4c9088ea98a306d5887d",
+      "title": "City Game ready free"
+    },
+    {
+      "file": "low-poly_city_buildings.glb",
+      "sha256": "65bac40b2f96085206dda9817606bda58b2a7228f7f27f6109c8e06d801334c2",
+      "author": "smooth998 (https://sketchfab.com/smooth998)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/low-poly-city-buildings-e0209ac5bb684d2d85e5ade96c92d2ff",
+      "title": "Low-poly City Buildings"
+    },
+    {
+      "file": "city_infrastructure_map_3.glb",
+      "sha256": "63cadbe53b91468134bf60be75cefdbaec6a3901a889dc56394e7102f241f04f",
+      "author": "PropShop™ (https://sketchfab.com/syedabbas0815)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/city-infrastructure-map-3-1c6262eb26b94ec0b7565211268fb577",
+      "title": "City infrastructure Map 3"
+    }
+  ],
+  "excluded": [
+    "city_at_night_low_poly_skyscrapers.glb: rights not documented for redistribution",
+    "colombo-city source/Untitled.glb: no embedded provenance"
+  ],
+  "custom_architecture": {
+    "retained_triangles": 1056,
+    "source": "assets/models/srilanka/world.glb",
+    "treatment": "Exact retained vertex attributes and triangles; obsolete track, start arch, boulders, sails and track furniture excluded."
+  }
+}

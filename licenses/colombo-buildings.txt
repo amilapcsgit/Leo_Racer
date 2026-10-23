@@ -1,0 +1,21 @@
+Colombo City building and infrastructure library
+
+City Game ready free
+Author: CG Lads (https://sketchfab.com/CGlads)
+Source: https://sketchfab.com/3d-models/city-game-ready-free-9095f8bcff1e4c9088ea98a306d5887d
+License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+Changes: separated reusable meshes, metre normalization, ground-level origins, shared resized textures; original UVs/material assignments retained.
+
+Low-poly City Buildings
+Author: smooth998 (https://sketchfab.com/smooth998)
+Source: https://sketchfab.com/3d-models/low-poly-city-buildings-e0209ac5bb684d2d85e5ade96c92d2ff
+License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+Changes: separated reusable meshes, metre normalization, ground-level origins, shared resized textures; original UVs/material assignments retained.
+
+City infrastructure Map 3
+Author: PropShop™ (https://sketchfab.com/syedabbas0815)
+Source: https://sketchfab.com/3d-models/city-infrastructure-map-3-1c6262eb26b94ec0b7565211268fb577
+License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+Changes: separated reusable meshes, metre normalization, ground-level origins, shared resized textures; original UVs/material assignments retained.
+
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
