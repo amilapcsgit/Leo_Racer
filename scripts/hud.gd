@@ -28,6 +28,7 @@ var garage_buttons: Array[Button] = []
 var local_lobby: LeoLocalLobby
 var garage_selector: ModularCarSelector
 var frontend: LeoFrontend
+var ui_effects: LeoUIEffects
 var unified_hud: LeoPlayerHUD
 var last_ready := true
 var last_drift_charged := false
@@ -70,6 +71,7 @@ func _ready() -> void:
 	modal_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	modal_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(modal_root)
+	ui_effects=LeoUIEffects.new();ui_effects.reduced_motion=game.reduced_motion;add_child(ui_effects)
 	frontend=LeoFrontend.new();frontend.game=game;frontend.hud=self;frontend.audio=game.ui_audio;add_child(frontend)
 
 func clear(root: Control) -> void:
@@ -177,17 +179,18 @@ func show_garage(_focus_group: String = "driver") -> void:
 	scene_mode="garage";hud_root.hide();clear(modal_root);clear(menu_root);menu_root.show()
 	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
 	garage_selector.configure(game.catalog,local.driver_id,local.vehicle_id,game.reduced_motion)
-	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining
+	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining;garage_selector.player_slot=game.selected_player_slot if from_lobby or retaining else -1
 	garage_selector.input_device=-2
 	menu_root.add_child(garage_selector)
 	garage_selector.race_button.text="Use This Ride" if from_lobby else "Back" if from_home else garage_selector.race_button.text
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
 		game.preview=garage_selector.assembly
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
-		play_arcade_cue("select");game.ui_audio.say("choice");garage_selector.identity.text="Nice choice!")
+		garage_selector.identity.text="Nice choice!")
 	garage_selector.name_changed.connect(func(value: String):
 		if not retaining:game.apply_garage_selection(garage_selector.driver_id,garage_selector.vehicle_id,value))
 	garage_selector.race_requested.connect(func(d: StringName,v: StringName):
+		if from_lobby:game.ui_audio.say("choice")
 		game.apply_garage_selection(d,v,garage_selector.custom_name)
 		if from_lobby:frontend.show_setup()
 		else:game.return_menu())
@@ -197,7 +200,7 @@ func show_garage(_focus_group: String = "driver") -> void:
 		elif from_lobby:frontend.show_setup()
 		else:game.return_menu())
 	game.preview=garage_selector.assembly
-	garage_selector.driver_buttons[game.catalog.driver_index(local.driver_id)].grab_focus()
+	garage_selector.carousel.grab_focus()
 	queue_redraw()
 
 func modal(title: String, subtitle: String = "") -> void:
@@ -311,6 +314,8 @@ func resize_canvas() -> void:
 	var factor := minf(available.x/1600.0,available.y/900.0)
 	scale = Vector2.ONE*factor
 	position = (available-Vector2(1600,900)*factor)*.5
+	for node in get_tree().get_nodes_in_group("ui_viewport_cover"):
+		if is_ancestor_of(node):cover_viewport(node)
 
 static func speed_line_strength(speed_mps: float,boosting: bool,active: bool,reduced: bool) -> float:
 	if not active or reduced:return 0.0
@@ -333,3 +338,10 @@ func show_rankings() -> void:
 
 func show_tracks() -> void:
 	frontend.show_tracks()
+
+func cover_viewport(node: Control) -> void:
+	node.add_to_group("ui_viewport_cover")
+	var available:=get_viewport_rect().size/maxf(.001,scale.x)
+	var extra:=(available-size)*.5
+	node.offset_left=-maxf(0.,extra.x);node.offset_right=maxf(0.,extra.x)
+	node.offset_top=-maxf(0.,extra.y);node.offset_bottom=maxf(0.,extra.y)

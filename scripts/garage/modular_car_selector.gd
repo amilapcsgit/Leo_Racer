@@ -13,7 +13,10 @@ var race_button: Button
 var back_button: Button
 var previous_button: Button
 var next_button: Button
-var driver_scroll: ScrollContainer
+var carousel: LeoDriverCarousel
+var player_slot := -1
+var ring_materials: Array[StandardMaterial3D]=[]
+var ring_tween: Tween
 var keyboard_first: Button
 var keyboard: Control
 var keyboard_original := ""
@@ -102,7 +105,7 @@ func positioned_label(words: String, pos: Vector2, font_size: int, color: Color=
 
 func button(parent: Node,words: String,action: Callable,selected:=false) -> Button:
 	var node: LeoActionButton=load("res://scenes/ui/ActionButton.tscn").instantiate()
-	node.text=words;node.primary=selected;node.reduced_motion=reduced_motion;node.pressed.connect(action);parent.add_child(node);node.custom_minimum_size.y=44
+	node.text=words;node.sound_key="back" if words=="Back" else "select";node.primary=selected;node.reduced_motion=reduced_motion;node.pressed.connect(action);parent.add_child(node);node.custom_minimum_size.y=44
 	return node
 
 func build_interface() -> void:
@@ -115,20 +118,9 @@ func build_interface() -> void:
 	name_field=LineEdit.new();name_field.position=Vector2(40,141);name_field.size=Vector2(432,48);name_field.max_length=32;name_field.text=custom_name;name_field.add_theme_font_size_override("font_size",26);ui.add_child(name_field)
 	name_field.text_changed.connect(func(value: String):custom_name=value;refresh_labels();name_changed.emit(value))
 	var keys:=button(ui,"Change Name",open_keyboard);keys.position=Vector2(224,201);keys.size=Vector2(248,44)
-	positioned_label("CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
-	driver_scroll=ScrollContainer.new();driver_scroll.position=Vector2(40,300);driver_scroll.size=Vector2(432,152);driver_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;driver_scroll.follow_focus=true;ui.add_child(driver_scroll)
-	var portrait_margin:=MarginContainer.new()
-	for side in ["left","right","top","bottom"]:portrait_margin.add_theme_constant_override("margin_"+side,8)
-	driver_scroll.add_child(portrait_margin)
-	var drivers:=HBoxContainer.new();drivers.add_theme_constant_override("separation",12);portrait_margin.add_child(drivers)
-	for d in catalog.drivers:
-		var card:=button(drivers,"",func():choose_driver(d.id));card.custom_minimum_size=Vector2(112,128);card.tooltip_text=d.display_name
-		var frame:=TextureRect.new();frame.texture=preload("res://assets/ui/icons/hex_frame.svg");frame.set_anchors_and_offsets_preset(PRESET_FULL_RECT);frame.mouse_filter=MOUSE_FILTER_IGNORE;frame.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;card.add_child(frame);card.set_meta("portrait_frame",frame)
-		add_card_content(card,d.display_name,d.portrait,Vector2(96,96),20);driver_buttons.append(card)
-		card.focus_entered.connect(func():animate_portrait(card,true));card.focus_exited.connect(func():animate_portrait(card,false));card.mouse_entered.connect(func():animate_portrait(card,true));card.mouse_exited.connect(func():animate_portrait(card,false))
-	caption=positioned_label("",Vector2(40,466),22,Color("b9c7d6"));caption.size=Vector2(432,56);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var dp:=button(ui,"‹ Driver",func():cycle_driver(-1));dp.position=Vector2(40,534);dp.size=Vector2(210,44)
-	var dn:=button(ui,"Driver ›",func():cycle_driver(1));dn.position=Vector2(262,534);dn.size=Vector2(210,44)
+	positioned_label(("PLAYER %d · " % (player_slot+1) if player_slot>=0 else "")+"CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
+	carousel=LeoDriverCarousel.new();carousel.catalog=catalog;carousel.reduced_motion=reduced_motion;carousel.position=Vector2(40,300);carousel.size=Vector2(432,224);ui.add_child(carousel);carousel.driver_selected.connect(choose_driver);driver_buttons=carousel.cards
+	caption=positioned_label("",Vector2(40,526),22,Color("b9c7d6"));caption.size=Vector2(432,56);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	for i in 3:
 		var caption_label:=positioned_label("",Vector2(40,604+i*52),21,cream);stat_labels.append(caption_label)
 		var bar: LeoStatBar=load("res://scenes/ui/StatBar.tscn").instantiate();bar.position=Vector2(268,608+i*52);bar.size=Vector2(200,18);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
@@ -149,22 +141,15 @@ func build_interface() -> void:
 	stats=positioned_label("",Vector2.ZERO,20);stats.hide()
 	positioned_label("Drag to orbit · Scroll to zoom · LB / RB change ride",Vector2(560,772),20,cream)
 	var reset:=button(ui,"Reset View",reset_view);reset.position=Vector2(560,812);reset.size=Vector2(224,48)
-	var all: Array[Button]=[];all.append_array(driver_buttons);all.append_array([dp,dn,previous_button,next_button,reset,race_button,back_button,keys])
+	var all: Array[Control]=[name_field,keys,carousel,carousel.left,carousel.right,previous_button,next_button,reset,race_button,back_button]
 	for i in all.size():
 		all[i].focus_next=all[i].get_path_to(all[(i+1)%all.size()]);all[i].focus_previous=all[i].get_path_to(all[posmod(i-1,all.size())])
-	for i in driver_buttons.size():
-		driver_buttons[i].focus_neighbor_left=driver_buttons[i].get_path_to(driver_buttons[posmod(i-1,driver_buttons.size())]);driver_buttons[i].focus_neighbor_right=driver_buttons[i].get_path_to(driver_buttons[(i+1)%driver_buttons.size()])
-		driver_buttons[i].focus_neighbor_top=driver_buttons[i].get_path_to(name_field);driver_buttons[i].focus_neighbor_bottom=driver_buttons[i].get_path_to(race_button)
-	name_field.focus_neighbor_bottom=name_field.get_path_to(driver_buttons[0])
-	race_button.focus_neighbor_top=race_button.get_path_to(driver_buttons[0]);race_button.focus_neighbor_right=race_button.get_path_to(back_button)
+	carousel.focus_neighbor_top=carousel.get_path_to(name_field);carousel.focus_neighbor_bottom=carousel.get_path_to(race_button)
+	carousel.left.focus_neighbor_right=carousel.left.get_path_to(carousel);carousel.right.focus_neighbor_left=carousel.right.get_path_to(carousel)
+	for control in [carousel.left,carousel.right]:control.focus_neighbor_top=control.get_path_to(name_field);control.focus_neighbor_bottom=control.get_path_to(race_button)
+	name_field.focus_neighbor_bottom=name_field.get_path_to(carousel)
+	race_button.focus_neighbor_top=race_button.get_path_to(carousel);race_button.focus_neighbor_right=race_button.get_path_to(back_button)
 	build_keyboard()
-
-func animate_portrait(card: Button,focused: bool) -> void:
-	if focused and card is LeoActionButton and not reduced_motion:card.stars()
-	if portrait_tweens.has(card):portrait_tweens[card].kill()
-	card.pivot_offset=card.size*.5
-	var tween:=create_tween();portrait_tweens[card]=tween
-	tween.tween_property(card,"scale",Vector2.ONE*(1.10 if focused and not reduced_motion else 1.),.12)
 
 func refresh_labels() -> void:
 	if not ui:return
@@ -185,18 +170,13 @@ func refresh_labels() -> void:
 		stat_bars[i].set_value(values[i]/maxf(.001,maxima[i]))
 		stat_labels[i].text=["Speed · %d km/h" % roundi(values[0]),"Grip · %.2f" % values[1],"Launch · %.1f m/s²" % values[2]][i]
 	policy.text="SELECTED RACER // CABIN POSE" if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else "HELMETED SHAVEN LEO // FIXED CABIN DRIVER" if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED else ("IDENTITY + PORTRAIT // DRIVER-FREE BODY" if v.driver_policy==VehicleDefinition.DriverPolicy.IDENTITY_ONLY else "OPEN COCKPIT // LIVE DRIVER")
-	for i in driver_buttons.size():
-		var card:=driver_buttons[i];var selected:=catalog.drivers[i].id==driver_id
-		card.modulate=Color.WHITE if selected else Color(.72,.78,.82)
-		var frame: TextureRect=card.get_meta("portrait_frame")
-		frame.texture=load("res://assets/ui/icons/hex_selected.svg") if selected else load("res://assets/ui/icons/hex_frame.svg")
+	carousel.select_id(driver_id)
 
 func cycle_vehicle(direction: int) -> void:
 	choose_vehicle(catalog.vehicles[posmod(catalog.vehicle_index(vehicle_id)+direction,catalog.vehicles.size())].id)
 
 func cycle_driver(direction: int) -> void:
-	choose_driver(catalog.drivers[posmod(catalog.driver_index(driver_id)+direction,catalog.drivers.size())].id)
-	driver_buttons[catalog.driver_index(driver_id)].grab_focus()
+	carousel.step(direction)
 
 func build_keyboard() -> void:
 	keyboard=Control.new();keyboard.set_anchors_and_offsets_preset(PRESET_FULL_RECT);ui.add_child(keyboard)
@@ -294,6 +274,7 @@ func set_selection(d: StringName,v: StringName) -> void:
 	if changed:reset_view()
 	else:update_camera()
 	refresh_labels()
+	pulse_rings()
 	preview_ready.emit()
 
 func choose_driver(id: StringName) -> void:
@@ -343,6 +324,26 @@ func build_showroom() -> void:
 	var mat := StandardMaterial3D.new();mat.albedo_color=Color("272625");mat.metallic=.65;mat.roughness=.34;podium.material_override=mat;showroom.add_child(podium)
 	for radius in [3.42,3.62]:
 		var rim:=MeshInstance3D.new();var ring:=TorusMesh.new();ring.inner_radius=radius;ring.outer_radius=radius+.035;rim.mesh=ring;rim.position.y=-.015
-		var metal:=StandardMaterial3D.new();metal.albedo_color=brass;metal.metallic=.75;metal.roughness=.26;rim.material_override=metal;showroom.add_child(rim)
+		var metal:=StandardMaterial3D.new();metal.albedo_color=cyan if radius<3.5 else Color("ffc857");metal.metallic=.7;metal.roughness=.28;metal.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;metal.emission_enabled=true;metal.emission=cyan if radius<3.5 else Color("ffc857");metal.emission_energy_multiplier=1.1;ring_materials.append(metal);rim.material_override=metal;showroom.add_child(rim)
+		var halo:=MeshInstance3D.new();var glow_ring:=TorusMesh.new();glow_ring.inner_radius=radius-.06;glow_ring.outer_radius=radius+.10;halo.mesh=glow_ring;halo.position.y=-.035;halo.scale.y=.05
+		var glow:=ShaderMaterial.new();glow.shader=preload("res://shaders/garage_ring_halo.gdshader");glow.set_shader_parameter("tint",metal.emission);halo.material_override=glow;showroom.add_child(halo)
 	for i in 16:
 		var bolt:=MeshInstance3D.new();var mesh:=CylinderMesh.new();mesh.top_radius=.05;mesh.bottom_radius=.05;mesh.height=.04;mesh.radial_segments=6;bolt.mesh=mesh;bolt.material_override=mat;bolt.position=Vector3(sin(i*TAU/16)*3.52,.015,cos(i*TAU/16)*3.52);showroom.add_child(bolt)
+
+func pulse_rings() -> void:
+	if ring_tween:ring_tween.kill()
+	var audio:=get_tree().get_first_node_in_group("ui_audio")
+	if audio and is_visible_in_tree():audio.cue("preview")
+	if reduced_motion:return
+	ring_tween=create_tween().set_parallel(true)
+	for material in ring_materials:
+		material.emission_energy_multiplier=1.7
+		material.albedo_color=material.emission*1.35
+		ring_tween.tween_property(material,"emission_energy_multiplier",1.1,.2)
+		ring_tween.tween_property(material,"albedo_color",material.emission,.2)
+func set_reduced_motion(value: bool) -> void:
+	reduced_motion=value
+	if carousel:carousel.fx_set_reduced(value)
+	for bar in stat_bars:bar.fx_set_reduced(value)
+	if value and ring_tween:ring_tween.kill()
+	for material in ring_materials:material.emission_energy_multiplier=1.1;material.albedo_color=material.emission

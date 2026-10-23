@@ -1,0 +1,148 @@
+{
+  "status": "PASS",
+  "date": "2026-10-23",
+  "base_branch": "release/1.9.0",
+  "base_commit": "1036c2246d44691718013fe10ddffe412993e1b5",
+  "implementation_branch": "neon_ui",
+  "functional_suites": {
+    "neon_ui_test": {
+      "status": "PASS",
+      "checks": 51
+    },
+    "ui_input_test": {
+      "status": "PASS",
+      "checks": 24
+    },
+    "local_input_test": {
+      "status": "PASS",
+      "checks": 35
+    },
+    "ui_frontend_test": {
+      "status": "PASS",
+      "checks": 33
+    },
+    "local_race_test": {
+      "status": "PASS",
+      "checks": 21
+    },
+    "local_ranking_test": {
+      "status": "PASS",
+      "checks": 26
+    },
+    "local_presentation_test": {
+      "status": "PASS",
+      "checks": 21
+    }
+  },
+  "functional_checks": 211,
+  "rendered": {
+    "forward_plus": {
+      "neon": {
+        "checks": 51,
+        "errors": [],
+        "renderer": "forward_plus",
+        "status": "PASS",
+        "visual": true
+      },
+      "screen_matrix": {
+        "captures": 39,
+        "errors": [],
+        "renderer": "forward_plus",
+        "sizes": [
+          "1280x720",
+          "1920x1080",
+          "2560x1080"
+        ],
+        "status": "PASS"
+      },
+      "neon_captures": 22
+    },
+    "gl_compatibility": {
+      "neon": {
+        "checks": 51,
+        "errors": [],
+        "renderer": "gl_compatibility",
+        "status": "PASS",
+        "visual": true
+      },
+      "screen_matrix": {
+        "captures": 39,
+        "errors": [],
+        "renderer": "gl_compatibility",
+        "sizes": [
+          "1280x720",
+          "1920x1080",
+          "2560x1080"
+        ],
+        "status": "PASS"
+      },
+      "neon_captures": 22
+    }
+  },
+  "rendered_captures": 122,
+  "gpu_comparison": {
+    "status": "PASS",
+    "baseline": {
+      "garage_ms": 1.37199997901917,
+      "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+      "home_ms": 2.57100009918213,
+      "label": "1.9.0",
+      "measurement": "Median of 90 frames after 30 warmup frames per screen; same hardware and scene.",
+      "renderer": "forward_plus",
+      "resolution": "1920x1080",
+      "track": "colombo_city",
+      "tracks_ms": 3.09500002861023
+    },
+    "neon": {
+      "garage_ms": 1.36099994182587,
+      "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+      "home_ms": 2.625,
+      "label": "neon",
+      "measurement": "Median of 90 frames after 30 warmup frames per screen; same hardware and scene.",
+      "renderer": "forward_plus",
+      "resolution": "1920x1080",
+      "track": "colombo_city",
+      "tracks_ms": 3.15799999237061
+    },
+    "delta_ms": {
+      "home_ms": 0.054,
+      "garage_ms": -0.011,
+      "tracks_ms": 0.063
+    },
+    "target_additional_ms": 2.0
+  },
+  "extracted_zip": {
+    "sdk_removed": true,
+    "archive_sha256": "6069380f4aff629f1d998c39ee2fb1d2172f7ed7431ed7de8e626e01f6d19964",
+    "boot_art_exit": 0,
+    "status": "PASS",
+    "smoke_exit": 0,
+    "content_exit": 0
+  },
+  "installer": {
+    "content_exit": 0,
+    "smoke_exit": 0,
+    "sdk_removed": true,
+    "status": "PASS",
+    "boot_art_exit": 0,
+    "archive_sha256": "6069380f4aff629f1d998c39ee2fb1d2172f7ed7431ed7de8e626e01f6d19964",
+    "filename": "LeoRacer-Setup-2.0.0.exe",
+    "bytes": 370837505,
+    "sha256": "8c363292e22ca9b115b2af990c7c7f83eee6db4cd4e2b77ab008892c50256500",
+    "isolated_install_and_uninstall": "PASS"
+  },
+  "upstream_menu_kit_commit": "08ffb82a46c818962edd4b0e34d4c4b596629760",
+  "diagnostics": "Existing engine teardown texture/RID diagnostics remain; no script, shader, or assertion failures in final checks.",
+  "hands_on_pending": [
+    "Leo usability playtest",
+    "Target keyboard rollover",
+    "Physical controller/wheel unplug/reconnect"
+  ],
+  "version": "2.0.0",
+  "local_candidate_scope": "Local 2.0.0 packages verified before publication. GitHub Actions rebuilds from the same source; release SHA256SUMS-2.0.0.txt is authoritative for published binaries.",
+  "local_candidate_zip": {
+    "archive": "LeoRacer-2.0.0-win64.zip",
+    "bytes": 371671070,
+    "sha256": "6069380f4aff629f1d998c39ee2fb1d2172f7ed7431ed7de8e626e01f6d19964"
+  }
+}

@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse, hashlib
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--version', default='1.9.0')
+parser.add_argument('--version', default='2.0.0')
 version = parser.parse_args().version
 root = Path(__file__).resolve().parents[1]
 names = [f'LeoRacer-{version}-win64.zip', f'LeoRacer-Setup-{version}.exe']

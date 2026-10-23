@@ -1,14 +1,16 @@
 # Leo Racer — Colombo 2026
 
-**Version 1.9.0** introduces a cinematic street-racing menu, **Go Race → Race Setup → Start Race**, automatic controller assignment, and two players sharing one keyboard. Generated Colombo artwork, a unified garage and compact HUD, playful sound cues, and offline English cheers make racing easier to start. See [controls, validation, and known limitations](docs/UI_REFRESH.md).
+**Version 2.0.0** introduces a cinematic street-racing menu, **Go Race → Race Setup → Start Race**, automatic controller assignment, and two players sharing one keyboard. Generated Colombo artwork, a unified garage and compact HUD, playful sound cues, and offline English cheers make racing easier to start. See [controls, validation, and known limitations](docs/UI_REFRESH.md).
 
 A local Windows arcade racer with six drivers, sixteen vehicles, the 1.9 km **Astra Lotus Coast** and 5.5 km **Colombo City Grand Prix**. Both tracks support single player and vertical two-player split screen. Existing settings, vehicles, race rules, and offline rankings are retained.
 
 ![Bigster Extreme in the garage](docs/qa-bigster-replacement/garage.png)
 
+**New in 2.0:** a dimensional driver carousel, reactive neon buttons, animated car statistics, procedural sound cues, and alternating day/night loading artwork. See [implementation and validation](docs/NEON_UI.md).
+
 ## Play
 
-Download **LeoRacer-Setup-1.9.0.exe** to install, or extract the entire **LeoRacer-1.9.0-win64.zip** folder and run **LeoRacer.exe**. Keep the complete folder together. Godot, a .NET installation, and an internet connection are not required to play. [Downloads and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v1.9.0).
+Download **LeoRacer-Setup-2.0.0.exe** to install, or extract the entire **LeoRacer-2.0.0-win64.zip** folder and run **LeoRacer.exe**. Keep the complete folder together. Godot, a .NET installation, and an internet connection are not required to play. [Downloads and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.0.0).
 
 Use **Play Compatibility.cmd** if Vulkan is unavailable. Compatibility mode uses simpler effects. Previous releases remain available for rollback.
 
@@ -38,7 +40,7 @@ This is a **Godot 4.7.2 .NET** project using **GDScript gameplay** and C# presen
 - [Astra build, model and circuit pipeline](docs/ASTRA_SETUP.md)
 - [Art pipeline and asset provenance](docs/COLOMBO_ASSETS.md)
 - [1.7 multiplayer validation and performance](docs/LOCAL2PLAYER_VALIDATION.md)
-- [1.9 release notes](docs/RELEASE_NOTES.md)
+- [2.0 release notes](docs/RELEASE_NOTES.md)
 - [Earlier Astra validation](docs/ASTRA_VALIDATION.md)
 - [Supplied-asset conversion and setup](docs/SRILANKA_SETUP.md)
 - [Visual comparison](docs/ASTRA_COMPARISON.md)

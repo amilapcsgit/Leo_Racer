@@ -5,6 +5,13 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await begin()
 func begin() -> void:
+	if "--verify-boot-art" in OS.get_cmdline_user_args():
+		var errors: Array[String]=[]
+		for path in [LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]:
+			var texture:=load(path) as Texture2D
+			if not texture or texture.get_width()<1:errors.append(path)
+		print("BOOT_ART_VALIDATION ",JSON.stringify({"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"before_asset_mount":true}))
+		get_tree().quit(0 if errors.is_empty() else 1);return
 	screen.stage("Checking game assets…",5)
 	await get_tree().process_frame
 	if not OS.has_feature("editor"):

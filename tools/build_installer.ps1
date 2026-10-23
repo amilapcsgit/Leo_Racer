@@ -1,4 +1,4 @@
-param([string]$Version='1.9.0',[string]$BuildFolder='build/ModularGarage',[switch]$Development,[switch]$CityAssets)
+param([string]$Version='2.0.0',[string]$BuildFolder='build/ModularGarage',[switch]$Development,[switch]$CityAssets)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 $archive=Join-Path $project '.tools/nsis-3.13.zip'

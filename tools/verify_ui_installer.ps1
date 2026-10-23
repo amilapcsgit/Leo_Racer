@@ -1,4 +1,4 @@
-param([string]$Version='1.9.0')
+param([string]$Version='2.0.0')
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 $installer=Join-Path $project ("dist/LeoRacer-Setup-$Version.exe")

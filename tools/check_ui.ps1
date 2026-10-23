@@ -4,7 +4,7 @@ $project=Split-Path $PSScriptRoot -Parent
 Push-Location $project
 try {
  New-Item -ItemType Directory -Force 'build/qa-ui' | Out-Null
- foreach($test in @('ui_input_test','local_input_test','ui_frontend_test','local_race_test','local_ranking_test','local_presentation_test')){
+ foreach($test in @('neon_ui_test','ui_input_test','local_input_test','ui_frontend_test','local_race_test','local_ranking_test','local_presentation_test')){
   $log="build/qa-ui/$test.log"
   & "$PSScriptRoot/run_godot.ps1" @('--headless','--script',"res://tests/$test.gd",'--','--drive-test') 2>&1 | Out-File -Encoding utf8 $log
   if($LASTEXITCODE -ne 0 -or (Select-String -Path $log -Pattern 'SCRIPT ERROR|"status": ?"(FAIL|CHECK)"' -Quiet) -or -not (Select-String -Path $log -Pattern '"status": ?"PASS"' -Quiet)){throw "Failed: $test. See $log"}

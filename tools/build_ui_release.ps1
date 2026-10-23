@@ -1,4 +1,4 @@
-param([string]$Version='1.9.0',[switch]$SkipExport)
+param([string]$Version='2.0.0',[switch]$SkipExport)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 Push-Location $project
@@ -29,6 +29,8 @@ Shared keyboard: P1 WASD, Space drift, Left Shift nitro, R recover, H horn.
 P2 Arrows, Right Ctrl drift, Right Shift nitro, Backspace recover, Enter horn.
 Esc / P pauses both racers. Reconnect and choose Keep Racing to resume.
 Spoken cheers are offline synthesized English, adjustable in Settings.
+The garage driver carousel has two arrows and no scrollbar.
+Loading alternates the original day artwork and current night artwork.
 Existing settings and records are retained. No SDK or network is required.
 Attribution and licenses: GameAssets/licenses.
 '@ | Set-Content -Encoding utf8 "$folder/README.txt"

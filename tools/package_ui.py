@@ -3,7 +3,7 @@ from pathlib import Path
 import argparse,hashlib,json,zipfile
 root=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
-parser.add_argument('--version',default='1.9.0')
+parser.add_argument('--version',default='2.0.0')
 version=parser.parse_args().version
 assert all(c in '0123456789.-abcdefghijklmnopqrstuvwxyz' for c in version), 'Invalid version'
 folder=root/'build/UIRefresh'

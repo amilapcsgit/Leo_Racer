@@ -45,7 +45,10 @@ def write_pack(path,engine,entries):
     # An independent read verifies all offsets and hashes before delivery.
     assert read_pack(path)[1]==entries
 
+BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png'}
+
 def category(name):
+    if name.removesuffix('.import') in BOOT_ART:return 'core'
     if name.startswith('assets/ui/art/'):return 'textures/art'
     if name.startswith('assets/tracks/colombo_city/'):return 'tracks/colombo_city/scenery'
     if name.startswith('assets/tracks/astra_coast/') or name=='assets/track-astra.json':return 'tracks/astra_coast/scenery'
@@ -75,7 +78,7 @@ def split(folder):
         owner=category(name.removesuffix('.import').removesuffix('.remap'))
         for target in re.findall(r'res://[^"\s]+',data.decode(errors='ignore')):
             if target.startswith('res://.godot/'):owners[target[6:]]=owner
-            if name.startswith('assets/ui/boot/') and target.startswith('res://.godot/'):boot_targets.add(target[6:])
+            if (name.startswith('assets/ui/boot/') or name.removesuffix('.import') in BOOT_ART) and target.startswith('res://.godot/'):boot_targets.add(target[6:])
     groups=collections.defaultdict(dict)
     for name,data in entries.items():
         owner=owners.get(name,category(name))

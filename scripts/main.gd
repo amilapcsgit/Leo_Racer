@@ -447,6 +447,7 @@ func return_menu() -> void:
 func start_race() -> void:
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
+	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"))
 	state="loading";loading.stage("Preparing racers…",15)
 	get_tree().paused=false
 	remove_racers()
@@ -555,6 +556,8 @@ func on_recover(kart: LeoKart) -> void:
 func set_reduced_motion(value: bool) -> void:
 	if is_instance_valid(loading):loading.reduced_motion=value
 	for button in get_tree().get_nodes_in_group("ui_buttons"):button.set_reduced_motion(value)
+	if hud and hud.ui_effects:hud.ui_effects.set_reduced_motion(value)
+	if hud and is_instance_valid(hud.garage_selector):hud.garage_selector.set_reduced_motion(value)
 	reduced_motion = value
 	if feedback: feedback.set_reduced_motion(value)
 	if local_players[1].feedback:local_players[1].feedback.set_reduced_motion(value)
@@ -850,7 +853,7 @@ func quit_game(exit_code: int = 0) -> void:
 	get_tree().quit(exit_code)
 
 func stop_all_audio() -> void:
-	if is_instance_valid(ui_audio):ui_audio.voice.stop();ui_audio.effect.stop()
+	if is_instance_valid(ui_audio):ui_audio.voice.stop();ui_audio.stop_effects()
 	for sound in [music,click_sound,countdown_sound,go_sound,finish_sound]:
 		if is_instance_valid(sound):sound.stop()
 	for kart in karts: kart.stop_audio()
@@ -1110,6 +1113,7 @@ func select_track(id: String) -> bool:
 	for candidate in tracks:
 		if candidate.id==id:target=candidate;break
 	if not target:return false
+	if not loading.visible:loading.begin_load(LeoLoadingBackdrops.new_operation("track"))
 	loading.stage("Checking "+target.display_name+"…",10)
 	await get_tree().process_frame
 	if not target.mount():

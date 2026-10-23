@@ -24,5 +24,12 @@
     "heading": "Barlow Condensed Bold Italic",
     "source": "https://github.com/google/fonts/tree/main/ofl/barlowcondensed",
     "license": "licenses/Barlow-OFL.txt"
+  },
+  "menu_kit_lite": {
+    "source": "https://github.com/eXiForever/godot-game-menu-kit-lite",
+    "commit": "08ffb82a46c818962edd4b0e34d4c4b596629760",
+    "license": "licenses/GameMenuKitLite-MIT.txt",
+    "vendored_file": "scripts/ui/vendor/menu_kit_sounds.gd",
+    "integration": "Standalone static procedural synth through LeoUIAudio; no plugin/autoload/settings replacement. Neon shaders are original."
   }
 }

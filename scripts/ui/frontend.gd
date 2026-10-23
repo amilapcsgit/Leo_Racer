@@ -28,7 +28,7 @@ func label(parent: Node,words: String,fs: int=24,color: Color=Color("f5f7fa")) -
  parent.add_child(node);return node
 func action(parent: Node,words: String,callback: Callable,primary: bool=false) -> LeoActionButton:
  var node: LeoActionButton=load("res://scenes/ui/ActionButton.tscn").instantiate()
- node.text=words;node.primary=primary;node.contained=hud.modal_root.is_ancestor_of(parent);node.glyph_name={"Garage":"garage","Records":"records","Settings":"settings"}.get(words,"");node.reduced_motion=game.reduced_motion;node.size_flags_horizontal=Control.SIZE_EXPAND_FILL;node.pressed.connect(callback);parent.add_child(node)
+ node.text=words;node.sound_key="back" if words in ["Back","Cancel","Keep Going"] else "select";node.primary=primary;node.contained=hud.modal_root.is_ancestor_of(parent);node.glyph_name={"Garage":"garage","Records":"records","Settings":"settings"}.get(words,"");node.reduced_motion=game.reduced_motion;node.size_flags_horizontal=Control.SIZE_EXPAND_FILL;node.pressed.connect(callback);parent.add_child(node)
  node.focus_entered.connect(func():last_focus[screen]=str(node.get_meta("focus_key",words)))
  return node
 func card(parent: Node) -> VBoxContainer:
@@ -43,8 +43,10 @@ func shell(title: String,subtitle: String="") -> VBoxContainer:
  game.input_router.gameplay_enabled=false;game.input_router.assignment_locked=false;game.input_router.controls_testing=false;game.input_router.clear_all()
  hud.clear(hud.menu_root);hud.clear(hud.hud_root);hud.hud_root.hide();hud.speed_overlay.hide();hud.menu_root.show()
  hud.menu_root.theme=load("res://assets/ui/theme.tres")
- var art:=picture(hud.menu_root,"res://assets/ui/art/home.png",Vector2.ZERO);art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
- var dim:=ColorRect.new();dim.color=Color(0.025,.04,.07,.35 if screen=="home" else .78);dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);dim.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.menu_root.add_child(dim)
+ var art:=picture(hud.menu_root,"res://assets/ui/art/home.png",Vector2.ZERO);art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);hud.cover_viewport(art)
+ var dim:=ColorRect.new();dim.color=Color(0.025,.04,.07,.35 if screen=="home" else .78);dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);dim.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.menu_root.add_child(dim);hud.cover_viewport(dim)
+ if screen=="home":
+  var atmosphere:=LeoBackdropFX.new();atmosphere.art=art;atmosphere.reduced_motion=game.reduced_motion;hud.menu_root.add_child(atmosphere)
  var margin:=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  for side in ["left","right"]:margin.add_theme_constant_override("margin_"+side,48)
  for side in ["top","bottom"]:margin.add_theme_constant_override("margin_"+side,36)
@@ -160,9 +162,10 @@ func dialog(title: String,subtitle: String,leave: Callable,width: float=760.) ->
   suspend_controls()
  else:hud.clear(hud.modal_root)
  modal_back=leave;game.input_router.clear_all()
+ audio.cue("open")
  modal_title=title
  hud.modal_root.theme=load("res://assets/ui/theme.tres")
- var shield:=Control.new();shield.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);shield.mouse_filter=Control.MOUSE_FILTER_STOP;hud.modal_root.add_child(shield)
+ var shield:=Control.new();shield.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);shield.mouse_filter=Control.MOUSE_FILTER_STOP;hud.modal_root.add_child(shield);hud.cover_viewport(shield)
  if RenderingServer.get_current_rendering_method()!="gl_compatibility":
   var copy:=BackBufferCopy.new();copy.copy_mode=BackBufferCopy.COPY_MODE_VIEWPORT;shield.add_child(copy)
   var blur:=ColorRect.new();blur.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);var material:=ShaderMaterial.new();material.shader=load("res://shaders/ui_frost.gdshader");blur.material=material;blur.mouse_filter=Control.MOUSE_FILTER_IGNORE;shield.add_child(blur)
@@ -252,7 +255,7 @@ func show_tracks() -> void:
   var path:="res://assets/ui/art/"+course.id+".png"
   if not ResourceLoader.exists(path):path="res://assets/ui/art/home.png"
   picture(row,path,Vector2(260,145))
-  var route:=TextureRect.new();var route_path:="res://assets/ui/icons/track_"+course.id+".svg"
+  var route:=LeoTrackHologram.new();route.reduced_motion=game.reduced_motion;var route_path:="res://assets/ui/icons/track_"+course.id+".svg"
   if ResourceLoader.exists(route_path):route.texture=load(route_path)
   route.custom_minimum_size=Vector2(140,130);route.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;route.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(route)
   var details:=VBoxContainer.new();details.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(details)
@@ -294,7 +297,8 @@ func verify_preview() -> void:
  var results: Array[String]=[]
  for name in ["home","garage","astra_coast","colombo_city"]:
   if not ResourceLoader.exists("res://assets/ui/art/"+name+".png"):errors.append("Missing artwork: "+name)
- if not ResourceLoader.exists("res://assets/ui/boot/loading.png"):errors.append("Missing boot artwork")
+ for path in [LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]:
+  if not ResourceLoader.exists(path):errors.append("Missing loading backdrop: "+path)
  for name in ["race","ready","choice","finish"]:
   if not ResourceLoader.exists("res://assets/audio/ui/voice_"+name+".wav"):errors.append("Missing voice: "+name)
  show_setup(2)
@@ -315,7 +319,7 @@ func verify_preview() -> void:
  game.return_menu();show_setup(1);await start_selected()
  if not is_instance_valid(hud.unified_hud):errors.append("Solo HUD unavailable")
  results.append("Solo race and unified HUD")
- var report:={"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"checks":results,"version":"1.9.0"}
+ var report:={"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"checks":results,"version":"2.0.0"}
  var destination: String=game.diagnostic_path("ui-smoke.json")
  FileAccess.open(destination,FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("UI_PACKAGE_SMOKE ",JSON.stringify(report))

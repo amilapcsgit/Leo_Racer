@@ -29,12 +29,12 @@ func run() -> void:
 	selector.choose_vehicle(&"duster")
 	check(selector.ui.get_instance_id()==persistent and selector.name_field.get_instance_id()==field,"Carousel updates persistent controls")
 	check(selector.name_field.text=="COLOMBO PILOT" and root.gui_get_focus_owner()==focus,"Vehicle selection preserves text and focus")
-	selector.driver_buttons[0].grab_focus();joy(JOY_BUTTON_DPAD_RIGHT);await process_frame
-	check(root.gui_get_focus_owner()==selector.driver_buttons[1],"Xbox D-pad moves native focus")
+	selector.carousel.grab_focus();joy(JOY_BUTTON_DPAD_RIGHT);await process_frame
+	check(selector.driver_id==&"lion" and selector.carousel.has_focus(),"Xbox D-pad selects the next carousel driver")
 	var motion:=InputEventJoypadMotion.new();motion.axis=JOY_AXIS_LEFT_X;motion.axis_value=.9;Input.parse_input_event(motion);await process_frame
-	check(root.gui_get_focus_owner()==selector.driver_buttons[2],"Xbox left stick moves native focus")
+	check(selector.driver_id==&"elephant" and selector.carousel.has_focus(),"Xbox left stick advances the carousel")
 	motion=InputEventJoypadMotion.new();motion.axis=JOY_AXIS_LEFT_X;motion.axis_value=0.;Input.parse_input_event(motion)
-	joy(JOY_BUTTON_A);await process_frame;check(selector.driver_id==&"elephant","Xbox A activates the focused driver")
+	joy(JOY_BUTTON_A);await process_frame;check(selector.driver_id==&"elephant","Xbox A preserves the carousel selection")
 	await selector.set_selection(&"mario",&"duster")
 	check(selector.assembly.get_meta("driver_id")==&"mario" and selector.assembly.get_node("Driver").get_meta("visible_driver_id")==&"mario","Dacia keeps selected identity and visible Mario cabin driver")
 	check(selector.stats.text.contains("165 KM/H"),"Duster displays real normal ceiling")
