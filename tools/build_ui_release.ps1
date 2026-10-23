@@ -1,9 +1,9 @@
-param([string]$Version='2.0.0',[switch]$SkipExport)
+param([string]$Version='2.0.0',[string]$BuildFolder='build/UIRefresh',[switch]$SkipExport)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 Push-Location $project
 try {
- $folder='build/UIRefresh'
+ $folder=$BuildFolder
  $savedEnvironment=@{}
  foreach($name in @('TEMP','TMP','APPDATA','LOCALAPPDATA')){$savedEnvironment[$name]=[Environment]::GetEnvironmentVariable($name)}
  foreach($directory in @('build/ui-temp','build/ui-userdata','build/ui-localdata')){New-Item -ItemType Directory -Force $directory | Out-Null}
@@ -39,7 +39,12 @@ Attribution and licenses: GameAssets/licenses.
 cd /d "%~dp0"
 start "" "LeoRacer.exe" --rendering-method gl_compatibility --rendering-driver opengl3
 '@ | Set-Content -Encoding ascii "$folder/Play Compatibility.cmd"
- python tools/package_ui.py --version $Version
+ if($Version.Contains('-dev')){
+  "`nColombo visuals development preview: assembled districts, shaped coast and bright tropical midday. Base neon_ui e20c7ed. Public releases are unchanged." | Add-Content -Encoding utf8 "$folder/README.txt"
+  $development=@{version=$Version;branch=(& git branch --show-current);source_commit=(& git rev-parse HEAD);base_commit='e20c7ed';public_release=$false;template='Godot 4.7.2 checked/debug'}
+  $development | ConvertTo-Json | Set-Content -Encoding utf8 "$folder/development-build.json"
+ }
+ python tools/package_ui.py --version $Version --folder $folder
  if($LASTEXITCODE -ne 0){throw 'ZIP packaging failed'}
 } finally {
  foreach($name in $savedEnvironment.Keys){[Environment]::SetEnvironmentVariable($name,$savedEnvironment[$name])}

@@ -19,5 +19,5 @@ void fragment(){
  NORMAL_MAP_DEPTH=.7;
  float foam=smoothstep(.73,.97,sin(shore*1.2-TIME*1.1+p.y*.04))*pow(near_shore,6.0)*.35*scale;
  ALBEDO=mix(deep_color,shallow_color,near_shore*.7)+vec3(.65,.73,.66)*foam+(a*b)*.008;
- ROUGHNESS=ocean ? .26 : .36; METALLIC=0.0; SPECULAR=.45;
+ ROUGHNESS=ocean ? .26 : .48; METALLIC=0.0; SPECULAR=ocean ? .45 : .18;
 }

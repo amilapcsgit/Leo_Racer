@@ -18,10 +18,10 @@ func run() -> void:
 	game.player.active = true
 	game.player.speed = 42
 	game.player.wheel_motion_speed = 0
-	game.hud._process(.016)
+	game.hud.unified_hud._process(.016)
 	verify(game.hud.unified_hud.speed.text=="000","Blocked kart reports zero actual speed despite commanded throttle")
 	game.player.wheel_motion_speed = 20
-	game.hud._process(.016)
+	game.hud.unified_hud._process(.016)
 	verify(game.hud.unified_hud.speed.text=="072","Speedometer converts measured travel speed to km/h")
 	verify(game.art_profile is LeoArtProfile,"Editable Colombo profile is active")
 	verify(game.world.find_child("AstraLotusCoast",true,false)!=null,"Additive Colombo scenery is assembled")

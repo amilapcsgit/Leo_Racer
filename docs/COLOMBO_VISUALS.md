@@ -90,3 +90,30 @@ Three older acceptance expectations predated neon_ui: loading heading, the HUD
 update owner, and a removed pause-garage New Race action. Tests now exercise the
 current loading state, actual player HUD, and visible Keep Racing button. Product
 UI and driving behavior are unchanged. Full regressions and package checks follow.
+
+## Checkpoint 5: source integration verified
+
+`tools/check_colombo_visuals.ps1 -WithGameplay` exits 0: new building/terrain/HDR
+contracts plus the complete city, legacy vehicle and neon UI checks pass. Final
+Bigster acceptance is 37 checks; source wheel/pivot regressions retain all 229
+replacement checks. Three-lap runs finish all six racers in both city modes.
+
+Final 1080p six-racer separated-player measurements (120 FPS cap): Vulkan
+119.99 FPS, p95 10.57 / p99 10.78 ms, maximum 22.87 ms, engine peak static
+224.88 MB and video allocations 1738.48 MB. Compatibility 119.67 FPS, p95 10.47 /
+p99 10.75 ms, maximum 74.74 ms, static 132.38 MB and video 669.22 MB. These are
+source/editor-engine measurements, not a claim of maximum uncapped throughput.
+An isolated Compatibility frame spike remains; do not hide it behind the average.
+
+Three reloads retain 1,371 nodes, cache 12; final memory samples differ by about
+18 KB. Short-range detail remains separate from permanent collision and LODs.
+Garden textures and building aprons were corrected after final visual review.
+
+Loading animation: cold-city 185 frames, p95 11.25 ms, largest 135.75 ms. Warm
+city p95 13.90 ms / max 136.58 ms; garage preview max 142.87 ms. Insertion spikes
+remain visible. Final street and landmark sheets, plus split views at 720p,
+1080p and ultrawide, are in qa-colombo-visuals.
+
+Next: rebuild the committed integration, verify extracted portable content with
+SDK variables removed, exercise both renderers, and record final package sizes.
+Development CI uploads artifacts only and has no publishing job.

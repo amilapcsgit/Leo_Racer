@@ -1,0 +1,221 @@
+{
+  "status": "PASS",
+  "reports": {
+    "assets": {
+      "checks": 16,
+      "errors": [],
+      "status": "PASS"
+    },
+    "tracks": {
+      "checks": 27,
+      "errors": [],
+      "status": "PASS"
+    },
+    "road": {
+      "checks": 11,
+      "errors": [],
+      "status": "PASS"
+    },
+    "streaming": {
+      "cache_entries": 12,
+      "cells": 57,
+      "checks": 35,
+      "errors": [],
+      "memory_static_bytes": [
+        396888788.0,
+        396891472.0,
+        396909692.0
+      ],
+      "node_counts": [
+        1371,
+        1371,
+        1371
+      ],
+      "resident_cells": 15,
+      "status": "PASS"
+    },
+    "drivers": {
+      "captures": false,
+      "checks": 63,
+      "errors": [],
+      "fits": [
+        {
+          "bounds_max": "(-0.031633, 1.523809, 0.401536)",
+          "bounds_min": "(-0.708367, 0.612, -0.617214)",
+          "driver": "hedgehog",
+          "vehicle": "duster"
+        },
+        {
+          "bounds_max": "(0.0172, 1.5844, 0.118)",
+          "bounds_min": "(-0.7572, 0.612, -0.617214)",
+          "driver": "lion",
+          "vehicle": "duster"
+        },
+        {
+          "bounds_max": "(0.03172, 1.4392, 0.118)",
+          "bounds_min": "(-0.77172, 0.612, -0.617214)",
+          "driver": "elephant",
+          "vehicle": "duster"
+        },
+        {
+          "bounds_max": "(-0.118, 1.503576, 0.1)",
+          "bounds_min": "(-0.622, 0.62, -0.610195)",
+          "driver": "parrot",
+          "vehicle": "duster"
+        },
+        {
+          "bounds_max": "(-0.137973, 1.470852, 0.054918)",
+          "bounds_min": "(-0.60203, 0.353426, -1.02865)",
+          "driver": "human",
+          "vehicle": "duster"
+        },
+        {
+          "bounds_max": "(-0.10587, 1.564134, 0.139604)",
+          "bounds_min": "(-0.634131, 0.47728, -0.632258)",
+          "driver": "mario",
+          "vehicle": "duster"
+        },
+        {
+          "bounds_max": "(-0.031633, 1.523809, 0.401536)",
+          "bounds_min": "(-0.708367, 0.612, -0.617214)",
+          "driver": "hedgehog",
+          "vehicle": "bigster"
+        },
+        {
+          "bounds_max": "(0.0172, 1.5844, 0.118)",
+          "bounds_min": "(-0.7572, 0.612, -0.617214)",
+          "driver": "lion",
+          "vehicle": "bigster"
+        },
+        {
+          "bounds_max": "(0.03172, 1.4392, 0.118)",
+          "bounds_min": "(-0.77172, 0.612, -0.617214)",
+          "driver": "elephant",
+          "vehicle": "bigster"
+        },
+        {
+          "bounds_max": "(-0.118, 1.503576, 0.1)",
+          "bounds_min": "(-0.622, 0.62, -0.610195)",
+          "driver": "parrot",
+          "vehicle": "bigster"
+        },
+        {
+          "bounds_max": "(-0.137973, 1.470852, 0.054918)",
+          "bounds_min": "(-0.60203, 0.353426, -1.02865)",
+          "driver": "human",
+          "vehicle": "bigster"
+        },
+        {
+          "bounds_max": "(-0.10587, 1.564134, 0.139604)",
+          "bounds_min": "(-0.634131, 0.47728, -0.632258)",
+          "driver": "mario",
+          "vehicle": "bigster"
+        }
+      ],
+      "status": "PASS"
+    },
+    "bigster": {
+      "captures": false,
+      "checks": 37,
+      "errors": [],
+      "status": "PASS"
+    },
+    "presentation": {
+      "checks": 24,
+      "errors": [],
+      "status": "PASS"
+    },
+    "single_full_race": {
+      "errors": [],
+      "first_finish_interval_seen": false,
+      "full_race": [
+        {
+          "finished": true,
+          "name": "Sonic",
+          "next_gate": 25,
+          "time": 382.104883999971
+        },
+        {
+          "finished": true,
+          "name": "Leo",
+          "next_gate": 25,
+          "time": 364.009779999977
+        },
+        {
+          "finished": true,
+          "name": "Ellie",
+          "next_gate": 25,
+          "time": 361.472051999978
+        },
+        {
+          "finished": true,
+          "name": "Rio",
+          "next_gate": 25,
+          "time": 365.333811999977
+        },
+        {
+          "finished": true,
+          "name": "Shaven Leo",
+          "next_gate": 25,
+          "time": 363.844275999977
+        },
+        {
+          "finished": true,
+          "name": "Mario",
+          "next_gate": 25,
+          "time": 365.168307999977
+        }
+      ],
+      "humans": 1,
+      "length_m": 5499.99501037598,
+      "status": "PASS",
+      "track": "colombo_city"
+    },
+    "split_full_race": {
+      "errors": [],
+      "first_finish_interval_seen": true,
+      "full_race": [
+        {
+          "finished": true,
+          "name": "Sonic",
+          "next_gate": 25,
+          "time": 382.160275999971
+        },
+        {
+          "finished": true,
+          "name": "Player 2",
+          "next_gate": 25,
+          "time": 364.010003999977
+        },
+        {
+          "finished": true,
+          "name": "Ellie",
+          "next_gate": 25,
+          "time": 362.410131999978
+        },
+        {
+          "finished": true,
+          "name": "Rio",
+          "next_gate": 25,
+          "time": 364.837523999977
+        },
+        {
+          "finished": true,
+          "name": "Shaven Leo",
+          "next_gate": 25,
+          "time": 363.347987999978
+        },
+        {
+          "finished": true,
+          "name": "Mario",
+          "next_gate": 25,
+          "time": 365.058195999977
+        }
+      ],
+      "humans": 2,
+      "length_m": 5499.99501037598,
+      "status": "PASS",
+      "track": "colombo_city"
+    }
+  }
+}

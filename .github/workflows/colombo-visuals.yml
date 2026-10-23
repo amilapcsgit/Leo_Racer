@@ -1,0 +1,60 @@
+name: Colombo visuals development build
+on:
+  push:
+    branches: [colombo-visuals]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: colombo-visuals-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  development:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
+      - name: Prepare pinned tools
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build,dist | Out-Null
+          python -m pip install -r tools/requirements-city.txt
+          ./tools/setup_windows.ps1
+      - name: Validate scenery and preserved gameplay
+        shell: pwsh
+        run: |
+          ./tools/check_colombo_visuals.ps1 -WithGameplay
+      - name: Export unpublished portable package
+        shell: pwsh
+        run: |
+          ./tools/build_ui_release.ps1 -BuildFolder build/ColomboVisuals -Version 2.0.0-colombo-visuals-dev
+          ./tools/verify_ui_package.ps1 -Archive dist/LeoRacer-2.0.0-colombo-visuals-dev-win64.zip
+          python tools/package_city.py --verify-folder build/ColomboVisuals
+          if ($LASTEXITCODE -ne 0) {throw 'Offline content verification failed'}
+          python tools/report_colombo_visuals.py
+          if ($LASTEXITCODE -ne 0) {throw 'Content size audit failed'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Colombo-visuals-checks
+          path: |
+            docs/qa-colombo-visuals/
+            build/qa-ui/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LeoRacer-colombo-visuals-win64
+          path: dist/LeoRacer-2.0.0-colombo-visuals-dev-win64.zip
+          retention-days: 14

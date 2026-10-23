@@ -4,9 +4,10 @@ import argparse,hashlib,json,zipfile
 root=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('--version',default='2.0.0')
-version=parser.parse_args().version
+parser.add_argument('--folder',type=Path,default=root/'build/UIRefresh')
+args=parser.parse_args();version=args.version
 assert all(c in '0123456789.-abcdefghijklmnopqrstuvwxyz' for c in version), 'Invalid version'
-folder=root/'build/UIRefresh'
+folder=args.folder.resolve()
 destination=root/('dist/LeoRacer-'+version+'-win64.zip')
 destination.parent.mkdir(exist_ok=True)
 with zipfile.ZipFile(destination,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as archive:

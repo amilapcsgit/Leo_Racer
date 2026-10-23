@@ -46,7 +46,8 @@ func run() -> void:
 	check(ui.retry.visible and ui.back.visible and ui.detail.text.contains("Missing test pack"),"Missing content exposes readable Retry and Back controls")
 	ui.retry.pressed.emit();ui.show_failure("Still missing",func():attempts[0]+=1,func():attempts[1]+=1);ui.back.pressed.emit()
 	check(attempts==[1,1],"Repeated errors never duplicate recovery callbacks")
-	ui.stage("Loading again",30);check(ui.caption.text=="LEO RACER" and not ui.retry.visible,"Retry restores loading animation state")
+	# Neon UI changed the heading; the asset contract is recovery into loading state.
+	ui.stage("Loading again",30);check(ui.visible and ui.bar.visible and ui.bar.value==30 and ui.detail.text=="Loading again" and not ui.retry.visible and not ui.back.visible,"Retry restores loading animation state")
 	ui.queue_free()
 	LeoAssets.directory="";LeoAssets.manifest={};LeoAssets.cache.clear();LeoAssets.modified_rules=false
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}

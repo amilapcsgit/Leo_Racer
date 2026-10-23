@@ -101,6 +101,8 @@ def split(folder):
     names={name.removesuffix('.import').removesuffix('.remap') for name in entries if name.startswith('assets/')}
     assets={f'res://{name}':f'res://{name}' for name in sorted(names)}
     catalog={'format':1,'engine':'4.7','packs':[p for p in packs if not p['id'].startswith('tracks/')],'assets':assets,'overrides':[]}
+    catalog['content']={'colombo_visuals':{'revision':2,'modules':'res://assets/models/colombo_city/modules.json',
+        'recipes':'res://assets/models/colombo_city/recipes.json','lighting':'res://assets/art/colombo/lighting.json'}}
     (root/'catalog.json').write_text(json.dumps(catalog,indent=2)+'\n',encoding='utf-8')
     for track in (ROOT/'assets/tracks').glob('*'):
         if not track.is_dir():continue
@@ -109,7 +111,7 @@ def split(folder):
             if (track/name).exists():shutil.copy2(track/name,root/'tracks'/track.name/name)
         metadata=json.loads((track/'manifest.json').read_text(encoding='utf-8'))
         required=['vehicles/roster','glb/shared-scenery','textures/imported']
-        required+=['glb/colombo-buildings','signs/colombo'] if metadata.get('world_kind')=='city' else ['roads/terrain','textures/surfaces','textures/art']
+        required+=['glb/colombo-buildings','signs/colombo','textures/surfaces','textures/art'] if metadata.get('world_kind')=='city' else ['roads/terrain','textures/surfaces','textures/art']
         metadata['dependencies']=[p['id'] for p in packs if p['id'] in required]
         if track.name in track_packs:
             pack=track_packs[track.name]

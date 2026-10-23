@@ -57,7 +57,7 @@ def place(entry,center,yaw,scale=1.,kind='building',always=False,district='skyli
             x=(bay-(entry['width']/6.912-1)/2)*6.912;z=3.79
             key=['ceylon-tea','island-bakery','coast-cafe','fort-market'][(parcel_id+bay)%4]
             placements.append({'asset':'res://assets/signs/colombo/'+key+'.svg',
-                'position':[float(center[0]+c*x+ss*z),3.20,float(center[1]-ss*x+c*z)],
+                'position':[float(center[0]+c*x+ss*z),2.75,float(center[1]-ss*x+c*z)],
                 'yaw':yaw,'scale':1.,'kind':'shop_sign','parcel':parcel_id,'always':False,'tint':[1,1,1,1]})
 
 def district_at(point):

@@ -21,7 +21,7 @@ func parts(node: Node3D, transform: Transform3D, result: Array) -> void:
 func source_meshes(path: String) -> Array:
 	if mesh_cache.has(path):return mesh_cache[path]
 	if path.ends_with(".svg"):
-		var sign_mesh:=QuadMesh.new();sign_mesh.size=Vector2(6.35,.53)
+		var sign_mesh:=QuadMesh.new();sign_mesh.size=Vector2(6.5,.76)
 		var sign_mat:=StandardMaterial3D.new();sign_mat.albedo_texture=load(path);sign_mat.roughness=.9
 		sign_mesh.material=sign_mat
 		var sign_result:Array=[{"mesh":sign_mesh,"transform":Transform3D.IDENTITY}]
@@ -115,7 +115,7 @@ func backdrop(data: Dictionary) -> void:
 	for z in range(-1400,1400,200):
 		for x in range(-940,1260,200):
 			add_mesh(node,terrain.tile(x,z,200.,200.),ground,Vector3.ZERO,"Ground_%d_%d"%[x,z])
-	var grass:=ShaderMaterial.new();grass.shader=load("res://shaders/city_ground.gdshader");grass.set_shader_parameter("tint",Color("78915b"))
+	var grass:ShaderMaterial=ground.duplicate();grass.set_shader_parameter("landscaped",true)
 	# Green is part of the shaped terrain; paths and old protected garden stay flat.
 	var green_marker:=Node3D.new();green_marker.name="GalleFaceGreen";green_marker.set_meta("protected_bounds",[-840,-520,-615,570]);node.add_child(green_marker);green_marker.owner=node
 	rectangle(node,Vector2(120,160),Vector3(-110,-.01,330),grass,"IndependenceGarden")
@@ -175,6 +175,9 @@ func run() -> void:
 	metal=LeoRaceVisuals.flat_material(Color("35423d"),.5);metal.roughness=.72
 	lamp=LeoRaceVisuals.flat_material(Color("e1deca"),.1);lamp.roughness=.65
 	grass_material=ShaderMaterial.new();grass_material.shader=load("res://shaders/city_grass.gdshader")
+	var apron_mesh:=PlaneMesh.new();apron_mesh.size=Vector2.ONE
+	var apron_material:=StandardMaterial3D.new();apron_material.albedo_texture=load("res://assets/materials/Concrete034_2K-JPG_Color.jpg")
+	apron_material.albedo_color=Color("a7a499");apron_material.roughness=.94;apron_material.metallic_specular=.16;apron_mesh.material=apron_material
 	for entry in data.placements:
 		if entry.always:continue
 		var key:=Vector2i(floori(float(entry.position[0])/200.),floori(float(entry.position[2])/200.))
@@ -196,6 +199,14 @@ func run() -> void:
 		for path in grouped:batch(node,path,grouped[path],center)
 		street_details(node,center,key)
 		terrain.grass(node,center,key,grass_material)
+		var apron_transforms:Array[Transform3D]=[]
+		for parcel in data.parcels:
+			if Vector2i(floori(parcel.center[0]/200.),floori(parcel.center[1]/200.))!=key:continue
+			apron_transforms.append(Transform3D(Basis(Vector3.UP,parcel.yaw).scaled_local(Vector3(parcel.width+.8,1.,parcel.depth+.8)),Vector3(parcel.center[0],-.012,parcel.center[1])-center))
+		if not apron_transforms.is_empty():
+			var aprons:=MultiMeshInstance3D.new();aprons.name="BuildingAprons";aprons.multimesh=MultiMesh.new();aprons.multimesh.mesh=apron_mesh
+			aprons.multimesh.transform_format=MultiMesh.TRANSFORM_3D;aprons.multimesh.instance_count=apron_transforms.size();Instances.store(aprons,apron_transforms)
+			aprons.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;node.add_child(aprons);aprons.owner=node
 		var path:=folder+"/cells/%d_%d.scn"%[key.x,key.y];save_scene(node,path)
 		cells.append({"id":"%d_%d"%[key.x,key.y],"center":[center.x,center.z],"scene":path,"instances":cell_placements[key].size()})
 		node.free();await process_frame

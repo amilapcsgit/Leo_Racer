@@ -64,3 +64,6 @@ docs/qa-local2player/garage-*.jpg
 docs/qa-local2player/driving-*.jpg
 !docs/qa-local2player/garage-sheet.jpg
 !docs/qa-local2player/driving-sheet.jpg
+
+# Visual QA sheets are evidence, not runtime texture resources.
+docs/qa-colombo-visuals/*.import

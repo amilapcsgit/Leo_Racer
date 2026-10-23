@@ -99,9 +99,10 @@ func run() -> void:
 	check(game.race_modified and not game.paused and not paused and game.player.racer_name=="TEST PILOT","Modified race resumes with custom name")
 	game.player.finish_time=100.;game.finish_race();check(game.best_time==500.,"Mid-race vehicle changes cannot update best-time records")
 	await game.start_race();check(not game.race_modified and game.player.next_gate==0 and game.race_time==0,"Start New Race resets the race normally")
-	game.toggle_pause();game.hud.show_garage("pause");selector=game.hud.garage_selector;selector.race_requested.emit(&"human",&"bigster");await process_frame
-	while game.state=="loading":await process_frame
-	check(not game.paused and game.state=="countdown" and game.player.vehicle_key=="bigster","Pause garage New Race applies the new selection")
+	# UI 2.0 offers Keep Racing here; Restart is a separate pause-menu action.
+	game.toggle_pause();game.hud.show_garage("pause");selector=game.hud.garage_selector
+	await selector.set_selection(&"human",&"bigster");selector.race_button.pressed.emit();await process_frame
+	check(not game.paused and game.state=="countdown" and game.player.vehicle_key=="bigster" and game.race_modified,"Pause garage Keep Racing applies the new selection without restarting")
 	game.return_menu();game.hud.show_garage();joy(JOY_BUTTON_B);await process_frame
 	check(game.state=="menu","Xbox B exits normal garage safely")
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"captures":captures}
