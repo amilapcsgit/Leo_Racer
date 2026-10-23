@@ -221,6 +221,7 @@ func update_wheel_motion(movement: Vector3, dt: float) -> void:
 
 func sound(file: String, volume: float, playing: bool) -> AudioStreamPlayer:
 	var p := AudioStreamPlayer.new()
+	p.bus="Effects"
 	p.stream = load("res://assets/audio/" + file)
 	if playing and p.stream is AudioStreamOggVorbis:
 		(p.stream as AudioStreamOggVorbis).loop = true

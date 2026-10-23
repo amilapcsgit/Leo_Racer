@@ -27,6 +27,8 @@ var interaction_buttons: Array[Button] = []
 var garage_buttons: Array[Button] = []
 var local_lobby: LeoLocalLobby
 var garage_selector: ModularCarSelector
+var frontend: LeoFrontend
+var unified_hud: LeoPlayerHUD
 var last_ready := true
 var last_drift_charged := false
 var ready_flash := 0.0
@@ -68,6 +70,7 @@ func _ready() -> void:
 	modal_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	modal_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(modal_root)
+	frontend=LeoFrontend.new();frontend.game=game;frontend.hud=self;frontend.audio=game.ui_audio;add_child(frontend)
 
 func clear(root: Control) -> void:
 	for c in root.get_children():
@@ -156,54 +159,14 @@ func backdrop(parent: Node, alpha: float = .7) -> void:
 	parent.add_child(color)
 
 func show_menu() -> void:
-	scene_mode = "menu"
-	clear(menu_root)
-	clear(modal_root)
-	hud_root.hide()
-	menu_root.show()
-	var art := TextureRect.new()
-	art.texture = load("res://assets/art/menu.png")
-	art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	menu_root.add_child(art)
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color("071630f5"))
-	gradient.set_color(1, Color("07163000"))
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill_from = Vector2.ZERO
-	texture.fill_to = Vector2(.77, 0)
-	var shade := TextureRect.new()
-	shade.texture = texture
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	menu_root.add_child(shade)
-	text_at(menu_root, Vector2(88, 78), Vector2(420, 30), "THE COLOMBO GRAND PRIX", 18, gold, true)
-	var title := text_at(menu_root, Vector2(78, 121), Vector2(600, 130), "LEO", 118, Color.WHITE, true)
-	title.add_theme_constant_override("outline_size", 5)
-	title.add_theme_color_override("font_outline_color", ink)
-	title = text_at(menu_root, Vector2(78, 223), Vector2(600, 140), "RACER", 118, accent, true)
-	title.add_theme_constant_override("outline_size", 5)
-	title.add_theme_color_override("font_outline_color", ink)
-	text_at(menu_root, Vector2(89, 374), Vector2(600, 37), game.track_definition.display_name.to_upper(), 29, Color.WHITE, true)
-	text_at(menu_root, Vector2(89, 417), Vector2(620, 65), "More coast. More corners. One wild harbour circuit.", 20, muted)
-	var first := button(menu_root, Vector2(88, 507), Vector2(389, 76), "1 PLAYER MODE    →", game.start_single_player, true)
-	button(menu_root,Vector2(500,507),Vector2(389,76),"2 PLAYER MODE",game.open_local_lobby,true)
-	button(menu_root,Vector2(500,600),Vector2(389,62),"CONTROLS",show_controls)
-	button(menu_root,Vector2(500,678),Vector2(389,57),"RANKINGS",show_rankings)
-	button(menu_root, Vector2(88, 600), Vector2(389, 62), "GARAGE & RACERS", show_garage)
-	button(menu_root, Vector2(88, 678), Vector2(185, 57), "GUIDE", show_guide)
-	button(menu_root, Vector2(288, 678), Vector2(189, 57), "SETTINGS", show_settings)
-	text_at(menu_root, Vector2(89, 812), Vector2(800, 26), "%.1f KM    /    3 LAPS    /    6 RACERS" % [game.circuit.length/1000.], 17, Color("d8e7ef"), true)
-	text_at(menu_root, Vector2(1200, 835), Vector2(350, 28), "DEVELOPMENT  //  COLOMBO CITY", 17, accent, true)
-	button(menu_root,Vector2(918,678),Vector2(389,57),"SELECT TRACK",show_tracks)
-	button(menu_root, Vector2(1430, 40), Vector2(120, 46), "QUIT", game.quit_game)
-	first.grab_focus()
-	queue_redraw()
+	frontend.show_home()
 
 func show_garage(_focus_group: String = "driver") -> void:
 	var retaining:=_focus_group=="pause"
-	var from_lobby:=_focus_group=="lobby"
+	var from_lobby:=_focus_group in ["lobby","setup"]
+	var from_home:=_focus_group=="home"
+	frontend.close_modal(false)
+	game.input_router.gameplay_enabled=false;game.input_router.clear_all()
 	if not retaining and not from_lobby:game.selected_player_slot=0
 	var local: LeoLocalPlayer=game.local_players[game.selected_player_slot]
 	if game.selected_player_slot==0:
@@ -215,23 +178,23 @@ func show_garage(_focus_group: String = "driver") -> void:
 	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
 	garage_selector.configure(game.catalog,local.driver_id,local.vehicle_id,game.reduced_motion)
 	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining
-	if game.human_count==2:garage_selector.input_device=game.input_router.players[game.selected_player_slot].device
+	garage_selector.input_device=-2
 	menu_root.add_child(garage_selector)
-	if from_lobby:garage_selector.race_button.text="SAVE / BACK TO TWO PLAYER"
+	garage_selector.race_button.text="Use This Ride" if from_lobby else "Back" if from_home else garage_selector.race_button.text
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
 		game.preview=garage_selector.assembly
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
-		play_arcade_cue("select"))
+		play_arcade_cue("select");game.ui_audio.say("choice");garage_selector.identity.text="Nice choice!")
 	garage_selector.name_changed.connect(func(value: String):
 		if not retaining:game.apply_garage_selection(garage_selector.driver_id,garage_selector.vehicle_id,value))
 	garage_selector.race_requested.connect(func(d: StringName,v: StringName):
 		game.apply_garage_selection(d,v,garage_selector.custom_name)
-		if from_lobby:game.open_local_lobby()
-		else:game.start_race())
+		if from_lobby:frontend.show_setup()
+		else:game.return_menu())
 	garage_selector.continue_requested.connect(func(d: StringName,v: StringName):game.swap_player_vehicle(d,v,garage_selector.custom_name))
 	garage_selector.back_requested.connect(func():
 		if retaining:game.cancel_pause_garage()
-		elif from_lobby:game.open_local_lobby()
+		elif from_lobby:frontend.show_setup()
 		else:game.return_menu())
 	game.preview=garage_selector.assembly
 	garage_selector.driver_buttons[game.catalog.driver_index(local.driver_id)].grab_focus()
@@ -245,179 +208,33 @@ func modal(title: String, subtitle: String = "") -> void:
 	if not subtitle.is_empty(): text_at(modal_root, Vector2(482, 247), Vector2(640, 35), subtitle, 18, accent)
 
 func show_guide() -> void:
-	modal("FIND YOUR FLOW", "A little sideways. A lot faster.")
-	var lines := [["WASD / ARROWS", "Accelerate, brake & steer"], ["SPACE + STEER", "Hold a drift. Release after the sparks for a boost."], ["LEFT SHIFT", "Nitro: use a full meter for a burst of speed."], ["H / CONTROLLER B", "Honk your ride's horn. Own the harbour."], ["R", "Recover at your last checkpoint"], ["ESC / P", "Pause, resume & restart"], ["CONTROLLER", "Left stick steer · RT drive · LT brake · A drift · X nitro"]]
-	for i in lines.size():
-		text_at(modal_root, Vector2(482, 299 + i * 49), Vector2(620, 26), lines[i][0], 16, gold, true)
-		text_at(modal_root, Vector2(482, 321 + i * 49), Vector2(660, 28), lines[i][1], 16, muted)
-	button(modal_root, Vector2(482, 694), Vector2(634, 54), "GOT IT", func(): clear(modal_root)).grab_focus()
+	frontend.show_guide()
 
 func show_settings() -> void:
-	modal("PIT SETTINGS", "Changes are saved automatically on this PC.")
-	text_at(modal_root, Vector2(482, 320), Vector2(250, 30), "MASTER VOLUME", 20, gold, true)
-	var slider := HSlider.new()
-	slider.position = Vector2(482, 378)
-	slider.size = Vector2(630, 38)
-	slider.min_value = 0
-	slider.max_value = 1
-	slider.step = .01
-	slider.value = game.master_volume
-	slider.value_changed.connect(game.set_volume)
-	modal_root.add_child(slider)
-	slider.grab_focus()
-	var check := CheckButton.new()
-	check.position = Vector2(482, 455)
-	check.size = Vector2(630, 55)
-	check.text = "Fullscreen"
-	check.add_theme_font_size_override("font_size", 24)
-	check.button_pressed = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
-	check.toggled.connect(game.set_fullscreen)
-	modal_root.add_child(check)
-	var music_check := CheckButton.new()
-	music_check.position = Vector2(482, 536)
-	music_check.text = "Island soundtrack"
-	music_check.add_theme_font_size_override("font_size", 24)
-	music_check.button_pressed = game.music_enabled
-	music_check.toggled.connect(game.set_music)
-	modal_root.add_child(music_check)
-	var motion_check := CheckButton.new()
-	motion_check.position = Vector2(482,602)
-	motion_check.text = "Reduced Motion"
-	motion_check.add_theme_font_size_override("font_size",24)
-	motion_check.button_pressed = game.reduced_motion
-	motion_check.toggled.connect(game.set_reduced_motion)
-	modal_root.add_child(motion_check)
-	button(modal_root, Vector2(482, 694), Vector2(634, 54), "BACK TO IT", close_settings)
+	frontend.show_settings()
 
 func close_settings() -> void:
-	if game.paused: pause_menu()
-	else: clear(modal_root)
+	frontend.close_modal()
 
 func show_race() -> void:
-	scene_mode = "race"
-	# Race restarts must discard photo mode, previous callouts and smoothed values.
-	photo_mode = false
-	announcement = ""
-	announcement_time = 0.0
-	display_speed = 0.0
-	display_nitro = 1.0
-	menu_root.hide()
-	if is_instance_valid(garage_selector): garage_selector.hide()
-	clear(modal_root)
-	clear(hud_root)
-	labels.clear()
-	last_ready = true
-	last_drift_charged = false
-	ready_flash = 0.0
-	if game.human_count==2:
-		hud_root.hide();speed_overlay.hide();queue_redraw();return
+	frontend.close_modal(false)
+	scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
+	game.input_router.gameplay_enabled=true;game.input_router.assignment_locked=true;game.input_router.clear_all()
+	if game.human_count==2:hud_root.hide();return
 	hud_root.show()
-	labels.position = text_at(hud_root, Vector2(65, 46), Vector2(170, 80), "1", 76, accent, true)
-	labels.position.add_theme_constant_override("outline_size",1)
-	labels.position.add_theme_color_override("font_outline_color",Color("d4af37"))
-	text_at(hud_root, Vector2(142, 88), Vector2(140, 35), "/ 6", 27, Color.WHITE, true)
-	text_at(hud_root, Vector2(68, 133), Vector2(180, 25), "POSITION", 16, muted, true)
-	labels.lap = text_at(hud_root,Vector2(325,48),Vector2(200,52),"1 / 3",42,accent,true)
-	labels.timer = text_at(hud_root,Vector2(325,106),Vector2(215,30),"00:00.000",21,Color.WHITE)
-	text_at(hud_root,Vector2(326,140),Vector2(180,25),"LAP // RACE TIME",14,muted,true)
-	text_at(hud_root,Vector2(590,36),Vector2(575,35),game.track_definition.display_name.to_upper(),21,Color("bce7e7"),true)
-	labels.sector = text_at(hud_root,Vector2(755,77),Vector2(400,28),"COASTAL PROMENADE",16,gold,true)
-	labels.progress = text_at(hud_root,Vector2(595,106),Vector2(270,25),"LAP PROGRESS  0%",14,muted,true)
-	labels.corner = text_at(hud_root,Vector2(858,106),Vector2(300,25),"",14,accent,true)
-	labels.corner.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	text_at(hud_root,Vector2(1282,51),Vector2(280,55),"LEO RACER",37,Color("e7f5f7"),true)
-	var lion := TextureRect.new()
-	lion.texture = load("res://assets/art/neon_lion.svg")
-	lion.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	lion.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	lion.position = Vector2(1207,44)
-	lion.size = Vector2(64,64)
-	lion.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hud_root.add_child(lion)
-	labels.speed = text_at(hud_root,Vector2(1293,663),Vector2(220,110),"000",91,Color("c3fcff"),true)
-	labels.speed.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	labels.speed.add_theme_constant_override("shadow_outline_size",4)
-	labels.speed.add_theme_color_override("font_shadow_color",Color(0,.8,.9,.24))
-	text_at(hud_root,Vector2(1370,773),Vector2(110,27),"KM/H",18,muted,true)
-	labels.nitro = text_at(hud_root,Vector2(1198,854),Vector2(160,25),"NITRO READY",17,Color("69e9b2"),true)
-	labels.drift = text_at(hud_root, Vector2(575, 758), Vector2(500, 35), "", 23, accent, true)
-	labels.drift.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var carbon:=ColorRect.new()
-	carbon.position=Vector2(47,840)
-	carbon.size=Vector2(836,36)
-	carbon.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	var carbon_material:=ShaderMaterial.new()
-	carbon_material.shader=load("res://shaders/control_carbon.gdshader")
-	carbon.material=carbon_material
-	hud_root.add_child(carbon)
-	var x:=59.0
-	for prompt in [["SPACE","DRIFT"],["SHIFT","NITRO"],["R","RECOVER"],["H","HORN"],["ESC","PAUSE"]]:
-		text_at(hud_root,Vector2(x,842),Vector2(72,28),prompt[0],15,accent,true)
-		x+=66 if prompt[0].length()>3 else 36
-		text_at(hud_root,Vector2(x,842),Vector2(100,28),prompt[1],15,Color("dfebf2"),true)
-		x+=105
-	nitro_liquid=ColorRect.new()
-	nitro_liquid.position=Vector2(1200,520)
-	nitro_liquid.size=Vector2(400,400)
-	nitro_liquid.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	var liquid:=ShaderMaterial.new()
-	liquid.shader=load("res://shaders/nitro_liquid.gdshader")
-	nitro_liquid.material=liquid
-	hud_root.add_child(nitro_liquid)
-	labels.countdown = text_at(hud_root, Vector2(250, 310), Vector2(1100, 180), "3", 126, gold, true)
-	labels.countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	labels.callout = text_at(hud_root, Vector2(400, 225), Vector2(800, 65), "", 37, gold, true)
-	labels.callout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	labels.launch = text_at(hud_root,Vector2(380,517),Vector2(840,35),"TAP ACCELERATE ON THE FINAL BEAT FOR A LAUNCH BOOST",20,accent,true)
-	labels.launch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	queue_redraw()
+	unified_hud=LeoPlayerHUD.new();unified_hud.game=game;unified_hud.slot=0;hud_root.add_child(unified_hud)
 
 func announce(words: String, duration: float = 1.8) -> void:
 	announcement = words
 	announcement_time = duration
+	if game and not game.local_players.is_empty():
+		game.local_players[0].announcement=words;game.local_players[0].announcement_time=duration
 
 func pause_menu() -> void:
-	modal("TAKE A BREATHER",game.disconnect_message if not game.disconnect_message.is_empty() else "Both racers pause together." if game.human_count==2 else "Your island lap will be right here.")
-	button(modal_root,Vector2(482,320),Vector2(634,55),"RESUME RACE",game.toggle_pause,true).grab_focus()
-	if game.human_count==2:
-		button(modal_root,Vector2(482,386),Vector2(310,55),"CHANGE P1 CAR",func():game.selected_player_slot=0;show_garage("pause"))
-		button(modal_root,Vector2(806,386),Vector2(310,55),"CHANGE P2 CAR",func():game.selected_player_slot=1;show_garage("pause"))
-		button(modal_root,Vector2(482,452),Vector2(634,55),"DEVICE & CONTROLS",show_controls)
-		button(modal_root,Vector2(482,518),Vector2(634,55),"RESTART RACE",game.start_race)
-		button(modal_root,Vector2(482,584),Vector2(310,55),"RETIRE P1",func():game.retire_player(0))
-		button(modal_root,Vector2(806,584),Vector2(310,55),"RETIRE P2",func():game.retire_player(1))
-		button(modal_root,Vector2(482,650),Vector2(634,55),"SETTINGS",show_settings)
-		button(modal_root,Vector2(482,716),Vector2(634,55),"MAIN MENU",game.return_menu)
-	else:
-		button(modal_root,Vector2(482,398),Vector2(634,60),"CHANGE CAR",func():game.selected_player_slot=0;show_garage("pause"))
-		button(modal_root,Vector2(482,476),Vector2(634,60),"RESTART RACE",game.start_race)
-		button(modal_root,Vector2(482,554),Vector2(634,60),"SETTINGS",show_settings)
-		button(modal_root,Vector2(482,632),Vector2(634,60),"MAIN MENU",game.return_menu)
+	frontend.show_pause()
 
 func show_results() -> void:
-	if game.human_count==2:
-		show_local_results();return
-	scene_mode = "results"
-	hud_root.hide()
-	clear(modal_root)
-	backdrop(modal_root, .68)
-	panel(modal_root, Vector2(370, 65), Vector2(860, 770), Color("091a34f5"))
-	text_at(modal_root, Vector2(430, 101), Vector2(750, 32), game.track_definition.display_name.to_upper()+" / THREE LAPS", 18, accent, true)
-	text_at(modal_root, Vector2(425, 149), Vector2(780, 85), "ISLAND CHAMPION!" if game.finish_place == 1 else "WHAT A RIDE!", 55, gold, true)
-	text_at(modal_root, Vector2(430, 246), Vector2(760, 35), "YOUR TIME  %s     •     BEST  %s" % [game.format_time(game.player.finish_time) if game.player.finished else "DNF", game.format_time(game.best_time) if game.best_time>0 else "--"], 22, Color.WHITE, true)
-	text_at(modal_root,Vector2(432,282),Vector2(750,22),game.ranking_message,15,gold,true)
-	text_at(modal_root, Vector2(432, 306), Vector2(760, 28), "POS        RACER                                         RACE TIME", 16, muted, true)
-	var order: Array = game.ranking()
-	for i in order.size():
-		var k: LeoKart = order[i]
-		if k.is_player: panel(modal_root, Vector2(417, 349 + i * 47), Vector2(765, 44), Color("214669"))
-		text_at(modal_root, Vector2(438, 351 + i * 47), Vector2(65, 38), "%02d" % (i + 1), 24, gold if k.is_player else Color.WHITE, true)
-		text_at(modal_root, Vector2(526, 351 + i * 47), Vector2(375, 38), k.racer_name + ("  /  YOU" if k.is_player else ""), 24, Color.WHITE, true)
-		text_at(modal_root, Vector2(962, 351 + i * 47), Vector2(220, 38), game.format_time(k.finish_time) if k.finished else "DNF" if k.retired else "%dm BEHIND" % int(game.circuit.length * 3 - k.progress), 22, muted)
-	text_at(modal_root, Vector2(432, 663), Vector2(750, 32), "BEST LAP  %s     /     %d BOOSTS" % [game.format_time(game.best_lap), game.boost_count], 19, accent, true)
-	button(modal_root, Vector2(430, 735), Vector2(350, 62), "RACE AGAIN  →", game.start_race, true).grab_focus()
-	button(modal_root, Vector2(803, 735), Vector2(365, 62), "BACK TO GARAGE", show_garage)
-	queue_redraw()
+	frontend.show_results()
 
 func _process(dt: float) -> void:
 	if scene_mode=="race" and game.human_count==2:
@@ -500,63 +317,19 @@ static func speed_line_strength(speed_mps: float,boosting: bool,active: bool,red
 	return maxf(1.0 if boosting and speed_mps>8 else 0.0,smoothstep(150.0,180.0,absf(speed_mps)*3.6)*.65)
 
 func _draw() -> void:
-	if scene_mode=="garage": return
-	if scene_mode!="race" or not game or not game.player or photo_mode or game.human_count==2: return
-	LeoTelemetry.draw(self)
+	pass
 
 func show_controls(slot: int = 0) -> void:
-	var controls:=LeoControlsPanel.new();controls.router=game.input_router;controls.slot=slot
-	clear(modal_root);modal_root.add_child(controls)
-	controls.closed.connect(func():
-		clear(modal_root)
-		if game.paused:pause_menu())
-
+	frontend.show_controls(slot)
 
 func show_lobby() -> void:
-	scene_mode="lobby";hud_root.hide();speed_overlay.hide();clear(menu_root);clear(modal_root);menu_root.show()
-	local_lobby=LeoLocalLobby.new();local_lobby.game=game;menu_root.add_child(local_lobby)
+	frontend.show_setup(2)
+
 func show_local_results() -> void:
-	scene_mode="results";hud_root.hide();clear(modal_root);backdrop(modal_root,.9)
-	panel(modal_root,Vector2(230,65),Vector2(1140,770),Color("091a34"))
-	text_at(modal_root,Vector2(280,95),Vector2(1040,60),"TWO PLAYER / COLOMBO RESULTS",37,gold,true)
-	for slot in 2:
-		var local: LeoLocalPlayer=game.local_players[slot]
-		var kart:=local.kart
-		text_at(modal_root,Vector2(280+slot*540,175),Vector2(520,90),"P%d / %s\n%s  /  BEST LAP %s" % [slot+1,kart.racer_name,game.format_time(kart.finish_time) if kart.finished else "DNF",game.format_time(local.best_lap) if local.best_lap<99999 else "--"],22,accent if slot==0 else gold,true)
-	var order: Array=game.ranking()
-	for i in order.size():
-		var kart: LeoKart=order[i]
-		text_at(modal_root,Vector2(280,320+i*48),Vector2(1020,44),"%d   %s    %s    %s" % [i+1,kart.racer_name,game.catalog.vehicle(StringName(kart.vehicle_key)).display_name,game.format_time(kart.finish_time) if kart.finished else "DNF"],22,gold if kart.is_player else Color.WHITE)
-	text_at(modal_root,Vector2(280,640),Vector2(1020,35),game.ranking_message,18,gold)
-	button(modal_root,Vector2(280,720),Vector2(480,65),"RACE AGAIN",game.try_start_local_race,true).grab_focus()
-	button(modal_root,Vector2(800,720),Vector2(480,65),"BACK TO LOBBY",game.open_local_lobby)
+	frontend.show_results()
 
 func show_rankings() -> void:
-	clear(modal_root)
-	var screen:=LeoRankingsPanel.new()
-	screen.game=game
-	modal_root.add_child(screen)
+	frontend.show_records()
 
 func show_tracks() -> void:
-	clear(modal_root)
-	var background:=ColorRect.new();background.color=Color("091a28");background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);modal_root.add_child(background)
-	text_at(modal_root,Vector2(260,120),Vector2(1100,60),"CHOOSE YOUR CIRCUIT",40,accent,true)
-	var scroll:=ScrollContainer.new();scroll.position=Vector2(260,220);scroll.size=Vector2(1080,430);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;modal_root.add_child(scroll)
-	var list:=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;list.add_theme_constant_override("separation",18);scroll.add_child(list)
-	for track in game.tracks:
-		var row:=HBoxContainer.new();row.add_theme_constant_override("separation",20);list.add_child(row)
-		var preview_path:=String(track.metadata.get("preview",""))
-		if not preview_path.is_empty() and not preview_path.contains("..") and not preview_path.is_absolute_path():
-			var path: String=track.folder.path_join(preview_path)
-			var texture: Texture2D
-			if path.begins_with("res://"):texture=load(path) as Texture2D
-			else:
-				var image:=Image.load_from_file(path)
-				if image:texture=ImageTexture.create_from_image(image)
-			if texture:
-				var preview:=TextureRect.new();preview.texture=texture;preview.custom_minimum_size=Vector2(190,110);preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(preview)
-		var details:=VBoxContainer.new();details.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(details)
-		var choose:=Button.new();choose.text="%s  /  %.1f KM" % [track.display_name.to_upper(),float(track.route.length)/1000.];choose.custom_minimum_size=Vector2(0,65);choose.add_theme_font_size_override("font_size",24);choose.pressed.connect(func():await game.select_track(track.id));details.add_child(choose)
-		var description:=Label.new();description.text=String(track.metadata.get("description",""));description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;description.add_theme_font_size_override("font_size",18);description.modulate=muted;details.add_child(description)
-	text_at(modal_root,Vector2(270,685),Vector2(1060,30),"Map reference: © OpenStreetMap contributors / ODbL · openstreetmap.org/copyright",16,muted)
-	button(modal_root,Vector2(260,740),Vector2(400,60),"BACK",func():clear(modal_root)).grab_focus()
+	frontend.show_tracks()

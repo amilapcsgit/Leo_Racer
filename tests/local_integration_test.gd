@@ -54,5 +54,5 @@ func run() -> void:
  var progress: Array=[]
  for k in game.karts:progress.append({"name":k.racer_name,"finished":k.finished,"next_gate":k.next_gate,"time":k.finish_time})
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"full_race":progress,"first_finish_interval_seen":first_finish_seen}
- FileAccess.open("res://docs/qa-local2player/integration.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("LOCAL_INTEGRATION_TEST ",report)
+ FileAccess.open("res://build/qa-ui/integration.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("LOCAL_INTEGRATION_TEST ",report)
  game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

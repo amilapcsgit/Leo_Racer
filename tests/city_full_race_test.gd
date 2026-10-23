@@ -26,5 +26,5 @@ func run() -> void:
 		racers.append({"name":kart.racer_name,"finished":kart.finished,"next_gate":kart.next_gate,"time":kart.finish_time})
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"full_race":racers,"first_finish_interval_seen":first_finish_interval,"track":"colombo_city","length_m":game.circuit.length}
 	report.humans=game.human_count
-	FileAccess.open("res://docs/qa-colombo-city/full-race%s.json" % ("-single" if single else ""),FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("CITY_FULL_RACE_TEST ",report)
+	FileAccess.open("res://build/qa-ui/full-race%s.json" % ("-single" if single else ""),FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("CITY_FULL_RACE_TEST ",report)
 	await game.quit_game(0 if errors.is_empty() else 1)

@@ -1,0 +1,101 @@
+name: Street Racing UI 1.9 release
+on:
+  push:
+    branches: [release/1.9.0]
+    tags: ['v1.9.*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: street-racing-ui-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set package version
+        shell: pwsh
+        run: |
+          $version='1.9.0'
+          if ('${{ github.ref_type }}' -eq 'tag') {$version='${{ github.ref_name }}'.TrimStart('v')}
+          "BUILD_VERSION=$version" >> $env:GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
+      - name: Prepare pinned toolchain
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build,dist | Out-Null
+          python -m pip install -r tools/requirements-city.txt
+          ./tools/setup_windows.ps1
+      - name: Validate protected content and UI behavior
+        shell: pwsh
+        run: |
+          python tools/colombo_baseline.py
+          if ($LASTEXITCODE -ne 0) {throw 'Protected geometry changed'}
+          ./tools/check_ui.ps1
+      - name: Build and verify offline packages
+        shell: pwsh
+        run: |
+          ./tools/build_ui_release.ps1 -Version $env:BUILD_VERSION
+          ./tools/verify_ui_package.ps1 -Archive "dist/LeoRacer-$env:BUILD_VERSION-win64.zip"
+          ./tools/build_installer.ps1 -Version $env:BUILD_VERSION -BuildFolder build/UIRefresh -CityAssets
+          ./tools/verify_ui_installer.ps1 -Version $env:BUILD_VERSION
+          python tools/ui_checksums.py --version $env:BUILD_VERSION
+          if ($LASTEXITCODE -ne 0) {throw 'Checksums failed'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LeoRacer-ui-checks
+          path: build/qa-ui/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LeoRacer-ui-win64
+          path: |
+            dist/LeoRacer-*-win64.zip
+            dist/LeoRacer-Setup-*.exe
+            dist/SHA256SUMS-*.txt
+          retention-days: 14
+  publish:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: LeoRacer-ui-win64
+          path: release
+      - name: Publish verified 1.9 package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="$GITHUB_REF_NAME"
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then tag="v1.9.0"; fi
+          if tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha' 2>/dev/null); then
+            if [[ "$tag_sha" != "$GITHUB_SHA" ]]; then echo 'Existing tag points elsewhere; refusing to overwrite it.'; exit 1; fi
+          fi
+          if gh release view "$tag" --json isDraft --jq '.isDraft' > existing 2>/dev/null; then
+            if [[ "$(cat existing)" == "false" ]]; then echo 'Release already public; refusing to overwrite assets.'; exit 0; fi
+          else
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Leo Racer ${tag#v} — Street Racing" --notes-file docs/RELEASE_NOTES.md --draft
+          fi
+          find release -type f -print0 | xargs -0 gh release upload "$tag" --clobber
+          gh release upload "$tag" docs/qa-ui/validation.json --clobber
+          gh release edit "$tag" --draft=false --latest

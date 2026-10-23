@@ -19,10 +19,10 @@ func run() -> void:
 	game.player.speed = 42
 	game.player.wheel_motion_speed = 0
 	game.hud._process(.016)
-	verify(game.hud.labels.speed.text=="000","Blocked kart reports zero actual speed despite commanded throttle")
+	verify(game.hud.unified_hud.speed.text=="000","Blocked kart reports zero actual speed despite commanded throttle")
 	game.player.wheel_motion_speed = 20
 	game.hud._process(.016)
-	verify(game.hud.labels.speed.text=="072","Speedometer converts measured travel speed to km/h")
+	verify(game.hud.unified_hud.speed.text=="072","Speedometer converts measured travel speed to km/h")
 	verify(game.art_profile is LeoArtProfile,"Editable Colombo profile is active")
 	verify(game.world.find_child("SriLanka2026",true,false)!=null,"Additive Colombo scenery is assembled")
 	verify(game.world.find_child("SculptedCoastalDunes",true,false).collision_mode==0,"Terrain3D does not change racing collision")

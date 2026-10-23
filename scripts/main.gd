@@ -1,5 +1,6 @@
 extends Node3D
 signal initialization_finished
+var ui_audio: LeoUIAudio
 var initialized := false
 var loading: LeoLoadingScreen
 
@@ -138,6 +139,9 @@ func _ready() -> void:
 	countdown_sound = make_sound("countdown.wav", -12)
 	go_sound = make_sound("go.wav", -12)
 	finish_sound = make_sound("finish.wav", -10)
+	ui_audio=LeoUIAudio.new();add_child(ui_audio)
+	music.bus="Music"
+	for sound in [click_sound,countdown_sound,go_sound,finish_sound]:sound.bus="Effects"
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	hud = LeoHUD.new()
@@ -180,6 +184,7 @@ func _ready() -> void:
 	if "--capture-v2-tour" in args:
 		capture_tour()
 	print("LEO_RACER_READY | circuit=%.2fm | assets=Blender GLB | Godot=%s" % [circuit.length, Engine.get_version_info().string])
+	if "--ui-smoke-test" in args:await hud.frontend.verify_preview()
 
 func configure_input() -> void:
 	var bindings := {"accelerate": [KEY_W, KEY_UP], "brake": [KEY_S, KEY_DOWN], "left": [KEY_A, KEY_LEFT], "right": [KEY_D, KEY_RIGHT], "drift": [KEY_SPACE], "boost": [KEY_SHIFT], "recover": [KEY_R], "pause_race": [KEY_ESCAPE, KEY_P], "photo": [KEY_F8], "horn": [KEY_H]}
@@ -425,6 +430,7 @@ func remove_racers() -> void:
 	player = null
 
 func return_menu() -> void:
+	input_router.gameplay_enabled=false;input_router.assignment_locked=false
 	garage_from_pause=false
 	showroom_lighting(false)
 	get_tree().paused = false
@@ -439,6 +445,8 @@ func return_menu() -> void:
 	hud.show_menu()
 
 func start_race() -> void:
+	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
+	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
 	state="loading";loading.stage("Preparing racers…",15)
 	get_tree().paused=false
 	remove_racers()
@@ -545,6 +553,8 @@ func on_recover(kart: LeoKart) -> void:
 		announce_player(local.slot,"BACK ON TRACK",1.2)
 
 func set_reduced_motion(value: bool) -> void:
+	if is_instance_valid(loading):loading.reduced_motion=value
+	for button in get_tree().get_nodes_in_group("ui_buttons"):button.set_reduced_motion(value)
 	reduced_motion = value
 	if feedback: feedback.set_reduced_motion(value)
 	if local_players[1].feedback:local_players[1].feedback.set_reduced_motion(value)
@@ -672,13 +682,14 @@ func toggle_pause() -> void:
 		for slot in human_count:
 			if local_players[slot].kart and not local_players[slot].kart.finished and not local_players[slot].kart.retired:
 				var problem:=input_router.ready_problem(slot)
-				if not problem.is_empty():disconnect_message=problem;hud.show_controls();return
+				if not problem.is_empty():disconnect_message=problem;hud.show_controls(slot);return
 	paused=not paused;get_tree().paused=paused
 	input_router.clear_all()
 	if split_view:split_view.set_frozen(paused)
+	input_router.gameplay_enabled=not paused
 	if paused:hud.pause_menu()
 	else:
-		hud.clear(hud.modal_root)
+		hud.frontend.close_modal(false)
 		for local in local_players:
 			if local.announcement==disconnect_message:local.announcement="";local.announcement_time=0.
 		disconnect_message=""
@@ -751,6 +762,7 @@ func update_slipstream(dt: float) -> void:
 
 func make_sound(file: String, volume: float) -> AudioStreamPlayer:
 	var p := AudioStreamPlayer.new()
+	p.bus="Effects"
 	p.stream = load("res://assets/audio/" + file)
 	p.volume_db = volume
 	add_child(p)
@@ -778,6 +790,7 @@ func save_settings() -> void:
 	var cfg := ConfigFile.new()
 	cfg.load("user://leo_racer.cfg")
 	cfg.set_value("game","track_id",chosen_track_id)
+	cfg.set_value("game","human_count",human_count)
 	cfg.set_value("audio", "volume", master_volume)
 	cfg.set_value("audio", "music", music_enabled)
 	cfg.set_value("game", "driver", selected_driver)
@@ -802,6 +815,7 @@ func load_settings() -> void:
 		selected_kart = selection.y
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
 		chosen_track_id=cfg.get_value("game","track_id","colombo_city")
+		human_count=clampi(int(cfg.get_value("game","human_count",1)),1,2)
 		legacy_best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		for local in local_players:
 			var data: Variant=cfg.get_value("local_players",str(local.slot),{})
@@ -836,6 +850,7 @@ func quit_game(exit_code: int = 0) -> void:
 	get_tree().quit(exit_code)
 
 func stop_all_audio() -> void:
+	if is_instance_valid(ui_audio):ui_audio.voice.stop();ui_audio.effect.stop()
 	for sound in [music,click_sound,countdown_sound,go_sound,finish_sound]:
 		if is_instance_valid(sound):sound.stop()
 	for kart in karts: kart.stop_audio()
@@ -884,6 +899,7 @@ func capture_tour() -> void:
 	quit_game()
 
 func diagnostic_path(file: String) -> String:
+	if OS.has_feature("editor") and "--ui-smoke-test" in OS.get_cmdline_user_args():return "res://build/qa-ui/"+file
 	return "res://docs/qa-modular-garage/" + file if OS.has_feature("editor") else OS.get_executable_path().get_base_dir().path_join(file)
 
 func check(condition: bool, message: String) -> void:
@@ -998,6 +1014,7 @@ func _on_device_lost(slot: int) -> void:
 		announce_player(slot,disconnect_message,999.)
 func _on_local_command(slot: int, action: String) -> void:
 	if slot>=human_count:return
+	if not input_router.gameplay_enabled:return
 	var local:=local_players[slot]
 	var kart:=local.kart
 	if action=="pause_race":
@@ -1037,17 +1054,12 @@ func test_input(action: String, strength: float = 1., slot: int = 0) -> void:
 	input_router.players[slot].inject_test(action,strength)
 
 func start_single_player() -> void:
-	human_count=1;selected_player_slot=0;input_router.active_slots=1
-	var problem:=input_router.ready_problem(0)
-	if not problem.is_empty():disconnect_message=problem;hud.show_controls(0);return
-	await start_race()
+	human_count=1;selected_player_slot=0;hud.frontend.show_setup(1)
+
 func open_local_lobby() -> void:
-	return_menu()
-	human_count=2;input_router.active_slots=2;input_router.clear_all()
-	local_players[0].driver_id=catalog.drivers[selected_driver].id
-	local_players[0].vehicle_id=catalog.vehicles[selected_kart].id
-	local_players[0].player_name=custom_player_name
-	state="lobby";hud.show_lobby()
+	if state not in ["menu","lobby"]:return_menu()
+	human_count=2;hud.frontend.show_setup(2)
+
 func try_start_local_race() -> bool:
 	for slot in 2:
 		var problem:=input_router.ready_problem(slot)
@@ -1060,7 +1072,7 @@ func try_start_local_race() -> bool:
 	return true
 
 func diagnostic_run() -> bool:
-	return test_mode or smoke_mode or diagnostics_mode or "--drive-test" in OS.get_cmdline_user_args()
+	return test_mode or smoke_mode or diagnostics_mode or "--drive-test" in OS.get_cmdline_user_args() or "--ui-smoke-test" in OS.get_cmdline_user_args()
 
 func open_rankings() -> bool:
 	if diagnostic_run():return false
@@ -1101,7 +1113,7 @@ func select_track(id: String) -> bool:
 	loading.stage("Checking "+target.display_name+"…",10)
 	await get_tree().process_frame
 	if not target.mount():
-		loading.show_failure(target.error,func():select_track(id),func():loading.hide());return false
+		loading.show_failure(target.error,func():hud.frontend.choose_track(target),func():loading.hide();hud.frontend.show_tracks());return false
 	state="loading";remove_racers()
 	var old_streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
 	if old_streamer:await old_streamer.stop()

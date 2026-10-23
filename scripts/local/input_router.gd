@@ -10,6 +10,11 @@ var capture_slot := -1
 var capture_action := ""
 var capture_rest: Dictionary = {}
 var last_error := ""
+var gameplay_enabled := false
+var controls_testing := false
+var assignment_locked := false
+var pending_binding: Dictionary = {}
+signal binding_conflict
 func _ready() -> void:
  process_mode = Node.PROCESS_MODE_ALWAYS
  Input.joy_connection_changed.connect(_connection)
@@ -21,14 +26,15 @@ func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  last_error = ""
  for i in players.size():
   if i == slot: continue
-  if kind == "keyboard" and players[i].kind == "keyboard": last_error = "Only one keyboard player is allowed. Change the other player's device first."
   if kind != "keyboard" and id >= 0 and players[i].kind != "keyboard" and players[i].device == id: last_error = "This device is already assigned to the other player."
  if not last_error.is_empty(): return false
  var p := players[slot]
- if p.kind != kind: p.reset_defaults(kind)
+ p.preference="manual"
+ if p.kind != kind:p.switch_kind(kind)
  p.device = id if kind != "keyboard" else -1
  p.identity = fingerprint(id) if id in Input.get_connected_joypads() else {}
  p.clear()
+ configure_keyboards(active_slots)
  if save: save_profiles()
  binding_changed.emit()
  return true
@@ -37,21 +43,42 @@ func ready_problem(slot: int) -> String:
  if p.kind != "keyboard" and not p.device in Input.get_connected_joypads(): return "Player %d: choose a connected controller or wheel." % (slot+1)
  for action in ["accelerate","brake","left","right"]:
   if p.bindings.get(action,[]).is_empty(): return "Player %d: bind %s." % [slot+1,action]
+ if active_slots==2 and players[0].kind=="keyboard" and players[1].kind=="keyboard":
+  for action in ["accelerate","brake","left","right","drift","boost","recover","horn"]:
+   for binding in p.bindings.get(action,[]):
+    if not conflicts(slot,action,binding).is_empty():return "Keyboard controls overlap. Open Controls to choose another key."
  return ""
 func clear_all() -> void:
  for p in players: p.clear()
 func _input(event: InputEvent) -> void:
  if capture_slot >= 0:
   _capture(event); return
- feed(event)
+ if gameplay_enabled or controls_testing:feed(event)
 func feed(event: InputEvent) -> void:
+ var pause_sent:=false
  for slot in players.size():
   for action in players[slot].feed(event):
-   if slot < active_slots: command.emit(slot,action)
+   if slot < active_slots and gameplay_enabled:
+    if action=="pause_race" and pause_sent:continue
+    if action=="pause_race":
+     pause_sent=true
+     if is_inside_tree():get_viewport().set_input_as_handled()
+    command.emit(slot,action)
 func _notification(what: int) -> void:
  if what == NOTIFICATION_APPLICATION_FOCUS_OUT: clear_all()
 func _connection(id: int, connected: bool) -> void:
  if connected:
+  var identity:=fingerprint(id)
+  var owners: Array[LeoPlayerInput]=[]
+  var matches:=0
+  for other_id in Input.get_connected_joypads():
+   if fingerprint(other_id)==identity:matches+=1
+  for p in players:
+   if p.kind!="keyboard" and p.identity==identity:owners.append(p)
+  if owners.size()==1 and matches==1 and owners[0].device<0:owners[0].device=id;owners[0].clear()
+  if not assignment_locked:resolve_automatic(active_slots)
+  var audio:=get_tree().get_first_node_in_group("ui_audio")
+  if audio:audio.cue("connect")
   binding_changed.emit(); return
  for i in players.size():
   if players[i].device == id:
@@ -71,7 +98,6 @@ func load_profiles() -> void:
  var identities: Dictionary={}
  for id in Input.get_connected_joypads():identities[id]=fingerprint(id)
  restore_assignments(Input.get_connected_joypads(),identities)
- if players[0].kind == "keyboard" and players[1].kind == "keyboard": players[1].reset_defaults("gamepad")
 func start_capture(slot: int, action: String) -> void:
  capture_slot = slot; capture_action = action
  capture_rest.clear()
@@ -83,13 +109,15 @@ func cancel_capture() -> void:
  capture_slot = -1; capture_action = ""
  clear_all()
 func _capture(event: InputEvent) -> void:
+ if players[capture_slot].kind=="keyboard" and event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_B:
+  cancel_capture();binding_changed.emit();get_viewport().set_input_as_handled();return
  if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
   cancel_capture(); binding_changed.emit(); get_viewport().set_input_as_handled(); return
  var p := players[capture_slot]
  if not p.accepts(event): return
  var binding := {}
  if event is InputEventKey and event.pressed:
-  binding = {"type":"key","index":event.physical_keycode if event.physical_keycode else event.keycode}
+  binding = {"type":"key","index":event.physical_keycode if event.physical_keycode else event.keycode,"location":event.location}
  elif event is InputEventJoypadButton and event.pressed:
   binding = {"type":"button","index":event.button_index}
  elif event is InputEventJoypadMotion:
@@ -97,9 +125,90 @@ func _capture(event: InputEvent) -> void:
   if absf(event.axis_value-rest)>.4:
    binding = {"type":"axis","index":event.axis,"rest":rest,"pressed":event.axis_value,"deadzone":.03 if p.kind == "wheel" else .16,"sensitivity":1.}
  if not binding.is_empty():
-  p.bindings[capture_action] = [binding]
+  if not conflicts(capture_slot,capture_action,binding).is_empty():
+   pending_binding={"slot":capture_slot,"action":capture_action,"binding":binding}
+   cancel_capture();binding_conflict.emit();get_viewport().set_input_as_handled();return
+  p.bindings[capture_action] = [binding];p.custom_bindings=true
   cancel_capture(); save_profiles(); binding_changed.emit()
  get_viewport().set_input_as_handled()
+
+func configure_keyboards(count: int) -> void:
+ var shared:=count==2 and players[0].kind=="keyboard" and players[1].kind=="keyboard"
+ for slot in players.size():players[slot].use_keyboard_preset("shared%d" % (slot+1) if shared else "solo")
+
+func resolve_automatic(count: int, devices: Array[int] = [], identities: Dictionary = {}, injected: bool = false) -> void:
+ if assignment_locked:return
+ active_slots=count
+ var connected: Array[int]=devices.duplicate() if injected else Input.get_connected_joypads()
+ connected.sort()
+ var used: Array[int]=[]
+ var reserved: Dictionary={}
+ for slot in count:
+  if players[slot].device in connected:reserved[players[slot].device]=slot
+ for slot in count:
+  var p:=players[slot]
+  if p.preference=="manual" and p.kind!="keyboard" and p.device in connected:used.append(p.device)
+ for slot in count:
+  var p:=players[slot]
+  if p.preference!="auto":continue
+  var chosen: int=-1
+  if p.device in connected and not p.device in used:chosen=p.device
+  else:
+   for id in connected:
+    if not id in used and int(reserved.get(id,slot))==slot and (injected or Input.is_joy_known(id)):chosen=id;break
+  var target:="gamepad" if chosen>=0 else "keyboard"
+  if p.kind!=target:
+   p.switch_kind(target)
+  p.device=chosen
+  p.identity=identities.get(chosen,{}) if injected else fingerprint(chosen) if chosen>=0 else {}
+  if chosen>=0:used.append(chosen)
+  p.clear()
+ configure_keyboards(count)
+ binding_changed.emit()
+
+func set_automatic(slot: int) -> void:
+ players[slot].preference="auto"
+ # Explicit recovery can resolve this slot without moving another player's device.
+ var locked:=assignment_locked;assignment_locked=false
+ resolve_automatic(active_slots);assignment_locked=locked
+ save_profiles()
+
+func conflicts(slot: int, action: String, binding: Dictionary) -> Array[Dictionary]:
+ var result: Array[Dictionary]=[]
+ if binding.get("type")!="key" or action in ["pause_race","photo"]:return result
+ for other_slot in active_slots:
+  var other:=players[other_slot]
+  if other.kind!="keyboard":continue
+  for other_action in other.bindings:
+   if other_action in ["pause_race","photo"] or (other_slot==slot and other_action==action):continue
+   for entry in other.bindings[other_action]:
+    if entry.get("type")!="key" or entry.get("index")!=binding.get("index"):continue
+    var a:=int(entry.get("location",0));var b:=int(binding.get("location",0))
+    if a==0 or b==0 or a==b:result.append({"slot":other_slot,"action":other_action,"binding":entry})
+ return result
+
+func resolve_conflict(choice: String) -> void:
+ if pending_binding.is_empty():return
+ var data:=pending_binding;pending_binding={}
+ if choice=="cancel":return
+ if choice=="retry":start_capture(data.slot,data.action);return
+ var matches:=conflicts(data.slot,data.action,data.binding)
+ var p:=players[int(data.slot)]
+ var previous: Array=p.bindings.get(data.action,[]).duplicate(true)
+ # A swap is safe only when one action owns the key and it can receive the old binding.
+ if matches.size()!=1 or previous.is_empty():last_error="Choose another key for this action.";return
+ var match_data: Dictionary=matches[0]
+ for old in previous:
+  if old.get("type")=="key" and data.binding.get("type")=="key" and old.get("index")==data.binding.get("index"):
+   var old_location:=int(old.get("location",0));var new_location:=int(data.binding.get("location",0))
+   if old_location==0 or new_location==0 or old_location==new_location:last_error="Those keys still overlap. Choose another key.";return
+  var overlaps:=conflicts(int(match_data.slot),str(match_data.action),old)
+  overlaps=overlaps.filter(func(item):return not (item.slot==data.slot and item.action==data.action))
+  if not overlaps.is_empty():last_error="That swap would overlap another action. Choose another key.";return
+ players[int(match_data.slot)].bindings[match_data.action]=previous
+ players[int(match_data.slot)].custom_bindings=true
+ p.bindings[data.action]=[data.binding];p.custom_bindings=true
+ clear_all();save_profiles();binding_changed.emit()
 
 func restore_assignments(devices: Array[int], identities: Dictionary) -> void:
  # Compare against ALL saved owners and ALL connected devices. A lone plugged-in

@@ -1,8 +1,8 @@
 name: Windows build and release
 on:
   push:
-    branches: ['**', '!local2player', '!colombo-city', '!release/1.8.*']
-    tags: ['v*', '!v1.8.*']
+    branches: ['**', '!local2player', '!colombo-city', '!release/1.8.*', '!release/1.9.*', '!ui-refresh']
+    tags: ['v*', '!v1.8.*', '!v1.9.*']
   workflow_dispatch:
 permissions:
   contents: read

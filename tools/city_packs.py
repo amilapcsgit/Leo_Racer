@@ -46,6 +46,7 @@ def write_pack(path,engine,entries):
     assert read_pack(path)[1]==entries
 
 def category(name):
+    if name.startswith('assets/ui/art/'):return 'textures/art'
     if name.startswith('assets/tracks/colombo_city/'):return 'tracks/colombo_city/scenery'
     if name.startswith('assets/tracks/astra_coast/') or name=='assets/track-astra.json':return 'tracks/astra_coast/scenery'
     if name.startswith('assets/models/colombo_city/'):return 'glb/colombo-buildings'
@@ -68,17 +69,19 @@ def split(folder):
     # Terrain3D tool installed in the editor, without an unused runtime DLL.
     if '.godot/extension_list.cfg' in entries:
         entries['.godot/extension_list.cfg']=b'\n'.join(line for line in entries['.godot/extension_list.cfg'].splitlines() if b'addons/terrain_3d/' not in line)
-    owners={}
+    owners={};boot_targets=set()
     for name,data in entries.items():
         if not name.endswith(('.import','.remap')):continue
         owner=category(name.removesuffix('.import').removesuffix('.remap'))
         for target in re.findall(r'res://[^"\s]+',data.decode(errors='ignore')):
             if target.startswith('res://.godot/'):owners[target[6:]]=owner
+            if name.startswith('assets/ui/boot/') and target.startswith('res://.godot/'):boot_targets.add(target[6:])
     groups=collections.defaultdict(dict)
     for name,data in entries.items():
         owner=owners.get(name,category(name))
         # Embedded and extracted copies of textures share a single pack/cache.
         if name.endswith('.ctex'):owner='textures/imported'
+        if name in boot_targets:owner='core'
         # The bootstrap icon can be requested by the engine before content mounts.
         if 'leo_road_crest.png' in name:owner='core'
         groups[owner][name]=data

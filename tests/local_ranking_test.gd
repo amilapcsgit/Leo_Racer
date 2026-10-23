@@ -40,7 +40,7 @@ func run() -> void:
  game.save_ranking_results();check(game.rankings_written and game.ranking_message.begins_with("DIAGNOSTIC"),"Main race excludes diagnostic writes")
  game.hud.show_rankings();await process_frame;check(game.hud.modal_root.get_child_count()==1,"Rankings screen handles unavailable database")
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
- FileAccess.open("res://docs/qa-local2player/rankings.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ FileAccess.open("res://build/qa-ui/rankings.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RANKING_TEST ",report)
  game.return_menu();game.stop_all_audio();game.queue_free();store.close_store()
  for suffix in ["","-shm","-wal",".corrupt"]:DirAccess.remove_absolute(path+suffix)

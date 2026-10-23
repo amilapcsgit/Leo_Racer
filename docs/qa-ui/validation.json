@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-23",
+  "base_branch": "release/1.8.0",
+  "base_commit": "529cb55cbd63740e792dbac03bf4482699ab15cc",
+  "implementation_branch": "release/1.9.0",
+  "functional_suites": {
+    "shared_keyboard_and_migration": {
+      "status": "PASS",
+      "checks": 24
+    },
+    "existing_input_and_wheel": {
+      "status": "PASS",
+      "checks": 35
+    },
+    "frontend_navigation": {
+      "status": "PASS",
+      "checks": 33
+    },
+    "local_race": {
+      "status": "PASS",
+      "checks": 21
+    },
+    "local_rankings": {
+      "status": "PASS",
+      "checks": 26
+    },
+    "local_presentation": {
+      "status": "PASS",
+      "checks": 21
+    }
+  },
+  "functional_checks": 160,
+  "rendered_matrices": {
+    "forward_plus": {
+      "captures": 39,
+      "errors": [],
+      "renderer": "forward_plus",
+      "sizes": [
+        "1280x720",
+        "1920x1080",
+        "2560x1080"
+      ],
+      "status": "PASS"
+    },
+    "gl_compatibility": {
+      "captures": 39,
+      "errors": [],
+      "renderer": "gl_compatibility",
+      "sizes": [
+        "1280x720",
+        "1920x1080",
+        "2560x1080"
+      ],
+      "status": "PASS"
+    }
+  },
+  "full_race_integration_status": "PASS",
+  "colombo_full_race_status": "PASS",
+  "gpu_profile": {
+    "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+    "hud_delta_ms": 0.0190000534057617,
+    "measurement": "Median of 90 frames after 30 warmup frames; same frozen scene.",
+    "pause_delta_ms": 0.492000102996826,
+    "renderer": "forward_plus",
+    "resolution": "1920x1080",
+    "scene_with_hud_ms": 6.94099998474121,
+    "scene_with_pause_ms": 7.41400003433228,
+    "scene_without_ui_ms": 6.92199993133545,
+    "status": "PASS",
+    "target_ms": 2.0
+  },
+  "extracted_zip": {
+    "smoke_exit": 0,
+    "archive_sha256": "ddd63a15a4fbb237919b77c2b3201135cf1466ede285851724a4b6d27aae9c57",
+    "status": "PASS",
+    "sdk_removed": true,
+    "content_exit": 0
+  },
+  "package": {
+    "bytes": 371639591,
+    "sha256": "ddd63a15a4fbb237919b77c2b3201135cf1466ede285851724a4b6d27aae9c57"
+  },
+  "voice": "Offline synthesized English (Microsoft Zira); human recordings not commissioned.",
+  "hands_on_pending": [
+    "Leo usability playtest",
+    "Target keyboard rollover",
+    "Physical controller/wheel disconnect and identical-device ownership"
+  ],
+  "status": "PASS",
+  "version": "1.9.0",
+  "installer": {
+    "smoke_exit": 0,
+    "status": "PASS",
+    "sdk_removed": true,
+    "content_exit": 0,
+    "isolated_install_and_uninstall": "PASS",
+    "bytes": 370809100,
+    "sha256": "111f605932f1abf0ee1daddf13248c217dd00e2f5cec0efd56a396abbd241e34"
+  },
+  "package_scope": "Locally verified release candidate. GitHub Actions independently rebuilds and verifies downloadable packages; use release SHA256SUMS for those artifacts."
+}

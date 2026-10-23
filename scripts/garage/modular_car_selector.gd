@@ -34,6 +34,10 @@ var title: Label
 var machine: Label
 var identity: Label
 var stats: Label
+var stat_bars: Array[LeoStatBar]=[]
+var stat_labels: Array[Label]=[]
+var portrait_tweens: Dictionary={}
+var keyboard_suspended: Array[Control]=[]
 var camera: Camera3D
 var yaw := -.6
 var pitch := .24
@@ -45,17 +49,18 @@ var target := Vector3(0,1,0)
 var cream := Color("f3e5ca")
 var brass := Color("d6b77a")
 var cyan := Color("67d6db")
-var font: Font = preload("res://assets/fonts/heading.ttf")
+var font: Font = preload("res://assets/fonts/BarlowCondensed-BoldItalic.ttf")
 @onready var showroom: Node3D = $SubViewportContainer/SubViewport/Garage3D
 @onready var viewport: SubViewport = $SubViewportContainer/SubViewport
 
 func _ready() -> void:
+	theme=load("res://assets/ui/theme.tres")
 	if not catalog: catalog=GarageCatalog.shared()
 	var surround := ColorRect.new()
 	surround.position=Vector2(-2000,0);surround.size=Vector2(5600,900)
 	surround.color=Color("17140f");surround.mouse_filter=MOUSE_FILTER_IGNORE;add_child(surround);move_child(surround,0)
 	var background := TextureRect.new()
-	background.texture=preload("res://assets/art/garage/workshop.png")
+	background.texture=preload("res://assets/ui/art/garage.png")
 	background.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	background.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -77,20 +82,10 @@ func kit(region: Rect2) -> AtlasTexture:
 	atlas.region=region
 	return atlas
 
-func panel(parent: Node, rect: Rect2) -> Panel:
-	var backing := ColorRect.new()
-	backing.color=Color(.055,.05,.045,.95 if rect.size.x<650 else .86)
-	var carbon := ShaderMaterial.new();carbon.shader=preload("res://shaders/garage_carbon.gdshader");backing.material=carbon
-	backing.position=rect.position;backing.size=rect.size;backing.mouse_filter=MOUSE_FILTER_IGNORE;parent.add_child(backing)
-	var node := Panel.new()
-	var frame := StyleBoxTexture.new()
-	frame.texture=kit(Rect2(0,0,512,256))
-	for side in [SIDE_LEFT,SIDE_TOP,SIDE_RIGHT,SIDE_BOTTOM]:frame.set_texture_margin(side,16)
-	node.add_theme_stylebox_override("panel",frame)
-	node.position=rect.position;node.size=rect.size
-	node.mouse_filter=MOUSE_FILTER_IGNORE
-	parent.add_child(node)
-	return node
+func panel(parent: Node,rect: Rect2) -> Panel:
+	var node:=Panel.new();node.position=rect.position;node.size=rect.size
+	var box:=StyleBoxFlat.new();box.bg_color=Color("101722ee");box.border_color=Color("526372");box.set_border_width_all(1);box.set_corner_radius_all(16);box.shadow_color=Color(0,0,0,.5);box.shadow_size=12
+	node.add_theme_stylebox_override("panel",box);node.mouse_filter=MOUSE_FILTER_IGNORE;parent.add_child(node);return node
 
 func label(parent: Node, words: String, font_size: int, color: Color=cream) -> Label:
 	var node := Label.new()
@@ -105,78 +100,71 @@ func positioned_label(words: String, pos: Vector2, font_size: int, color: Color=
 	var node := label(ui,words,font_size,color);node.position=pos
 	return node
 
-func button(parent: Node, words: String, action: Callable, selected:=false) -> Button:
-	var node := Button.new()
-	node.text=words
-	node.add_theme_font_override("font",font)
-	node.add_theme_font_size_override("font_size",22)
-	node.add_theme_color_override("font_color",cream)
-	for state in ["normal","hover","pressed","focus"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color=Color("4a3624") if selected else Color("211e1bec")
-		style.border_color=cyan if state=="focus" else (brass if selected or state!="normal" else Color("70604b"))
-		style.set_border_width_all(2 if selected or state=="focus" else 1)
-		style.set_corner_radius_all(5)
-		style.shadow_color=Color(0,0,0,.5);style.shadow_size=3
-		node.add_theme_stylebox_override(state,style)
-	parent.add_child(node)
-	node.pressed.connect(action)
+func button(parent: Node,words: String,action: Callable,selected:=false) -> Button:
+	var node: LeoActionButton=load("res://scenes/ui/ActionButton.tscn").instantiate()
+	node.text=words;node.primary=selected;node.reduced_motion=reduced_motion;node.pressed.connect(action);parent.add_child(node);node.custom_minimum_size.y=44
 	return node
 
 func build_interface() -> void:
-	# Construct once: selection updates labels/models/styles without destroying
-	# focused controls, text composition, scroll position or controller routes.
 	if ui:return
 	process_mode=Node.PROCESS_MODE_ALWAYS
 	ui=Control.new();ui.set_anchors_and_offsets_preset(PRESET_FULL_RECT);ui.mouse_filter=MOUSE_FILTER_IGNORE;add_child(ui)
-	panel(ui,Rect2(12,12,630,876))
-	positioned_label("ASTRA MOTOR CLUB // COLOMBO 2026",Vector2(36,30),18,brass)
-	positioned_label("THE PIT SHOP",Vector2(34,68),52)
-	positioned_label("01 / DRIVER SETUP",Vector2(36,142),21,brass)
-	name_field=LineEdit.new();name_field.position=Vector2(34,184);name_field.size=Vector2(586,55);name_field.max_length=32;name_field.text=custom_name
-	name_field.add_theme_font_override("font",font);name_field.add_theme_font_size_override("font_size",26);ui.add_child(name_field)
+	panel(ui,Rect2(16,20,480,860))
+	positioned_label("COLOMBO MOTOR CLUB",Vector2(40,36),20,cyan)
+	positioned_label("THE PIT SHOP",Vector2(38,72),48)
+	name_field=LineEdit.new();name_field.position=Vector2(40,141);name_field.size=Vector2(432,48);name_field.max_length=32;name_field.text=custom_name;name_field.add_theme_font_size_override("font_size",26);ui.add_child(name_field)
 	name_field.text_changed.connect(func(value: String):custom_name=value;refresh_labels();name_changed.emit(value))
-	var keys:=button(ui,"NAME KEYBOARD  /  A",open_keyboard);keys.position=Vector2(367,248);keys.size=Vector2(253,35);keys.add_theme_font_size_override("font_size",17)
-	positioned_label("SELECT YOUR DRIVER",Vector2(36,293),21,brass)
-	driver_scroll=ScrollContainer.new();driver_scroll.position=Vector2(34,334);driver_scroll.size=Vector2(586,140);driver_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;driver_scroll.follow_focus=true;ui.add_child(driver_scroll)
-	var drivers:=HBoxContainer.new();drivers.add_theme_constant_override("separation",6);driver_scroll.add_child(drivers)
+	var keys:=button(ui,"Change Name",open_keyboard);keys.position=Vector2(224,201);keys.size=Vector2(248,44)
+	positioned_label("CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
+	driver_scroll=ScrollContainer.new();driver_scroll.position=Vector2(40,300);driver_scroll.size=Vector2(432,152);driver_scroll.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;driver_scroll.follow_focus=true;ui.add_child(driver_scroll)
+	var portrait_margin:=MarginContainer.new()
+	for side in ["left","right","top","bottom"]:portrait_margin.add_theme_constant_override("margin_"+side,8)
+	driver_scroll.add_child(portrait_margin)
+	var drivers:=HBoxContainer.new();drivers.add_theme_constant_override("separation",12);portrait_margin.add_child(drivers)
 	for d in catalog.drivers:
-		var card:=button(drivers,"",func():choose_driver(d.id),d.id==driver_id);card.custom_minimum_size=Vector2(90,128);card.tooltip_text=d.display_name
-		add_card_content(card,d.display_name,d.portrait,Vector2(82,88),15 if d.display_name.length()>8 else 17);driver_buttons.append(card)
-	caption=positioned_label("",Vector2(36,486),18,Color("bcb3a4"));caption.size=Vector2(580,54);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var dp:=button(ui,"‹ DRIVER",func():cycle_driver(-1));dp.position=Vector2(34,548);dp.size=Vector2(275,43)
-	var dn:=button(ui,"DRIVER ›",func():cycle_driver(1));dn.position=Vector2(325,548);dn.size=Vector2(295,43)
-	positioned_label("YOUR COMBO. YOUR COAST.",Vector2(36,626),24,brass)
-	positioned_label("LB / RB   CHANGE MACHINE\nSTICK / D-PAD   MOVE FOCUS\nA   SELECT     B   BACK",Vector2(36,674),19,cyan)
-	var race_y:=820. if not race_context else 744.
-	race_button=button(ui,"CONTINUE RACE  →" if race_context else "LET'S MAKE SOME NOISE  →",func():
+		var card:=button(drivers,"",func():choose_driver(d.id));card.custom_minimum_size=Vector2(112,128);card.tooltip_text=d.display_name
+		var frame:=TextureRect.new();frame.texture=preload("res://assets/ui/icons/hex_frame.svg");frame.set_anchors_and_offsets_preset(PRESET_FULL_RECT);frame.mouse_filter=MOUSE_FILTER_IGNORE;frame.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;card.add_child(frame);card.set_meta("portrait_frame",frame)
+		add_card_content(card,d.display_name,d.portrait,Vector2(96,96),20);driver_buttons.append(card)
+		card.focus_entered.connect(func():animate_portrait(card,true));card.focus_exited.connect(func():animate_portrait(card,false));card.mouse_entered.connect(func():animate_portrait(card,true));card.mouse_exited.connect(func():animate_portrait(card,false))
+	caption=positioned_label("",Vector2(40,466),22,Color("b9c7d6"));caption.size=Vector2(432,56);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var dp:=button(ui,"‹ Driver",func():cycle_driver(-1));dp.position=Vector2(40,534);dp.size=Vector2(210,44)
+	var dn:=button(ui,"Driver ›",func():cycle_driver(1));dn.position=Vector2(262,534);dn.size=Vector2(210,44)
+	for i in 3:
+		var caption_label:=positioned_label("",Vector2(40,604+i*52),21,cream);stat_labels.append(caption_label)
+		var bar: LeoStatBar=load("res://scenes/ui/StatBar.tscn").instantiate();bar.position=Vector2(268,608+i*52);bar.size=Vector2(200,18);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
+	positioned_label("Your combo. Your coast.",Vector2(40,770),22,cyan)
+	race_button=button(ui,"Keep Racing" if race_context else "Use This Ride",func():
 		if race_context:continue_requested.emit(driver_id,vehicle_id)
 		else:race_requested.emit(driver_id,vehicle_id),true)
-	race_button.position=Vector2(34,race_y);race_button.size=Vector2(425,50)
-	back_button=button(ui,"BACK",func():back_requested.emit());back_button.position=Vector2(472,820);back_button.size=Vector2(148,50)
-	if race_context:
-		var fresh:=button(ui,"START NEW RACE",func():race_requested.emit(driver_id,vehicle_id));fresh.position=Vector2(34,820);fresh.size=Vector2(425,50)
-	panel(ui,Rect2(668,20,912,110))
-	title=positioned_label("",Vector2(694,31),38);title.size=Vector2(860,48);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.clip_text=true
-	machine=positioned_label("",Vector2(697,82),26,brass);machine.size=Vector2(765,36);machine.clip_text=true;machine.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-	counter=positioned_label("",Vector2(1460,84),22,cyan)
-	identity=positioned_label("",Vector2(695,143),18,cyan)
-	policy=positioned_label("",Vector2(695,180),16,brass)
-	previous_button=button(ui,"‹",func():cycle_vehicle(-1));previous_button.text="";previous_button.icon=preload("res://assets/art/garage/carousel_left.svg");previous_button.tooltip_text="Previous vehicle / LB";previous_button.position=Vector2(671,374);previous_button.size=Vector2(70,138);previous_button.add_theme_font_size_override("font_size",68)
-	next_button=button(ui,"›",func():cycle_vehicle(1));next_button.text="";next_button.icon=preload("res://assets/art/garage/carousel_right.svg");next_button.tooltip_text="Next vehicle / RB";next_button.position=Vector2(1496,374);next_button.size=Vector2(70,138);next_button.add_theme_font_size_override("font_size",68)
-	panel(ui,Rect2(965,749,615,136))
-	stats=positioned_label("",Vector2(990,761),23)
-	positioned_label("DRAG TO ORBIT  ·  WHEEL TO ZOOM",Vector2(686,803),17,cream)
-	var reset:=button(ui,"RESET VIEW",reset_view);reset.position=Vector2(688,836);reset.size=Vector2(220,40)
+	race_button.position=Vector2(40,812);race_button.size=Vector2(432,48)
+	back_button=button(ui,"Back",func():back_requested.emit());back_button.position=Vector2(1328,812);back_button.size=Vector2(224,48)
+	panel(ui,Rect2(536,20,1016,108))
+	title=positioned_label("",Vector2(560,30),38);title.size=Vector2(910,44);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.clip_text=true
+	machine=positioned_label("",Vector2(560,78),28,cyan);machine.size=Vector2(810,40);machine.clip_text=true
+	counter=positioned_label("",Vector2(1450,80),22,cyan)
+	identity=positioned_label("Your ride. Your rules.",Vector2(558,138),20,cream)
+	policy=positioned_label("",Vector2(558,164),20);policy.hide()
+	previous_button=button(ui,"‹",func():cycle_vehicle(-1));previous_button.position=Vector2(540,382);previous_button.size=Vector2(64,112);previous_button.tooltip_text="Previous ride · LB"
+	next_button=button(ui,"›",func():cycle_vehicle(1));next_button.position=Vector2(1488,382);next_button.size=Vector2(64,112);next_button.tooltip_text="Next ride · RB"
+	stats=positioned_label("",Vector2.ZERO,20);stats.hide()
+	positioned_label("Drag to orbit · Scroll to zoom · LB / RB change ride",Vector2(560,772),20,cream)
+	var reset:=button(ui,"Reset View",reset_view);reset.position=Vector2(560,812);reset.size=Vector2(224,48)
 	var all: Array[Button]=[];all.append_array(driver_buttons);all.append_array([dp,dn,previous_button,next_button,reset,race_button,back_button,keys])
 	for i in all.size():
-		all[i].focus_next=all[(i+1)%all.size()].get_path();all[i].focus_previous=all[posmod(i-1,all.size())].get_path()
+		all[i].focus_next=all[i].get_path_to(all[(i+1)%all.size()]);all[i].focus_previous=all[i].get_path_to(all[posmod(i-1,all.size())])
 	for i in driver_buttons.size():
-		driver_buttons[i].focus_neighbor_left=driver_buttons[posmod(i-1,driver_buttons.size())].get_path();driver_buttons[i].focus_neighbor_right=driver_buttons[(i+1)%driver_buttons.size()].get_path()
-		driver_buttons[i].focus_neighbor_top=name_field.get_path();driver_buttons[i].focus_neighbor_bottom=race_button.get_path()
-	name_field.focus_neighbor_bottom=driver_buttons[0].get_path()
-	race_button.focus_neighbor_top=driver_buttons[0].get_path();race_button.focus_neighbor_right=back_button.get_path()
+		driver_buttons[i].focus_neighbor_left=driver_buttons[i].get_path_to(driver_buttons[posmod(i-1,driver_buttons.size())]);driver_buttons[i].focus_neighbor_right=driver_buttons[i].get_path_to(driver_buttons[(i+1)%driver_buttons.size()])
+		driver_buttons[i].focus_neighbor_top=driver_buttons[i].get_path_to(name_field);driver_buttons[i].focus_neighbor_bottom=driver_buttons[i].get_path_to(race_button)
+	name_field.focus_neighbor_bottom=name_field.get_path_to(driver_buttons[0])
+	race_button.focus_neighbor_top=race_button.get_path_to(driver_buttons[0]);race_button.focus_neighbor_right=race_button.get_path_to(back_button)
 	build_keyboard()
+
+func animate_portrait(card: Button,focused: bool) -> void:
+	if focused and card is LeoActionButton and not reduced_motion:card.stars()
+	if portrait_tweens.has(card):portrait_tweens[card].kill()
+	card.pivot_offset=card.size*.5
+	var tween:=create_tween();portrait_tweens[card]=tween
+	tween.tween_property(card,"scale",Vector2.ONE*(1.10 if focused and not reduced_motion else 1.),.12)
 
 func refresh_labels() -> void:
 	if not ui:return
@@ -187,10 +175,21 @@ func refresh_labels() -> void:
 	identity.text="%d RACERS × %d MACHINES // YOUR COMBO. YOUR COAST."%[catalog.drivers.size(),catalog.vehicles.size()]
 	caption.text=d.tagline
 	stats.text="TOP SPEED     %03d KM/H\nCORNER GRIP   %.2f\nLAUNCH POWER  %.1f M/S²"%[roundi(float(LeoRaceRules.resolve(v).max_speed)*3.6),float(LeoRaceRules.resolve(v).handling),float(LeoRaceRules.resolve(v).acceleration)]
+	var rules:=LeoRaceRules.resolve(v)
+	var values: Array[float]=[float(rules.max_speed)*3.6,float(rules.handling),float(rules.acceleration)]
+	var maxima: Array[float]=[0.,0.,0.]
+	for vehicle in catalog.vehicles:
+		var resolved:=LeoRaceRules.resolve(vehicle)
+		maxima[0]=maxf(maxima[0],float(resolved.max_speed)*3.6);maxima[1]=maxf(maxima[1],float(resolved.handling));maxima[2]=maxf(maxima[2],float(resolved.acceleration))
+	for i in 3:
+		stat_bars[i].set_value(values[i]/maxf(.001,maxima[i]))
+		stat_labels[i].text=["Speed · %d km/h" % roundi(values[0]),"Grip · %.2f" % values[1],"Launch · %.1f m/s²" % values[2]][i]
 	policy.text="SELECTED RACER // CABIN POSE" if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else "HELMETED SHAVEN LEO // FIXED CABIN DRIVER" if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED else ("IDENTITY + PORTRAIT // DRIVER-FREE BODY" if v.driver_policy==VehicleDefinition.DriverPolicy.IDENTITY_ONLY else "OPEN COCKPIT // LIVE DRIVER")
 	for i in driver_buttons.size():
 		var card:=driver_buttons[i];var selected:=catalog.drivers[i].id==driver_id
-		var style:=card.get_theme_stylebox("normal").duplicate() as StyleBoxFlat;style.bg_color=Color("4a3624") if selected else Color("211e1bec");style.border_color=cyan if selected else Color("70604b");style.set_border_width_all(2 if selected else 1);card.add_theme_stylebox_override("normal",style)
+		card.modulate=Color.WHITE if selected else Color(.72,.78,.82)
+		var frame: TextureRect=card.get_meta("portrait_frame")
+		frame.texture=load("res://assets/ui/icons/hex_selected.svg") if selected else load("res://assets/ui/icons/hex_frame.svg")
 
 func cycle_vehicle(direction: int) -> void:
 	choose_vehicle(catalog.vehicles[posmod(catalog.vehicle_index(vehicle_id)+direction,catalog.vehicles.size())].id)
@@ -214,6 +213,10 @@ func build_keyboard() -> void:
 	keyboard.hide()
 
 func open_keyboard() -> void:
+	keyboard_suspended.clear()
+	for control in ui.find_children("*","Control",true,false):
+		if not keyboard.is_ancestor_of(control) and control.focus_mode!=Control.FOCUS_NONE:
+			control.set_meta("keyboard_focus_mode",control.focus_mode);control.focus_mode=Control.FOCUS_NONE;keyboard_suspended.append(control)
 	keyboard_original=name_field.text;keyboard_caption.text=name_field.text;keyboard.show();keyboard_first.grab_focus()
 
 func keyboard_append(character: String) -> void:
@@ -224,6 +227,9 @@ func keyboard_sync() -> void:
 	custom_name=name_field.text;keyboard_caption.text=custom_name;refresh_labels()
 
 func close_keyboard(cancelled: bool) -> void:
+	for control in keyboard_suspended:
+		if is_instance_valid(control):control.focus_mode=int(control.get_meta("keyboard_focus_mode",Control.FOCUS_ALL))
+	keyboard_suspended.clear()
 	if cancelled:name_field.text=keyboard_original
 	keyboard_sync();keyboard.hide();race_button.grab_focus();name_changed.emit(custom_name)
 

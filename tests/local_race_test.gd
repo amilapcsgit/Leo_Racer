@@ -63,6 +63,6 @@ func run() -> void:
  check(not game.swap_player_vehicle(&"mario",&"duster","MISSING DEVICE") and game.paused,"Car change cannot bypass mandatory device reassignment")
  game.diagnostics_mode=true
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
- FileAccess.open("res://docs/qa-local2player/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ FileAccess.open("res://build/qa-ui/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RACE_TEST ",report)
  game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

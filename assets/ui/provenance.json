@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-23",
+  "generator": "Built-in image_gen",
+  "prompts": {
+    "home": "Use case: stylized-concept. Asset type: Leo Racer main menu BACKGROUND ONLY, cinematic high-end playful street racing game, 16:9 landscape. Colombo Sri Lanka at blue hour, accurate recognizable illuminated pink Lotus Tower and tropical palms, wet asphalt cyan and warm yellow reflections. On right half a beautifully rendered dark metallic grey family SUV with copper details and a lively blue arcade racing kart, seen three-quarter front. Premium Forza Horizon meets joyful family arcade mood. Left 45 percent low-detail dark navy negative space for LIVE UI, do not draw interface. Grounded polished 3D game art, dramatic but welcoming, no text, no logos, no watermarks, no borders, no UI, no people. Wide composition.",
+    "garage": "Use case: stylized-concept. Asset type: full-bleed landscape 16:9 game garage BACKGROUND, no interface. Match premium cinematic blue-hour Colombo street racing mood, high quality 3D environmental concept. View from inside an elegant tropical motor workshop looking through wide open garage doors at Colombo city skyline with illuminated pink Lotus Tower and palm trees at dusk. Workshop tools and tyres neatly frame far left and right. Clear EMPTY floor across center and lower center for compositing a live 3D vehicle and turntable, floor perspective viewed from low eye level. Charcoal metal, subtle cyan accents and warm amber practical lights, wet concrete reflections. Fun and inviting premium family racing game, no cars, no characters, no people, no text, no logos, no watermarks, no borders or UI.",
+    "astra_coast": "Use case: stylized-concept. Asset type: landscape racing game track selection illustration, NO UI. Astra Lotus Coast, Colombo Sri Lanka tropical island coast circuit at twilight, sweeping smooth race track around palm gardens and harbour water, beautiful illuminated pink Lotus Tower far in background, distant warm city lights. Dynamic curve viewed from elevated helicopter cinematic perspective, turquoise sea and cyan evening light, warm golden racing curbs and streetlamps, polished premium 3D arcade racing environment, playful and welcoming, consistent charcoal blue cyan gold palette. Road layout is impressionistic, actual route displayed separately by game. No text, no logos, no watermarks, no interface, no map lines.",
+    "colombo_city": "Use case: stylized-concept. Asset type: landscape racing game track selection illustration, no interface. Colombo City Grand Prix, Sri Lanka, blue-hour street racing course through lively colonial Fort streets, tropical palms, distant illuminated pink Lotus Tower behind city skyline. View dynamic sweeping urban street curve past colonial architecture and contemporary towers, glossy wet dark asphalt reflecting warm amber lamps and subtle cyan accents. Premium cinematic polished 3D arcade game environmental art, playful inviting family racing, cohesive navy charcoal cyan gold palette. No vehicles in foreground, no people, no text, no logos, no watermarks, no UI. Impressionistic environment, game overlays actual route separately.",
+    "loading": "Use case: stylized-concept. Asset type: small landscape 16:9 racing game loading-screen background illustration. Colombo at blue hour, cinematic coast road sweeping toward a distant pink illuminated Lotus Tower, dark metallic grey SUV and blue racing kart receding into distance on far right. Dark navy gradient negative space across left half and lower center for LIVE loading labels. Simple bold composition, luminous cyan tire trails and warm gold streetlamps, palm silhouettes. Premium polished 3D arcade game art with cheerful sense of anticipation. NO text, NO logo, NO UI, no borders, no watermark, no characters, no foreground detail clutter."
+  },
+  "svg": "Original editable SVG assets; track paths derived from shipped routes.",
+  "voice": {
+    "source": "Microsoft Zira Desktop en-US, Windows System.Speech",
+    "type": "Offline synthesized English",
+    "phrases": {
+      "race": "Let's race!",
+      "ready": "Ready to roll!",
+      "choice": "Nice choice!",
+      "finish": "Great race!"
+    },
+    "note": "Replace bundled WAVs with commissioned recordings when available; runtime needs no speech service."
+  },
+  "fonts": {
+    "heading": "Barlow Condensed Bold Italic",
+    "source": "https://github.com/google/fonts/tree/main/ofl/barlowcondensed",
+    "license": "licenses/Barlow-OFL.txt"
+  }
+}

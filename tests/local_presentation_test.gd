@@ -11,15 +11,15 @@ func frame() -> void:
 func capture(name: String) -> void:
  if not "--visual-test" in OS.get_cmdline_user_args():return
  await frame();await RenderingServer.frame_post_draw
- root.get_texture().get_image().save_png("res://docs/qa-local2player/"+name+".png")
+ root.get_texture().get_image().save_png("res://build/qa-ui/"+name+".png")
 func run() -> void:
  game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await frame();game.diagnostics_mode=true
  var labels:=[]
  for button in game.hud.menu_root.find_children("*","Button",true,false):labels.append(button.text)
- check("2 PLAYER MODE" in labels and "CONTROLS" in labels,"Menu exposes multiplayer and controls")
+ check("Go Race   →" in labels,"Menu exposes race setup")
  game.open_local_lobby();await frame()
- check(game.hud.local_lobby.cards.size()==2 and game.state=="lobby","Two-player setup cards")
- check(game.hud.local_lobby.start_button.disabled,"Race cannot start without device readiness")
+ check(game.hud.frontend.player_status.size()==2 and game.state=="lobby","Two-player setup cards")
+ check(not game.hud.frontend.start_button.disabled,"Automatic controls remove mandatory readiness")
  await capture("lobby")
  game.selected_player_slot=1;game.hud.show_garage("lobby");await frame()
  check(game.hud.garage_selector.vehicle_id==game.local_players[1].vehicle_id,"Garage targets P2")
@@ -53,6 +53,6 @@ func run() -> void:
  game.return_menu();check(not game.split_view.visible and game.camera.current,"Menu restores full-window camera")
  game.human_count=1;await game.start_race();check(not game.split_view.visible and game.camera.current,"Single-player stays full width")
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"renderer":RenderingServer.get_current_rendering_method(),"captures":"--visual-test" in OS.get_cmdline_user_args()}
- FileAccess.open("res://docs/qa-local2player/presentation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ FileAccess.open("res://build/qa-ui/presentation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_PRESENTATION_TEST ",report)
  game.return_menu();game.stop_all_audio();game.queue_free();await frame();quit(0 if errors.is_empty() else 1)

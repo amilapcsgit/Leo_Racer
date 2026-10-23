@@ -1,8 +1,8 @@
-param([string]$Version='1.5.0',[string]$BuildFolder='build/ModularGarage',[switch]$Development,[switch]$CityAssets)
+param([string]$Version='1.9.0',[string]$BuildFolder='build/ModularGarage',[switch]$Development,[switch]$CityAssets)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 $archive=Join-Path $project '.tools/nsis-3.13.zip'
-$compiler=Join-Path $project '.tools/nsis/nsis-3.13/makensis.exe'
+$compiler=Join-Path $project '.tools/nsis/nsis-3.13/Bin/makensis.exe'
 if (-not (Test-Path $compiler)) {
     # SourceForge may return an HTML download page; follow its official refresh.
     Invoke-WebRequest -Uri 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.13/nsis-3.13.zip' -OutFile $archive

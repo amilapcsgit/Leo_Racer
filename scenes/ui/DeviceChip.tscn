@@ -1,0 +1,11 @@
+[gd_scene format=3]
+[node name="DeviceChip" type="HBoxContainer"]
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(44,44)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Caption" type="Label" parent="."]
+size_flags_horizontal = 3
+autowrap_mode = 3
