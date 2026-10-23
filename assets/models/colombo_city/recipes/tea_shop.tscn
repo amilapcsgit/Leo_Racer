@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_08.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_12.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_48.glb" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_68.glb" id="4"]
+
+[node name="tea_shop" type="Node3D"]
+
+[node name="Part0" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 0, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(1.0720455673459084, 1.0, 1.0)
+
+[node name="Part1" parent="." instance=ExtResource("2")]
+position = Vector3(0.0, 3.6866, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part2" parent="." instance=ExtResource("3")]
+position = Vector3(0.0, 6.8266, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part3" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 0, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(1.0720455673459084, 1.0, 1.0)
+
+[node name="Part4" parent="." instance=ExtResource("2")]
+position = Vector3(0.0, 3.6866, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part5" parent="." instance=ExtResource("3")]
+position = Vector3(0.0, 6.8266, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part6" parent="." instance=ExtResource("4")]
+position = Vector3(-1.8, 7.5866, -1.0)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(0.65, 0.65, 0.65)

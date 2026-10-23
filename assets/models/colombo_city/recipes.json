@@ -1,0 +1,2192 @@
+{
+  "format": 2,
+  "recipes": [
+    {
+      "id": "colombo_tea_shop",
+      "path": "res://assets/models/colombo_city/recipes/tea_shop.tscn",
+      "width": 6.912,
+      "height": 8.128234714351276,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 2,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            0.0,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            6.8266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            0.0,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            6.8266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -1.8,
+            7.5866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_fort_corner",
+      "path": "res://assets/models/colombo_city/recipes/fort_corner.tscn",
+      "width": 6.912,
+      "height": 11.328234714351277,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 3,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            0.0,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            0.0,
+            6.8866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            10.0266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            0.0,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            0.0,
+            6.8866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            10.0266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -1.8,
+            10.7866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_coast_cafe",
+      "path": "res://assets/models/colombo_city/recipes/coast_cafe.tscn",
+      "width": 6.912,
+      "height": 7.641634714351277,
+      "depth": 9.224,
+      "front_axis": "+Z",
+      "floors": 2,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_32",
+          "asset": "res://assets/models/colombo_city/modules/module_32.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_46",
+          "asset": "res://assets/models/colombo_city/modules/module_46.glb",
+          "position": [
+            0.0,
+            0,
+            3.656
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "role": "cafe_facade"
+        },
+        {
+          "module": "module_14",
+          "asset": "res://assets/models/colombo_city/modules/module_14.glb",
+          "position": [
+            0.0,
+            3.2,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            6.34,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_32",
+          "asset": "res://assets/models/colombo_city/modules/module_32.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_14",
+          "asset": "res://assets/models/colombo_city/modules/module_14.glb",
+          "position": [
+            0.0,
+            3.2,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            6.34,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -1.8,
+            7.1,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_bakery",
+      "path": "res://assets/models/colombo_city/recipes/bakery.tscn",
+      "width": 6.912,
+      "height": 7.419049572461945,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 1,
+      "pitched": true,
+      "components": [
+        {
+          "module": "module_04",
+          "asset": "res://assets/models/colombo_city/modules/module_04.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.057370358694033,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_34",
+          "asset": "res://assets/models/colombo_city/modules/module_34.glb",
+          "position": [
+            0.0,
+            3.6266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0775645040872706,
+            1.0,
+            1.08
+          ],
+          "role": "pitched_roof"
+        },
+        {
+          "module": "module_04",
+          "asset": "res://assets/models/colombo_city/modules/module_04.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.057370358694033,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_34",
+          "asset": "res://assets/models/colombo_city/modules/module_34.glb",
+          "position": [
+            0.0,
+            3.6266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0775645040872706,
+            1.0,
+            1.08
+          ],
+          "role": "pitched_roof"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_shophouse",
+      "path": "res://assets/models/colombo_city/recipes/shophouse.tscn",
+      "width": 6.912,
+      "height": 11.328234714351277,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 3,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_26",
+          "asset": "res://assets/models/colombo_city/modules/module_26.glb",
+          "position": [
+            0.0,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132697609251,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_26",
+          "asset": "res://assets/models/colombo_city/modules/module_26.glb",
+          "position": [
+            0.0,
+            6.8866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132697609251,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            10.0266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_26",
+          "asset": "res://assets/models/colombo_city/modules/module_26.glb",
+          "position": [
+            0.0,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132697609251,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_26",
+          "asset": "res://assets/models/colombo_city/modules/module_26.glb",
+          "position": [
+            0.0,
+            6.8866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132697609251,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            10.0266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -1.8,
+            10.7866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_balcony_house",
+      "path": "res://assets/models/colombo_city/recipes/balcony_house.tscn",
+      "width": 6.912,
+      "height": 10.619049572461945,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 2,
+      "pitched": true,
+      "components": [
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_14",
+          "asset": "res://assets/models/colombo_city/modules/module_14.glb",
+          "position": [
+            0.0,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_34",
+          "asset": "res://assets/models/colombo_city/modules/module_34.glb",
+          "position": [
+            0.0,
+            6.8266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0775645040872706,
+            1.0,
+            1.08
+          ],
+          "role": "pitched_roof"
+        },
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_14",
+          "asset": "res://assets/models/colombo_city/modules/module_14.glb",
+          "position": [
+            0.0,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_34",
+          "asset": "res://assets/models/colombo_city/modules/module_34.glb",
+          "position": [
+            0.0,
+            6.8266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0775645040872706,
+            1.0,
+            1.08
+          ],
+          "role": "pitched_roof"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_market_terrace",
+      "path": "res://assets/models/colombo_city/recipes/market_terrace.tscn",
+      "width": 13.824,
+      "height": 8.128234714351276,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 2,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            -3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            6.8266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            -3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            6.8266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -5.256,
+            7.5866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            6.8266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            6.8266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            1.656,
+            7.5866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_commercial_corner",
+      "path": "res://assets/models/colombo_city/recipes/commercial_corner.tscn",
+      "width": 13.824,
+      "height": 14.528234714351276,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 4,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            -3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            -3.456,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            -3.456,
+            6.8866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            -3.456,
+            10.0866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            13.2266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            -3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            -3.456,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            -3.456,
+            6.8866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            -3.456,
+            10.0866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            13.2266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -5.256,
+            13.9866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        },
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            3.456,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            3.456,
+            6.8866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            3.456,
+            10.0866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            13.2266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_06",
+          "asset": "res://assets/models/colombo_city/modules/module_06.glb",
+          "position": [
+            3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0573703683456686,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            3.456,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            3.456,
+            6.8866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_20",
+          "asset": "res://assets/models/colombo_city/modules/module_20.glb",
+          "position": [
+            3.456,
+            10.0866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            13.2266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            1.656,
+            13.9866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_courtyard_shops",
+      "path": "res://assets/models/colombo_city/recipes/courtyard_shops.tscn",
+      "width": 13.824,
+      "height": 4.928234714351277,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 1,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_04",
+          "asset": "res://assets/models/colombo_city/modules/module_04.glb",
+          "position": [
+            -3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.057370358694033,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            3.6266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_04",
+          "asset": "res://assets/models/colombo_city/modules/module_04.glb",
+          "position": [
+            -3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.057370358694033,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            3.6266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -5.256,
+            4.3866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        },
+        {
+          "module": "module_04",
+          "asset": "res://assets/models/colombo_city/modules/module_04.glb",
+          "position": [
+            3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.057370358694033,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            3.6266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_04",
+          "asset": "res://assets/models/colombo_city/modules/module_04.glb",
+          "position": [
+            3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.057370358694033,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            3.6266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            1.656,
+            4.3866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_fort_apartments",
+      "path": "res://assets/models/colombo_city/recipes/fort_apartments.tscn",
+      "width": 13.824,
+      "height": 14.528234714351276,
+      "depth": 7.824000000000001,
+      "front_axis": "+Z",
+      "floors": 4,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            -3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            6.8866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            10.0866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            13.2266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            -3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            6.8866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            -3.456,
+            10.0866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            -3.456,
+            13.2266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -5.256,
+            13.9866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            3.456,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            3.6866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            6.8866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            10.0866,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            13.2266,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_08",
+          "asset": "res://assets/models/colombo_city/modules/module_08.glb",
+          "position": [
+            3.456,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0720455673459084,
+            1.0,
+            1.0
+          ],
+          "role": "storefront"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            3.6866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            6.8866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_12",
+          "asset": "res://assets/models/colombo_city/modules/module_12.glb",
+          "position": [
+            3.456,
+            10.0866,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            3.456,
+            13.2266,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            1.656,
+            13.9866,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_lake_residence",
+      "path": "res://assets/models/colombo_city/recipes/lake_residence.tscn",
+      "width": 6.912,
+      "height": 10.841634714351278,
+      "depth": 9.224,
+      "front_axis": "+Z",
+      "floors": 3,
+      "pitched": false,
+      "components": [
+        {
+          "module": "module_32",
+          "asset": "res://assets/models/colombo_city/modules/module_32.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_46",
+          "asset": "res://assets/models/colombo_city/modules/module_46.glb",
+          "position": [
+            0.0,
+            0,
+            3.656
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "role": "cafe_facade"
+        },
+        {
+          "module": "module_16",
+          "asset": "res://assets/models/colombo_city/modules/module_16.glb",
+          "position": [
+            0.0,
+            3.2,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0590831332678619,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_16",
+          "asset": "res://assets/models/colombo_city/modules/module_16.glb",
+          "position": [
+            0.0,
+            6.4,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0590831332678619,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            9.54,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_32",
+          "asset": "res://assets/models/colombo_city/modules/module_32.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_16",
+          "asset": "res://assets/models/colombo_city/modules/module_16.glb",
+          "position": [
+            0.0,
+            3.2,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0590831332678619,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_16",
+          "asset": "res://assets/models/colombo_city/modules/module_16.glb",
+          "position": [
+            0.0,
+            6.4,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0590831332678619,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_48",
+          "asset": "res://assets/models/colombo_city/modules/module_48.glb",
+          "position": [
+            0.0,
+            9.54,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "roof_cap"
+        },
+        {
+          "module": "module_68",
+          "asset": "res://assets/models/colombo_city/modules/module_68.glb",
+          "position": [
+            -1.8,
+            10.3,
+            -1.0
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.65,
+            0.65,
+            0.65
+          ],
+          "role": "prop"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    },
+    {
+      "id": "colombo_garden_cafe",
+      "path": "res://assets/models/colombo_city/recipes/garden_cafe.tscn",
+      "width": 6.912,
+      "height": 6.932449572461945,
+      "depth": 9.224,
+      "front_axis": "+Z",
+      "floors": 1,
+      "pitched": true,
+      "components": [
+        {
+          "module": "module_32",
+          "asset": "res://assets/models/colombo_city/modules/module_32.glb",
+          "position": [
+            0.0,
+            0,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_46",
+          "asset": "res://assets/models/colombo_city/modules/module_46.glb",
+          "position": [
+            0.0,
+            0,
+            3.656
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "role": "cafe_facade"
+        },
+        {
+          "module": "module_34",
+          "asset": "res://assets/models/colombo_city/modules/module_34.glb",
+          "position": [
+            0.0,
+            3.14,
+            1.856
+          ],
+          "yaw": 0.0,
+          "scale_xyz": [
+            1.0775645040872706,
+            1.0,
+            1.08
+          ],
+          "role": "pitched_roof"
+        },
+        {
+          "module": "module_32",
+          "asset": "res://assets/models/colombo_city/modules/module_32.glb",
+          "position": [
+            0.0,
+            0,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            0.9989132146913301,
+            1.0,
+            1.0
+          ],
+          "role": "upper_floor"
+        },
+        {
+          "module": "module_34",
+          "asset": "res://assets/models/colombo_city/modules/module_34.glb",
+          "position": [
+            0.0,
+            3.14,
+            -1.856
+          ],
+          "yaw": 3.141592653589793,
+          "scale_xyz": [
+            1.0775645040872706,
+            1.0,
+            1.08
+          ],
+          "role": "pitched_roof"
+        }
+      ],
+      "entrance": true,
+      "complete_roof": true
+    }
+  ],
+  "units": "metres",
+  "floor_height": 3.2,
+  "seed": 23102026
+}

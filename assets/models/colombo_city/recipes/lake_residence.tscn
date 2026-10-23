@@ -1,0 +1,59 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_16.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_32.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_46.glb" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_48.glb" id="4"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_68.glb" id="5"]
+
+[node name="lake_residence" type="Node3D"]
+
+[node name="Part0" parent="." instance=ExtResource("2")]
+position = Vector3(0.0, 0, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part1" parent="." instance=ExtResource("3")]
+position = Vector3(0.0, 0, 3.656)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(1.0, 1.0, 1.0)
+
+[node name="Part2" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 3.2, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(1.0590831332678619, 1.0, 1.0)
+
+[node name="Part3" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 6.4, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(1.0590831332678619, 1.0, 1.0)
+
+[node name="Part4" parent="." instance=ExtResource("4")]
+position = Vector3(0.0, 9.54, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part5" parent="." instance=ExtResource("2")]
+position = Vector3(0.0, 0, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part6" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 3.2, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(1.0590831332678619, 1.0, 1.0)
+
+[node name="Part7" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 6.4, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(1.0590831332678619, 1.0, 1.0)
+
+[node name="Part8" parent="." instance=ExtResource("4")]
+position = Vector3(0.0, 9.54, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(0.9989132146913301, 1.0, 1.0)
+
+[node name="Part9" parent="." instance=ExtResource("5")]
+position = Vector3(-1.8, 10.3, -1.0)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(0.65, 0.65, 0.65)

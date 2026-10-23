@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_04.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/colombo_city/modules/module_34.glb" id="2"]
+
+[node name="bakery" type="Node3D"]
+
+[node name="Part0" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 0, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(1.057370358694033, 1.0, 1.0)
+
+[node name="Part1" parent="." instance=ExtResource("2")]
+position = Vector3(0.0, 3.6266, 1.856)
+rotation = Vector3(0, 0.0, 0)
+scale = Vector3(1.0775645040872706, 1.0, 1.08)
+
+[node name="Part2" parent="." instance=ExtResource("1")]
+position = Vector3(0.0, 0, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(1.057370358694033, 1.0, 1.0)
+
+[node name="Part3" parent="." instance=ExtResource("2")]
+position = Vector3(0.0, 3.6266, -1.856)
+rotation = Vector3(0, 3.141592653589793, 0)
+scale = Vector3(1.0775645040872706, 1.0, 1.08)

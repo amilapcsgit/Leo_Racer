@@ -45,3 +45,17 @@ python tools/audit_city_course.py
 
 Full-size before/after views belong under ignored `build/colombo-visuals/`; commit
 compact reviewed contact sheets and measured reports under `docs/qa-colombo-visuals/`.
+
+## Completed checkpoint 1
+
+Pinned MIT terrain reference `71ff8c8`; 41 audited components, twelve baseline
+driving views and protected course/vehicle hashes. Baseline split-screen Vulkan:
+118.00 FPS, p95 11.44 ms, p99 12.67 ms at 1080p on RTX A1000.
+
+## Completed checkpoint 2
+
+Twelve assembled recipes render correctly in `qa-colombo-visuals/recipes.jpg`;
+shop entrances are grounded, upper storeys supported, flat/pitched roofs capped.
+Shared module scenes retain source UV/materials. Headless recipe loading and roof
+placement checks pass under Godot 4.7.2. District prototype captures follow with
+the baked placement checkpoint, using the same reviewed recipes.
