@@ -273,9 +273,14 @@ func set_selection(d: StringName,v: StringName) -> void:
 	var generation:=selection_generation
 	var car:=catalog.vehicle(v)
 	var racer:=catalog.driver(d)
-	if not car.model_path.is_empty():await LeoAssets.scene_async(car.model_path,get_tree())
+	refresh_labels()
+	if not car.model_path.is_empty() and not await LeoAssets.scene_async(car.model_path,get_tree()):
+		if generation==selection_generation:machine.text="PREVIEW UNAVAILABLE / CHECK GAME ASSETS"
+		return
 	var driver_path:=racer.cabin_model_path if car.driver_policy==VehicleDefinition.DriverPolicy.CABIN else racer.seated_model_path
-	if not driver_path.is_empty():await LeoAssets.scene_async(driver_path,get_tree())
+	if not driver_path.is_empty() and not await LeoAssets.scene_async(driver_path,get_tree()):
+		if generation==selection_generation:machine.text="DRIVER PREVIEW UNAVAILABLE / CHECK GAME ASSETS"
+		return
 	if generation!=selection_generation or not is_inside_tree():return
 	if is_instance_valid(assembly):showroom.remove_child(assembly);assembly.queue_free()
 	assembly=VehicleAssembler.assemble(catalog.vehicle(v),catalog.driver(d));showroom.add_child(assembly)

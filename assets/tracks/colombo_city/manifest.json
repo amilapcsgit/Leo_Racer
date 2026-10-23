@@ -79,5 +79,6 @@
   "packs": [],
   "route": "route.json",
   "scene": "res://assets/tracks/colombo_city/course.scn",
-  "world_kind": "city"
+  "world_kind": "city",
+  "preview": "preview.png"
 }

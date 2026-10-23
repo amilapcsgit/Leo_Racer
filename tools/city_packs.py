@@ -1,6 +1,6 @@
 """Split a Godot export into lossless, deduplicated external category packs.
 
-Reads Godot's documented-in-source PCK v2/v3 directory; writes plain v3 packs.
+Reads Godot's documented-in-source PCK v2/v3/v4 directory; writes plain v3 packs.
 Compiled resources and dependency remaps are preserved byte for byte.
 """
 from __future__ import annotations
@@ -64,6 +64,10 @@ def split(folder):
     if previous.exists() and source.stat().st_size==json.loads(previous.read_text())['core_bytes']:
         raise ValueError('Package already split: export the complete PCK before splitting again')
     engine,entries=read_pack(source)
+    # Both playable tracks use regular baked/procedural meshes. Keep the old
+    # Terrain3D tool installed in the editor, without an unused runtime DLL.
+    if '.godot/extension_list.cfg' in entries:
+        entries['.godot/extension_list.cfg']=b'\n'.join(line for line in entries['.godot/extension_list.cfg'].splitlines() if b'addons/terrain_3d/' not in line)
     owners={}
     for name,data in entries.items():
         if not name.endswith(('.import','.remap')):continue
@@ -78,21 +82,33 @@ def split(folder):
         # The bootstrap icon can be requested by the engine before content mounts.
         if 'leo_road_crest.png' in name:owner='core'
         groups[owner][name]=data
-    root=folder/'GameAssets';packs=[]
+    root=folder/'GameAssets';packs=[];track_packs={}
     for group,files in sorted(groups.items()):
         target=source if group=='core' else root/(group+'.pck')
         write_pack(target,engine,files)
-        if group!='core':packs.append({'id':group,'file':target.relative_to(root).as_posix(),'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'bytes':target.stat().st_size})
+        if group!='core':
+            entry={'id':group,'file':target.relative_to(root).as_posix(),'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'bytes':target.stat().st_size}
+            packs.append(entry)
+            if group.startswith('tracks/'):track_packs[group.split('/')[1]]=entry
     for category_name in ['textures','vehicles','roads','signs','glb','tracks/astra_coast','tracks/colombo_city','licenses']:
         (root/category_name).mkdir(parents=True,exist_ok=True)
-    assets={f'res://{name}':f'res://{name}' for name in entries if name.startswith('assets/') and not name.endswith(('.import','.remap'))}
-    catalog={'format':1,'engine':'4.7','packs':packs,'assets':assets,'overrides':[]}
+    names={name.removesuffix('.import').removesuffix('.remap') for name in entries if name.startswith('assets/')}
+    assets={f'res://{name}':f'res://{name}' for name in sorted(names)}
+    catalog={'format':1,'engine':'4.7','packs':[p for p in packs if not p['id'].startswith('tracks/')],'assets':assets,'overrides':[]}
     (root/'catalog.json').write_text(json.dumps(catalog,indent=2)+'\n',encoding='utf-8')
     for track in (ROOT/'assets/tracks').glob('*'):
         if not track.is_dir():continue
         import shutil
-        for name in ['manifest.json','route.json']:
+        for name in ['route.json','cells.json','preview.png']:
             if (track/name).exists():shutil.copy2(track/name,root/'tracks'/track.name/name)
+        metadata=json.loads((track/'manifest.json').read_text(encoding='utf-8'))
+        required=['vehicles/roster','glb/shared-scenery','textures/imported']
+        required+=['glb/colombo-buildings','signs/colombo'] if metadata.get('world_kind')=='city' else ['roads/terrain','textures/surfaces','textures/art']
+        metadata['dependencies']=[p['id'] for p in packs if p['id'] in required]
+        if track.name in track_packs:
+            pack=track_packs[track.name]
+            metadata['packs']=[{'file':'scenery.pck','sha256':pack['sha256']}]
+        (root/'tracks'/track.name/'manifest.json').write_text(json.dumps(metadata,indent=2)+'\n',encoding='utf-8')
     import shutil
     shutil.copytree(ROOT/'licenses',root/'licenses',dirs_exist_ok=True)
     (root/'README.txt').write_text('Optimized game content. Install complete compatible track folders under tracks/.\nRegistered cosmetic GLB/PNG/SVG overrides are listed in catalog.json overrides.\nEach override has id (resource path), file (relative GameAssets path), affects_rules (boolean).\nRoute/handling modifications cannot set official records. Keep settings and rankings in user data.\n',encoding='utf-8')

@@ -1,0 +1,8 @@
+{
+  "isolated_content_test": true,
+  "existing_installation_untouched": true,
+  "installer_bytes": 360720292,
+  "status": "PASS",
+  "destination": "C:\\Users\\amilapcs\\.codex\\.chatgpt-projects\\g-p-69b05da7e0d4819184cc29634b4e0928\\publish\\Leo_Racer\\build\\city-installer\\21412f503ebc4d24ad0304a2c11e6a42\\LeoRacer",
+  "offline_checks": "installer-content.json"
+}

@@ -1,0 +1,46 @@
+{
+  "errors": [],
+  "first_finish_interval_seen": false,
+  "full_race": [
+    {
+      "finished": true,
+      "name": "Sonic",
+      "next_gate": 25,
+      "time": 382.173691999971
+    },
+    {
+      "finished": true,
+      "name": "Leo",
+      "next_gate": 25,
+      "time": 363.802747999977
+    },
+    {
+      "finished": true,
+      "name": "Ellie",
+      "next_gate": 25,
+      "time": 361.540859999978
+    },
+    {
+      "finished": true,
+      "name": "Rio",
+      "next_gate": 25,
+      "time": 365.402619999977
+    },
+    {
+      "finished": true,
+      "name": "Shaven Leo",
+      "next_gate": 25,
+      "time": 363.913083999977
+    },
+    {
+      "finished": true,
+      "name": "Mario",
+      "next_gate": 25,
+      "time": 365.237115999977
+    }
+  ],
+  "humans": 1,
+  "length_m": 5499.99501037598,
+  "status": "PASS",
+  "track": "colombo_city"
+}

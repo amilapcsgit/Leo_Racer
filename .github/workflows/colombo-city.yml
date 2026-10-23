@@ -1,7 +1,8 @@
-name: Colombo city development
+name: Colombo city build and 1.8 release
 on:
   push:
-    branches: [colombo-city]
+    branches: [colombo-city, release/1.8.0]
+    tags: ['v1.8.*']
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,21 +15,91 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Set package version
+        shell: pwsh
+        run: |
+          $version='1.8.0-dev'
+          if ('${{ github.ref_name }}' -eq 'release/1.8.0') {$version='1.8.0'}
+          if ('${{ github.ref_type }}' -eq 'tag') {$version='${{ github.ref_name }}'.TrimStart('v')}
+          "BUILD_VERSION=$version" >> $env:GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
       - name: Prepare pinned toolchain
         shell: pwsh
         run: |
-          python -m pip install numpy==2.2.6 Pillow==11.2.1
+          New-Item -ItemType Directory -Force build,dist | Out-Null
+          python -m pip install -r tools/requirements-city.txt
           ./tools/setup_windows.ps1
       - name: Protect released geometry
         run: python tools/colombo_baseline.py
       - name: Validate regression suite
         shell: pwsh
-        run: ./tools/check_local2player.ps1
+        run: ./tools/check_city.ps1
+      - name: Build unpublished offline development artifacts
+        shell: pwsh
+        run: |
+          ./tools/build_city_release.ps1
+          $flags=@('--version',$env:BUILD_VERSION)
+          if (-not $env:BUILD_VERSION.Contains('-dev')) {$flags+='--public-release'}
+          python tools/package_city.py @flags
+          if ($LASTEXITCODE -ne 0) {throw 'Extracted offline checks failed'}
+          $installerFlags=@{Version=$env:BUILD_VERSION;BuildFolder='build/ColomboCity';CityAssets=$true}
+          if ($env:BUILD_VERSION.Contains('-dev')) {$installerFlags.Development=$true}
+          ./tools/build_installer.ps1 @installerFlags
+          ./tools/verify_city_installer.ps1 -Version $env:BUILD_VERSION
+          python tools/city_checksums.py --version $env:BUILD_VERSION
       - uses: actions/upload-artifact@v4
         with:
           name: LeoRacer-colombo-city-checks
           path: docs/qa-colombo-city/
           retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LeoRacer-colombo-city-win64
+          path: |
+            dist/LeoRacer-*-win64.zip
+            dist/LeoRacer-Setup-*.exe
+            dist/SHA256SUMS-*.txt
+          retention-days: 14
+  publish:
+    needs: validate
+    if: startsWith(github.ref, 'refs/tags/v1.8.') || github.ref == 'refs/heads/release/1.8.0'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: LeoRacer-colombo-city-win64
+          path: release
+      - name: Publish verified 1.8 package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="$GITHUB_REF_NAME"
+          if [[ "$GITHUB_REF_TYPE" != "tag" ]]; then tag="v1.8.0"; fi
+          if tag_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha' 2>/dev/null); then
+            if [[ "$tag_sha" != "$GITHUB_SHA" ]]; then echo 'Existing tag points elsewhere; refusing to overwrite it.'; exit 1; fi
+          fi
+          if gh release view "$tag" --json isDraft --jq '.isDraft' > existing 2>/dev/null; then
+            if [[ "$(cat existing)" == "false" ]]; then echo 'Release already public; refusing to overwrite assets.'; exit 0; fi
+          else
+            gh release create "$tag" --target "$GITHUB_SHA" --title "Leo Racer ${tag#v} — Colombo City" --notes-file docs/RELEASE_NOTES.md --draft
+          fi
+          find release -type f -print0 | xargs -0 gh release upload "$tag" --clobber
+          gh release upload "$tag" docs/qa-colombo-city/city-contact-sheet.jpg --clobber
+          gh release edit "$tag" --draft=false --latest

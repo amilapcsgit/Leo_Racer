@@ -36,4 +36,4 @@ func finish() -> void:
  var report:={"status":"MEASURED","renderer":renderer,"gpu":RenderingServer.get_video_adapter_name(),"resolution":[root.size.x,root.size.y],"left":str(game.split_view.views[0].size),"right":str(game.split_view.views[1].size),"six_racers":game.karts.size(),"humans":game.human_count,"seconds":elapsed,"fps":samples.size()/elapsed,"p50_ms":percentile(samples,.5),"p95_ms":percentile(samples,.95),"p99_ms":percentile(samples,.99),"draw_calls":mean(draws),"physics_ms":mean(physics),"progress_m":[game.karts[0].progress,game.karts[1].progress],"target_fps":60,"target_met":samples.size()/elapsed>=60.,"root_3d_camera":str(root.get_camera_3d()),"separated_players":"--separated-players" in OS.get_cmdline_user_args()}
  FileAccess.open("res://docs/qa-colombo-city/performance-%s%s.json" % [renderer,"-separated" if "--separated-players" in OS.get_cmdline_user_args() else ""],FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("SPLIT_RENDER_PROFILE ",report)
- game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit()
+ await game.quit_game()

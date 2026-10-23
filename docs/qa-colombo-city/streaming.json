@@ -1,17 +1,17 @@
 {
   "cache_entries": 12,
-  "cells": 54,
-  "checks": 35,
+  "cells": 53,
+  "checks": 34,
   "errors": [],
   "memory_static_bytes": [
-    355359988.0,
-    355366744.0,
-    355369508.0
+    351477433.0,
+    351484037.0,
+    351486649.0
   ],
   "node_counts": [
-    917,
-    917,
-    917
+    928,
+    928,
+    928
   ],
   "resident_cells": 14,
   "status": "PASS"

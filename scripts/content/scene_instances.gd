@@ -21,6 +21,13 @@ static func restore(node: Node) -> void:
 		var buffer: PackedFloat32Array=node.get_meta("instance_buffer")
 		var stride:=16 if node.multimesh.use_colors else 12
 		if buffer.size()==node.multimesh.instance_count*stride:
-			node.multimesh=node.multimesh.duplicate();node.multimesh.custom_aabb=node.get_meta("instance_bounds",AABB());node.multimesh.buffer=buffer
+			# Headless bakes intentionally have no GPU buffer. Construct a fresh
+			# allocation on the rendering thread rather than duplicating that state.
+			var original: MultiMesh=node.multimesh
+			var instances:=MultiMesh.new();instances.transform_format=original.transform_format
+			instances.use_colors=original.use_colors;instances.use_custom_data=original.use_custom_data
+			instances.mesh=original.mesh;instances.instance_count=original.instance_count
+			instances.custom_aabb=node.get_meta("instance_bounds",AABB());instances.buffer=buffer
+			node.multimesh=instances
 		else:push_error("Invalid scenery instance buffer: "+String(node.name))
 	for child in node.get_children():restore(child)

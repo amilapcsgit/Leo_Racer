@@ -10,7 +10,7 @@ try {
     $output='build/ColomboCity/LeoRacer.exe'
     New-Item -ItemType Directory -Force (Split-Path $output -Parent) | Out-Null
     if (-not $SkipExport) {
-        & "$PSScriptRoot/build_modular_release.ps1" -Output $output
+        & "$PSScriptRoot/build_modular_release.ps1" -Output $output -DebugExport
         if ($LASTEXITCODE -ne 0) {throw 'City export failed'}
     }
     python tools/city_packs.py build/ColomboCity

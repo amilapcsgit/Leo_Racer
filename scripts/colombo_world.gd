@@ -65,8 +65,11 @@ func setup(track: LeoCircuit, p: LeoArtProfile) -> void:
 	print("COLOMBO_WORLD_READY | new_instances=%d | spatial_batches=%d"%[count,bins.size()])
 
 func _terrain() -> void:
+	# Legacy authoring terrain is optional. Astra overrides this method with its
+	# existing procedural mesh; Colombo uses baked scenery, so neither needs the DLL.
+	if not ClassDB.class_exists("Terrain3D"):return
 	if not ResourceLoader.exists("res://assets/terrain/terrain3d-2-2.res") and DirAccess.get_files_at("res://assets/terrain").is_empty(): return
-	var t := Terrain3D.new()
+	var t=ClassDB.instantiate("Terrain3D")
 	t.name = "SculptedCoastalDunes"
 	t.region_size = 256
 	t.vertex_spacing = 1.0
@@ -75,9 +78,9 @@ func _terrain() -> void:
 	t.mesh_lods = 5
 	t.mesh_size = 24
 	t.data_directory = "res://assets/terrain"
-	t.material = Terrain3DMaterial.new()
-	t.assets = Terrain3DAssets.new()
-	var sand := Terrain3DTextureAsset.new()
+	t.material = ClassDB.instantiate("Terrain3DMaterial")
+	t.assets = ClassDB.instantiate("Terrain3DAssets")
+	var sand=ClassDB.instantiate("Terrain3DTextureAsset")
 	sand.name = "Coastal sand"
 	sand.albedo_color = Color("a98453")
 	sand.albedo_texture = load("res://assets/materials/shore_AlbedoHeight.png")
@@ -87,7 +90,7 @@ func _terrain() -> void:
 	sand.uv_scale = .55
 	t.assets.set_texture(0,sand)
 	add_child(t)
-	t.collision.mode = Terrain3DCollision.DISABLED
+	t.collision.mode = 0 # Terrain3DCollision.DISABLED
 	t.material.set_shader_param("world_background",0)
 	if RenderingServer.get_current_rendering_method()=="forward_plus":
 		var haze := FogVolume.new()

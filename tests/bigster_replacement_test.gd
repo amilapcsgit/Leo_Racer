@@ -105,7 +105,7 @@ func run() -> void:
   game.diagnostics_mode = true
   game.hud.show_garage()
   var selector: ModularCarSelector = game.hud.garage_selector
-  selector.set_selection(&"human", &"bigster")
+  await selector.set_selection(&"human", &"bigster")
   selector.reduced_motion = true
   root.size = Vector2i(1600,900)
   DisplayServer.window_set_size(root.size)

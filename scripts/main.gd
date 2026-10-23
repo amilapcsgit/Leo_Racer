@@ -55,6 +55,8 @@ var cam_heading := 0.0
 var clock := 0.0
 var test_mode := false
 var smoke_mode := false
+var shutting_down := false
+var initialization_error := ""
 var test_tick := 0
 var test_errors: Array[String] = []
 var capture_results := false
@@ -71,6 +73,8 @@ var slipstream_cooldown := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	get_tree().auto_accept_quit=false
+	get_tree().root.close_requested.connect(quit_game)
 	loading=LeoLoadingScreen.new();add_child(loading)
 	await get_tree().process_frame
 	loading.stage("Loading garage catalog…",25)
@@ -96,7 +100,8 @@ func _ready() -> void:
 		save_settings()
 	tracks=LeoTrackDefinition.discover()
 	if tracks.is_empty():
-		loading.show_failure("No compatible tracks are installed.",func():get_tree().reload_current_scene(),quit_game);return
+		initialization_error="No compatible tracks are installed."
+		loading.show_failure(initialization_error,func():get_tree().reload_current_scene(),quit_game);return
 	if diagnostic_run():chosen_track_id="astra_coast"
 	for arg in args:
 		if arg.begins_with("--track="):chosen_track_id=arg.trim_prefix("--track=")
@@ -105,7 +110,8 @@ func _ready() -> void:
 		if candidate.id==chosen_track_id:track_definition=candidate;break
 	chosen_track_id=track_definition.id
 	if not track_definition.mount():
-		loading.show_failure(track_definition.error,func():get_tree().reload_current_scene(),quit_game);return
+		initialization_error=track_definition.error
+		loading.show_failure(initialization_error,func():get_tree().reload_current_scene(),quit_game);return
 	art_profile=track_definition.profile()
 	circuit = LeoCircuit.new(track_definition)
 	await build_world()
@@ -439,9 +445,11 @@ func start_race() -> void:
 	for i in 6:
 		var v:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
 		var d:=catalog.drivers[selected_driver] if i==0 else (catalog.driver(local_players[i].driver_id) if i<human_count else catalog.drivers[i%catalog.drivers.size()])
-		if not v.model_path.is_empty():await LeoAssets.scene_async(v.model_path,get_tree())
+		if not v.model_path.is_empty() and not await LeoAssets.scene_async(v.model_path,get_tree()):
+			loading.show_failure(LeoAssets.failure,start_race,func():loading.hide();return_menu());return
 		var driver_path:=d.cabin_model_path if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else d.seated_model_path
-		if not driver_path.is_empty():await LeoAssets.scene_async(driver_path,get_tree())
+		if not driver_path.is_empty() and not await LeoAssets.scene_async(driver_path,get_tree()):
+			loading.show_failure(LeoAssets.failure,start_race,func():loading.hide();return_menu());return
 		loading.stage("Preparing racers %d / 6…"%[i+1],15.+float(i+1)*12.)
 		await get_tree().process_frame
 	garage_from_pause=false
@@ -809,12 +817,23 @@ func format_time(seconds: float) -> String:
 	var milliseconds:=roundi(seconds*1000.)
 	return "%02d:%02d.%03d" % [milliseconds/60000,(milliseconds/1000)%60,milliseconds%1000]
 
-func quit_game() -> void:
+func quit_game(exit_code: int = 0) -> void:
+	if shutting_down:return
+	shutting_down=true;get_tree().paused=false
 	if world:
 		var streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
 		if streamer:await streamer.stop()
+	while not LeoAssets._loading.is_empty():await get_tree().process_frame
 	stop_all_audio()
-	get_tree().quit()
+	if ranking_store:ranking_store.close_store()
+	set_process(false);set_physics_process(false);set_process_input(false);set_process_unhandled_input(false)
+	# Release scene instances while rendering and .NET are still running. Engine
+	# shutdown must not race deferred frees or outstanding resource owners.
+	for child in get_children():child.queue_free()
+	for frame in 3:await get_tree().process_frame
+	LeoAssets.cache.clear();LeoAssets._patched_meshes.clear()
+	await get_tree().process_frame
+	get_tree().quit(exit_code)
 
 func stop_all_audio() -> void:
 	for sound in [music,click_sound,countdown_sound,go_sound,finish_sound]:
@@ -948,10 +967,7 @@ func complete_test() -> void:
 	var file := FileAccess.open(diagnostic_path("race-test.json" if test_mode else "smoke-test.json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  "))
 	print("LEO_TEST_REPORT ", JSON.stringify(report))
-	stop_all_audio()
-	await get_tree().process_frame
-	await get_tree().process_frame
-	get_tree().quit(0 if test_errors.is_empty() else 1)
+	await quit_game(0 if test_errors.is_empty() else 1)
 
 func state_for(kart: LeoKart) -> LeoLocalPlayer:
 	for local in local_players:

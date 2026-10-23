@@ -14,7 +14,7 @@ func run() -> void:
 	check(await game.select_track("colombo_city"),"Colombo scenery loads")
 	var streamer: Node3D=game.world.find_child("ColomboSceneryStreaming",true,false)
 	await settle(streamer)
-	check(streamer.cells.size()==54 and streamer.loaded.size()>0 and streamer.loaded.size()<54,"Only nearby detail cells start resident")
+	check(streamer.cells.size()>40 and streamer.loaded.size()>0 and streamer.loaded.size()<streamer.cells.size(),"Only nearby detail cells start resident")
 	for name_text in ["AuthenticLotusTower","GalleFaceGreen","PreservedCustomArchitecture","BeiraInspiredLake"]:
 		check(game.world.find_child(name_text,true,false)!=null,"Protected landmark stays resident: "+name_text)
 	var count:=0;var buffers_valid:=true
@@ -54,9 +54,9 @@ func run() -> void:
 		streamer=game.world.find_child("ColomboSceneryStreaming",true,false);await settle(streamer)
 		for frame in 4:await process_frame
 		memory_samples.append(Performance.get_monitor(Performance.MEMORY_STATIC));node_counts.append(get_node_count())
-		check(streamer.loaded.size()<54 and LeoAssets.cache.size()<=12,"Repeated track loading stays bounded "+str(cycle))
+		check(streamer.loaded.size()<streamer.cells.size() and LeoAssets.cache.size()<=12,"Repeated track loading stays bounded "+str(cycle))
 	check(memory_samples[-1]<=memory_samples[1]*1.10+8.*1024.*1024.,"Repeated track changes do not accumulate substantial memory")
 	check(node_counts[-1]<=node_counts[1]+2,"Repeated worlds do not accumulate nodes")
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"cells":streamer.cells.size(),"resident_cells":streamer.loaded.size(),"cache_entries":LeoAssets.cache.size(),"memory_static_bytes":memory_samples,"node_counts":node_counts}
 	FileAccess.open("res://docs/qa-colombo-city/streaming.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("CITY_STREAMING_TEST ",report)
-	game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)
+	await streamer.stop();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

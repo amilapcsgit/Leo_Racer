@@ -10,7 +10,7 @@ try {
     foreach ($test in $tests) {
         if (-not (Test-Path "tests/$test.gd")) {continue}
         $log="build/local2player-$test.log"
-        & "$PSScriptRoot/run_godot.ps1" @('--headless','--script',"res://tests/$test.gd",'--','--drive-test') 2>&1 | Tee-Object -FilePath $log
+        & "$PSScriptRoot/run_godot.ps1" @('--headless','--script',"res://tests/$test.gd",'--quit-after','18000','--','--drive-test') 2>&1 | Tee-Object -FilePath $log
         if ($LASTEXITCODE -ne 0 -or (Select-String -Path $log -Pattern 'SCRIPT ERROR|^FAIL |"status": "FAIL"|"status":"FAIL"' -Quiet)) {throw "Failed $test"}
     }
 } finally {Pop-Location}

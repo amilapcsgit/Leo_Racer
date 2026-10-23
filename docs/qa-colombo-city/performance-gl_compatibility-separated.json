@@ -1,0 +1,28 @@
+{
+  "draw_calls": 1200.51231709576,
+  "fps": 119.966306332974,
+  "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+  "humans": 2,
+  "left": "(958, 1080)",
+  "p50_ms": 8.365,
+  "p95_ms": 10.434,
+  "p99_ms": 10.701,
+  "physics_ms": 2.33972846823475,
+  "progress_m": [
+    2444.79493848396,
+    5033.9664592949
+  ],
+  "renderer": "gl_compatibility",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "right": "(959, 1080)",
+  "root_3d_camera": "<Object#null>",
+  "seconds": 45.004303,
+  "separated_players": true,
+  "six_racers": 6,
+  "status": "MEASURED",
+  "target_fps": 60,
+  "target_met": true
+}

@@ -1,6 +1,24 @@
 Unicode true
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
+!include "FileFunc.nsh"
+Var ContentTest
+Function .onInit
+  ${GetParameters} $R0
+  ClearErrors
+  ${GetOptions} $R0 "/CONTENTTEST" $R1
+  ${IfNot} ${Errors}
+    StrCpy $ContentTest "yes"
+  ${EndIf}
+FunctionEnd
+Function un.onInit
+  ${GetParameters} $R0
+  ClearErrors
+  ${GetOptions} $R0 "/CONTENTTEST" $R1
+  ${IfNot} ${Errors}
+    StrCpy $ContentTest "yes"
+  ${EndIf}
+FunctionEnd
 !ifndef VERSION
 !define VERSION "1.5.0"
 !endif
@@ -13,6 +31,7 @@ Unicode true
 !ifdef DEVELOPMENT
 !define APP_NAME "Leo Racer Development"
 !define APP_KEY "LeoRacerDevelopment"
+!define APP_EXEC "LeoRacer.exe"
 !else
 !if "${CHANNEL}" == "True"
 !define APP_NAME "Leo Racer RC"
@@ -20,6 +39,13 @@ Unicode true
 !else
 !define APP_NAME "Leo Racer"
 !define APP_KEY "LeoRacer"
+!endif
+!endif
+!ifndef APP_EXEC
+!ifdef CITY_ASSETS
+!define APP_EXEC "LeoRacer.exe"
+!else
+!define APP_EXEC "Leo Racer Launcher.exe"
 !endif
 !endif
 Name "${APP_NAME} ${VERSION}"
@@ -35,7 +61,7 @@ UninstallIcon "..\assets\art\launcher\leo-road-crest.ico"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
-!define MUI_FINISHPAGE_RUN "$INSTDIR\Leo Racer Launcher.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXEC}"
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
@@ -53,17 +79,30 @@ Section "Leo Racer (required)"
   CreateDirectory "$INSTDIR\GameAssets\glb"
   CreateDirectory "$INSTDIR\GameAssets\tracks"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+  ${If} $ContentTest != "yes"
+!ifdef CITY_ASSETS
+  ; Known files owned by the old bundled installer. User records live elsewhere.
+  Delete "$INSTDIR\Leo Racer.exe"
+  Delete "$INSTDIR\Leo Racer.pck"
+  Delete "$INSTDIR\Leo Racer Launcher.exe"
+!endif
   WriteRegStr HKCU "Software\${APP_KEY}" "InstallDir" "$INSTDIR"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayName" "${APP_NAME}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayVersion" "${VERSION}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayIcon" "$INSTDIR\Leo Racer Launcher.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "DisplayIcon" "$INSTDIR\${APP_EXEC}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
   CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-  CreateShortcut "$SMPROGRAMS\${APP_NAME}\Leo Racer.lnk" "$INSTDIR\Leo Racer Launcher.exe"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\Leo Racer.lnk" "$INSTDIR\${APP_EXEC}"
+!ifdef DEVELOPMENT
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\Compatibility mode.lnk" "$INSTDIR\${APP_EXEC}" "--rendering-method gl_compatibility --rendering-driver opengl3"
+!endif
   CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+  ${EndIf}
 SectionEnd
 Section /o "Desktop shortcut"
-  CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\Leo Racer Launcher.exe"
+  ${If} $ContentTest != "yes"
+  CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXEC}"
+  ${EndIf}
 SectionEnd
 Section "Uninstall"
   SetShellVarContext current
@@ -71,10 +110,15 @@ Section "Uninstall"
   !include "owned-files.nsh"
   Delete "$INSTDIR\Uninstall.exe"
   RMDir "$INSTDIR"
+  ${If} $ContentTest != "yes"
   Delete "$SMPROGRAMS\${APP_NAME}\Leo Racer.lnk"
+!ifdef DEVELOPMENT
+  Delete "$SMPROGRAMS\${APP_NAME}\Compatibility mode.lnk"
+!endif
   Delete "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk"
   RMDir "$SMPROGRAMS\${APP_NAME}"
   Delete "$DESKTOP\${APP_NAME}.lnk"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_KEY}"
   DeleteRegKey HKCU "Software\${APP_KEY}"
+  ${EndIf}
 SectionEnd

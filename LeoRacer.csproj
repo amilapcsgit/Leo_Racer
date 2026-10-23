@@ -8,7 +8,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreLockedMode>true</RestoreLockedMode>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <NuGetLockFilePath Condition="'$(Configuration)' == 'ExportRelease'">packages.ExportRelease.lock.json</NuGetLockFilePath>
+    <NuGetLockFilePath Condition="'$(Configuration)' == 'ExportRelease' Or '$(Configuration)' == 'ExportDebug'">packages.ExportRelease.lock.json</NuGetLockFilePath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.22" />

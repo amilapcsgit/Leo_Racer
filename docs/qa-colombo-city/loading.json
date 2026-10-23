@@ -1,0 +1,32 @@
+{
+  "limit_ms": 1000,
+  "phases": {
+    "cold_city_scene": {
+      "frames": 167,
+      "max_ms": 138.985666666667,
+      "p95_ms": 10.049
+    },
+    "selected_garage_preview": {
+      "frames": 4,
+      "max_ms": 127.449666666667,
+      "p95_ms": 9.526
+    },
+    "six_racer_assembly": {
+      "frames": 50,
+      "max_ms": 94.011,
+      "p95_ms": 14.453
+    },
+    "track_change_astra": {
+      "frames": 4,
+      "max_ms": 139.690333333334,
+      "p95_ms": 136.536333333333
+    },
+    "warm_city_scene": {
+      "frames": 47,
+      "max_ms": 121.089333333333,
+      "p95_ms": 25.695
+    }
+  },
+  "renderer": "forward_plus",
+  "status": "PASS"
+}

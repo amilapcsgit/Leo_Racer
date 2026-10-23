@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "exe_bytes": 103484928,
+  "core_bytes": 10692824,
+  "launcher_bytes": 0,
+  "shared_packs_bytes": 253519332,
+  "track_bytes": {
+    "astra_coast": 52481,
+    "colombo_city": 41215945
+  },
+  "installed_bytes": 496748785,
+  "compressed_bytes": 362019282,
+  "sha256": "d6c81c4eb053f658e690863699f86bd67eac434db7a7932af161169cc13ca280",
+  "archive": "C:\\Users\\amilapcs\\.codex\\.chatgpt-projects\\g-p-69b05da7e0d4819184cc29634b4e0928\\publish\\Leo_Racer\\dist\\LeoRacer-1.8.0-win64.zip",
+  "extracted_folder": "C:\\Users\\amilapcs\\.codex\\.chatgpt-projects\\g-p-69b05da7e0d4819184cc29634b4e0928\\publish\\Leo_Racer\\build\\offline-city\\2787643407a44e648f37fcc505f4857d\\LeoRacer"
+}

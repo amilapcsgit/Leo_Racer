@@ -15,7 +15,16 @@ func begin() -> void:
 		var error:=int(validator.wait_to_finish())
 		if error==OK:error=LeoAssets.mount_packs()
 		if error!=OK:
+			printerr("CONTENT_VALIDATION_FAILED ",LeoAssets.failure)
+			if "--verify-content" in OS.get_cmdline_user_args():get_tree().quit(2);return
 			screen.show_failure(LeoAssets.failure,begin,func():get_tree().quit());return
+	if "--verify-content" in OS.get_cmdline_user_args():
+		var tracks:=LeoTrackDefinition.discover()
+		if tracks.is_empty():printerr("CONTENT_VALIDATION_FAILED No compatible tracks");get_tree().quit(2);return
+		for track in tracks:
+			if not track.mount():printerr("CONTENT_VALIDATION_FAILED ",track.error);get_tree().quit(2);return
+		print("CONTENT_VALIDATION_OK tracks=",tracks.map(func(t):return t.id)," cache=",LeoAssets.cache.size())
+		get_tree().quit();return
 	screen.stage("Loading interface…",20)
 	var path:="res://scenes/main.tscn"
 	ResourceLoader.load_threaded_request(path)
@@ -24,5 +33,8 @@ func begin() -> void:
 		screen.show_failure("Game interface could not be loaded.",begin,func():get_tree().quit());return
 	var scene:=ResourceLoader.load_threaded_get(path) as PackedScene
 	var game:=scene.instantiate();get_tree().root.add_child(game)
-	if not game.initialized:await game.initialization_finished
+	while not game.initialized and game.initialization_error.is_empty():await get_tree().process_frame
+	if not game.initialization_error.is_empty():
+		var message: String=game.initialization_error
+		game.queue_free();screen.show_failure(message,begin,func():get_tree().quit());return
 	get_tree().current_scene=game;queue_free()

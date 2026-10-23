@@ -8,5 +8,6 @@
   "world_kind": "astra",
   "lighting": "res://assets/config/astra.tres",
   "description": "The original 1.9 km coast, harbour and garden circuit.",
-  "packs": []
+  "packs": [],
+  "preview": "preview.png"
 }

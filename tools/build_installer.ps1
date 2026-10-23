@@ -1,4 +1,4 @@
-param([string]$Version='1.5.0',[string]$BuildFolder='build/ModularGarage',[switch]$Development)
+param([string]$Version='1.5.0',[string]$BuildFolder='build/ModularGarage',[switch]$Development,[switch]$CityAssets)
 $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 $archive=Join-Path $project '.tools/nsis-3.13.zip'
@@ -25,6 +25,7 @@ Push-Location (Join-Path $project 'installer')
 try {
     $flags=@("/DVERSION=$Version","/DCHANNEL=$($Version.Contains('-rc'))","/DBUILD_ROOT=$build")
     if ($Development) {$flags+='/DDEVELOPMENT'}
+    if ($CityAssets) {$flags+='/DCITY_ASSETS'}
     & $compiler @flags 'LeoRacer.nsi'
     if ($LASTEXITCODE -ne 0) {throw 'NSIS build failed'}
 } finally {Pop-Location}

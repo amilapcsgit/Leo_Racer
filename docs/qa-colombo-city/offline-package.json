@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Self-contained game, .NET and Windows SQLite; no duplicate launcher runtime",
+    "Offline catalog, shared packs and both track packs verified",
+    "astra_coast: race, garage, split views and SQLite transactions",
+    "colombo_city: race, garage, split views and SQLite transactions",
+    "Missing required pack produces readable failure",
+    "Corrupt pack produces readable failure",
+    "Missing per-track scenery produces readable failure",
+    "Additional compatible track discovered and raced without executable rebuild"
+  ],
+  "sdk_environment_removed": true,
+  "network_required": false,
+  "folder": "C:\\Users\\amilapcs\\.codex\\.chatgpt-projects\\g-p-69b05da7e0d4819184cc29634b4e0928\\publish\\Leo_Racer\\build\\offline-city\\2787643407a44e648f37fcc505f4857d\\LeoRacer"
+}

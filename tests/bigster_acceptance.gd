@@ -35,11 +35,11 @@ func run() -> void:
 	check(root.gui_get_focus_owner()==selector.driver_buttons[2],"Xbox left stick moves native focus")
 	motion=InputEventJoypadMotion.new();motion.axis=JOY_AXIS_LEFT_X;motion.axis_value=0.;Input.parse_input_event(motion)
 	joy(JOY_BUTTON_A);await process_frame;check(selector.driver_id==&"elephant","Xbox A activates the focused driver")
-	selector.set_selection(&"mario",&"duster")
+	await selector.set_selection(&"mario",&"duster")
 	check(selector.assembly.get_meta("driver_id")==&"mario" and selector.assembly.get_node("Driver").get_meta("visible_driver_id")==&"mario","Dacia keeps selected identity and visible Mario cabin driver")
 	check(selector.stats.text.contains("165 KM/H"),"Duster displays real normal ceiling")
 	selector.cycle_vehicle(-1);check(selector.vehicle_id==&"race_bus","Previous cycles catalog order")
-	selector.set_selection(&"human",game.catalog.vehicles.back().id);joy(JOY_BUTTON_RIGHT_SHOULDER);await process_frame
+	await selector.set_selection(&"human",game.catalog.vehicles.back().id);joy(JOY_BUTTON_RIGHT_SHOULDER);await process_frame
 	check(selector.vehicle_id==game.catalog.vehicles[0].id,"Xbox RB wraps all machines")
 	joy(JOY_BUTTON_LEFT_SHOULDER);await process_frame
 	check(selector.vehicle_id==game.catalog.vehicles.back().id,"Xbox LB wraps backwards")
@@ -55,18 +55,18 @@ func run() -> void:
 	check(selector.custom_name=="LEO" and selector.title.text=="LEO","Controller keyboard accepts custom name")
 	selector.open_keyboard();await capture("controller-keyboard");selector.close_keyboard(false)
 	var extra:=game.catalog.vehicles[0].duplicate(true) as VehicleDefinition;extra.id=&"carousel_expansion_probe";extra.display_name="A deliberately long future imported vehicle display name";game.catalog.vehicles.append(extra)
-	selector.set_selection(&"human",extra.id);check(selector.counter.text=="17 / 17" and selector.machine.text==extra.display_name.to_upper(),"Catalog expansion requires no carousel code change")
-	game.catalog.vehicles.pop_back();selector.set_selection(&"human",&"bigster")
+	await selector.set_selection(&"human",extra.id);check(selector.counter.text=="17 / 17" and selector.machine.text==extra.display_name.to_upper(),"Catalog expansion requires no carousel code change")
+	game.catalog.vehicles.pop_back();await selector.set_selection(&"human",&"bigster")
 	for resolution in [Vector2i(1280,720),Vector2i(1920,1080),Vector2i(2560,1080)]:
 		DisplayServer.window_set_size(resolution);root.size=resolution;await process_frame;game.hud.resize_canvas()
 		check((Vector2(1600,900)*game.hud.scale+game.hud.position*2).is_equal_approx(game.hud.get_viewport_rect().size),"Centered scalable design canvas "+str(resolution))
 		await capture("garage-%dx%d"%[resolution.x,resolution.y])
 	root.size=Vector2i(1600,900);DisplayServer.window_set_size(root.size);game.hud.resize_canvas()
-	selector.set_selection(&"human",&"duster");selector.yaw=-.72;selector.update_camera();await capture("white-duster")
-	selector.set_selection(&"human",&"bigster");selector.yaw=-.7;selector.update_camera();await capture("grey-bigster")
-	selector.set_selection(&"human",&"colombo_tuk");await capture("resized-tuk-tuk")
+	await selector.set_selection(&"human",&"duster");selector.yaw=-.72;selector.update_camera();await capture("white-duster")
+	await selector.set_selection(&"human",&"bigster");selector.yaw=-.7;selector.update_camera();await capture("grey-bigster")
+	await selector.set_selection(&"human",&"colombo_tuk");await capture("resized-tuk-tuk")
 	for id in [&"blue",&"formula_red",&"roadster_gold",&"race_tuk",&"race_bus"]:
-		selector.set_selection(&"human",id);selector.yaw=-1.2;selector.update_camera();await capture("seated-"+String(id))
+		await selector.set_selection(&"human",id);selector.yaw=-1.2;selector.update_camera();await capture("seated-"+String(id))
 	selector.reduced_motion=true;var yaw:=selector.yaw;selector._process(8.);check(selector.yaw==yaw,"Reduced Motion suppresses showroom rotation")
 	selector.hide();check(selector.viewport.render_target_update_mode==SubViewport.UPDATE_DISABLED,"Hidden preview suspends rendering");selector.show()
 	for id in [&"duster",&"bigster"]:
@@ -99,7 +99,8 @@ func run() -> void:
 	check(game.race_modified and not game.paused and not paused and game.player.racer_name=="TEST PILOT","Modified race resumes with custom name")
 	game.player.finish_time=100.;game.finish_race();check(game.best_time==500.,"Mid-race vehicle changes cannot update best-time records")
 	await game.start_race();check(not game.race_modified and game.player.next_gate==0 and game.race_time==0,"Start New Race resets the race normally")
-	game.toggle_pause();game.hud.show_garage("pause");selector=game.hud.garage_selector;selector.race_requested.emit(&"human",&"bigster")
+	game.toggle_pause();game.hud.show_garage("pause");selector=game.hud.garage_selector;selector.race_requested.emit(&"human",&"bigster");await process_frame
+	while game.state=="loading":await process_frame
 	check(not game.paused and game.state=="countdown" and game.player.vehicle_key=="bigster","Pause garage New Race applies the new selection")
 	game.return_menu();game.hud.show_garage();joy(JOY_BUTTON_B);await process_frame
 	check(game.state=="menu","Xbox B exits normal garage safely")

@@ -541,9 +541,22 @@ func show_tracks() -> void:
 	clear(modal_root)
 	var background:=ColorRect.new();background.color=Color("091a28");background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);modal_root.add_child(background)
 	text_at(modal_root,Vector2(260,120),Vector2(1100,60),"CHOOSE YOUR CIRCUIT",40,accent,true)
-	for i in game.tracks.size():
-		var track: LeoTrackDefinition=game.tracks[i]
-		button(modal_root,Vector2(260,235+i*120),Vector2(1080,70),"%s  /  %.1f KM" % [track.display_name.to_upper(),float(track.route.length)/1000.],func():await game.select_track(track.id),track.id==game.chosen_track_id)
-		text_at(modal_root,Vector2(270,310+i*120),Vector2(1040,35),String(track.metadata.get("description","")),18,muted)
+	var scroll:=ScrollContainer.new();scroll.position=Vector2(260,220);scroll.size=Vector2(1080,430);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;modal_root.add_child(scroll)
+	var list:=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;list.add_theme_constant_override("separation",18);scroll.add_child(list)
+	for track in game.tracks:
+		var row:=HBoxContainer.new();row.add_theme_constant_override("separation",20);list.add_child(row)
+		var preview_path:=String(track.metadata.get("preview",""))
+		if not preview_path.is_empty() and not preview_path.contains("..") and not preview_path.is_absolute_path():
+			var path: String=track.folder.path_join(preview_path)
+			var texture: Texture2D
+			if path.begins_with("res://"):texture=load(path) as Texture2D
+			else:
+				var image:=Image.load_from_file(path)
+				if image:texture=ImageTexture.create_from_image(image)
+			if texture:
+				var preview:=TextureRect.new();preview.texture=texture;preview.custom_minimum_size=Vector2(190,110);preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(preview)
+		var details:=VBoxContainer.new();details.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(details)
+		var choose:=Button.new();choose.text="%s  /  %.1f KM" % [track.display_name.to_upper(),float(track.route.length)/1000.];choose.custom_minimum_size=Vector2(0,65);choose.add_theme_font_size_override("font_size",24);choose.pressed.connect(func():await game.select_track(track.id));details.add_child(choose)
+		var description:=Label.new();description.text=String(track.metadata.get("description",""));description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;description.add_theme_font_size_override("font_size",18);description.modulate=muted;details.add_child(description)
 	text_at(modal_root,Vector2(270,685),Vector2(1060,30),"Map reference: © OpenStreetMap contributors / ODbL · openstreetmap.org/copyright",16,muted)
 	button(modal_root,Vector2(260,740),Vector2(400,60),"BACK",func():clear(modal_root)).grab_focus()
