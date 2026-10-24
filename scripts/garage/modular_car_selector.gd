@@ -170,6 +170,7 @@ func refresh_labels() -> void:
 		stat_bars[i].set_value(values[i]/maxf(.001,maxima[i]))
 		stat_labels[i].text=["Speed · %d km/h" % roundi(values[0]),"Grip · %.2f" % values[1],"Launch · %.1f m/s²" % values[2]][i]
 	policy.text="SELECTED RACER // CABIN POSE" if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else "HELMETED SHAVEN LEO // FIXED CABIN DRIVER" if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED else ("IDENTITY + PORTRAIT // DRIVER-FREE BODY" if v.driver_policy==VehicleDefinition.DriverPolicy.IDENTITY_ONLY else "OPEN COCKPIT // LIVE DRIVER")
+	if not v.official:policy.text+=" · MODDED / NO OFFICIAL RECORDS"
 	carousel.select_id(driver_id)
 
 func cycle_vehicle(direction: int) -> void:

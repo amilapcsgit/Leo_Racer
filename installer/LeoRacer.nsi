@@ -71,6 +71,10 @@ Section "Leo Racer (required)"
   SetShellVarContext current
   SetOutPath "$INSTDIR"
   File /r "${BUILD_ROOT}\*.*"
+!ifdef MODULAR_CONTENT
+  ; Remove only the superseded known stock bundle. Loose user folders survive.
+  Delete "$INSTDIR\GameAssets\vehicles\roster.pck"
+!endif
   ; Empty override folders also exist on a clean hybrid-content installation.
   CreateDirectory "$INSTDIR\GameAssets\textures"
   CreateDirectory "$INSTDIR\GameAssets\vehicles"

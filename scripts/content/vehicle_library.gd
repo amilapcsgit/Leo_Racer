@@ -7,6 +7,16 @@ static var entries: Array[VehicleDefinition]=[]
 static var unavailable: Array[Dictionary]=[]
 static var pending: Array[String]=[]
 static var root := ""
+static var fingerprint_details: Dictionary={}
+static var discovering := false
+
+static func discover_async(tree: SceneTree) -> void:
+	if discovering:
+		while discovering:await tree.process_frame
+		return
+	discovering=true;var worker:=Thread.new();worker.start(discover)
+	while worker.is_alive():await tree.process_frame
+	worker.wait_to_finish();discovering=false
 
 static func default_root() -> String:
 	for arg in OS.get_cmdline_user_args():
@@ -31,7 +41,24 @@ static func valid_transform(value: Variant) -> bool:
 	if not axes is Array or axes.size()!=3:return false
 	for axis in axes:
 		if not finite_vector(axis):return false
-	return absf(LeoVehicleCodec.transform(value).basis.determinant())>.000001
+	return absf(LeoVehicleCodec.transform(value).basis.determinant())>.000000000000001
+
+static func glb_problem(path: String) -> String:
+	var file:=FileAccess.open(path,FileAccess.READ)
+	if not file:return "Model is not readable"
+	if file.get_length()<20:return "Damaged GLB header"
+	if file.get_32()!=0x46546c67 or file.get_32()!=2 or file.get_32()!=file.get_length():return "Damaged or unsupported GLB container"
+	var size:=file.get_32()
+	if file.get_32()!=0x4e4f534a or size>file.get_length()-20 or size>64000000:return "Damaged GLB metadata chunk"
+	var metadata: Variant=JSON.parse_string(file.get_buffer(size).get_string_from_utf8())
+	if not metadata is Dictionary:return "Invalid GLB metadata"
+	if not metadata.get("images",[]) is Array or not metadata.get("buffers",[]) is Array:return "Invalid GLB image/buffer list"
+	for image in metadata.get("images",[]):
+		if not image is Dictionary:return "Invalid GLB images"
+		if image.has("uri") and not String(image.uri).begins_with("data:"):return "Embed image files in the GLB before importing"
+	for buffer in metadata.get("buffers",[]):
+		if not buffer is Dictionary or buffer.has("uri"):return "Embed geometry buffers in the GLB"
+	return ""
 
 static func problems(data: Variant, folder: String, files: bool=true) -> PackedStringArray:
 	var errors:=PackedStringArray()
@@ -57,7 +84,11 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 	for key in ["model","thumbnail"]:
 		var relative: Variant=data.get(key,"model.glb" if key=="model" else "thumbnail.png")
 		if not relative is String or not safe_relative(relative):errors.append("Unsafe "+key+" path")
-		elif files and key=="model" and not FileAccess.file_exists(folder.path_join(relative)):errors.append("Missing model: "+relative)
+		elif files and key=="model":
+			if not FileAccess.file_exists(folder.path_join(relative)):errors.append("Missing model: "+relative)
+			else:
+				var problem:=glb_problem(folder.path_join(relative))
+				if not problem.is_empty():errors.append(problem)
 	if String(data.get("model","")).get_extension().to_lower()!="glb":errors.append("Model must be GLB")
 	for key in ["collision_size","collision_position","preview_target"]:
 		if data.has(key) and not finite_vector(data[key]):errors.append("Invalid "+key)
@@ -103,7 +134,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 
 static func discover(directory: String="") -> void:
 	root=default_root() if directory.is_empty() else directory
-	entries.clear();unavailable.clear();pending.clear();generation+=1
+	entries.clear();unavailable.clear();pending.clear();fingerprint_details.clear();generation+=1
 	if not DirAccess.dir_exists_absolute(root):return
 	var candidates: Array[Dictionary]=[];var counts: Dictionary={}
 	for child in DirAccess.get_directories_at(root):
@@ -126,7 +157,10 @@ static func discover(directory: String="") -> void:
 
 static func official(data: Dictionary, folder: String) -> bool:
 	var path:="res://assets/config/official-vehicles.json"
-	if not FileAccess.file_exists(path):return false
+	if not FileAccess.file_exists(path):fingerprint_details[String(data.id)]={"registry_found":false};return false
 	var registry: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(path))
 	var expected: Dictionary=registry.get(String(data.id),{})
-	return not expected.is_empty() and expected.get("definition")==FileAccess.get_sha256(folder.path_join("vehicle.json")) and expected.get("model")==FileAccess.get_sha256(folder.path_join(String(data.model)))
+	var definition_hash:=FileAccess.get_file_as_string(folder.path_join("vehicle.json")).replace("\r\n","\n").sha256_text()
+	var model_hash:=FileAccess.get_sha256(folder.path_join(String(data.model)))
+	fingerprint_details[String(data.id)]={"registry_found":true,"trusted_id":not expected.is_empty(),"definition_match":expected.get("definition")==definition_hash,"model_match":expected.get("model")==model_hash,"definition_sha256":definition_hash,"model_sha256":model_hash}
+	return not expected.is_empty() and expected.get("definition")==definition_hash and expected.get("model")==model_hash

@@ -30,8 +30,13 @@ func begin() -> void:
 		if tracks.is_empty():printerr("CONTENT_VALIDATION_FAILED No compatible tracks");get_tree().quit(2);return
 		for track in tracks:
 			if not track.mount():printerr("CONTENT_VALIDATION_FAILED ",track.error);get_tree().quit(2);return
+			print("TRACK_VERIFIED ",track.id," official=",not track.modified)
 		print("CONTENT_VALIDATION_OK tracks=",tracks.map(func(t):return t.id)," cache=",LeoAssets.cache.size())
 		get_tree().quit();return
+	if "--validate-vehicles" in OS.get_cmdline_user_args():
+		var report: Dictionary=await load("res://scripts/content/content_validator.gd").vehicles(get_tree())
+		FileAccess.open("user://content-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+		print("VEHICLE_VALIDATION ",JSON.stringify(report));get_tree().quit(0 if report.status=="PASS" else 2);return
 	screen.stage("Loading interface…",20)
 	var path:="res://scenes/main.tscn"
 	ResourceLoader.load_threaded_request(path)

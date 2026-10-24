@@ -7,6 +7,7 @@ var status: Label
 
 func _ready() -> void:
 	layer=90;process_mode=Node.PROCESS_MODE_ALWAYS
+	var shade:=ColorRect.new();shade.color=Color("091522");shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
 	panel=PanelContainer.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.theme=load("res://assets/ui/theme.tres");add_child(panel)
 	var margin:=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+side,32)
@@ -44,7 +45,11 @@ func refresh() -> void:
 	game.refresh_content();populate()
 
 func edit_vehicle(vehicle: VehicleDefinition) -> void:
-	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(vehicle);game.add_child(editor);hide();editor.tree_exited.connect(func():show();populate())
+	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(vehicle);game.add_child(editor);hide();editor.tree_exited.connect(resume_list)
 
 func setup_glb(path: String) -> void:
-	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(null,path);game.add_child(editor);hide();editor.tree_exited.connect(func():show();populate())
+	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(null,path);game.add_child(editor);hide();editor.tree_exited.connect(resume_list)
+
+func resume_list() -> void:
+	if not is_inside_tree():return
+	show();populate()

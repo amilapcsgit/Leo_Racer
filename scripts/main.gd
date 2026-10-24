@@ -77,6 +77,7 @@ func ensure_available_selections() -> void:
 	if catalog.vehicles.is_empty():return
 	for local in local_players:
 		if not local.preferred_vehicle_id.is_empty() and catalog.vehicle(local.preferred_vehicle_id):
+			if local.slot==0:selected_kart=catalog.vehicle_index(local.preferred_vehicle_id)
 			local.vehicle_id=local.preferred_vehicle_id;local.preferred_vehicle_id=&""
 		if not catalog.vehicle(local.vehicle_id):
 			if local.preferred_vehicle_id.is_empty():local.preferred_vehicle_id=local.vehicle_id
@@ -92,7 +93,7 @@ func show_content_manager() -> void:
 func refresh_content() -> void:
 	if state not in ["menu","lobby"]:return
 	var previous_id:=local_players[0].vehicle_id
-	LeoVehicleLibrary.discover();LeoAssets.cache.clear();LeoAssets._recent.clear()
+	LeoVehicleLibrary.discover();LeoAssets.refresh_loose_cache()
 	catalog=GarageCatalog.shared()
 	if not hud or catalog.vehicles.is_empty():
 		get_tree().reload_current_scene();return
@@ -112,6 +113,7 @@ func _ready() -> void:
 	loading=LeoLoadingScreen.new();add_child(loading)
 	await get_tree().process_frame
 	loading.stage("Loading garage catalog…",25)
+	if not LeoVehicleLibrary.legacy():await LeoVehicleLibrary.discover_async(get_tree())
 	catalog = GarageCatalog.shared()
 	var args := OS.get_cmdline_user_args()
 	test_mode = "--race-test" in args
@@ -136,6 +138,9 @@ func _ready() -> void:
 		ensure_available_selections()
 		save_settings()
 	ensure_available_selections()
+	for arg in args:
+		if arg.begins_with("--vehicle=") and catalog.vehicle(StringName(arg.trim_prefix("--vehicle="))):
+			selected_kart=catalog.vehicle_index(StringName(arg.trim_prefix("--vehicle=")));local_players[0].vehicle_id=catalog.vehicles[selected_kart].id
 	tracks=LeoTrackDefinition.discover()
 	if tracks.is_empty():
 		initialization_error="No compatible tracks are installed."
@@ -276,12 +281,13 @@ func build_world() -> void:
 		await scenery.setup(self,track_definition)
 	loading.stage("Loading landmarks…",70)
 	await get_tree().process_frame
-	var tower: Node3D = load(art_profile.landmark_model).instantiate()
-	tower.position = art_profile.landmark_position
-	tower.scale = Vector3.ONE * art_profile.landmark_scale
-	tower.name = "AuthenticLotusTower"
-	world.add_child(tower)
-	polish_materials(tower,true)
+	if not art_profile.landmark_model.is_empty():
+		var tower: Node3D = load(art_profile.landmark_model).instantiate()
+		tower.position = art_profile.landmark_position
+		tower.scale = Vector3.ONE * art_profile.landmark_scale
+		tower.name = "AuthenticLotusTower"
+		world.add_child(tower)
+		polish_materials(tower,true)
 	var ground := StaticBody3D.new()
 	var shape := CollisionShape3D.new()
 	var box := BoxShape3D.new()
@@ -328,7 +334,7 @@ func build_world() -> void:
 	sun.directional_shadow_blend_splits = true
 	world.add_child(sun)
 	LeoColomboWorld.environment_setup(environment,sun,art_profile)
-	if track_definition.world_kind()=="city":
+	if track_definition.world_kind() in ["city","external"]:
 		environment.ssr_enabled=false;environment.volumetric_fog_enabled=false
 		environment.ssao_radius=1.;environment.ssao_intensity=.7
 		sun.directional_shadow_max_distance=110.
@@ -893,7 +899,7 @@ func quit_game(exit_code: int = 0) -> void:
 	if world:
 		var streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
 		if streamer:await streamer.stop()
-	while not LeoAssets._loading.is_empty():await get_tree().process_frame
+	while not LeoAssets._loading.is_empty() or LeoVehicleLibrary.discovering:await get_tree().process_frame
 	stop_all_audio()
 	if ranking_store:ranking_store.close_store()
 	set_process(false);set_physics_process(false);set_process_input(false);set_process_unhandled_input(false)
@@ -963,7 +969,7 @@ func check(condition: bool, message: String) -> void:
 	print(("PASS " if condition else "FAIL ") + message)
 
 func run_smoke_checks() -> void:
-	check(circuit.length > 700, "Circuit loads with expected length")
+	check(circuit.length >= 100, "Circuit meets the supported route length contract")
 	check(circuit.sample(0).distance_to(circuit.sample(circuit.length)) < .001, "Track closes without a seam")
 	check(absf(circuit.delta_distance(circuit.length - 2, 2) - 4) < .001, "Finish seam uses signed forward distance")
 	for fraction in [.0, .17, .43, .8, .99]:
@@ -972,7 +978,7 @@ func run_smoke_checks() -> void:
 		check(absf(projection.offset - 4) < .15, "Projection and lane offset agree at %.2f" % fraction)
 	await start_race()
 	check(karts.size() == 6 and player.is_player, "Six racers spawn with one local player")
-	check(player.wheels.size() == 4, "Four animated wheel pivots are imported")
+	check(player.wheels.size() == player.definition.wheels.size(), "Animated wheel topology matches this vehicle definition")
 	check(player.get_child_count() >= 4, "Visuals collision and audio are attached")
 	player.next_gate = 7
 	player.progress = circuit.length * .9

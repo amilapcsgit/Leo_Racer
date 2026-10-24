@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+[ext_resource type="Script" path="res://track_author.gd" id="1"]
+[sub_resource type="BoxMesh" id="building"]
+size=Vector3(20,24,20)
+[sub_resource type="StandardMaterial3D" id="plaster"]
+albedo_color=Color(0.76,0.64,0.48,1)
+[sub_resource type="BoxMesh" id="detail"]
+size=Vector3(2,3,2)
+[sub_resource type="StandardMaterial3D" id="green"]
+albedo_color=Color(0.15,0.38,0.22,1)
+[node name="ExampleTrack" type="Node3D"]
+script=ExtResource("1")
+[node name="Route" type="Path3D" parent="."]
+[node name="Scenery" type="Node3D" parent="."]
+[node name="BuildingA" type="MeshInstance3D" parent="Scenery"]
+position=Vector3(160,12,0)
+mesh=SubResource("building")
+material_override=SubResource("plaster")
+[node name="BuildingB" type="MeshInstance3D" parent="Scenery"]
+position=Vector3(-160,12,0)
+mesh=SubResource("building")
+material_override=SubResource("plaster")
+[node name="Details" type="Node3D" parent="."]
+[node name="GardenA" type="MeshInstance3D" parent="Details"]
+position=Vector3(90,1.5,0)
+mesh=SubResource("detail")
+material_override=SubResource("green")
+[node name="GardenB" type="MeshInstance3D" parent="Details"]
+position=Vector3(-90,1.5,0)
+mesh=SubResource("detail")
+material_override=SubResource("green")
+[node name="PreviewCamera" type="Camera3D" parent="."]
+position=Vector3(240,230,240)
+rotation_degrees=Vector3(-34,45,0)
+[node name="PreviewSun" type="DirectionalLight3D" parent="."]
+rotation_degrees=Vector3(-60,-35,0)

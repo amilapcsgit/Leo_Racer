@@ -31,6 +31,7 @@ static func serialize(vehicle: VehicleDefinition) -> Dictionary:
 
 static func deserialize(data: Dictionary, folder: String) -> VehicleDefinition:
 	var vehicle:=VehicleDefinition.new();vehicle.id=StringName(data.id)
+	vehicle.max_speed=165./3.6;vehicle.boosted_speed=55.;vehicle.acceleration=18.;vehicle.handling=1.
 	for key in FIELDS:
 		if not data.has(key):continue
 		var value: Variant=data[key]

@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "core_files_unchanged": true,
+  "hashes": {
+    "LeoRacer.exe": "3256eb08cbe2ecb7a0a85453495a52b824311f9908a536e7b5a2eca27d566002",
+    "LeoRacer.pck": "c25e6ff7aa0cb6af7efd2071ad9a65183b2825ff955efb53a99578c903ba480c"
+  },
+  "component_builds": [
+    "vehicle:duster",
+    "track:astra_coast"
+  ],
+  "packed_vehicle_models": 0,
+  "packs_audited": 12
+}

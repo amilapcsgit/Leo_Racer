@@ -75,6 +75,9 @@ func _ready() -> void:
 func configure(vehicle: VehicleDefinition=null,path: String="") -> void:
 	if vehicle:
 		source_path=vehicle.model_path;data=LeoVehicleCodec.serialize(vehicle)
+		if vehicle.official:
+			var rules:=LeoRaceRules.resolve(vehicle)
+			for key in ["max_speed","boosted_speed","acceleration","handling","ai_lateral_acceleration"]:data[key]=rules[key]
 	else:
 		source_path=path
 		var temporary:=VehicleDefinition.new();temporary.id=StringName(slug(path.get_file().get_basename()));temporary.display_name=path.get_file().get_basename();temporary.max_speed=165./3.6;temporary.boosted_speed=55.;temporary.setup_complete=true
@@ -136,7 +139,7 @@ func build_fields() -> void:
 	vector_field(fields,"Rotation degrees",LeoVehicleCodec.encode(transform.basis.get_euler()*180./PI),func(value):
 		var t:=LeoVehicleCodec.transform(data.normalization);t.basis=Basis.from_euler(LeoVehicleCodec.vector(value)*PI/180.).scaled(t.basis.get_scale());data.normalization=LeoVehicleCodec.encode(t);changed())
 	label(fields,"Uniform model scale")
-	number(fields,transform.basis.get_scale().x,func(value):set_model_scale(value),.01,20.)
+	number(fields,transform.basis.get_scale().x,func(value):set_model_scale(value),.00001,1000.,.00001)
 	button(fields,"Ground model",ground_model)
 	heading("Wheels")
 	wheel_choice=OptionButton.new();fields.add_child(wheel_choice)
@@ -230,7 +233,7 @@ func fit_collision() -> void:
 func ground_model() -> void:
 	var t:=LeoVehicleCodec.transform(data.normalization);var box: AABB=t*source_bounds;t.origin.y-=box.position.y;data.normalization=LeoVehicleCodec.encode(t);fit_collision()
 func set_model_scale(value: float) -> void:
-	var t:=LeoVehicleCodec.transform(data.normalization);var ratio:=value/maxf(.001,t.basis.get_scale().x);t.basis=t.basis.orthonormalized().scaled(Vector3.ONE*value);t.origin*=ratio;data.normalization=LeoVehicleCodec.encode(t)
+	var t:=LeoVehicleCodec.transform(data.normalization);var ratio:=value/maxf(.0000001,t.basis.get_scale().x);t.basis=t.basis.orthonormalized().scaled(Vector3.ONE*value);t.origin*=ratio;data.normalization=LeoVehicleCodec.encode(t)
 	for key in ["collision_size","collision_position","preview_target"]:data[key]=LeoVehicleCodec.encode(LeoVehicleCodec.vector(data[key])*ratio)
 	data.preview_distance=float(data.preview_distance)*ratio
 	for wheel in data.wheels:wheel.radius=float(wheel.radius)*ratio
@@ -301,8 +304,11 @@ func save_vehicle() -> void:
 	file.store_string(JSON.stringify(data,"  ")+"\n");file.close()
 	if DirAccess.rename_absolute(temporary,folder.path_join("vehicle.json"))!=OK:status.text="Cannot replace vehicle definition.";saving=false;return
 	if not FileAccess.file_exists(folder.path_join("LICENSE.txt")):FileAccess.open(folder.path_join("LICENSE.txt"),FileAccess.WRITE).store_string(String(data.get("attribution","Author must supply redistribution terms."))+"\n")
-	collision_hint.hide();await get_tree().process_frame;await RenderingServer.frame_post_draw
-	viewport.get_texture().get_image().save_png(folder.path_join("thumbnail.png"));collision_hint.show()
+	if DisplayServer.get_name()=="headless":
+		var image:=Image.create(256,144,false,Image.FORMAT_RGB8);image.fill(Color("102733"));image.save_png(folder.path_join("thumbnail.png"))
+	else:
+		collision_hint.hide();await get_tree().process_frame;await RenderingServer.frame_post_draw
+		viewport.get_texture().get_image().save_png(folder.path_join("thumbnail.png"));collision_hint.show()
 	saved_folder=folder;saving=false;status.text="Saved "+String(data.id)+". Back → Refresh Content makes it selectable. Share this complete folder."
 
 func _process(dt: float) -> void:

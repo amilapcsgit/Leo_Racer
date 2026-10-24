@@ -34,11 +34,12 @@ static func apply_textures(materials: Array, data: Dictionary, folder: String) -
 
 static func import_scene(path: String) -> Dictionary:
 	var started:=Time.get_ticks_usec()
-	var result: Dictionary={"scene":null,"error":"","cache_hit":false,"seconds":0.}
+	var result: Dictionary={"scene":null,"error":"","cache_hit":false,"seconds":0.,"signature":""}
 	if not FileAccess.file_exists(path):result.error="Missing vehicle model: "+path.get_file();return result
 	var cache_root:="user://content-cache/vehicles"
 	DirAccess.make_dir_recursive_absolute(cache_root)
-	var target:=cache_root.path_join(key(path)+".scn")
+	result.signature=key(path)
+	var target:=cache_root.path_join(String(result.signature)+".scn")
 	if FileAccess.file_exists(target):
 		var cached:=ResourceLoader.load(target,"PackedScene",ResourceLoader.CACHE_MODE_IGNORE) as PackedScene
 		if cached:result.scene=cached;result.cache_hit=true

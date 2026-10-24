@@ -9,9 +9,15 @@ static var cache: Dictionary = {}
 static var _recent: Array[String] = []
 static var _patched_meshes: Dictionary = {}
 static var _loading: Dictionary = {}
+static var _loose_signatures: Dictionary = {}
+
+static func refresh_loose_cache() -> void:
+	for id in _loose_signatures.keys():
+		var current: String=LeoVehicleImporter.key(id) if FileAccess.file_exists(id) and id.get_extension().to_lower()=="glb" else FileAccess.get_sha256(id) if FileAccess.file_exists(id) else ""
+		if current!=_loose_signatures[id]:cache.erase(id);_recent.erase(id);_loose_signatures.erase(id)
 
 static func configure(root: String) -> Error:
-	directory=root;failure="";manifest={};cache.clear();_recent.clear();_patched_meshes.clear();modified_rules=false
+	directory=root;failure="";manifest={};cache.clear();_recent.clear();_patched_meshes.clear();_loose_signatures.clear();modified_rules=false
 	var path:=root.path_join("catalog.json")
 	if not FileAccess.file_exists(path):failure="Missing GameAssets/catalog.json";return ERR_FILE_NOT_FOUND
 	var parsed=JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -55,10 +61,12 @@ static func resource(id: String) -> Resource:
 		if id.get_extension().to_lower()=="glb":
 			var imported:=LeoVehicleImporter.import_scene(id);LeoVehicleImporter.last_report=imported.duplicate();external=imported.scene
 			if not external:failure=imported.error;return null
-		elif id.get_extension().to_lower() in ["png","jpg","webp"]:
+			_loose_signatures[id]=String(imported.signature)
+		elif id.get_extension().to_lower() in ["png","jpg","webp","svg"]:
 			var image:=Image.load_from_file(id)
 			if image and not image.is_empty():image.generate_mipmaps();external=ImageTexture.create_from_image(image)
-		if external:cache[id]=external;_touch(id)
+			if external:_loose_signatures[id]=FileAccess.get_sha256(id)
+		if external:cache[id]=external;_touch(id);_trim()
 		return external
 	var entry:=override_for(id)
 	var result: Resource
@@ -79,8 +87,12 @@ static func resource(id: String) -> Resource:
 		if ResourceLoader.exists(path):result=ResourceLoader.load(path)
 	if result:
 		cache[id]=result;_touch(id)
-		while _recent.size()>12:cache.erase(_recent.pop_front())
+		_trim()
 	return result
+
+static func _trim() -> void:
+	while _recent.size()>12:
+		var id: String=_recent.pop_front();cache.erase(id);_loose_signatures.erase(id)
 
 static func _touch(id: String) -> void:
 	_recent.erase(id);_recent.append(id)
@@ -100,7 +112,8 @@ static func scene_async(id: String, tree: SceneTree) -> PackedScene:
 		var result: Dictionary=worker.wait_to_finish();_loading.erase(id);LeoVehicleImporter.last_report=result.duplicate()
 		if not result.scene:failure=String(result.error);return null
 		cache[id]=result.scene;_touch(id)
-		while _recent.size()>12:cache.erase(_recent.pop_front())
+		_loose_signatures[id]=String(result.signature)
+		_trim()
 		return result.scene as PackedScene
 	if cache.has(id) or not override_for(id).is_empty():return scene(id)
 	var path:=String(manifest.get("assets",{}).get(id,id))
@@ -115,7 +128,7 @@ static func scene_async(id: String, tree: SceneTree) -> PackedScene:
 		var loaded:=ResourceLoader.load_threaded_get(path) as PackedScene
 		if loaded:
 			cache[id]=loaded;_touch(id)
-			while _recent.size()>12:cache.erase(_recent.pop_front())
+			_trim()
 		return loaded
 	return scene(id)
 

@@ -48,11 +48,7 @@
       "type": "string"
     },
     "world_kind": {
-      "enum": [
-        "astra",
-        "city",
-        "external"
-      ]
+      "const": "external"
     },
     "dependencies": {
       "type": "array",

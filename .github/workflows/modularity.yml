@@ -1,0 +1,98 @@
+name: Modular content development
+on:
+  push:
+    branches: [modularity]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: modularity-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Select dependency closure
+        id: scope
+        shell: pwsh
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          New-Item -ItemType Directory -Force build/modularity | Out-Null
+          $base=$env:BEFORE_SHA
+          if (-not $base -or $base -match '^0+$') {$base='v2.1.0'}
+          python tools/content_changes.py --base $base --output build/modularity/selection.json
+          python -m unittest discover -s tests -p test_content_changes.py
+          if ($LASTEXITCODE -ne 0) {throw 'Dependency selection failed'}
+          $scope=Get-Content build/modularity/selection.json -Raw | ConvertFrom-Json
+          "docs=$($scope.docs_only.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+          "core=$($scope.core.ToString().ToLower())" >> $env:GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        if: steps.scope.outputs.docs != 'true'
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
+      - name: Prepare authoring tools
+        if: steps.scope.outputs.docs != 'true'
+        shell: pwsh
+        run: |
+          python -m pip install -r tools/requirements-city.txt
+          ./tools/setup_windows.ps1
+      - name: Validate selected content and shared behavior
+        if: steps.scope.outputs.docs != 'true'
+        shell: pwsh
+        run: |
+          $scope=Get-Content build/modularity/selection.json -Raw | ConvertFrom-Json
+          if ($scope.core) {
+            $checks=@{FullRoster=[bool]$scope.full_roster;Integration=$true}
+            ./tools/check_modularity.ps1 @checks
+          } else {
+            python tools/content.py stage --profile dev
+            foreach ($vehicle in $scope.vehicles) {
+              ./tools/build_content.ps1 -Target vehicle -Id $vehicle
+            }
+            foreach ($track in $scope.tracks) {
+              ./tools/build_content.ps1 -Target track -Id $track
+            }
+            if ($scope.vehicles.Count -gt 0) {
+              ./tools/run_godot.ps1 @('--headless','--','--drive-test','--validate-vehicles','--vehicles=res://build/content-vehicles')
+              if ($LASTEXITCODE -ne 0) {throw 'Vehicle module validation failed'}
+            }
+          }
+      - name: Build core development package only when required
+        if: steps.scope.outputs.core == 'true'
+        shell: pwsh
+        run: |
+          ./tools/build_content.ps1 -Target core
+          ./tools/build_content.ps1 -Target distribution -Profile dev
+          ./tools/build_content.ps1 -Target sdk
+          ./tools/verify_modularity_package.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: modularity-checks
+          path: build/modularity/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: success() && steps.scope.outputs.docs != 'true'
+        with:
+          name: modularity-content
+          path: |
+            dist/content/*.zip
+            dist/content/*.sha256
+            dist/LeoRacer-2.2.0-modularity-dev-win64.zip
+            dist/LeoRacer-Contributor-SDK.zip
+          if-no-files-found: ignore
+          retention-days: 14

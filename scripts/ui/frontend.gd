@@ -36,7 +36,8 @@ func card(parent: Node) -> VBoxContainer:
  return panel.get_node("Body") as VBoxContainer
 func picture(parent: Node,path: String,min_size: Vector2) -> TextureRect:
  var node:=TextureRect.new()
- if ResourceLoader.exists(path):node.texture=load(path)
+ if path.is_absolute_path() and not path.begins_with("res://"):node.texture=LeoAssets.texture(path)
+ elif ResourceLoader.exists(path):node.texture=load(path)
  node.custom_minimum_size=min_size;node.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;node.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED;node.mouse_filter=Control.MOUSE_FILTER_IGNORE;parent.add_child(node);return node
 func shell(title: String,subtitle: String="") -> VBoxContainer:
  close_modal(false);pause_open=false;starting=false;player_status.clear()
@@ -255,9 +256,11 @@ func show_tracks() -> void:
   var row: HBoxContainer=load("res://scenes/ui/TrackCard.tscn").instantiate();list.add_child(row)
   var path:="res://assets/ui/art/"+course.id+".png"
   if not ResourceLoader.exists(path):path="res://assets/ui/art/home.png"
+  if course.metadata.has("preview") and LeoVehicleLibrary.safe_relative(String(course.metadata.preview)) and FileAccess.file_exists(course.folder.path_join(String(course.metadata.preview))):path=ProjectSettings.globalize_path(course.folder.path_join(String(course.metadata.preview)))
   picture(row,path,Vector2(260,145))
   var route:=LeoTrackHologram.new();route.reduced_motion=game.reduced_motion;var route_path:="res://assets/ui/icons/track_"+course.id+".svg"
   if ResourceLoader.exists(route_path):route.texture=load(route_path)
+  elif FileAccess.file_exists(course.folder.path_join("route.svg")):route.texture=LeoAssets.texture(ProjectSettings.globalize_path(course.folder.path_join("route.svg")))
   route.custom_minimum_size=Vector2(140,130);route.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;route.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(route)
   var details:=VBoxContainer.new();details.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(details)
   action(details,("✓ " if course.id==game.chosen_track_id else "")+course.display_name,func():choose_track(course))
@@ -286,7 +289,7 @@ func show_results() -> void:
   var local: LeoLocalPlayer=game.local_players[slot];var kart:=local.kart
   label(box,"P%d · %s     %s     %s" % [slot+1,kart.racer_name,("#%d" % game.player_place(slot)) if kart.finished else "Didn't finish",game.format_time(kart.finish_time) if kart.finished else ""],36,Color("ffc857") if game.player_place(slot)==1 else Color("f5f7fa"))
   label(box,"Best lap · "+(game.format_time(local.best_lap) if local.best_lap<99999 else "—"),24)
- label(box,game.ranking_message.replace("OFFLINE RANKINGS","Records").replace("MODIFIED RACE / RECORDS NOT SAVED","You changed rides. This run won't set a record."),22,Color("b9c7d6"))
+ label(box,game.ranking_message.replace("OFFLINE RANKINGS","Records").replace("MODIFIED RACE / RECORDS NOT SAVED","Modded race · official records aren't saved."),22,Color("b9c7d6"))
  var spacer:=Control.new();spacer.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(spacer)
  action(box,"Race Again   →",start_selected,true).grab_focus()
  var row:=HBoxContainer.new();box.add_child(row);action(row,"Change Race",func():show_setup());action(row,"Home",game.return_menu)

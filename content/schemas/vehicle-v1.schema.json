@@ -48,7 +48,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "maxItems": 0
     },
     "wheels": {
       "type": "array",
@@ -86,6 +87,58 @@
           }
         }
       }
+    },
+    "setup_complete": {
+      "const": true
+    },
+    "driver_policy": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "collision_size": {
+      "$ref": "#/$defs/vector"
+    },
+    "collision_position": {
+      "$ref": "#/$defs/vector"
+    },
+    "preview_target": {
+      "$ref": "#/$defs/vector"
+    },
+    "seat": {
+      "$ref": "#/$defs/transform"
+    },
+    "normalization": {
+      "$ref": "#/$defs/transform"
+    },
+    "max_speed": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "boosted_speed": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "acceleration": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "handling": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "preview_distance": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
     }
   },
   "$defs": {
@@ -95,6 +148,26 @@
       "maxItems": 3,
       "items": {
         "type": "number"
+      }
+    },
+    "transform": {
+      "type": "object",
+      "required": [
+        "basis",
+        "origin"
+      ],
+      "properties": {
+        "origin": {
+          "$ref": "#/$defs/vector"
+        },
+        "basis": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/vector"
+          }
+        }
       }
     }
   }

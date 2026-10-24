@@ -290,6 +290,9 @@ func place(distance: float, lane: float) -> void:
 
 func recover() -> void:
 	var safe := maxf(0, (next_gate - 1) * circuit.length / LeoCircuit.GATES) + 2.0
+	var recoveries: Array=circuit.features.get("recoveries",[])
+	if recoveries.size()==LeoCircuit.GATES:
+		safe=float(recoveries[posmod(maxi(0,next_gate-1),LeoCircuit.GATES)].distance)
 	var lane := (-3.2 if local_slot==0 else 3.2) if local_slot>=0 else (0.0 if is_player else ai_lane)
 	var chosen := circuit.sample(safe,lane)+Vector3.UP*.2
 	if is_inside_tree() and definition:
