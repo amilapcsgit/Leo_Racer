@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "vehicles": 16,
+  "fields_roundtripped": 23,
+  "wheel_groups_pivots_preserved": true,
+  "source_commit": "70961b6",
+  "loose_glbs_self_contained": true
+}

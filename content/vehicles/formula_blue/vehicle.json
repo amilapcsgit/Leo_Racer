@@ -1,0 +1,204 @@
+{
+  "acceleration": 18.04,
+  "ai_lateral_acceleration": 0.0,
+  "attribution": "",
+  "boosted_speed": 0.0,
+  "braking_regeneration": 0.0,
+  "camera_height": 0.0,
+  "collision_position": [
+    0.0,
+    0.779999971389771,
+    0.0
+  ],
+  "collision_size": [
+    2.20000004768372,
+    1.39999997615814,
+    3.79999995231628
+  ],
+  "core": {
+    "max_major": 2,
+    "min": "2.2.0"
+  },
+  "dependencies": [],
+  "display_name": "Formula Blue",
+  "driver_fits": {
+    "human": {
+      "basis": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "origin": [
+        0.0,
+        0.810000002384186,
+        0.119999997317791
+      ]
+    }
+  },
+  "driver_policy": 0,
+  "electric_boost": false,
+  "exhausts": [
+    [
+      -0.5,
+      0.469999998807907,
+      2.04999995231628
+    ],
+    [
+      0.5,
+      0.469999998807907,
+      2.04999995231628
+    ]
+  ],
+  "fixed_driver_id": "",
+  "format": 1,
+  "handling": 1.01,
+  "hovering": false,
+  "id": "formula_blue",
+  "max_speed": 38.0,
+  "model": "model.glb",
+  "normalization": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "preserve_materials": false,
+  "preview_distance": 7.6,
+  "preview_target": [
+    0.0,
+    0.899999976158142,
+    0.0
+  ],
+  "seat": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "setup_complete": true,
+  "thumbnail": "thumbnail.png",
+  "vehicle_api": 1,
+  "version": "1.0.0",
+  "wheels": [
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.939999997615814,
+        0.490000009536743,
+        -1.22000002861023
+      ],
+      "radius": 0.49,
+      "rotating": [
+        "wheel-front-left"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.939999997615814,
+        0.490000009536743,
+        -1.22000002861023
+      ],
+      "radius": 0.49,
+      "rotating": [
+        "wheel-front-right"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.939999997615814,
+        0.490000009536743,
+        1.12000000476837
+      ],
+      "radius": 0.49,
+      "rotating": [
+        "wheel-back-left"
+      ],
+      "stationary": [],
+      "steering": false
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.939999997615814,
+        0.490000009536743,
+        1.12000000476837
+      ],
+      "radius": 0.49,
+      "rotating": [
+        "wheel-back-right"
+      ],
+      "stationary": [],
+      "steering": false
+    }
+  ]
+}

@@ -35,9 +35,15 @@ enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var driver_fits: Dictionary = {}
 @export var hovering := false
 @export var preserve_materials := true
-@export var thumbnail: Texture2D
+@export var thumbnail: Texture2D:
+	get:
+		return thumbnail if thumbnail else (LeoAssets.texture(thumbnail_path) if not thumbnail_path.is_empty() else null)
 @export var setup_complete := false
 @export_multiline var attribution := ""
+var content_folder := ""
+var content_data: Dictionary = {}
+var official := true
+var thumbnail_path := ""
 
 func problems() -> PackedStringArray:
 	var errors := PackedStringArray()

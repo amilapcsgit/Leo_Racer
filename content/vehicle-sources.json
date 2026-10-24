@@ -1,0 +1,82 @@
+{
+  "aqua": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/kart_aqua.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_aqua.png"
+  },
+  "bigster": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/bigster/bigster.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_bigster.png"
+  },
+  "blue": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/kart_blue.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_blue.png"
+  },
+  "colombo_tuk": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/bigster/colombo_tuk.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_colombo_tuk.png"
+  },
+  "coral": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/kart_coral.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_coral.png"
+  },
+  "cyberpunk": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/modular/cyberpunk.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_cyberpunk.png"
+  },
+  "duster": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/bigster/duster.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_duster.png"
+  },
+  "formula_blue": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/astra/kart_formula_blue.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_formula_blue.png"
+  },
+  "formula_red": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/astra/kart_formula_red.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_formula_red.png"
+  },
+  "hover": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/modular/hover.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_hover.png"
+  },
+  "mclaren": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/modular/mclaren.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_mclaren.png"
+  },
+  "pink": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/kart_pink.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_pink.png"
+  },
+  "pony": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/modular/pony.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_pony.png"
+  },
+  "race_bus": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/astra/kart_race_bus.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_race_bus.png"
+  },
+  "race_tuk": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/astra/kart_race_tuk.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_race_tuk.png"
+  },
+  "roadster_gold": {
+    "fixed_driver_model": "",
+    "model": "res://assets/models/astra/kart_roadster_gold.glb",
+    "thumbnail": "res://assets/art/garage/thumbnails/vehicle_roadster_gold.png"
+  }
+}

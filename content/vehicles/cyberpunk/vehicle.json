@@ -1,0 +1,179 @@
+{
+  "acceleration": 18.0,
+  "ai_lateral_acceleration": 0.0,
+  "attribution": "",
+  "boosted_speed": 0.0,
+  "braking_regeneration": 0.0,
+  "camera_height": 0.0,
+  "collision_position": [
+    0.0,
+    0.808165490627289,
+    0.0
+  ],
+  "collision_size": [
+    2.20000004768372,
+    1.45633101463318,
+    4.19999980926514
+  ],
+  "core": {
+    "max_major": 2,
+    "min": "2.2.0"
+  },
+  "dependencies": [],
+  "display_name": "Cyberpunk GT",
+  "driver_fits": {},
+  "driver_policy": 1,
+  "electric_boost": false,
+  "exhausts": [
+    [
+      -0.5,
+      0.5,
+      2.26680493354797
+    ],
+    [
+      0.5,
+      0.5,
+      2.26680493354797
+    ]
+  ],
+  "fixed_driver_id": "",
+  "format": 1,
+  "handling": 1.0,
+  "hovering": false,
+  "id": "cyberpunk",
+  "max_speed": 33.0,
+  "model": "model.glb",
+  "normalization": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0799999982118607,
+      0.0
+    ]
+  },
+  "preserve_materials": true,
+  "preview_distance": 8.31161826953413,
+  "preview_target": [
+    0.0,
+    0.728165507316589,
+    0.0
+  ],
+  "seat": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "setup_complete": true,
+  "thumbnail": "thumbnail.png",
+  "vehicle_api": 1,
+  "version": "1.0.0",
+  "wheels": [
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.86612731218338,
+        0.495986610651016,
+        -1.62221086025238
+      ],
+      "radius": 0.390282278373566,
+      "rotating": [
+        "wheel_0"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.896601378917694,
+        0.495986610651016,
+        -1.62221074104309
+      ],
+      "radius": 0.390282250464544,
+      "rotating": [
+        "wheel_1"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.86612731218338,
+        0.470282286405563,
+        1.30286836624146
+      ],
+      "radius": 0.390282278979953,
+      "rotating": [
+        "wheel_2"
+      ],
+      "stationary": [],
+      "steering": false
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.896600782871246,
+        0.470282286405563,
+        1.30286884307861
+      ],
+      "radius": 0.390282250820122,
+      "rotating": [
+        "wheel_3"
+      ],
+      "stationary": [],
+      "steering": false
+    }
+  ]
+}

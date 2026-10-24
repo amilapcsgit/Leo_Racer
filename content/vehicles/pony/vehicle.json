@@ -1,0 +1,179 @@
+{
+  "acceleration": 18.0,
+  "ai_lateral_acceleration": 0.0,
+  "attribution": "",
+  "boosted_speed": 0.0,
+  "braking_regeneration": 0.0,
+  "camera_height": 0.0,
+  "collision_position": [
+    0.0,
+    1.12549149990082,
+    0.0
+  ],
+  "collision_size": [
+    2.20000004768372,
+    2.09098291397095,
+    3.71153569221497
+  ],
+  "core": {
+    "max_major": 2,
+    "min": "2.2.0"
+  },
+  "dependencies": [],
+  "display_name": "Pony Cartoon",
+  "driver_fits": {},
+  "driver_policy": 1,
+  "electric_boost": false,
+  "exhausts": [
+    [
+      -0.5,
+      0.5,
+      1.67019104957581
+    ],
+    [
+      0.5,
+      0.5,
+      1.67019104957581
+    ]
+  ],
+  "fixed_driver_id": "",
+  "format": 1,
+  "handling": 1.0,
+  "hovering": false,
+  "id": "pony",
+  "max_speed": 33.0,
+  "model": "model.glb",
+  "normalization": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0799999982118607,
+      0.0
+    ]
+  },
+  "preserve_materials": true,
+  "preview_distance": 7.6,
+  "preview_target": [
+    0.0,
+    1.04549145698547,
+    0.0
+  ],
+  "seat": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "setup_complete": true,
+  "thumbnail": "thumbnail.png",
+  "vehicle_api": 1,
+  "version": "1.0.0",
+  "wheels": [
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.769809722900391,
+        0.402072995901108,
+        -1.15275549888611
+      ],
+      "radius": 0.322072972731442,
+      "rotating": [
+        "wheel_0"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.88526052236557,
+        0.402072995901108,
+        -1.1499627828598
+      ],
+      "radius": 0.322072958759075,
+      "rotating": [
+        "wheel_1"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.769550025463104,
+        0.402072995901108,
+        0.961889326572418
+      ],
+      "radius": 0.322072972731442,
+      "rotating": [
+        "wheel_2"
+      ],
+      "stationary": [],
+      "steering": false
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.885000884532928,
+        0.402072995901108,
+        0.961889386177063
+      ],
+      "radius": 0.322072958759075,
+      "rotating": [
+        "wheel_3"
+      ],
+      "stationary": [],
+      "steering": false
+    }
+  ]
+}

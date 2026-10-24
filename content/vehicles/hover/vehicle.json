@@ -1,0 +1,106 @@
+{
+  "acceleration": 18.0,
+  "ai_lateral_acceleration": 0.0,
+  "attribution": "",
+  "boosted_speed": 0.0,
+  "braking_regeneration": 0.0,
+  "camera_height": 0.0,
+  "collision_position": [
+    0.0,
+    0.912872195243835,
+    0.0
+  ],
+  "collision_size": [
+    2.20000004768372,
+    1.66574430465698,
+    4.19999980926514
+  ],
+  "core": {
+    "max_major": 2,
+    "min": "2.2.0"
+  },
+  "dependencies": [],
+  "display_name": "Neon Hover",
+  "driver_fits": {},
+  "driver_policy": 1,
+  "electric_boost": false,
+  "exhausts": [
+    [
+      -0.5,
+      0.5,
+      2.94918894767761
+    ],
+    [
+      0.5,
+      0.5,
+      2.94918894767761
+    ]
+  ],
+  "fixed_driver_id": "",
+  "format": 1,
+  "handling": 1.0,
+  "hovering": true,
+  "id": "hover",
+  "max_speed": 33.0,
+  "model": "model.glb",
+  "normalization": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0799999982118607,
+      0.0
+    ]
+  },
+  "preserve_materials": true,
+  "preview_distance": 10.8136925222542,
+  "preview_target": [
+    0.0,
+    0.832872152328491,
+    0.0
+  ],
+  "seat": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "setup_complete": true,
+  "thumbnail": "thumbnail.png",
+  "vehicle_api": 1,
+  "version": "1.0.0",
+  "wheels": []
+}

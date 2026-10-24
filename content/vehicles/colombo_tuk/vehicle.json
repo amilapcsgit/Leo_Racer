@@ -1,0 +1,161 @@
+{
+  "acceleration": 18.0,
+  "ai_lateral_acceleration": 0.0,
+  "attribution": "",
+  "boosted_speed": 0.0,
+  "braking_regeneration": 0.0,
+  "camera_height": 0.35,
+  "collision_position": [
+    0.0,
+    0.930000007152557,
+    0.0
+  ],
+  "collision_size": [
+    1.29999995231628,
+    1.70000004768372,
+    2.63499999046326
+  ],
+  "core": {
+    "max_major": 2,
+    "min": "2.2.0"
+  },
+  "dependencies": [],
+  "display_name": "Colombo Tuk-Tuk",
+  "driver_fits": {},
+  "driver_policy": 1,
+  "electric_boost": false,
+  "exhausts": [
+    [
+      -0.419999986886978,
+      0.400000005960464,
+      1.2121000289917
+    ],
+    [
+      0.419999986886978,
+      0.400000005960464,
+      1.2121000289917
+    ]
+  ],
+  "fixed_driver_id": "",
+  "format": 1,
+  "handling": 1.0,
+  "hovering": false,
+  "id": "colombo_tuk",
+  "max_speed": 33.0,
+  "model": "model.glb",
+  "normalization": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0799999982118607,
+      0.0
+    ]
+  },
+  "preserve_materials": true,
+  "preview_distance": 8.0,
+  "preview_target": [
+    0.0,
+    0.815999984741211,
+    0.0
+  ],
+  "seat": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "setup_complete": true,
+  "thumbnail": "thumbnail.png",
+  "vehicle_api": 1,
+  "version": "1.0.0",
+  "wheels": [
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        7.69999985550385e-07,
+        0.283199995756149,
+        -1.0
+      ],
+      "radius": 0.2032,
+      "rotating": [
+        "wheel_0"
+      ],
+      "stationary": [],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.514999985694885,
+        0.283199995756149,
+        1.0
+      ],
+      "radius": 0.2032,
+      "rotating": [
+        "wheel_1"
+      ],
+      "stationary": [],
+      "steering": false
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.514999985694885,
+        0.283199995756149,
+        1.0
+      ],
+      "radius": 0.2032,
+      "rotating": [
+        "wheel_2"
+      ],
+      "stationary": [],
+      "steering": false
+    }
+  ]
+}

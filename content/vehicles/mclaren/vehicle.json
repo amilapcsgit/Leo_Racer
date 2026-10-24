@@ -1,0 +1,183 @@
+{
+  "acceleration": 18.0,
+  "ai_lateral_acceleration": 0.0,
+  "attribution": "",
+  "boosted_speed": 0.0,
+  "braking_regeneration": 0.0,
+  "camera_height": 0.0,
+  "collision_position": [
+    0.0,
+    0.990626692771912,
+    0.0
+  ],
+  "collision_size": [
+    2.20000004768372,
+    1.82125329971313,
+    4.19999980926514
+  ],
+  "core": {
+    "max_major": 2,
+    "min": "2.2.0"
+  },
+  "dependencies": [],
+  "display_name": "McLaren MP4-25",
+  "driver_fits": {},
+  "driver_policy": 1,
+  "electric_boost": false,
+  "exhausts": [
+    [
+      -0.5,
+      0.5,
+      1.95987844467163
+    ],
+    [
+      0.5,
+      0.5,
+      1.95987844467163
+    ]
+  ],
+  "fixed_driver_id": "",
+  "format": 1,
+  "handling": 1.0,
+  "hovering": false,
+  "id": "mclaren",
+  "max_speed": 33.0,
+  "model": "model.glb",
+  "normalization": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0799999982118607,
+      0.0
+    ]
+  },
+  "preserve_materials": true,
+  "preview_distance": 7.6,
+  "preview_target": [
+    0.0,
+    0.910626649856567,
+    0.0
+  ],
+  "seat": {
+    "basis": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "setup_complete": true,
+  "thumbnail": "thumbnail.png",
+  "vehicle_api": 1,
+  "version": "1.0.0",
+  "wheels": [
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.861201524734497,
+        0.595525920391083,
+        -1.22911274433136
+      ],
+      "radius": 0.438243914397362,
+      "rotating": [
+        "wheel_0"
+      ],
+      "stationary": [
+        "wheel_0_caliper"
+      ],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.901546478271484,
+        0.595525920391083,
+        -1.2199239730835
+      ],
+      "radius": 0.438243914397362,
+      "rotating": [
+        "wheel_1"
+      ],
+      "stationary": [
+        "wheel_1_caliper"
+      ],
+      "steering": true
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        0.901614785194397,
+        0.598106980323792,
+        1.71985614299774
+      ],
+      "radius": 0.438245041423053,
+      "rotating": [
+        "wheel_2"
+      ],
+      "stationary": [],
+      "steering": false
+    },
+    {
+      "axle": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "pivot": [
+        -0.834526479244232,
+        0.598029017448425,
+        1.72869968414307
+      ],
+      "radius": 0.438244094321641,
+      "rotating": [
+        "wheel_3"
+      ],
+      "stationary": [],
+      "steering": false
+    }
+  ]
+}
