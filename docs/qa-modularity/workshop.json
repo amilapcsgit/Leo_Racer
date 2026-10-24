@@ -1,0 +1,7 @@
+{
+  "checks": 22,
+  "errors": [],
+  "private_test_uses_game_physics": true,
+  "source_models_untouched": true,
+  "status": "PASS"
+}

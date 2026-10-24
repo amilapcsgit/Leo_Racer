@@ -14,7 +14,7 @@ func _ready() -> void:
 	var title:=Label.new();title.text="CONTENT / VEHICLES";title.add_theme_font_size_override("font_size",38);box.add_child(title)
 	status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(status)
 	var buttons:=HBoxContainer.new();box.add_child(buttons)
-	button(buttons,"Refresh Content",refresh)
+	button(buttons,"Refresh Content",refresh).grab_focus()
 	button(buttons,"Open Vehicles Folder",func():OS.shell_open(LeoVehicleLibrary.default_root()))
 	button(buttons,"Back",func():
 		if game.hud:queue_free()
@@ -43,8 +43,8 @@ func refresh() -> void:
 	if game.state not in ["menu","lobby"]:status.text="Return home before refreshing content.";return
 	game.refresh_content();populate()
 
-func edit_vehicle(_vehicle: VehicleDefinition) -> void:
-	status.text="Vehicle setup is being prepared. Folder discovery and loose loading are ready."
+func edit_vehicle(vehicle: VehicleDefinition) -> void:
+	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(vehicle);game.add_child(editor);hide();editor.tree_exited.connect(func():show();populate())
 
-func setup_glb(_path: String) -> void:
-	status.text="Vehicle setup is being prepared. A GLB needs wheel, collision and seating confirmation."
+func setup_glb(path: String) -> void:
+	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(null,path);game.add_child(editor);hide();editor.tree_exited.connect(func():show();populate())

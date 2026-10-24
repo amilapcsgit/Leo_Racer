@@ -44,6 +44,8 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 	if not bool(data.get("setup_complete",false)):errors.append("Vehicle setup is incomplete")
 	var pattern:=RegEx.new();pattern.compile("^[a-z0-9][a-z0-9_.-]{0,63}$")
 	if not data.get("id") is String or not pattern.search(data.id):errors.append("Invalid stable vehicle ID")
+	var version_pattern:=RegEx.new();version_pattern.compile("^[0-9]+\\.[0-9]+\\.[0-9]+$")
+	if not data.get("version") is String or not version_pattern.search(String(data.get("version",""))):errors.append("Invalid content version")
 	var core: Variant=data.get("core",{})
 	if not core is Dictionary or int(core.get("max_major",0))<CORE_VERSION.x:errors.append("Incompatible core version")
 	else:
@@ -96,6 +98,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 	elif not data.get("dependencies",[]).is_empty():errors.append("Vehicle API 1 requires a self-contained model; unsupported dependency")
 	if not (data.get("driver_policy",0) is int or data.get("driver_policy",0) is float):errors.append("Unsupported driver policy")
 	elif float(data.get("driver_policy",0))!=int(data.get("driver_policy",0)) or int(data.get("driver_policy",0)) not in [0,1,2,3]:errors.append("Unsupported driver policy")
+	elif int(data.get("driver_policy",0))==2 and String(data.get("fixed_driver_id","")) not in ["human","mario","hedgehog","lion","elephant","parrot"]:errors.append("Choose a valid fixed driver")
 	return errors
 
 static func discover(directory: String="") -> void:
