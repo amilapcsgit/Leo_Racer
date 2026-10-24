@@ -22,6 +22,7 @@ func _ready() -> void:
 	var buttons:=HBoxContainer.new();box.add_child(buttons)
 	refresh_button=button(buttons,"Refresh Content",refresh);refresh_button.grab_focus()
 	button(buttons,"Import GLB…",browse_glb)
+	button(buttons,"Vehicle Workshop",func():launch_workshop(""))
 	button(buttons,"Open Vehicles Folder",func():OS.shell_open(LeoVehicleLibrary.default_root()))
 	button(buttons,"Back" if game.hud else "Quit to Desktop",close)
 	var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
@@ -81,7 +82,21 @@ func edit_vehicle(vehicle: VehicleDefinition) -> void:
 	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(vehicle);game.add_child(editor);hide();editor.tree_exited.connect(resume_list)
 
 func setup_glb(path: String) -> void:
-	var editor: CanvasLayer=load("res://scripts/content/vehicle_setup.gd").new();editor.game=game;editor.configure(null,path);game.add_child(editor);hide();editor.tree_exited.connect(resume_list)
+	launch_workshop(path)
+
+func launch_workshop(path: String) -> void:
+	if refreshing or game.state not in ["menu","lobby"]:return
+	var helper:=LeoWorkshopLauncher.launch(game,path)
+	if not helper:status.text="Vehicle Workshop could not start. Check the Tools/VehicleWorkshop folder in this installation.";return
+	status.text="Vehicle Workshop opened in a separate window. Import, test and install locally; close it to refresh this list."
+	if not helper.completed.is_connected(workshop_closed):helper.completed.connect(workshop_closed)
+
+func workshop_closed(result: Dictionary) -> void:
+	if not is_inside_tree() or returning:return
+	await refresh()
+	if not is_inside_tree():return
+	if result.get("status")=="saved":status.text+="\nInstalled "+String(result.get("id","vehicle"))+". Select it in the garage."
+	elif not String(result.get("error","")).is_empty():status.text+="\n"+String(result.error)
 
 func resume_list() -> void:
 	if not is_inside_tree():return

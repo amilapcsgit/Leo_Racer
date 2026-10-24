@@ -1,5 +1,5 @@
 param(
- [ValidateSet('core','vehicle','track','distribution','sdk')][string]$Target='distribution',
+ [ValidateSet('core','vehicle','track','distribution','sdk','workshop')][string]$Target='distribution',
  [string]$Id='',
  [ValidateSet('dev','full')][string]$Profile='dev',
  [string]$Version='2.2.0-modularity-dev',
@@ -28,6 +28,12 @@ try {
    python tools/content.py core --folder $CoreFolder --version $Version
    if($LASTEXITCODE -ne 0){throw 'Core package failed'}
   } finally {foreach($name in $saved.Keys){[Environment]::SetEnvironmentVariable($name,$saved[$name])}}
+ } elseif($Target -eq 'workshop'){
+  if(-not $Output){$Output='build/VehicleWorkshop'}
+  ./tools/run_godot.ps1 @('--headless','--script','res://tools/build_workshop_pack.gd','--',('--output='+[IO.Path]::GetFullPath((Join-Path $project $Output))))
+  if($LASTEXITCODE -ne 0){throw 'Independent workshop build failed'}
+  python tools/content.py workshop --folder $Output
+  if($LASTEXITCODE -ne 0){throw 'Independent workshop ZIP failed'}
  } elseif($Target -eq 'vehicle'){
   if(-not $Id){throw '-Id is required'}
   python tools/content.py vehicle $Id --zip

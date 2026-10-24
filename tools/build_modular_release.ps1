@@ -35,6 +35,9 @@ try {
     $folder=Split-Path $Output -Parent
     if (-not (Get-ChildItem $folder -Recurse -Filter 'LeoRacer.dll')) {throw 'Export is missing .NET assemblies'}
     if (-not (Get-ChildItem $folder -Recurse -Filter 'e_sqlite3.dll')) {throw 'Export is missing Windows native SQLite'}
+    & "$PSScriptRoot/run_godot.ps1" @('--headless','--script','res://tools/build_workshop_pack.gd','--',('--output='+[IO.Path]::GetFullPath((Join-Path $project "$folder/Tools/VehicleWorkshop"))))
+    if ($LASTEXITCODE -ne 0) {throw 'Vehicle Workshop pack failed'}
+    [IO.File]::WriteAllText((Join-Path $folder 'Vehicle Workshop.cmd'),"@echo off`r`ncd /d `"%~dp0`"`r`nstart `"`" `"LeoRacer.exe`" -- --vehicle-workshop`r`n",[Text.Encoding]::ASCII)
 } finally {
     if($null -ne $originalProject){[IO.File]::WriteAllBytes((Join-Path $project 'project.godot'),$originalProject)}
     Pop-Location

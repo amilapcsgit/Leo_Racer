@@ -5,6 +5,8 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await begin()
 func begin() -> void:
+	if "--vehicle-workshop" in OS.get_cmdline_user_args():
+		await begin_workshop();return
 	if "--verify-boot-art" in OS.get_cmdline_user_args():
 		var errors: Array[String]=[]
 		for path in [LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]:
@@ -25,6 +27,10 @@ func begin() -> void:
 			printerr("CONTENT_VALIDATION_FAILED ",LeoAssets.failure)
 			if "--verify-content" in OS.get_cmdline_user_args():get_tree().quit(2);return
 			screen.show_failure(LeoAssets.failure,begin,func():get_tree().quit());return
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--workshop-test="):
+			var trial:=load("res://scripts/content/workshop_trial.gd").new() as Node3D
+			trial.configure(argument.trim_prefix("--workshop-test="));get_tree().root.add_child(trial);get_tree().current_scene=trial;queue_free();return
 	if "--verify-content" in OS.get_cmdline_user_args():
 		var tracks:=LeoTrackDefinition.discover()
 		if tracks.is_empty():printerr("CONTENT_VALIDATION_FAILED No compatible tracks");get_tree().quit(2);return
@@ -53,3 +59,36 @@ func begin() -> void:
 		var message: String=game.initialization_error
 		game.queue_free();screen.show_failure(message,begin,func():get_tree().quit());return
 	get_tree().current_scene=game;queue_free()
+
+func begin_workshop() -> void:
+	DisplayServer.window_set_title("Leo Racer / Vehicle Workshop")
+	var job: Dictionary={"format":1,"source":"","vehicles_root":OS.get_executable_path().get_base_dir().path_join("GameAssets/vehicles")}
+	if OS.has_feature("editor"):job.vehicles_root=LeoVehicleLibrary.default_root()
+	var job_path:=""
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--workshop-job="):job_path=argument.trim_prefix("--workshop-job=")
+	if not job_path.is_empty():
+		var file:=FileAccess.open(job_path,FileAccess.READ)
+		var parsed: Variant=JSON.parse_string(file.get_as_text()) if file and file.get_length()<1048576 else null
+		if not parsed is Dictionary or parsed.get("format")!=1:
+			screen.show_failure("Workshop job could not be read.",begin_workshop,func():get_tree().quit());return
+		job=parsed
+	if not OS.has_feature("editor"):
+		var folder:=OS.get_executable_path().get_base_dir().path_join("Tools/VehicleWorkshop")
+		var metadata: Variant=JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("workshop.json"))) if FileAccess.file_exists(folder.path_join("workshop.json")) else null
+		if not metadata is Dictionary or metadata.get("workshop_api")!=1 or metadata.get("core_major")!=2 or not ProjectSettings.load_resource_pack(folder.path_join("workshop.pck"),true):
+			screen.show_failure("Vehicle Workshop is missing or incompatible. Restore Tools/VehicleWorkshop from this development package.",begin_workshop,func():get_tree().quit());return
+	screen.stage("Opening offline Vehicle Workshop…",75);await get_tree().process_frame
+	var script:=load("res://tools/vehicle_workshop/workshop.gd") as GDScript
+	if not script or not script.can_instantiate():
+		screen.show_failure("Vehicle Workshop could not be loaded.",begin_workshop,func():get_tree().quit());return
+	var app:=script.new() as Control
+	app.configure(job)
+	app.completed.connect(func(result: Dictionary):
+		LeoWorkshopLauncher.write_result(job_path,result)
+		get_tree().quit())
+	get_tree().root.add_child(app);get_tree().current_scene=app;screen.hide()
+	if "--workshop-smoke" in OS.get_cmdline_user_args():
+		await get_tree().process_frame;await get_tree().process_frame
+		var report:={"status":"PASS","workshop_api":1,"offline":true,"separate_entrypoint":true,"source_untouched":true}
+		LeoWorkshopLauncher.write_result(job_path,report);print("WORKSHOP_BOOT_TEST ",JSON.stringify(report));get_tree().quit()

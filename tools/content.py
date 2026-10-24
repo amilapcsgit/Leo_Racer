@@ -126,14 +126,15 @@ def distribution(core_folder, profile, output, version):
     readme.write_text('LEO RACER '+version+' / '+profile.upper()+' PROFILE\n'
       'Run LeoRacer.exe; keep the complete folder together. No SDK or network is required.\n'
       'Content > Vehicles discovers folders and standalone GLBs in GameAssets/vehicles.\n'
-      'Use Set Up Vehicle, validate and privately test, then save and Refresh Content.\n'
+      'Import GLB opens the offline Vehicle Workshop in a separate window. Confirm orientation and four wheels, preview/test, then Install.\n'
+      'Vehicle Workshop.cmd also launches the companion directly. No extra engine/editor installation is needed.\n'
       'Mesh/texture caches are disposable files in Godot user data; authoritative GLBs stay loose.\n'
       'Install compatible track folders in GameAssets/tracks while the game is closed.\n'
       'Existing controls/settings/rankings are preserved. Custom content cannot set official records.\n'
       +('Development build. ' if development else 'Release build. ')+'Vehicles: '+', '.join(keys)+'.\n'
       'Attribution: GameAssets/licenses and individual content LICENSE.txt files.\n',encoding='utf-8')
     (output/'Play Compatibility.cmd').write_text('@echo off\ncd /d "%~dp0"\nstart "" "LeoRacer.exe" --rendering-method gl_compatibility --rendering-driver opengl3\n',encoding='ascii')
-    metadata={'version':version,'branch':'modularity','profile':profile,'vehicles':list(keys),
+    metadata={'version':version,'branch':subprocess.check_output(['git','branch','--show-current'],cwd=ROOT,text=True).strip(),'profile':profile,'vehicles':list(keys),
               'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
               'public_release':not development,'template':'Godot 4.7.2 checked/debug'}
     (output/'development-build.json').write_text(json.dumps(metadata,indent=2)+'\n')
@@ -171,6 +172,7 @@ def main():
     p=sub.add_parser('track');p.add_argument('id');p.add_argument('--source-folder',type=Path)
     p=sub.add_parser('distribution');p.add_argument('--core',type=Path,default=ROOT/'build/ModularityCore');p.add_argument('--profile',choices=['dev','full'],default='dev');p.add_argument('--output',type=Path,required=True);p.add_argument('--version',default='2.2.0-modularity-dev')
     p=sub.add_parser('sdk')
+    p=sub.add_parser('workshop');p.add_argument('--folder',type=Path,default=ROOT/'build/VehicleWorkshop')
     args=parser.parse_args()
     if args.target=='registry':print('OFFICIAL_VEHICLES',len(registry()));return
     if args.target=='stage':
@@ -188,5 +190,12 @@ def main():
         folder=args.source_folder or ROOT/'build/content-tracks'/args.id;assert (folder/'manifest.json').exists(),'Export the track first'
         result=archive(folder,'tracks',args.id,ROOT/'dist/content');print('TRACK_BUILT',result.name,'core_export_invoked=false')
     elif args.target=='sdk':sdk()
+    elif args.target=='workshop':
+        files={'Tools/VehicleWorkshop/'+name:args.folder/name for name in ['workshop.pck','workshop.json']}
+        assert all(p.is_file() for p in files.values()),'Build the Workshop PCK first'
+        metadata=read(args.folder/'workshop.json')
+        assert metadata['sha256']==sha(args.folder/'workshop.pck')
+        result=zip_files(files,ROOT/'dist/LeoRacer-VehicleWorkshop-dev.zip')
+        print('WORKSHOP_BUILT',result.name,'bytes=',result.stat().st_size,'core_export_invoked=false')
 
 if __name__=='__main__':main()
