@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "profile": "dev",
+  "vehicles": [
+    "bigster",
+    "duster"
+  ],
+  "exe_bytes": 103484928,
+  "core_bytes": 16011120,
+  "installed_bytes": 478050990,
+  "compressed_bytes": 324673455,
+  "archive": "LeoRacer-2.2.0-customcars-dev-win64.zip",
+  "sha256": "9220ece0ed4d786921eac3f36cd9670c66e0cc2a15a933e3d9cab2b6e1ae4487",
+  "vehicle_bytes": 8188486,
+  "track_bytes": {
+    "astra_coast": 52480,
+    "colombo_city": 49657778
+  },
+  "core_export_invoked": false,
+  "workshop_pack_bytes": 54684,
+  "workshop_zip_bytes": 16228
+}

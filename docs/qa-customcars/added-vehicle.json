@@ -1,0 +1,135 @@
+{
+  "status": "PASS",
+  "original_source_sha256": "3b89bb556637f1870c722bcc03b1c5bd86b601e712bff326e9b71f1afd8cdcae",
+  "cold": {
+    "core_version": "2.2.0",
+    "errors": [],
+    "needs_setup": [],
+    "status": "PASS",
+    "vehicle_api": 1,
+    "vehicles": [
+      {
+        "cache_hit": false,
+        "compressed_materials": 0,
+        "fingerprint": {
+          "definition_match": true,
+          "definition_sha256": "3499ed26bbcc13dded073d0e1e9609efb786c417bc08f8dd16221fc1fbc74c7e",
+          "model_match": true,
+          "model_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+          "registry_found": true,
+          "trusted_id": true
+        },
+        "id": "bigster",
+        "import_seconds": 0.680362,
+        "official": true,
+        "wheels": 4
+      },
+      {
+        "cache_hit": false,
+        "compressed_materials": 0,
+        "fingerprint": {
+          "definition_match": false,
+          "definition_sha256": "e8e4d9c80e7164fdee6b0b3e70b1b2a14d879261e6bcb85242749d7eddba5dbe",
+          "model_match": false,
+          "model_sha256": "b2def85b8387c95bdb44f2efd30d86521950ad59563f266eb83f69c418db8877",
+          "registry_found": true,
+          "trusted_id": false
+        },
+        "id": "byd_yangwang_u8",
+        "import_seconds": 0.72552,
+        "official": false,
+        "wheels": 4
+      },
+      {
+        "cache_hit": false,
+        "compressed_materials": 0,
+        "fingerprint": {
+          "definition_match": true,
+          "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+          "model_match": true,
+          "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+          "registry_found": true,
+          "trusted_id": true
+        },
+        "id": "duster",
+        "import_seconds": 0.819368,
+        "official": true,
+        "wheels": 4
+      }
+    ]
+  },
+  "warm": {
+    "core_version": "2.2.0",
+    "errors": [],
+    "needs_setup": [],
+    "status": "PASS",
+    "vehicle_api": 1,
+    "vehicles": [
+      {
+        "cache_hit": true,
+        "compressed_materials": 0,
+        "fingerprint": {
+          "definition_match": true,
+          "definition_sha256": "3499ed26bbcc13dded073d0e1e9609efb786c417bc08f8dd16221fc1fbc74c7e",
+          "model_match": true,
+          "model_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+          "registry_found": true,
+          "trusted_id": true
+        },
+        "id": "bigster",
+        "import_seconds": 0.018017,
+        "official": true,
+        "wheels": 4
+      },
+      {
+        "cache_hit": true,
+        "compressed_materials": 0,
+        "fingerprint": {
+          "definition_match": false,
+          "definition_sha256": "e8e4d9c80e7164fdee6b0b3e70b1b2a14d879261e6bcb85242749d7eddba5dbe",
+          "model_match": false,
+          "model_sha256": "b2def85b8387c95bdb44f2efd30d86521950ad59563f266eb83f69c418db8877",
+          "registry_found": true,
+          "trusted_id": false
+        },
+        "id": "byd_yangwang_u8",
+        "import_seconds": 0.029442,
+        "official": false,
+        "wheels": 4
+      },
+      {
+        "cache_hit": true,
+        "compressed_materials": 0,
+        "fingerprint": {
+          "definition_match": true,
+          "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+          "model_match": true,
+          "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+          "registry_found": true,
+          "trusted_id": true
+        },
+        "id": "duster",
+        "import_seconds": 0.011459,
+        "official": true,
+        "wheels": 4
+      }
+    ]
+  },
+  "private_drive": {
+    "jets": 2,
+    "rankings_created": false,
+    "speed": 45.0424110337785,
+    "status": "PASS",
+    "wheels": 4
+  },
+  "race_smoke": {
+    "boosts": 0,
+    "engine": "4.7.2-stable (official)",
+    "errors": [],
+    "race_time": 0.0,
+    "status": "PASS"
+  },
+  "exe_and_core_unchanged": true,
+  "new_visible_driver": false,
+  "rankings_store_created_by_private_test": false
+}

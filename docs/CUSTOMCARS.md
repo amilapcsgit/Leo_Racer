@@ -41,10 +41,35 @@ and SQLite rankings remain.
 - Exported Workshop bootstrap and BYD private-drive probe pass. The private
   proving ground uses actual arcade physics and never constructs a ranking store.
 
-## Remaining checkpoint
+## Checkpoint 3: development delivery complete
 
-3. Exported offline package, both-track/split-screen regressions and contributor
-   instructions. Development delivery only; public release is separate.
+- Development ZIP: `dist/LeoRacer-2.2.0-customcars-dev-win64.zip`, Bigster/Duster
+  profile, both tracks and shared drivers. Run `LeoRacer.exe` after extraction.
+- Separate Workshop update: `dist/LeoRacer-VehicleWorkshop-dev.zip`. Runtime
+  tool replacement passed in the extracted copy with identical EXE/core hashes.
+- Optional locally prepared BYD: `dist/content/LeoRacer-vehicles-byd_yangwang_u8.zip`.
+  It retains its author's CC-BY-NC-SA-4.0 attribution; not included in the default
+  two-car distribution. Copied into the extracted build, all three cars validate,
+  and the BYD private arcade drive passes with four wheels/two boost jets and
+  no visible driver. EXE/core hashes stay unchanged. BYD cold import: 0.726 s;
+  cached import: 0.029 s. Import timing is separate from steady driving performance.
+- All eight extracted offline checks pass with SDK paths removed: boot artwork,
+  content, cold/warm vehicles, actual pointer refresh/navigation, UI and both-track
+  smoke tests. A diagnostic bootstrap loading overlay was discovered intercepting
+  pointer events; it is hidden before the GUI test. The rebuilt package passes.
+- Six-racer, two-human 1080p RTX A1000 measurements: Colombo Forward+ 119.84 FPS,
+  p95 10.924 ms/p99 11.379 ms/max 36.634 ms; Astra Compatibility 116.11 FPS,
+  p95 10.417 ms/p99 12.019 ms/max 137.191 ms. Astra Forward+ measured 92.09 FPS
+  while the headless race matrix ran concurrently; do not use that sample to
+  claim a baseline performance comparison. Colombo Forward+ cell transitions
+  show no live renderer errors; resource warnings remain during engine teardown.
+- Default distribution: EXE 103,484,928 bytes; core 16,011,120 bytes; installed
+  478,050,990 bytes; compressed 324,673,455 bytes. Vehicle source folders total
+  8,188,486 bytes. Workshop PCK 54,684 bytes; tool ZIP 16,228 bytes. Shared asset
+  packs and both tracks remain external. Detailed evidence is in `qa-customcars/`.
+- Local `check_customcars.ps1` passes. `customcars.yml` creates development-only
+  artifacts; it does not publish a release. Physical native-dialog/per-monitor
+  DPI interaction remains a user-playtest item. Public release is separate.
 
 After user acceptance, a separate opt-in, unranked arcade suspension preview
 may be developed on `physics-v2`. Rendering and audio improvements follow.
