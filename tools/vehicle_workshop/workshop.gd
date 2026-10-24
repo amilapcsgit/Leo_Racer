@@ -626,21 +626,22 @@ func export_to(root: String) -> Dictionary:
 	var destination := root.path_join(id)
 	if DirAccess.dir_exists_absolute(destination):
 		return {"ok": false, "error": "That folder already exists. Choose another ID; existing vehicles are never overwritten."}
-	var result: Dictionary = Converter.export_folder(converted, destination)
-	if result.get("ok", false):
-		if DisplayServer.get_name() != "headless":
-			if is_instance_valid(collision_hint): collision_hint.hide()
-			if is_instance_valid(selection_hint): selection_hint.hide()
-			await get_tree().process_frame
-			if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return {"ok": false, "error": "Cancelled after export", "folder": destination}
-			await RenderingServer.frame_post_draw
-			if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return {"ok": false, "error": "Cancelled after export", "folder": destination}
-			viewport.get_texture().get_image().save_png(destination.path_join("thumbnail.png"))
-			if is_instance_valid(collision_hint): collision_hint.show()
-		if not FileAccess.file_exists(destination.path_join("LICENSE.txt")):
-			var license_file := FileAccess.open(destination.path_join("LICENSE.txt"), FileAccess.WRITE)
-			if license_file: license_file.store_string(license_edit.text + "\n")
-	return result
+	if DisplayServer.get_name() != "headless":
+		var helpers: Array = [front_marker, collision_hint, selection_hint] + flames
+		var visibility: Array[bool] = []
+		for helper in helpers:
+			visibility.append(is_instance_valid(helper) and helper.visible)
+			if is_instance_valid(helper): helper.hide()
+		await get_tree().process_frame
+		if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return {"ok": false, "error": "Cancelled before export"}
+		await RenderingServer.frame_post_draw
+		if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return {"ok": false, "error": "Cancelled before export"}
+		converted.thumbnail = viewport.get_texture().get_image()
+		for index in helpers.size():
+			if is_instance_valid(helpers[index]): helpers[index].visible = visibility[index]
+	# The real thumbnail is staged together with GLB/metadata, not changed after
+	# the complete folder becomes discoverable by the running game.
+	return Converter.export_folder(converted, destination)
 
 func install_vehicle() -> void:
 	if busy or exporting: return

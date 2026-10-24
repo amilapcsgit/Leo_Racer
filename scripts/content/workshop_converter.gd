@@ -265,7 +265,9 @@ static func export_folder(converted: Dictionary, destination: String) -> Diction
 		if not file:return failure("Cannot write vehicle metadata; staging folder retained.")
 		file.store_string(item[1]);var write_error:=file.get_error();file.close()
 		if write_error!=OK:return failure("Vehicle metadata write failed; staging folder retained.")
-	var image:=Image.create(256,144,false,Image.FORMAT_RGB8);image.fill(Color("102733"))
+	var image: Image=converted.get("thumbnail") as Image
+	if not image or image.is_empty():
+		image=Image.create(256,144,false,Image.FORMAT_RGB8);image.fill(Color("102733"))
 	if image.save_png(temporary.path_join("thumbnail.png"))!=OK:return failure("Cannot write vehicle thumbnail; staging folder retained.")
 	var written_data: Variant=JSON.parse_string(FileAccess.get_file_as_string(temporary.path_join("vehicle.json")))
 	var written_errors:=LeoVehicleLibrary.problems(written_data,temporary,true)
