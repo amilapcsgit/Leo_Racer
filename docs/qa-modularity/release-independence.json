@@ -1,0 +1,13 @@
+{
+  "hashes": {
+    "core": "964B6F728B1FF210697DD4E56242AB7CA1C0B7FFB2C2EAC2DE58BA1491E95E58",
+    "exe": "41DFD2FA448B4DBE728270D3C8110D0B5B364A6455AA491660AB590EF9D16CF9"
+  },
+  "component_builds": [
+    "vehicle:bigster",
+    "vehicle:duster",
+    "track:astra_coast"
+  ],
+  "core_files_unchanged": true,
+  "status": "PASS"
+}

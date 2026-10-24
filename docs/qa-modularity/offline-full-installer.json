@@ -1,0 +1,533 @@
+{
+  "checks": [
+    "--verify-boot-art",
+    "--verify-content",
+    "--validate-vehicles",
+    "--validate-vehicles",
+    "--verify-content-refresh",
+    "--ui-smoke-test",
+    "--smoke-test --track=astra_coast",
+    "--smoke-test --track=colombo_city"
+  ],
+  "extended": false,
+  "warm_import": [
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "a6f4b64bd01ac099fde261b7b5baf0a93d5ec2def7d9939c99132a49a4e580c0",
+        "model_match": true,
+        "model_sha256": "f631be5c2f3dbc5858f2ebaf05f843af3e6fe68d7dea5c14fc91939941444170",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "aqua",
+      "import_seconds": 0.001868,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3499ed26bbcc13dded073d0e1e9609efb786c417bc08f8dd16221fc1fbc74c7e",
+        "model_match": true,
+        "model_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "bigster",
+      "import_seconds": 0.016146,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "65aca1ba8f8a8b32c1ce953a9bcc6c6dfd351d2a9c722f96cb16bd121f4fe198",
+        "model_match": true,
+        "model_sha256": "60551ab75ac62cd2ffbaf6e076c825f5d46562cb5d009d5aabf8eab08de1eae1",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "blue",
+      "import_seconds": 0.00184,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3ecd6b35eaaf3f078b6ba74104d3c31d8291537c299a0b6e8069bf8e266d3831",
+        "model_match": true,
+        "model_sha256": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "colombo_tuk",
+      "import_seconds": 0.043365,
+      "official": true,
+      "wheels": 3
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "bcdcc473d82c6a61768af8ba3fde03f60a83445c0ea35d00add5b85b3e753dae",
+        "model_match": true,
+        "model_sha256": "9169a61fcfd682f8dc48745bc2af493bd9bdff2675eb64501a17dff754a0f2f3",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "coral",
+      "import_seconds": 0.001801,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "e3b4774fc5f77e00ad25a3df5ec663a4806fbff1ed8aad53756f4ef0f5026045",
+        "model_match": true,
+        "model_sha256": "482dc51f4670b7c10fca83b6e74f24c13b9c4d62408105ddf10b9bea45b2cf8d",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "cyberpunk",
+      "import_seconds": 0.04104,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+        "model_match": true,
+        "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "duster",
+      "import_seconds": 0.011107,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "b515e6c346134f716fd3298eed2b7a6474f2caff7db797490c0465c6a89d711d",
+        "model_match": true,
+        "model_sha256": "d9bb41c33ae5e2ba695f7162165065a3d9bdcb6094a76a851f71a930931637ba",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "formula_blue",
+      "import_seconds": 0.003187,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "709e006323cb2adb1836b2f728ee97c34991759b8adafe8e9e0462d53018fb57",
+        "model_match": true,
+        "model_sha256": "0991af23884e31c76f9a4d04101b0b59570da170447cea01ec3bc33589acae63",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "formula_red",
+      "import_seconds": 0.002935,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "1b1060ee52e1a4ab254321e6a16bf1eeefed1cad992b881a764d1c20fe5db478",
+        "model_match": true,
+        "model_sha256": "c174a2d0d17598af72280fa4bfb019b28db381a3b8506d52cd94edbc64e5ac21",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "hover",
+      "import_seconds": 0.04067,
+      "official": true,
+      "wheels": 0
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "95842174a24054ca777da64e40d1caf47890ee864e5219f7c3c19a931ca4aaed",
+        "model_match": true,
+        "model_sha256": "7c453693ed68961e49333cc598218f8a9ea0d2e3ed3acdaaaf912d8dc425de16",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "mclaren",
+      "import_seconds": 0.019797,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "62be79aa2640a4eae4e3413b7d42adc000a4d66bb979520494b7bc92b48e955f",
+        "model_match": true,
+        "model_sha256": "e92f82380c22538777bef2486cc53189c347a86e0143f68ce89889a49366ceac",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "pink",
+      "import_seconds": 0.001934,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "586a091ac99b5a059c07c6806f2354eb82705fb8c2825120e7c735c9554d82c4",
+        "model_match": true,
+        "model_sha256": "fbdf41b6ed3ce471fb8524f18a28a5dbbfc596ca964369149d513f4bb3ac5ad1",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "pony",
+      "import_seconds": 0.036036,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7e4dfe56d3735fd138744e9dd902efec240029679ad0671ab9c63d266b9e4bb7",
+        "model_match": true,
+        "model_sha256": "809237545e8ba34de782da0c1383b3e670479b26d54df697ae8413c9b74dec62",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "race_bus",
+      "import_seconds": 0.003486,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "8c2a6412106120b534410ccc2787d6695b089df42481d131a8e1df3973a7f8e1",
+        "model_match": true,
+        "model_sha256": "26863f467ca0fecbecba3ea232484209188138716b3bcd1f8d1ca9146916ef1f",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "race_tuk",
+      "import_seconds": 0.00286,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "b9295a138c54a3db093e39130ba5a75785080286ff23b31af3ff2219aceb0b1c",
+        "model_match": true,
+        "model_sha256": "a8f2abbed820be931001ad70685b2f3777c6b60198af5115bad1edb44bfd522f",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "roadster_gold",
+      "import_seconds": 0.003065,
+      "official": true,
+      "wheels": 4
+    }
+  ],
+  "network_required": false,
+  "exe_and_core_unchanged": true,
+  "sdk_environment_removed": true,
+  "cold_import": [
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "a6f4b64bd01ac099fde261b7b5baf0a93d5ec2def7d9939c99132a49a4e580c0",
+        "model_match": true,
+        "model_sha256": "f631be5c2f3dbc5858f2ebaf05f843af3e6fe68d7dea5c14fc91939941444170",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "aqua",
+      "import_seconds": 0.332813,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3499ed26bbcc13dded073d0e1e9609efb786c417bc08f8dd16221fc1fbc74c7e",
+        "model_match": true,
+        "model_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "bigster",
+      "import_seconds": 0.928633,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "65aca1ba8f8a8b32c1ce953a9bcc6c6dfd351d2a9c722f96cb16bd121f4fe198",
+        "model_match": true,
+        "model_sha256": "60551ab75ac62cd2ffbaf6e076c825f5d46562cb5d009d5aabf8eab08de1eae1",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "blue",
+      "import_seconds": 0.318734,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3ecd6b35eaaf3f078b6ba74104d3c31d8291537c299a0b6e8069bf8e266d3831",
+        "model_match": true,
+        "model_sha256": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "colombo_tuk",
+      "import_seconds": 0.383871,
+      "official": true,
+      "wheels": 3
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "bcdcc473d82c6a61768af8ba3fde03f60a83445c0ea35d00add5b85b3e753dae",
+        "model_match": true,
+        "model_sha256": "9169a61fcfd682f8dc48745bc2af493bd9bdff2675eb64501a17dff754a0f2f3",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "coral",
+      "import_seconds": 0.318633,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "e3b4774fc5f77e00ad25a3df5ec663a4806fbff1ed8aad53756f4ef0f5026045",
+        "model_match": true,
+        "model_sha256": "482dc51f4670b7c10fca83b6e74f24c13b9c4d62408105ddf10b9bea45b2cf8d",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "cyberpunk",
+      "import_seconds": 0.411352,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+        "model_match": true,
+        "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "duster",
+      "import_seconds": 0.906049,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "b515e6c346134f716fd3298eed2b7a6474f2caff7db797490c0465c6a89d711d",
+        "model_match": true,
+        "model_sha256": "d9bb41c33ae5e2ba695f7162165065a3d9bdcb6094a76a851f71a930931637ba",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "formula_blue",
+      "import_seconds": 0.443141,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "709e006323cb2adb1836b2f728ee97c34991759b8adafe8e9e0462d53018fb57",
+        "model_match": true,
+        "model_sha256": "0991af23884e31c76f9a4d04101b0b59570da170447cea01ec3bc33589acae63",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "formula_red",
+      "import_seconds": 0.457173,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "1b1060ee52e1a4ab254321e6a16bf1eeefed1cad992b881a764d1c20fe5db478",
+        "model_match": true,
+        "model_sha256": "c174a2d0d17598af72280fa4bfb019b28db381a3b8506d52cd94edbc64e5ac21",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "hover",
+      "import_seconds": 4.283819,
+      "official": true,
+      "wheels": 0
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "95842174a24054ca777da64e40d1caf47890ee864e5219f7c3c19a931ca4aaed",
+        "model_match": true,
+        "model_sha256": "7c453693ed68961e49333cc598218f8a9ea0d2e3ed3acdaaaf912d8dc425de16",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "mclaren",
+      "import_seconds": 0.493789,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "62be79aa2640a4eae4e3413b7d42adc000a4d66bb979520494b7bc92b48e955f",
+        "model_match": true,
+        "model_sha256": "e92f82380c22538777bef2486cc53189c347a86e0143f68ce89889a49366ceac",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "pink",
+      "import_seconds": 0.318817,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "586a091ac99b5a059c07c6806f2354eb82705fb8c2825120e7c735c9554d82c4",
+        "model_match": true,
+        "model_sha256": "fbdf41b6ed3ce471fb8524f18a28a5dbbfc596ca964369149d513f4bb3ac5ad1",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "pony",
+      "import_seconds": 0.386864,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7e4dfe56d3735fd138744e9dd902efec240029679ad0671ab9c63d266b9e4bb7",
+        "model_match": true,
+        "model_sha256": "809237545e8ba34de782da0c1383b3e670479b26d54df697ae8413c9b74dec62",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "race_bus",
+      "import_seconds": 0.484609,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "8c2a6412106120b534410ccc2787d6695b089df42481d131a8e1df3973a7f8e1",
+        "model_match": true,
+        "model_sha256": "26863f467ca0fecbecba3ea232484209188138716b3bcd1f8d1ca9146916ef1f",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "race_tuk",
+      "import_seconds": 0.491515,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "b9295a138c54a3db093e39130ba5a75785080286ff23b31af3ff2219aceb0b1c",
+        "model_match": true,
+        "model_sha256": "a8f2abbed820be931001ad70685b2f3777c6b60198af5115bad1edb44bfd522f",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "roadster_gold",
+      "import_seconds": 0.443248,
+      "official": true,
+      "wheels": 4
+    }
+  ],
+  "status": "PASS"
+}

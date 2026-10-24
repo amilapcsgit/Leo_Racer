@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "vehicles": [
+    "aqua",
+    "bigster",
+    "blue",
+    "colombo_tuk",
+    "coral",
+    "cyberpunk",
+    "duster",
+    "formula_blue",
+    "formula_red",
+    "hover",
+    "mclaren",
+    "pink",
+    "pony",
+    "race_bus",
+    "race_tuk",
+    "roadster_gold"
+  ],
+  "packed_vehicle_models": [],
+  "packs_audited": [
+    "GameAssets/audio/shared.pck",
+    "GameAssets/drivers/shared.pck",
+    "GameAssets/glb/colombo-buildings.pck",
+    "GameAssets/glb/shared-scenery.pck",
+    "GameAssets/roads/terrain.pck",
+    "GameAssets/signs/colombo.pck",
+    "GameAssets/textures/art.pck",
+    "GameAssets/textures/imported.pck",
+    "GameAssets/textures/surfaces.pck",
+    "GameAssets/tracks/astra_coast/scenery.pck",
+    "GameAssets/tracks/colombo_city/scenery.pck",
+    "LeoRacer.pck"
+  ],
+  "loose_models_match_sources": true,
+  "archive_crc": "PASS",
+  "archive_sha256": "d62e3f0101ea5c998f151d7a9cb740dc8ac32214c2d9c4f289777a0a8973d1f1",
+  "exe_bytes": 103484928,
+  "core_bytes": 15978444,
+  "vehicle_bytes": 66223053,
+  "texture_bytes": 175008640,
+  "shared_asset_bytes": 39228216,
+  "tracks": {
+    "astra_coast": 52480,
+    "colombo_city": 49657778
+  },
+  "installed_bytes": 535998019,
+  "compressed_bytes": 360633318
+}

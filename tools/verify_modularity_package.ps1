@@ -37,10 +37,10 @@ try {
  $null=Run @('--verify-boot-art') 'BOOT_ART_VALIDATION.*"status":"PASS"'
  $content=Run @('--verify-content') 'CONTENT_VALIDATION_OK'
  if($content -notmatch 'TRACK_VERIFIED astra_coast official=true' -or $content -notmatch 'TRACK_VERIFIED colombo_city official=true'){throw 'Stock tracks unexpectedly excluded from official records'}
- $null=Run @('--verify-content-refresh') 'CONTENT_REFRESH_TEST.*"status":"PASS"'
  $cold=Run @('--validate-vehicles') 'VEHICLE_VALIDATION.*"status":"PASS"'
  if($cold -match '"official":false'){throw 'Stock vehicles unexpectedly unranked'}
- $null=Run @('--validate-vehicles') '"cache_hit":true'
+ $warm=Run @('--validate-vehicles') '"cache_hit":true'
+ $null=Run @('--verify-content-refresh') 'CONTENT_REFRESH_TEST.*"status":"PASS"'
  $null=Run @('--ui-smoke-test') 'UI_PACKAGE_SMOKE.*"status":"PASS"'
  foreach($track in @('astra_coast','colombo_city')){$null=Run @('--smoke-test',('--track='+$track)) 'LEO_TEST_REPORT.*"status":"PASS"'}
  if($Extended){
@@ -74,7 +74,9 @@ try {
   } finally {foreach($file in $readonly){$file.IsReadOnly=$false}}
  }
  if((Get-FileHash (Join-Path $game 'LeoRacer.exe')).Hash -ne $before.exe -or (Get-FileHash (Join-Path $game 'LeoRacer.pck')).Hash -ne $before.core){throw 'Content tests changed the executable/core'}
- $report=@{status='PASS';sdk_environment_removed=$true;network_required=$false;checks=$checks.ToArray();extended=[bool]$Extended;exe_and_core_unchanged=$true;folder=$game}
+ $coldReport=([regex]::Match($cold,'VEHICLE_VALIDATION (\{[^\r\n]+\})').Groups[1].Value | ConvertFrom-Json)
+ $warmReport=([regex]::Match($warm,'VEHICLE_VALIDATION (\{[^\r\n]+\})').Groups[1].Value | ConvertFrom-Json)
+ $report=@{cold_import=$coldReport.vehicles;warm_import=$warmReport.vehicles;status='PASS';sdk_environment_removed=$true;network_required=$false;checks=$checks.ToArray();extended=[bool]$Extended;exe_and_core_unchanged=$true;folder=$game}
  $report | ConvertTo-Json -Depth 8 | Set-Content -Encoding utf8 build/modularity/offline-package.json
  Write-Host 'MODULARITY_OFFLINE_PACKAGE PASS'
 } finally {foreach($name in $saved.Keys){[Environment]::SetEnvironmentVariable($name,$saved[$name])};Pop-Location}

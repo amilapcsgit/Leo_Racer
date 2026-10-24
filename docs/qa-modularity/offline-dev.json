@@ -1,0 +1,92 @@
+{
+  "status": "PASS",
+  "checks": [
+    "--verify-boot-art",
+    "--verify-content",
+    "--validate-vehicles",
+    "--validate-vehicles",
+    "--verify-content-refresh",
+    "--ui-smoke-test",
+    "--smoke-test --track=astra_coast",
+    "--smoke-test --track=colombo_city",
+    "--validate-vehicles",
+    "--validate-vehicles",
+    "--validate-vehicles",
+    "--smoke-test --vehicle=contributor_probe --track=astra_coast",
+    "--smoke-test --track=community_example",
+    "--validate-vehicles",
+    "--validate-vehicles"
+  ],
+  "exe_and_core_unchanged": true,
+  "cold_import": [
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3499ed26bbcc13dded073d0e1e9609efb786c417bc08f8dd16221fc1fbc74c7e",
+        "model_match": true,
+        "model_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "bigster",
+      "import_seconds": 0.928553,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": false,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+        "model_match": true,
+        "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "duster",
+      "import_seconds": 0.914874,
+      "official": true,
+      "wheels": 4
+    }
+  ],
+  "extended": true,
+  "warm_import": [
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3499ed26bbcc13dded073d0e1e9609efb786c417bc08f8dd16221fc1fbc74c7e",
+        "model_match": true,
+        "model_sha256": "3c4d68bc30dfe01a0c21334279a7b7b09a58ba1e883137ce7645cf61b03febfe",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "bigster",
+      "import_seconds": 0.01624,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+        "model_match": true,
+        "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "duster",
+      "import_seconds": 0.010468,
+      "official": true,
+      "wheels": 4
+    }
+  ],
+  "network_required": false,
+  "sdk_environment_removed": true
+}

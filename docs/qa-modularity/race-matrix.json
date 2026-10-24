@@ -1,0 +1,66 @@
+{
+  "errors": [],
+  "races": [
+    {
+      "humans": 1,
+      "premature_results": false,
+      "racers": 6,
+      "three_laps_finished": true,
+      "times": [
+        295.163600000008,
+        148.830479999999,
+        138.762319999998,
+        150.071759999999,
+        141.520719999998,
+        149.244239999999
+      ],
+      "track": "astra_coast"
+    },
+    {
+      "humans": 2,
+      "premature_results": false,
+      "racers": 6,
+      "three_laps_finished": true,
+      "times": [
+        295.148800000008,
+        148.815679999999,
+        138.747519999998,
+        150.056959999999,
+        141.505919999998,
+        149.229439999999
+      ],
+      "track": "astra_coast"
+    },
+    {
+      "humans": 1,
+      "premature_results": false,
+      "racers": 6,
+      "three_laps_finished": true,
+      "times": [
+        694.983280000032,
+        360.941040000012,
+        329.77112000001,
+        362.734000000012,
+        330.32280000001,
+        362.182320000012
+      ],
+      "track": "colombo_city"
+    },
+    {
+      "humans": 2,
+      "premature_results": false,
+      "racers": 6,
+      "three_laps_finished": true,
+      "times": [
+        694.981580000032,
+        361.077260000012,
+        329.76942000001,
+        362.732300000012,
+        330.32110000001,
+        362.180620000012
+      ],
+      "track": "colombo_city"
+    }
+  ],
+  "status": "PASS"
+}

@@ -1,6 +1,6 @@
 # Modularity development
 
-Branch `modularity`, based on released v2.1.0 (`70961b6`). Public releases are unchanged.
+Branch `modularity`, based on released v2.1.0 (`70961b6`). Prior releases remain unchanged; v2.2.0 publication was authorized after playtesting.
 
 ## Contract and recovery
 
@@ -37,3 +37,5 @@ Shared-change migration validation passed 1,205 checks across all sixteen cars a
 Checkpoint 5: extracted development builds passed offline import, official fingerprints, stock-track loading, SQLite/UI, custom compressed textures, a contributor vehicle and the SDK track without changes to executable/core hashes. All sixteen folders contain loose model, metadata, thumbnail and license files; no shipped vehicle models remain in packs. Installer install/update/uninstall preserves unknown community folders. Final acceptance and package sizes are recorded in MODULARITY_VALIDATION.md.
 
 Release follow-up: Refresh Content now scans on a worker with visible progress, leaves the content screen focused, removes stale rows immediately and refreshes automatically after leaving the workshop. Empty-roster management remains accessible. The actual button and workshop-return regression test checks six cases, including newly dropped GLBs, newly configured folders, removal and the race guard.
+
+Final release acceptance: four three-lap races (both tracks × one/two humans), the extracted two-car package and installed sixteen-car package passed. Final package CRC/model-source audits, cold/warm timings and installer preservation evidence are under docs/qa-modularity.
