@@ -2,20 +2,22 @@ extends SceneTree
 var game: Node3D
 var errors: Array[String]=[]
 var checks:=0
+var output_dir:="res://docs/qa-local2player/"
 func _initialize() -> void:run.call_deferred()
 func check(ok: bool,message: String) -> void:
  checks+=1
  if not ok:errors.append(message);push_error(message)
 func capture(label: String) -> void:
- await process_frame;await process_frame;await RenderingServer.frame_post_draw
- root.get_texture().get_image().save_jpg("res://docs/qa-local2player/"+label+".jpg",.88)
+ await create_timer(.25).timeout;await process_frame;await process_frame;await RenderingServer.frame_post_draw
+ root.get_texture().get_image().save_jpg(output_dir+label+".jpg",.88)
 func run() -> void:
+ if "--modularity" in OS.get_cmdline_user_args():output_dir="res://build/modularity/drivers/";DirAccess.make_dir_recursive_absolute(output_dir)
  root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size)
  game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame;game.diagnostics_mode=true
  game.hud.show_garage()
  for v in [&"duster",&"bigster"]:
   for d in game.catalog.drivers:
-   game.hud.garage_selector.choose_driver(d.id);game.hud.garage_selector.choose_vehicle(v)
+   await game.hud.garage_selector.set_selection(d.id,v)
    check(game.hud.garage_selector.vehicle_id==v and game.hud.garage_selector.driver_id==d.id,"Garage target "+String(v)+"/"+String(d.id))
    await capture("garage-%s-%s" % [v,d.id])
  game.return_menu();game.hud.show_controls();await capture("controls");game.hud.clear(game.hud.modal_root)
@@ -32,5 +34,5 @@ func run() -> void:
   check(game.karts[0].driver.get_meta("visible_driver_id")==d.id and game.karts[1].driver.get_meta("visible_driver_id")==d.id,"Driving cabin identities "+String(d.id))
   await capture("driving-"+String(d.id))
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"renderer":RenderingServer.get_current_rendering_method(),"resolution":[1920,1080]}
- FileAccess.open("res://docs/qa-local2player/visual-acceptance.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("LOCAL_VISUAL_TEST ",report)
+ FileAccess.open(output_dir+"visual-acceptance.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("LOCAL_VISUAL_TEST ",report)
  game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

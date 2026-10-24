@@ -16,7 +16,7 @@ Default development profile: Bigster and Duster, six drivers, both tracks, six r
 4. Track starter project and independent core/vehicle/track/distribution targets.
 5. Full migration, integration, performance and extracted offline development build.
 
-Commit and push each tested checkpoint. Routine content changes test their dependency closure; full-roster checks run for shared changes and release candidates. No new public release is authorized by this milestone.
+Commit and push each tested checkpoint. Routine content changes test their dependency closure; full-roster checks run for shared changes and release candidates. The original milestone requested development artifacts. After playing the build, the user explicitly authorized publication as v2.2.0.
 
 ## Verification
 
@@ -33,3 +33,7 @@ Checkpoint 3: vehicle workshop validated 22 checks, including four wheel pivots,
 Checkpoint 4 verified: independent Track API 2 starter project exports a 753.95 m example with resident collision, eight safe recoveries, route helpers and two decorative cells. Six racers completed three laps (8 checks). Both original Track API 1 folders remain compatible. Core, individual vehicle/track, SDK and assembled distribution targets are separate; a Duster/Astra rebuild left executable/core hashes unchanged. Twelve packs were audited with zero packed vehicle models. CI selects dependency-specific checks and uploads development artifacts only.
 
 Shared-change migration validation passed 1,205 checks across all sixteen cars and six drivers (96 assemblies), including measured wheel travel, pivots, cabin identity and legacy selection migration. Selective loose-cache invalidation passed 40 checks; unchanged cars remain in memory. Runtime metadata scanning runs on a worker while the loading screen animates. Final exported-template, installation and performance evidence follows in checkpoint 5.
+
+Checkpoint 5: extracted development builds passed offline import, official fingerprints, stock-track loading, SQLite/UI, custom compressed textures, a contributor vehicle and the SDK track without changes to executable/core hashes. All sixteen folders contain loose model, metadata, thumbnail and license files; no shipped vehicle models remain in packs. Installer install/update/uninstall preserves unknown community folders. Final acceptance and package sizes are recorded in MODULARITY_VALIDATION.md.
+
+Release follow-up: Refresh Content now scans on a worker with visible progress, leaves the content screen focused, removes stale rows immediately and refreshes automatically after leaving the workshop. Empty-roster management remains accessible. The actual button and workshop-return regression test checks six cases, including newly dropped GLBs, newly configured folders, removal and the race guard.

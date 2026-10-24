@@ -70,7 +70,11 @@ Section "Leo Racer (required)"
   SectionIn RO
   SetShellVarContext current
   SetOutPath "$INSTDIR"
+!ifdef MODULAR_CONTENT
+  !include "payload-files.nsh"
+!else
   File /r "${BUILD_ROOT}\*.*"
+!endif
 !ifdef MODULAR_CONTENT
   ; Remove only the superseded known stock bundle. Loose user folders survive.
   Delete "$INSTDIR\GameAssets\vehicles\roster.pck"

@@ -37,9 +37,9 @@ func run() -> void:
 	var folder:=editor.saved_folder
 	if not folder.is_empty():
 		for name in ["model.glb","vehicle.json","thumbnail.png","LICENSE.txt"]:check(FileAccess.file_exists(folder.path_join(name)),"Saved "+name)
-		game.refresh_content();check(game.catalog.vehicle(&"workshop_test_vehicle")!=null and not game.catalog.vehicle(&"workshop_test_vehicle").official,"Unchanged game discovers new mod vehicle")
+		await game.refresh_content();check(game.catalog.vehicle(&"workshop_test_vehicle")!=null and not game.catalog.vehicle(&"workshop_test_vehicle").official,"Unchanged game discovers new mod vehicle")
 		for name in ["model.glb","vehicle.json","thumbnail.png","LICENSE.txt"]:DirAccess.remove_absolute(folder.path_join(name))
-		DirAccess.remove_absolute(folder);game.refresh_content()
+		DirAccess.remove_absolute(folder);await game.refresh_content()
 	if DisplayServer.get_name()!="headless":
 		await process_frame;await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("res://build/modularity/workshop.png")

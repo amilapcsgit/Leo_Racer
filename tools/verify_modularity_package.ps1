@@ -22,7 +22,13 @@ try {
   $process=Start-Process -FilePath $exe -ArgumentList $command -WorkingDirectory $game -WindowStyle Hidden -RedirectStandardOutput $log -RedirectStandardError $err -PassThru
   $deadline=[DateTime]::UtcNow.AddMinutes(3)
   while(-not $process.HasExited){if([DateTime]::UtcNow -gt $deadline){$process.Kill($true);throw 'Offline game check timed out'};Start-Sleep -Milliseconds 250}
-  $text=([IO.File]::ReadAllText($log)+[IO.File]::ReadAllText($err))
+  $process.WaitForExit()
+  # Start-Process flushes its redirected streams asynchronously after exit.
+  $text=$null
+  for($attempt=0;$attempt -lt 40;$attempt++){
+   try{$text=([IO.File]::ReadAllText($log)+[IO.File]::ReadAllText($err));break}catch [IO.IOException]{Start-Sleep -Milliseconds 100}
+  }
+  if($null -eq $text){throw 'Redirected process output did not close'}
   if($process.ExitCode -ne $Exit -or $text -notmatch $Expected -or $text -match 'SCRIPT ERROR|SHADER ERROR'){throw "Offline check failed: $($Arguments -join ' '); see $log and $err"}
   $checks.Add($Arguments -join ' ');Write-Host "OFFLINE PASS $($Arguments -join ' ')";return $text
  }
@@ -31,6 +37,7 @@ try {
  $null=Run @('--verify-boot-art') 'BOOT_ART_VALIDATION.*"status":"PASS"'
  $content=Run @('--verify-content') 'CONTENT_VALIDATION_OK'
  if($content -notmatch 'TRACK_VERIFIED astra_coast official=true' -or $content -notmatch 'TRACK_VERIFIED colombo_city official=true'){throw 'Stock tracks unexpectedly excluded from official records'}
+ $null=Run @('--verify-content-refresh') 'CONTENT_REFRESH_TEST.*"status":"PASS"'
  $cold=Run @('--validate-vehicles') 'VEHICLE_VALIDATION.*"status":"PASS"'
  if($cold -match '"official":false'){throw 'Stock vehicles unexpectedly unranked'}
  $null=Run @('--validate-vehicles') '"cache_hit":true'
@@ -55,6 +62,11 @@ try {
   $addonSource=Join-Path $project 'build/content-tracks/community_example';$addon=Join-Path $game 'GameAssets/tracks/community_example'
   Copy-Item -LiteralPath $addonSource -Destination $addon -Recurse
   $null=Run @('--smoke-test','--track=community_example') 'LEO_TEST_REPORT.*"status":"PASS"'
+  $cacheRoot=Join-Path $env:APPDATA 'Godot/app_userdata'
+  $cacheFiles=@(Get-ChildItem -LiteralPath $cacheRoot -Recurse -File | Where-Object {$_.FullName -match '[\\/]content-cache[\\/]vehicles[\\/]'} )
+  if($cacheFiles.Count -eq 0){throw 'Expected disposable vehicle cache files'}
+  foreach($file in $cacheFiles){Remove-Item -LiteralPath $file.FullName}
+  $null=Run @('--validate-vehicles') '"cache_hit":false'
   $readonly=Get-ChildItem -LiteralPath $vehicles -Recurse -File
   try{
    foreach($file in $readonly){$file.IsReadOnly=$true}

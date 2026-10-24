@@ -121,26 +121,27 @@ def distribution(core_folder, profile, output, version):
             backup=target.with_name(target.name+'.user-backup')
             if not backup.exists():shutil.copy2(target,backup)
         shutil.copy2(source,target)
+    development='-' in version
     readme=output/'README.txt'
-    readme.write_text('LEO RACER MODULARITY DEVELOPMENT BUILD\n'
+    readme.write_text('LEO RACER '+version+' / '+profile.upper()+' PROFILE\n'
       'Run LeoRacer.exe; keep the complete folder together. No SDK or network is required.\n'
       'Content > Vehicles discovers folders and standalone GLBs in GameAssets/vehicles.\n'
       'Use Set Up Vehicle, validate and privately test, then save and Refresh Content.\n'
       'Mesh/texture caches are disposable files in Godot user data; authoritative GLBs stay loose.\n'
       'Install compatible track folders in GameAssets/tracks while the game is closed.\n'
       'Existing controls/settings/rankings are preserved. Custom content cannot set official records.\n'
-      'This is an unpublished development build, profile: '+profile+'; vehicles: '+', '.join(keys)+'.\n'
+      +('Development build. ' if development else 'Release build. ')+'Vehicles: '+', '.join(keys)+'.\n'
       'Attribution: GameAssets/licenses and individual content LICENSE.txt files.\n',encoding='utf-8')
     (output/'Play Compatibility.cmd').write_text('@echo off\ncd /d "%~dp0"\nstart "" "LeoRacer.exe" --rendering-method gl_compatibility --rendering-driver opengl3\n',encoding='ascii')
     metadata={'version':version,'branch':'modularity','profile':profile,'vehicles':list(keys),
               'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
-              'public_release':False,'template':'Godot 4.7.2 checked/debug'}
+              'public_release':not development,'template':'Godot 4.7.2 checked/debug'}
     (output/'development-build.json').write_text(json.dumps(metadata,indent=2)+'\n')
     for name in ['README.txt','Play Compatibility.cmd','development-build.json']:desired[name]=output/name
     files={name:output/name for name in desired}
     owned={name:sha(p) for name,p in files.items()}
     (output/'.managed-build.json').write_text(json.dumps(owned,indent=2)+'\n')
-    suffix='' if profile=='dev' else '-full'
+    suffix=('' if profile=='dev' else '-full') if development else ('-dev' if profile=='dev' else '')
     result=zip_files(files,ROOT/'dist'/f'LeoRacer-{version}{suffix}-win64.zip')
     report={'status':'PASS','profile':profile,'vehicles':list(keys),'exe_bytes':(output/'LeoRacer.exe').stat().st_size,
             'core_bytes':(output/'LeoRacer.pck').stat().st_size,'installed_bytes':sum(p.stat().st_size for p in files.values()),

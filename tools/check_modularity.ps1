@@ -14,6 +14,7 @@ try {
   Write-Host "PASS $Name"
  }
  Check vehicle_codec_test VEHICLE_CODEC_PASS @('--legacy-content')
+ Check content_refresh_test 'CONTENT_REFRESH_TEST.*PASS'
  Check loose_vehicles_test 'LOOSE_VEHICLES_TEST.*PASS'
  Check local_race_test 'LOCAL_RACE_TEST.*PASS'
  Check local_input_test 'LOCAL_INPUT_TEST.*PASS'

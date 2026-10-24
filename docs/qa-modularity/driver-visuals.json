@@ -1,0 +1,10 @@
+{
+  "checks": 18,
+  "errors": [],
+  "renderer": "gl_compatibility",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "status": "PASS"
+}

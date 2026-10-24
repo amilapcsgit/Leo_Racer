@@ -58,5 +58,5 @@ func run() -> void:
 	check(memory_samples[-1]<=memory_samples[1]*1.10+8.*1024.*1024.,"Repeated track changes do not accumulate substantial memory")
 	check(node_counts[-1]<=node_counts[1]+2,"Repeated worlds do not accumulate nodes")
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"cells":streamer.cells.size(),"resident_cells":streamer.loaded.size(),"cache_entries":LeoAssets.cache.size(),"memory_static_bytes":memory_samples,"node_counts":node_counts}
-	FileAccess.open("res://docs/qa-colombo-city/streaming.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("CITY_STREAMING_TEST ",report)
+	FileAccess.open("res://build/modularity/streaming.json" if "--modularity" in OS.get_cmdline_user_args() else "res://docs/qa-colombo-city/streaming.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "));print("CITY_STREAMING_TEST ",report)
 	await streamer.stop();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)

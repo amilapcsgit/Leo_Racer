@@ -62,9 +62,13 @@ jobs:
             python tools/content.py stage --profile dev
             foreach ($vehicle in $scope.vehicles) {
               ./tools/build_content.ps1 -Target vehicle -Id $vehicle
+              ./tools/run_godot.ps1 @('--headless','--script','res://tests/modularity_full_roster.gd','--quit-after','18000','--','--drive-test','--vehicles=res://build/content-vehicles',('--module-only='+$vehicle))
+              if ($LASTEXITCODE -ne 0) {throw 'Vehicle assembly checks failed'}
             }
             foreach ($track in $scope.tracks) {
               ./tools/build_content.ps1 -Target track -Id $track
+              ./tools/run_godot.ps1 @('--headless','--quit-after','18000','--','--drive-test','--smoke-test','--tracks=res://build/content-tracks',('--track='+$track))
+              if ($LASTEXITCODE -ne 0) {throw 'Track runtime checks failed'}
             }
             if ($scope.vehicles.Count -gt 0) {
               ./tools/run_godot.ps1 @('--headless','--','--drive-test','--validate-vehicles','--vehicles=res://build/content-vehicles')

@@ -63,6 +63,7 @@ var test_errors: Array[String] = []
 var capture_results := false
 var wrong_way_time := 0.0
 var diagnostics_mode := false
+var content_refreshing := false
 var content_panel: CanvasLayer
 var art_profile: LeoArtProfile = preload("res://assets/config/astra.tres")
 var feedback: Node
@@ -90,13 +91,17 @@ func show_content_manager() -> void:
 	if is_instance_valid(content_panel):content_panel.queue_free()
 	content_panel=load("res://scripts/content/content_manager.gd").new();content_panel.game=self;add_child(content_panel)
 
-func refresh_content() -> void:
-	if state not in ["menu","lobby"]:return
+func refresh_content() -> bool:
+	if state not in ["menu","lobby"] or content_refreshing:return false
+	content_refreshing=true
 	var previous_id:=local_players[0].vehicle_id
-	LeoVehicleLibrary.discover();LeoAssets.refresh_loose_cache()
+	await LeoVehicleLibrary.discover_async(get_tree())
+	LeoAssets.refresh_loose_cache()
 	catalog=GarageCatalog.shared()
-	if not hud or catalog.vehicles.is_empty():
-		get_tree().reload_current_scene();return
+	content_refreshing=false
+	if catalog.vehicles.is_empty():KARTS.clear();return true
+	if not hud:
+		get_tree().reload_current_scene();return true
 	selected_kart=catalog.vehicle_index(previous_id)
 	ensure_available_selections()
 	KARTS.clear()
@@ -104,7 +109,9 @@ func refresh_content() -> void:
 		var rules:=LeoRaceRules.resolve(vehicle)
 		KARTS.append({"name":vehicle.display_name,"color":String(vehicle.id),"speed":(rules.max_speed-29.)/.9,"grip":(rules.handling-.8)/.05,"accel":(rules.acceleration-13.)/1.2,"top":rules.max_speed})
 	tracks=LeoTrackDefinition.discover()
-	hud.frontend.show_home()
+	# Keep the content screen and its focus stable while updating its catalog.
+	if not is_instance_valid(content_panel):hud.frontend.show_home()
+	return true
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS

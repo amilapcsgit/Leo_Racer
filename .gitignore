@@ -67,3 +67,5 @@ docs/qa-local2player/driving-*.jpg
 
 # Visual QA sheets are evidence, not runtime texture resources.
 docs/qa-colombo-visuals/*.import
+
+/installer/payload-files.nsh

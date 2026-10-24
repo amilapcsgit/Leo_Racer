@@ -1,0 +1,9 @@
+{
+  "custom_content_preserved": true,
+  "uninstall": true,
+  "update": true,
+  "status": "PASS",
+  "isolated_install": true,
+  "obsolete_roster_removed": true,
+  "stable_installation_unchanged": true
+}

@@ -17,10 +17,25 @@ if (-not (Test-Path $compiler)) {
     Expand-Archive -LiteralPath $archive -DestinationPath (Join-Path $project '.tools/nsis') -Force
 }
 $build=[IO.Path]::GetFullPath((Join-Path $project $BuildFolder))
-$owned=@()
-Get-ChildItem -LiteralPath $build -Recurse -File | ForEach-Object {$owned+='Delete "$INSTDIR\'+$_.FullName.Substring($build.Length+1)+'"'}
+$owned=@();$payload=@()
+if($ModularContent){
+ $managed=Get-Content (Join-Path $build '.managed-build.json') -Raw | ConvertFrom-Json
+ $files=@($managed.PSObject.Properties.Name | ForEach-Object {
+  $candidate=[IO.Path]::GetFullPath((Join-Path $build $_))
+  if(-not $candidate.StartsWith($build+[IO.Path]::DirectorySeparatorChar)){throw 'Installer payload escapes build folder'}
+  Get-Item -LiteralPath $candidate
+ })
+}else{$files=@(Get-ChildItem -LiteralPath $build -Recurse -File)}
+foreach($file in $files){
+ $relative=$file.FullName.Substring($build.Length+1)
+ $owned+='Delete "$INSTDIR\'+$relative+'"'
+ $parent=Split-Path $relative -Parent
+ $payload+='SetOutPath "$INSTDIR'+$(if($parent){'\'+$parent}else{''})+'"'
+ $payload+='File "'+$file.FullName+'"'
+}
 Get-ChildItem -LiteralPath $build -Recurse -Directory | Sort-Object {$_.FullName.Length} -Descending | ForEach-Object {$owned+='RMDir "$INSTDIR\'+$_.FullName.Substring($build.Length+1)+'"'}
 [IO.File]::WriteAllLines((Join-Path $project 'installer/owned-files.nsh'),$owned)
+[IO.File]::WriteAllLines((Join-Path $project 'installer/payload-files.nsh'),$payload)
 Push-Location (Join-Path $project 'installer')
 try {
     $flags=@("/DVERSION=$Version","/DCHANNEL=$($Version.Contains('-rc'))","/DBUILD_ROOT=$build")
