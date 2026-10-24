@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "offline": true,
+  "errors": [],
+  "checks": [
+    "Exported core mounted and ran independently replaced API 1 tool pack"
+  ],
+  "core_sha256_before": {
+    "LeoRacer.exe": "eb5935382908a825a0fb5ad24b3b40c725e4fe5d65deaf716fa06101a35a4e5c",
+    "LeoRacer.console.exe": "f78703ba3a05dd51a3464f8c90d4c72f54f95d5a8669993e7a5c3ce522b30c52",
+    "LeoRacer.pck": "f384865459b84d93e8f9910fa601d124ee1520a14ef97047f149de45a0a35367"
+  },
+  "core_sha256_after": {
+    "LeoRacer.exe": "eb5935382908a825a0fb5ad24b3b40c725e4fe5d65deaf716fa06101a35a4e5c",
+    "LeoRacer.console.exe": "f78703ba3a05dd51a3464f8c90d4c72f54f95d5a8669993e7a5c3ce522b30c52",
+    "LeoRacer.pck": "f384865459b84d93e8f9910fa601d124ee1520a14ef97047f149de45a0a35367"
+  },
+  "exe_and_core_unchanged": true,
+  "original_tool_restored": true
+}

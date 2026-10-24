@@ -40,6 +40,9 @@ func begin() -> void:
 		print("CONTENT_VALIDATION_OK tracks=",tracks.map(func(t):return t.id)," cache=",LeoAssets.cache.size())
 		get_tree().quit();return
 	if "--verify-content-refresh" in OS.get_cmdline_user_args():
+		# This diagnostic builds its own game UI. Do not leave bootstrap's higher
+		# CanvasLayer intercepting the real pointer events under test.
+		screen.hide()
 		var report: Dictionary=await load("res://scripts/content/content_refresh_check.gd").run(get_tree())
 		print("CONTENT_REFRESH_TEST ",JSON.stringify(report));get_tree().quit(0 if report.status=="PASS" else 2);return
 	if "--validate-vehicles" in OS.get_cmdline_user_args():

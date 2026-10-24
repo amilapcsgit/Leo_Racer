@@ -6,20 +6,21 @@ Distribute and verify that checkpoint before expanding the game architecture.
 
 ## Follow-up checkpoints
 
-1. **Content quality and authoring.** Add measured triangle/material/texture
+1. **Driving feel (`physics-v2`, after customcars playtesting).** Prototype
+   four-point suspension and chassis feedback as an opt-in experimental profile.
+   Preserve current arcade physics as the default; preview races are unranked
+   diagnostics. Keep old records intact. Start force-feedback work with local
+   telemetry and a mock output; physical torque requires a platform bridge and
+   real hardware tests before being described as supported.
+2. **Content quality and authoring.** Add measured triangle/material/texture
    budgets, optional offline LOD and texture processing, and script-free track
    validation. Keep original GLBs authoritative. Reload authoring previews safely;
    never replace resources underneath an active race. Ship tools and all required
    dependencies locally, with content ZIPs and checksums for manual sharing.
-2. **Rendering and surfaces.** Improve material consistency, daylight, road
+3. **Rendering and surfaces.** Improve material consistency, daylight, road
    detail and skyline transitions first. Add optional wetness, reflections and
    weather quality presets only after separate Forward+ and Compatibility
    measurements. Retain the existing lightweight presets and split-screen support.
-3. **Driving feel.** Prototype four-point suspension and chassis feedback as an
-   opt-in experimental profile. Preserve current arcade physics as the default;
-   changed physics and surfaces make races unranked. Keep old records intact.
-   Wheel force feedback requires a local platform bridge and real hardware tests
-   before being described as supported.
 4. **Audio and local progression.** Add licensed RPM/load sample layers, local
    reverb zones and sound budgets. Optional local career progress uses the existing
    offline save location; it must not alter or merge official race records.

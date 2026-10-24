@@ -1,0 +1,62 @@
+name: Offline custom cars development
+on:
+  push:
+    branches: [customcars]
+    paths-ignore: ['docs/**', '**/*.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: customcars-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  development:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .tools/dotnet
+            .tools/godot
+            .tools/templates
+            .tools/nuget
+            addons/rokojori_action_library
+          key: leo-windows-tools-v2-${{ hashFiles('toolchain-lock.json', 'dependency-lock.json') }}
+      - name: Prepare pinned build tools
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build,dist | Out-Null
+          python -m pip install -r tools/requirements-city.txt
+          ./tools/setup_windows.ps1
+      - name: Verify offline source behavior
+        shell: pwsh
+        run: ./tools/check_customcars.ps1
+      - name: Assemble unpublished offline build
+        shell: pwsh
+        run: |
+          ./tools/build_content.ps1 -Target core -CoreFolder build/CustomCarsCore -Version 2.2.0-customcars-dev
+          ./tools/build_content.ps1 -Target workshop -Output build/CustomCarsCore/Tools/VehicleWorkshop
+          ./tools/build_content.ps1 -Target distribution -CoreFolder build/CustomCarsCore -Output build/CustomCars-dev -Version 2.2.0-customcars-dev
+          ./tools/verify_modularity_package.ps1 -Archive dist/LeoRacer-2.2.0-customcars-dev-win64.zip
+          python tools/verify_workshop_pack.py --folder build/CustomCars-dev
+          if ($LASTEXITCODE -ne 0) {throw 'Independent tool replacement failed'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: customcars-checks
+          path: |
+            build/customcars/
+            build/modularity/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LeoRacer-customcars-development
+          path: |
+            dist/LeoRacer-2.2.0-customcars-dev-win64.zip*
+            dist/LeoRacer-VehicleWorkshop-dev.zip*
+          retention-days: 14
