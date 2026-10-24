@@ -31,10 +31,15 @@ var trial_input: LeoPlayerInput
 var trial_time := 0.
 var trial_start := Vector3.ZERO
 var trial_road: MeshInstance3D
+var load_generation := 0
+
+func _exit_tree() -> void:
+	load_generation+=1
+	if is_instance_valid(trial):trial.stop_audio()
 
 func _ready() -> void:
 	layer=95;process_mode=Node.PROCESS_MODE_ALWAYS
-	var shade:=ColorRect.new();shade.color=Color("091522");shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
+	var shade:=ColorRect.new();shade.color=Color("091522");shade.mouse_filter=Control.MOUSE_FILTER_IGNORE;shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
 	var panel:=PanelContainer.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.theme=load("res://assets/ui/theme.tres");add_child(panel)
 	var margin:=MarginContainer.new()
 	for side in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+side,20)
@@ -110,8 +115,13 @@ func changed() -> void:
 	tested=false;saved_folder="";refresh_preview.call_deferred()
 
 func load_model() -> void:
+	load_generation+=1
+	var ticket:=load_generation
 	status.text="Importing "+source_path.get_file()+"…";await get_tree().process_frame
-	source_scene=await LeoAssets.scene_async(source_path,get_tree())
+	if not is_inside_tree() or ticket!=load_generation:return
+	var loaded: PackedScene=await LeoAssets.scene_async(source_path,get_tree())
+	if not is_inside_tree() or ticket!=load_generation:return
+	source_scene=loaded
 	if not source_scene:status.text=LeoAssets.failure;return
 	var model:=source_scene.instantiate() as Node3D;studio.add_child(model)
 	source_bounds=bounds(model)
@@ -308,6 +318,7 @@ func save_vehicle() -> void:
 		var image:=Image.create(256,144,false,Image.FORMAT_RGB8);image.fill(Color("102733"));image.save_png(folder.path_join("thumbnail.png"))
 	else:
 		collision_hint.hide();await get_tree().process_frame;await RenderingServer.frame_post_draw
+		if not is_inside_tree():return
 		viewport.get_texture().get_image().save_png(folder.path_join("thumbnail.png"));collision_hint.show()
 	saved_folder=folder;saving=false;status.text="Saved "+String(data.id)+". Back → Refresh Content makes it selectable. Share this complete folder."
 

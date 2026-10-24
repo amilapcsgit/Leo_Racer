@@ -7,10 +7,12 @@ var status: Label
 var refresh_button: Button
 var refreshing := false
 var refreshed_at := ""
+var browser: FileDialog
+var returning := false
 
 func _ready() -> void:
 	layer=90;process_mode=Node.PROCESS_MODE_ALWAYS
-	var shade:=ColorRect.new();shade.color=Color("091522");shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
+	var shade:=ColorRect.new();shade.color=Color("091522");shade.mouse_filter=Control.MOUSE_FILTER_IGNORE;shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(shade)
 	panel=PanelContainer.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.theme=load("res://assets/ui/theme.tres");add_child(panel)
 	var margin:=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+side,32)
@@ -19,18 +21,31 @@ func _ready() -> void:
 	status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(status)
 	var buttons:=HBoxContainer.new();box.add_child(buttons)
 	refresh_button=button(buttons,"Refresh Content",refresh);refresh_button.grab_focus()
+	button(buttons,"Import GLB…",browse_glb)
 	button(buttons,"Open Vehicles Folder",func():OS.shell_open(LeoVehicleLibrary.default_root()))
-	button(buttons,"Back",func():
-		if refreshing:return
-		if game.catalog.vehicles.is_empty():status.text="Add a compatible vehicle before returning to the menu.";return
-		if game.hud:
-			if game.state=="lobby":game.hud.frontend.show_setup()
-			else:game.hud.frontend.show_home()
-			queue_free()
-		else:get_tree().quit())
+	button(buttons,"Back" if game.hud else "Quit to Desktop",close)
 	var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
 	list=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(list)
 	populate()
+	browser=FileDialog.new();browser.title="Import vehicle GLB";browser.access=FileDialog.ACCESS_FILESYSTEM;browser.file_mode=FileDialog.FILE_MODE_OPEN_FILE;browser.filters=PackedStringArray(["*.glb ; glTF binary model"]);browser.use_native_dialog=true;browser.file_selected.connect(setup_glb);add_child(browser)
+
+func browse_glb() -> void:
+	if refreshing:return
+	browser.popup_centered_ratio(.8)
+
+func close() -> void:
+	if returning:return
+	returning=true
+	if game.hud:
+		if game.state=="lobby" and not game.catalog.vehicles.is_empty():game.hud.frontend.show_setup()
+		else:game.hud.frontend.show_home()
+		queue_free()
+	else:game.quit_game()
+
+func _input(event: InputEvent) -> void:
+	if not visible or returning or (browser and browser.visible):return
+	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE):
+		get_viewport().set_input_as_handled();close()
 
 func button(parent: Node, text: String, action: Callable) -> Button:
 	var node:=Button.new();node.text=text;node.custom_minimum_size=Vector2(200,52);node.pressed.connect(action);parent.add_child(node);return node
@@ -55,7 +70,7 @@ func refresh() -> void:
 	refreshing=true;refresh_button.disabled=true;status.text="Scanning installed vehicle folders…"
 	await get_tree().process_frame
 	var updated: bool=await game.refresh_content()
-	if not is_inside_tree():return
+	if not is_inside_tree() or returning:return
 	refreshing=false;refresh_button.disabled=false
 	if updated:
 		refreshed_at=Time.get_time_string_from_system();populate()

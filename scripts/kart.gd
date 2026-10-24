@@ -103,7 +103,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	wheel_radius = definition.wheels[0].radius if not definition.wheels.is_empty() else .49
 	camera_height_offset = definition.camera_height
 	engine_pitch = .65 if kart_color=="race_bus" else (1.22 if kart_color in ["race_tuk","colombo_tuk"] else (1.12 if kart_color.begins_with("formula") else 1.0))
-	for p in definition.exhausts: exhaust_positions.append(p)
+	for p in definition.boost_emitters(): exhaust_positions.append(p)
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_ON
 	visual = VehicleAssembler.assemble(definition,GarageCatalog.shared().driver(animal))
 	add_child(visual)

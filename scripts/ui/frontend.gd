@@ -72,10 +72,12 @@ func show_home() -> void:
  var row:=HBoxContainer.new();row.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(row)
  var left:=VBoxContainer.new();left.custom_minimum_size.x=480;left.add_theme_constant_override("separation",16);row.add_child(left)
  label(left,"Your coast. Your race.",32)
- label(left,game.track_definition.display_name+"\n"+game.catalog.vehicle(game.local_players[0].vehicle_id).display_name,24,Color("b9c7d6"))
+ var selected_vehicle: VehicleDefinition=game.catalog.vehicle(game.local_players[0].vehicle_id)
+ label(left,game.track_definition.display_name+"\n"+(selected_vehicle.display_name if selected_vehicle else "No vehicles installed — open Content to import a GLB"),24,Color("b9c7d6"))
  var go:=action(left,"Go Race   →",func():show_setup(),true)
+ go.disabled=selected_vehicle==null
  var grid:=GridContainer.new();grid.columns=2;grid.add_theme_constant_override("h_separation",16);grid.add_theme_constant_override("v_separation",16);left.add_child(grid)
- action(grid,"Garage",func():open_garage(0))
+ var garage_button:=action(grid,"Garage",func():open_garage(0));garage_button.disabled=selected_vehicle==null
  action(grid,"Records",show_records)
  action(grid,"Settings",show_settings)
  action(grid,"How to Play",show_guide)
@@ -329,6 +331,7 @@ func verify_preview() -> void:
  print("UI_PACKAGE_SMOKE ",JSON.stringify(report))
  await game.quit_game(0 if errors.is_empty() else 1)
 func _input(event: InputEvent) -> void:
+ if is_instance_valid(game.content_panel):return
  if is_instance_valid(game.loading) and game.loading.visible:return
  if event is InputEventJoypadButton or event is InputEventJoypadMotion:last_pad=true;update_prompt()
  elif event is InputEventKey or event is InputEventMouseMotion:last_pad=false;update_prompt()
@@ -354,6 +357,8 @@ func _input(event: InputEvent) -> void:
   get_viewport().set_input_as_handled()
 
 func _process(_dt: float) -> void:
+ # Content and its workshop own keyboard/controller focus until they close.
+ if is_instance_valid(game.content_panel):return
  if hud.scene_mode=="garage" or (is_instance_valid(game.loading) and game.loading.visible):return
  var root: Control=hud.modal_root if hud.modal_root.get_child_count()>0 else hud.menu_root
  if not root.is_visible_in_tree():return
