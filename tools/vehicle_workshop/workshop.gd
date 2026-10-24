@@ -344,6 +344,8 @@ func reinspect() -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return
 	clear_preview()
+	if converted.get("scene") is Node and is_instance_valid(converted.scene): converted.scene.free()
+	converted = {}
 	if inspection.get("scene") is Node and is_instance_valid(inspection.scene): inspection.scene.free()
 	worker_result = {}
 	worker_task = WorkerThreadPool.add_task(inspect_worker.bind(source, rotation_value, model_scale))

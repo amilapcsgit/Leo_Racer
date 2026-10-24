@@ -84,6 +84,9 @@ func run() -> void:
 	ui.region_size = Vector3(.1, 3., 5.)
 	ui.split_region()
 	check(ui.inventory.item_count == previous_islands + 1, "guided triangle-region correction")
+	var previous_conversion: WeakRef=weakref(ui.converted.scene)
+	await ui.reinspect()
+	check(previous_conversion.get_ref()==null, "reinspection frees the old detached conversion")
 	var response: Dictionary = {}
 	ui.completed.connect(func(value): response.merge(value, true))
 	ui.cancel()

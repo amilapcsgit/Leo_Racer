@@ -32,7 +32,8 @@ and SQLite rankings remain.
   staging directory outside vehicle discovery before atomic folder installation.
 - Raw BYD: PASS 63 checks; combined anonymous geometry: PASS 49 checks. Actual
   game wheel pivots, steering/calipers and material export/reimport are checked.
-- Workshop UI: PASS 19; menu/dialog input: PASS 13. Core regression checks:
+- Workshop UI: PASS 20, including detached-model cleanup on reinspection;
+  menu/dialog input: PASS 13. Core regression checks:
   input 35, rankings 26, race state 21, old workshop 22, loose/cache content 40.
 - Both tracks, 1/2 humans, six racers, three laps: all four matrix cases pass.
   Dummy renderer logs one nonfatal scenery-instantiation warning; GPU checks
