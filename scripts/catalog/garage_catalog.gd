@@ -6,9 +6,19 @@ extends Resource
 const PATH := "res://assets/catalog/runtime/catalog.tres"
 const LEGACY_DRIVERS := ["hedgehog","lion","elephant","parrot","human"]
 const LEGACY_VEHICLES := ["blue","coral","aqua","pink","formula_blue","formula_red","roadster_gold","race_tuk","race_bus"]
+static var _discovered: GarageCatalog
+static var _generation := -1
 
 static func shared() -> GarageCatalog:
-	return load(PATH) as GarageCatalog
+	if LeoVehicleLibrary.legacy():return load(PATH) as GarageCatalog
+	if LeoVehicleLibrary.generation==0:LeoVehicleLibrary.discover()
+	if not _discovered or _generation!=LeoVehicleLibrary.generation:
+		_discovered=GarageCatalog.new()
+		# Driver-only catalog has no dependency on the installed vehicle roster.
+		var driver_catalog:=load("res://assets/catalog/runtime/drivers.tres") as GarageCatalog
+		_discovered.drivers.assign(driver_catalog.drivers);_discovered.vehicles.assign(LeoVehicleLibrary.entries)
+		_generation=LeoVehicleLibrary.generation
+	return _discovered
 
 func vehicle(key: StringName) -> VehicleDefinition:
 	for entry in vehicles:

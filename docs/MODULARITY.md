@@ -25,3 +25,5 @@ Evidence belongs under `docs/qa-modularity/`, with machine paths removed before 
 Baseline and final: six racers using only Bigster/Duster, 1080p, both renderers, identical track/camera conditions. Report cold/warm load duration, p50/p95/p99 frame time, memory and spikes independently. Target 60 FPS and at most 5% steady-state frame-time regression.
 
 Checkpoint 1 verified: sixteen definitions round-trip all 23 transferable fields and wheel bindings; source GLBs are self-contained. Baseline measurements use the original engine loading path and only Bigster/Duster. Core compatibility starts at 2.2.0 (this development branch); no public 2.2 release is implied.
+
+Checkpoint 2 verified: loose Bigster/Duster metadata discovery and threaded cold/warm cache imports (36 checks), independent-player race state (21 checks), and all six racers completing three laps with one human held back until AI finish (10 checks). The race implementation still ends when both humans finish. Missing/duplicate/newer/incomplete entries are isolated. Content manager discovery is available; its setup actions are completed in checkpoint 3.

@@ -58,7 +58,8 @@ func run() -> void:
  first.speed=20.;second.speed=-20.;game._process(.6)
  check(game.local_players[1].wrong_way>.5 and game.local_players[0].wrong_way==0.,"Wrong-way feedback is independent")
  game.selected_player_slot=1;game.toggle_pause();game.hud.show_garage("pause")
- check(game.swap_player_vehicle(&"mario",&"blue","SECOND SWAP") and game.karts[0]==first and game.karts[1]!=second and game.local_players[1].kart==game.karts[1],"Pause car swap targets only P2")
+ var swap_id: StringName=&"blue" if game.catalog.vehicle(&"blue") else &"duster"
+ check(game.swap_player_vehicle(&"mario",swap_id,"SECOND SWAP") and game.karts[0]==first and game.karts[1]!=second and game.local_players[1].kart==game.karts[1],"Pause car swap targets only P2")
  game.toggle_pause();game.hud.show_garage("pause");game.input_router.players[1].device=-1;game.diagnostics_mode=false
  check(not game.swap_player_vehicle(&"mario",&"duster","MISSING DEVICE") and game.paused,"Car change cannot bypass mandatory device reassignment")
  game.diagnostics_mode=true

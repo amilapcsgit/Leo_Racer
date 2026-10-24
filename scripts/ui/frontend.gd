@@ -78,6 +78,7 @@ func show_home() -> void:
  action(grid,"Records",show_records)
  action(grid,"Settings",show_settings)
  action(grid,"How to Play",show_guide)
+ action(grid,"Content",game.show_content_manager)
  label(left,"Pick your ride. Hit the road.",24,Color("ffc857"))
  restore(go)
 func show_setup(count: int=-1) -> void:

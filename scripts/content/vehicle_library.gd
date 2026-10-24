@@ -37,6 +37,11 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 	var errors:=PackedStringArray()
 	if not data is Dictionary:return ["vehicle.json must contain an object"]
 	if data.get("format")!=1 or data.get("vehicle_api")!=1:errors.append("Unsupported Vehicle API; expected 1")
+	for field in ["display_name","version","fixed_driver_id","attribution"]:
+		if data.has(field) and not data[field] is String:errors.append("Invalid "+field)
+	for field in ["electric_boost","hovering","preserve_materials","setup_complete"]:
+		if data.has(field) and not data[field] is bool:errors.append("Invalid "+field)
+	if not bool(data.get("setup_complete",false)):errors.append("Vehicle setup is incomplete")
 	var pattern:=RegEx.new();pattern.compile("^[a-z0-9][a-z0-9_.-]{0,63}$")
 	if not data.get("id") is String or not pattern.search(data.id):errors.append("Invalid stable vehicle ID")
 	var core: Variant=data.get("core",{})
@@ -66,6 +71,8 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 			if not valid_transform(fit):errors.append("Invalid driver fit")
 	for key in ["max_speed","boosted_speed","acceleration","handling","braking_regeneration","camera_height","preview_distance","ai_lateral_acceleration"]:
 		if data.has(key) and ((not data[key] is int and not data[key] is float) or not is_finite(float(data[key])) or absf(float(data[key]))>1000):errors.append("Invalid "+key)
+	for key in ["max_speed","acceleration","handling","preview_distance"]:
+		if (data.get(key,1) is float or data.get(key,1) is int) and float(data.get(key,1))<=0:errors.append(key+" must be positive")
 	var wheels: Variant=data.get("wheels",[])
 	if not wheels is Array:return ["Invalid wheel list"]
 	if wheels.is_empty() and not bool(data.get("hovering",false)):errors.append("Bind wheels or enable hovering")
@@ -87,7 +94,8 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 			if not finite_vector(point):errors.append("Invalid exhaust position")
 	if not data.get("dependencies",[]) is Array:errors.append("Invalid dependencies")
 	elif not data.get("dependencies",[]).is_empty():errors.append("Vehicle API 1 requires a self-contained model; unsupported dependency")
-	if int(data.get("driver_policy",0)) not in [0,1,2,3]:errors.append("Unsupported driver policy")
+	if not (data.get("driver_policy",0) is int or data.get("driver_policy",0) is float):errors.append("Unsupported driver policy")
+	elif float(data.get("driver_policy",0))!=int(data.get("driver_policy",0)) or int(data.get("driver_policy",0)) not in [0,1,2,3]:errors.append("Unsupported driver policy")
 	return errors
 
 static func discover(directory: String="") -> void:

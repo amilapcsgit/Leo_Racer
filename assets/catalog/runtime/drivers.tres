@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GarageCatalog" format=3]
+
+[ext_resource type="Script" path="res://scripts/catalog/garage_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/catalog/vehicle_definition.gd" id="v"]
+[ext_resource type="Script" path="res://scripts/catalog/driver_definition.gd" id="d"]
+[ext_resource type="Resource" path="res://assets/catalog/runtime/driver_hedgehog.tres" id="d_hedgehog"]
+[ext_resource type="Resource" path="res://assets/catalog/runtime/driver_lion.tres" id="d_lion"]
+[ext_resource type="Resource" path="res://assets/catalog/runtime/driver_elephant.tres" id="d_elephant"]
+[ext_resource type="Resource" path="res://assets/catalog/runtime/driver_parrot.tres" id="d_parrot"]
+[ext_resource type="Resource" path="res://assets/catalog/runtime/driver_human.tres" id="d_human"]
+[ext_resource type="Resource" path="res://assets/catalog/runtime/driver_mario.tres" id="d_mario"]
+
+[resource]
+script = ExtResource("1")
+drivers = Array[ExtResource("d")]([ExtResource("d_hedgehog"), ExtResource("d_lion"), ExtResource("d_elephant"), ExtResource("d_parrot"), ExtResource("d_human"), ExtResource("d_mario")])

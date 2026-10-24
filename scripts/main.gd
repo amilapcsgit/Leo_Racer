@@ -63,6 +63,7 @@ var test_errors: Array[String] = []
 var capture_results := false
 var wrong_way_time := 0.0
 var diagnostics_mode := false
+var content_panel: CanvasLayer
 var art_profile: LeoArtProfile = preload("res://assets/config/astra.tres")
 var feedback: Node
 var reduced_motion := false
@@ -71,6 +72,38 @@ var launch_charged := false
 var horn_cooldown := 0.0
 var slipstream_time := 0.0
 var slipstream_cooldown := 0.0
+
+func ensure_available_selections() -> void:
+	if catalog.vehicles.is_empty():return
+	for local in local_players:
+		if not local.preferred_vehicle_id.is_empty() and catalog.vehicle(local.preferred_vehicle_id):
+			local.vehicle_id=local.preferred_vehicle_id;local.preferred_vehicle_id=&""
+		if not catalog.vehicle(local.vehicle_id):
+			if local.preferred_vehicle_id.is_empty():local.preferred_vehicle_id=local.vehicle_id
+			local.vehicle_id=catalog.vehicles[0].id
+	if not local_players[0].preferred_vehicle_id.is_empty():selected_kart=catalog.vehicle_index(local_players[0].vehicle_id)
+	else:local_players[0].vehicle_id=catalog.vehicles[clampi(selected_kart,0,catalog.vehicles.size()-1)].id
+
+func show_content_manager() -> void:
+	if state not in ["menu","lobby"]:return
+	if is_instance_valid(content_panel):content_panel.queue_free()
+	content_panel=load("res://scripts/content/content_manager.gd").new();content_panel.game=self;add_child(content_panel)
+
+func refresh_content() -> void:
+	if state not in ["menu","lobby"]:return
+	var previous_id:=local_players[0].vehicle_id
+	LeoVehicleLibrary.discover();LeoAssets.cache.clear();LeoAssets._recent.clear()
+	catalog=GarageCatalog.shared()
+	if not hud or catalog.vehicles.is_empty():
+		get_tree().reload_current_scene();return
+	selected_kart=catalog.vehicle_index(previous_id)
+	ensure_available_selections()
+	KARTS.clear()
+	for vehicle in catalog.vehicles:
+		var rules:=LeoRaceRules.resolve(vehicle)
+		KARTS.append({"name":vehicle.display_name,"color":String(vehicle.id),"speed":(rules.max_speed-29.)/.9,"grip":(rules.handling-.8)/.05,"accel":(rules.acceleration-13.)/1.2,"top":rules.max_speed})
+	tracks=LeoTrackDefinition.discover()
+	hud.frontend.show_home()
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -95,10 +128,14 @@ func _ready() -> void:
 	add_child(input_router)
 	input_router.command.connect(_on_local_command)
 	input_router.device_lost.connect(_on_device_lost)
+	if catalog.vehicles.is_empty():
+		loading.hide();initialized=true;set_process(false);set_process_unhandled_input(false);initialization_finished.emit();show_content_manager();return
 	if not diagnostic_run():
 		load_settings()
 		open_rankings()
+		ensure_available_selections()
 		save_settings()
+	ensure_available_selections()
 	tracks=LeoTrackDefinition.discover()
 	if tracks.is_empty():
 		initialization_error="No compatible tracks are installed."
@@ -453,6 +490,7 @@ func return_menu() -> void:
 	hud.show_menu()
 
 func start_race() -> void:
+	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
 	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"))
@@ -471,6 +509,9 @@ func start_race() -> void:
 		await get_tree().process_frame
 	garage_from_pause=false
 	race_modified=track_definition.modified or LeoAssets.modified_rules
+	for i in 6:
+		var vehicle:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
+		race_modified=race_modified or not vehicle.official
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	rankings_written=false;ranking_message=""
 	showroom_lighting(false)
@@ -605,6 +646,7 @@ func player_place(slot: int = 0) -> int:
 
 func apply_garage_selection(d: StringName,v: StringName,player_name: String) -> void:
 	var local:=local_players[selected_player_slot]
+	local.preferred_vehicle_id=&""
 	local.driver_id=d;local.vehicle_id=v;local.player_name=player_name.strip_edges().left(32)
 	if selected_player_slot==0:
 		selected_driver=catalog.driver_index(d);selected_kart=catalog.vehicle_index(v);custom_player_name=local.player_name
@@ -620,6 +662,7 @@ func cancel_pause_garage() -> void:
 
 func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> bool:
 	if not garage_from_pause or not paused or not is_instance_valid(local_players[selected_player_slot].kart):return false
+	if not catalog.vehicle(v) or not catalog.driver(d):return false
 	if not diagnostics_mode:
 		for slot in human_count:
 			var assigned:=local_players[slot].kart
@@ -807,7 +850,7 @@ func save_settings() -> void:
 	cfg.set_value("game", "driver", selected_driver)
 	cfg.set_value("game", "kart", selected_kart)
 	cfg.set_value("game","driver_id",String(catalog.drivers[selected_driver].id))
-	cfg.set_value("game","vehicle_id",String(catalog.vehicles[selected_kart].id))
+	cfg.set_value("game","vehicle_id",String(local_players[0].preferred_vehicle_id if not local_players[0].preferred_vehicle_id.is_empty() else catalog.vehicles[selected_kart].id))
 	cfg.set_value("game","custom_player_name",custom_player_name.strip_edges())
 	# Legacy 1.6 best_time_astra is deliberately preserved in the loaded config.
 	for local in local_players:cfg.set_value("local_players",str(local.slot),local.selection())
@@ -836,6 +879,8 @@ func load_settings() -> void:
 		local_players[1].profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	if local_players[0].profile_id.is_empty():local_players[0].profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(master_volume, .0001)))
+	var preferred:=StringName(str(cfg.get_value("game","vehicle_id","")))
+	if not preferred.is_empty() and not catalog.vehicle(preferred):local_players[0].preferred_vehicle_id=preferred
 
 func format_time(seconds: float) -> String:
 	if seconds > 9999: return "--:--.---"

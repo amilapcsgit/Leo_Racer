@@ -37,6 +37,9 @@ func run() -> void:
  # A full shared-world race: diagnostic acceleration of wall time only.
  await game.start_race();game.state="race"
  for kart in game.karts:kart.active=true;kart.auto_drive=true
+ # Hold one human until AI finish. The real race correctly ends when both
+ # humans finish, which can otherwise stop a slower AI before the assertion.
+ game.karts[0].active=false;game.karts[0].collision_layer=0
  Engine.time_scale=8.;Engine.max_physics_steps_per_frame=32
  var deadline:=Time.get_ticks_msec()+100000
  var first_finish_seen:=false
@@ -47,7 +50,9 @@ func run() -> void:
    check(game.state!="results","One human still racing after other finishes")
    # Only one assertion for this interval.
    break
- while not game.karts.all(func(k):return k.finished) and Time.get_ticks_msec()<deadline:await process_frame
+ while not game.karts.all(func(k):return k.finished) and Time.get_ticks_msec()<deadline:
+  if game.karts.slice(1).all(func(k):return k.finished):game.karts[0].active=true;game.karts[0].collision_layer=2
+  await process_frame
  Engine.time_scale=1.
  check(game.karts.all(func(k):return k.finished and k.next_gate==25 and k.lap==3),"Both humans and all four AI complete three ordered laps")
  check(game.local_players[0].best_lap>0 and game.local_players[1].best_lap>0 and game.local_players[0].best_lap<99999 and game.local_players[1].best_lap<99999,"Independent best lap records survive a full race")

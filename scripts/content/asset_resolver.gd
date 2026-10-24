@@ -50,6 +50,16 @@ static func override_for(id: String) -> Dictionary:
 
 static func resource(id: String) -> Resource:
 	if cache.has(id):_touch(id);return cache[id]
+	if id.is_absolute_path() and not id.begins_with("res://") and not id.begins_with("user://"):
+		var external: Resource
+		if id.get_extension().to_lower()=="glb":
+			var imported:=LeoVehicleImporter.import_scene(id);LeoVehicleImporter.last_report=imported.duplicate();external=imported.scene
+			if not external:failure=imported.error;return null
+		elif id.get_extension().to_lower() in ["png","jpg","webp"]:
+			var image:=Image.load_from_file(id)
+			if image and not image.is_empty():image.generate_mipmaps();external=ImageTexture.create_from_image(image)
+		if external:cache[id]=external;_touch(id)
+		return external
 	var entry:=override_for(id)
 	var result: Resource
 	if not entry.is_empty():
@@ -79,6 +89,19 @@ static func texture(id: String) -> Texture2D:return resource(id) as Texture2D
 static func scene(id: String) -> PackedScene:return resource(id) as PackedScene
 
 static func scene_async(id: String, tree: SceneTree) -> PackedScene:
+	if id.is_absolute_path() and not id.begins_with("res://") and id.get_extension().to_lower()=="glb":
+		if cache.has(id):_touch(id);return cache[id] as PackedScene
+		if _loading.has(id):
+			while _loading.has(id):await tree.process_frame
+			return cache.get(id) as PackedScene
+		_loading[id]=true
+		var worker:=Thread.new();worker.start(func():return LeoVehicleImporter.import_scene(id))
+		while worker.is_alive():await tree.process_frame
+		var result: Dictionary=worker.wait_to_finish();_loading.erase(id);LeoVehicleImporter.last_report=result.duplicate()
+		if not result.scene:failure=String(result.error);return null
+		cache[id]=result.scene;_touch(id)
+		while _recent.size()>12:cache.erase(_recent.pop_front())
+		return result.scene as PackedScene
 	if cache.has(id) or not override_for(id).is_empty():return scene(id)
 	var path:=String(manifest.get("assets",{}).get(id,id))
 	if not _loading.has(path):
