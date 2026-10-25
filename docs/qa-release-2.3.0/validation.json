@@ -171,5 +171,100 @@
   "known_limitations": [
     "Compatibility frame-time spikes remain; prior 1080p Kandy split-screen benchmark max190ms.",
     "Diagnostic shutdown reports Godot resource/ObjectDB cleanup warnings, without native process failure in the checked-runtime race matrix."
-  ]
+  ],
+  "final_installer": {
+    "status": "PASS",
+    "cars": 48,
+    "official": 16,
+    "all_three_tracks": true,
+    "core_hashes_match": true,
+    "checked_runtime": true
+  },
+  "portable_audit": {
+    "status": "PASS",
+    "portable_default_cars": 16,
+    "addon_cars": 32,
+    "packed_vehicle_models": [],
+    "audited_packs": [
+      "LeoRacer.pck",
+      "GameAssets/audio/shared.pck",
+      "GameAssets/drivers/shared.pck",
+      "GameAssets/glb/colombo-buildings.pck",
+      "GameAssets/glb/shared-scenery.pck",
+      "GameAssets/roads/terrain.pck",
+      "GameAssets/signs/colombo.pck",
+      "GameAssets/textures/art.pck",
+      "GameAssets/textures/imported.pck",
+      "GameAssets/textures/surfaces.pck",
+      "GameAssets/tracks/astra_coast/scenery.pck",
+      "GameAssets/tracks/colombo_city/scenery.pck",
+      "GameAssets/tracks/kandy_lake/scenery.pck",
+      "Tools/VehicleWorkshop/workshop.pck"
+    ],
+    "portable_core_hashes_match": true,
+    "offline_tracks": 3
+  },
+  "final_vulkan": {
+    "track": "colombo_city",
+    "mode": "single",
+    "three_laps": "PASS",
+    "exit_code": 0
+  },
+  "artifacts": {
+    "version": "2.3.0",
+    "commit": "ad370b95655b79f37b497ef046b677825d6d7992",
+    "files": [
+      {
+        "name": "LeoRacer-Setup-2.3.0.exe",
+        "bytes": 758539406,
+        "sha256": "ed0bc561247bd00de34a17661f6b0bd103dc66c96ae1bf9f914ba25142b7aa65"
+      },
+      {
+        "name": "LeoRacer-2.3.0-win64.zip",
+        "bytes": 405460579,
+        "sha256": "fff99ee57ad8bbeb691f85c77775e9c4fd905a0eac91648c3f3fbe4bd0baaca7"
+      },
+      {
+        "name": "LeoRacer-AdditionalCars-2.3.0.zip",
+        "bytes": 362297283,
+        "sha256": "5885ebb44cf5e1ece7e26acff981081f96b579e0e405f0f0599303bacdbfe0a6"
+      },
+      {
+        "name": "LeoRacer-KandyLake-2.3.0.zip",
+        "bytes": 34005775,
+        "sha256": "5dfbb3958423d1d6e09172fef778dc3aad7dbe026c6941dabe8096100c7d7480"
+      },
+      {
+        "name": "ATTRIBUTION-2.3.0.txt",
+        "bytes": 7942,
+        "sha256": "7e798e6ec26ad645abc19d5f13d239a85773de279eb7453fbf7a247f8fe6ef25"
+      },
+      {
+        "name": "SIZES-2.3.0.json",
+        "bytes": 314,
+        "sha256": "cbb8dbffa5ceffea11220b87c6365b5ea51f2f7d001875487914af3d2298183f"
+      },
+      {
+        "name": "RELEASE_NOTES-2.3.0.md",
+        "bytes": 2210,
+        "sha256": "614d29a40b69f50bd1992957c3842c1c8457ca9aa4e077695367eded2a93dd2e"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 644,
+        "sha256": "8092940dcf85b59ebf74e5c8c495da80a79e110b86ca179e9fcc6148d9e7f16d"
+      }
+    ]
+  },
+  "sizes": {
+    "version": "2.3.0",
+    "commit": "ad370b95655b79f37b497ef046b677825d6d7992",
+    "base_installed_bytes": 612231062,
+    "optional_cars_installed_bytes": 727640137,
+    "exe_bytes": 103484928,
+    "core_bytes": 16022432,
+    "default_cars": 16,
+    "optional_cars": 32,
+    "complete_installed_bytes": 1339871199
+  }
 }
