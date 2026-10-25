@@ -163,3 +163,37 @@ The final supplied-landmark pass confirms a 48.51m-wide, 60m-tall stupa with
 The converter must evaluate modifiers before deleting guide curves: removing the
 stupa fence's curve first unwinds it into a straight strip. This was caught and
 fixed before installation. Final terrain and 145-check material tests pass.
+
+
+## Installed and extracted development package verification
+
+Scenery source checkpoint b6f7e29 is pushed. Updated content is installed under
+build/Kandy-dev; 1,116 executable/core/vehicle files remained byte-identical.
+The previous Kandy folder is backed up outside discovery at
+build/kandy/pre-landmark-track. Existing Astra and Colombo remain official;
+Kandy remains development/unranked. No release was published.
+
+Final exported single-player and split-screen three-lap sessions pass. A clean
+portable extraction under build/Kandy-landmarks-clean validates all three tracks
+and passes the six-racer split-screen race, including independent human finishes.
+All 178 two-camera streaming checks pass; three track-change cycles retain
+9,954 nodes and approximately 225/229/225MB static memory. Twelve fixed camera
+positions were captured in both renderers; the review sheet is beside the JSON
+report in docs/qa-kandy.
+
+The 30-second 1920x1080 six-racer, separated-player benchmark on RTX A1000 reports:
+Forward+ 112.7fps, p95 11.52ms, p99 12.19ms, maximum 15.62ms, 263MB static and
+934MB reported VRAM. Compatibility 80.0fps, p95 18.70ms, p99 23.33ms, maximum
+190.18ms, 174MB static and 426MB VRAM. The Compatibility spike remains a tuning
+item; these figures are not a claim of uniformly sustained 60fps in that renderer.
+Vehicle assembly timing was 652ms Forward+ and 1,835ms Compatibility; this does
+not measure whole-process cold loading. Diagnostic shutdown cleanup warnings
+remain distinct from the measured stable repeated-world memory behavior.
+
+Portable game: 566MB installed / 376MB ZIP (Bigster and Duster). Kandy track:
+68.4MB installed / 34.0MB ZIP. Bigster: 17.6MB / 11.1MB ZIP. Offline SDK:
+1,457MB / 597MB ZIP. Executable remains 103.5MB and core PCK 16.0MB;
+shared assets are 214.2MB. Local Kandy-dev retains all 34 car folders and is
+approximately 1,294MB; it is intentionally larger than the two-car portable ZIP.
+Archives and SHA256SUMS are in dist/kandy-development. Extracted binaries/core
+and scenery hashes match the installed build. Reports include exact byte sizes.

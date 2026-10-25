@@ -1,0 +1,166 @@
+{
+  "source_checkpoint": "b6f7e29",
+  "development_only": true,
+  "landmarks": {
+    "errors": [],
+    "landmarks": {
+      "mahaweli_seya": {
+        "bounds": "[P: (-554.255, 2.793496, -159.255), S: (48.50998, 60.0, 48.50998)]",
+        "corner_route_clearance": 51.0084037780762,
+        "height": 60.0,
+        "root": "(-530.0, 2.793496, -135.0)"
+      },
+      "sacred_tooth_precinct": {
+        "bounds": "[P: (-19.18012, 4.640813, -303.1383), S: (20.90358, 14.0, 36.67834)]",
+        "corner_route_clearance": 13.997730255127,
+        "height": 14.0,
+        "root": "(-8.728331, 4.640813, -284.7991)"
+      }
+    },
+    "status": "PASS"
+  },
+  "surface": {
+    "blocked_examples": [],
+    "gap_examples": [],
+    "maximum_rendered_road_height_error_m": 0.0258972644805908,
+    "probes": 4949,
+    "rendered_road_segments": 32,
+    "rendered_terrain_meshes": 257,
+    "road_gap_samples": 0,
+    "status": "PASS",
+    "terrain_blocked_samples": 0
+  },
+  "materials": {
+    "checks": 145,
+    "errors": [],
+    "status": "PASS",
+    "terrain_cells": 29,
+    "tree_batches": 81
+  },
+  "streaming": {
+    "cache_entries": 12,
+    "cells": 256,
+    "checks": 178,
+    "errors": [],
+    "memory_static_bytes": [
+      224594945.0,
+      229335625.0,
+      224615825.0
+    ],
+    "node_counts": [
+      9954,
+      9954,
+      9954
+    ],
+    "resident_cells": 29,
+    "status": "PASS"
+  },
+  "single": {
+    "checks": 3,
+    "errors": [],
+    "length_m": 2827.51662683487,
+    "mode": "single",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "kandy_lake",
+    "unranked": true,
+    "vehicle_load_ms": 204
+  },
+  "split_clean_extraction": {
+    "checks": 12,
+    "errors": [],
+    "length_m": 2827.51662683487,
+    "mode": "split",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "kandy_lake",
+    "unranked": true,
+    "vehicle_load_ms": 241
+  },
+  "forward_1080p": {
+    "fps": 112.660613036393,
+    "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+    "humans": 2,
+    "max_frame_ms": 15.616,
+    "p50_ms": 9.749,
+    "p95_ms": 11.518,
+    "p99_ms": 12.187,
+    "racers": 6,
+    "renderer": "forward_plus",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "separated_players": true,
+    "static_peak_mb": 263.188765,
+    "vehicle_load_ms": 652,
+    "vram_peak_mb": 933.657136
+  },
+  "compatibility_1080p": {
+    "fps": 79.9664427606269,
+    "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+    "humans": 2,
+    "max_frame_ms": 190.179,
+    "p50_ms": 11.546,
+    "p95_ms": 18.703,
+    "p99_ms": 23.328,
+    "racers": 6,
+    "renderer": "gl_compatibility",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "separated_players": true,
+    "static_peak_mb": 174.47821,
+    "vehicle_load_ms": 1835,
+    "vram_peak_mb": 425.731233
+  },
+  "packages": {
+    "game": {
+      "file": "LeoRacer-Kandy-dev-win64.zip",
+      "installed_bytes": 566132886,
+      "compressed_bytes": 375628378,
+      "sha256": "8dab1eb2fab2c0f746c3d6450c2d5783f51d99151e3993322a6c76cbb29bcb62"
+    },
+    "track": {
+      "file": "KandyLake-1.0.0-track.zip",
+      "installed_bytes": 68356551,
+      "compressed_bytes": 34004399,
+      "sha256": "cbb3bbed3005f193bdd64e3782819c44479e6703b98f18a5c35a96c89615e0a0"
+    },
+    "bigster": {
+      "file": "Bigster-024-vehicle.zip",
+      "installed_bytes": 17610820,
+      "compressed_bytes": 11100168,
+      "sha256": "ef45dee2ea952c7be7c180aec82f75a198b81760bfd60173d7ef8474613f3fd7"
+    },
+    "sdk": {
+      "file": "SriLanka-TrackSDK-win64.zip",
+      "installed_bytes": 1456773485,
+      "compressed_bytes": 596598353,
+      "sha256": "699079a21167ea489feee26ae25d260172531484d4af8d2af60b6a9595abab38"
+    },
+    "exe_bytes": 103484928,
+    "core_pck_bytes": 16022304,
+    "core_and_managed_bytes": 213051715,
+    "shared_assets_bytes": 214236856,
+    "tracks_bytes": {
+      "astra_coast": 52480,
+      "colombo_city": 49657778,
+      "kandy_lake": 68356551
+    },
+    "vehicle_dev_bytes": 20777506,
+    "local_full_install_bytes": 1293818403,
+    "exe_sha256": "0db5d242def539c4cae921f790b530f7e9bb08348629b649db0505bae8e084fa",
+    "core_sha256": "e87f7dedb9176fb81c332d47e306c75c7e4e18b1e70eb0595538f79a13ffc768",
+    "source_commit": "b6f7e29b2051c5b35935c79e177a6473f60e12f5"
+  },
+  "limitations": [
+    "Compatibility averaged 80fps but max frame spike was 190ms; further streaming/shader warm-up tuning remains.",
+    "Diagnostic shutdown reports ObjectDB/GL resource cleanup warnings; repeated track changes show stable nodes and memory.",
+    "FBX external texture files missing; model inspected but not installed.",
+    "No new public release; supplied converted models remain local development content."
+  ]
+}
