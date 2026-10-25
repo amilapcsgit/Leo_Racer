@@ -1,0 +1,12 @@
+{
+  "generator": "Built-in imagegen",
+  "date": "2026-10-25",
+  "asset": "local_materials_atlas.png",
+  "quadrants": [
+    "lime plaster",
+    "teal corrugated shutter",
+    "weathered timber",
+    "clay roof tiles"
+  ],
+  "prompt": "Original Kandy hill-country material atlas: four square quadrants; uniform orthographic diffuse PBR albedo; off-white tropical plaster, muted teal shutter, weathered timber, muted clay tiles; no text, logos, perspective or directional lighting."
+}

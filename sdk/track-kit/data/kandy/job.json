@@ -1,0 +1,17 @@
+{
+  "format": 1,
+  "id": "kandy_lake",
+  "seed": 311,
+  "course_revision": 1,
+  "source_geography_sha256": "73f27545c3d2384ed0a7f994242c4baf29ffc792be63b1ad4f571c6efaaf5a29",
+  "course_sha256": "be7e5b9c216c7c6d98767b747002d5243daa133a15385d9c80187343dadf2a45",
+  "origin_world": [
+    -118.63289921410237,
+    161.46234734295456
+  ],
+  "max_grade": 0.007931000922608445,
+  "minimum_vertical_radius": 43984.641135549864,
+  "length_m": 2852.1487723316063,
+  "race_adapted": true,
+  "reference": "Kandy Lake geography, not a reconstruction of the 2014 race"
+}

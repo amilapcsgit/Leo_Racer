@@ -1,0 +1,13 @@
+{
+  "format": 1,
+  "size": 512,
+  "spacing": 6.0,
+  "origin": [
+    -1536,
+    -1536
+  ],
+  "source": "Archived Mapzen Terrarium DEM, flattened outside the race corridor",
+  "terrain_sha256": "0fd5a8e95073eef49dd3246758dc511916c9515f4b82d783491e9fb97e175d9d",
+  "minimum": -2.4,
+  "maximum": 267.0
+}

@@ -48,6 +48,7 @@ def write_pack(path,engine,entries):
 BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png'}
 
 def category(name):
+    if name.startswith("assets/art/kandy/"):return "authoring-only-source"
     if name.removesuffix('.import') in BOOT_ART:return 'core'
     if name.startswith('assets/ui/art/'):return 'textures/art'
     if name.startswith('assets/tracks/colombo_city/'):return 'tracks/colombo_city/scenery'
@@ -100,7 +101,7 @@ def split(folder,loose_vehicles=False):
     groups=collections.defaultdict(dict)
     for name,data in entries.items():
         owner=owners.get(name,classify(name))
-        if owner=='loose-vehicle-source':continue
+        if owner in ['loose-vehicle-source','authoring-only-source']:continue
         # Embedded and extracted copies of textures share a single pack/cache.
         if name.endswith('.ctex'):owner='textures/imported'
         if name in boot_targets:owner='core'
@@ -131,7 +132,7 @@ def split(folder,loose_vehicles=False):
     names={name.removesuffix('.import').removesuffix('.remap') for name in kept if name.startswith('assets/')}
     assets={f'res://{name}':f'res://{name}' for name in sorted(names)}
     catalog={'format':1,'engine':'4.7','packs':[p for p in packs if not p['id'].startswith('tracks/')],'assets':assets,'overrides':[]}
-    if loose_vehicles:catalog.update(vehicle_api=1,track_api=2,core={'min':'2.2.0','max_major':2})
+    if loose_vehicles:catalog.update(vehicle_api=1,track_api=3,core={'min':'2.3.0','max_major':2})
     catalog['content']={'colombo_visuals':{'revision':2,'modules':'res://assets/models/colombo_city/modules.json',
         'recipes':'res://assets/models/colombo_city/recipes.json','lighting':'res://assets/art/colombo/lighting.json'}}
     (root/'catalog.json').write_text(json.dumps(catalog,indent=2)+'\n',encoding='utf-8')

@@ -61,7 +61,12 @@ func begin() -> void:
 	if not game.initialization_error.is_empty():
 		var message: String=game.initialization_error
 		game.queue_free();screen.show_failure(message,begin,func():get_tree().quit());return
-	get_tree().current_scene=game;queue_free()
+	get_tree().current_scene=game
+	if "--drive-test" in OS.get_cmdline_user_args():
+		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--track-check="):
+				screen.hide();var probe: Node=load("res://scripts/content/track_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
+	queue_free()
 
 func begin_workshop() -> void:
 	DisplayServer.window_set_title("Leo Racer / Vehicle Workshop")

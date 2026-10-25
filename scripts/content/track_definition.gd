@@ -35,7 +35,7 @@ static func discover() -> Array[LeoTrackDefinition]:
 
 func read_manifest(path: String) -> void:
 	var parsed=JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not parsed is Dictionary or parsed.get("format",0)!=1 or int(parsed.get("asset_api",0)) not in [1,2,3]:
+	if not parsed is Dictionary or parsed.get("format",0)!=1 or (not parsed.get("asset_api") is int and not parsed.get("asset_api") is float) or float(parsed.get("asset_api",0)) not in [1.,2.,3.]:
 		error="Unsupported track format";return
 	if not parsed.get("id","") is String or not parsed.get("name","") is String or not (parsed.get("course_revision",1) is float or parsed.get("course_revision",1) is int):error="Invalid track identity";return
 	metadata=parsed;id=String(metadata.get("id",""));display_name=String(metadata.get("name",id));revision=int(metadata.get("course_revision",1))
