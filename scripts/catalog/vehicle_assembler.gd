@@ -26,6 +26,7 @@ static func assemble(vehicle: VehicleDefinition, racer: DriverDefinition) -> Nod
 		for key in racer.material_bindings:
 			if racer.material_bindings[key] is Texture2D: bind_albedo(driver,String(key),racer.material_bindings[key])
 	LeoAssets.apply_overrides(root)
+	preload("res://scripts/catalog/vehicle_finish.gd").install(body,vehicle.visual_profile)
 	return root
 
 static func bind_albedo(node: Node, material_name: String, texture: Texture2D) -> void:

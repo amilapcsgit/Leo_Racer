@@ -35,6 +35,7 @@ enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var driver_fits: Dictionary = {}
 @export var hovering := false
 @export var preserve_materials := true
+@export var visual_profile := ""
 @export var thumbnail: Texture2D:
 	get:
 		return thumbnail if thumbnail else (LeoAssets.texture(thumbnail_path) if not thumbnail_path.is_empty() else null)

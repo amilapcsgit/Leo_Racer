@@ -74,6 +74,7 @@ var definition: VehicleDefinition
 var wheel_radii: Array[float] = []
 var wheel_axes: Array[Vector3] = []
 var wheel_angles: Array[float] = []
+var vehicle_lighting: Node
 
 static func chassis_path(key: String) -> String:
 	return GarageCatalog.shared().vehicle(key).model.resource_path
@@ -108,6 +109,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	visual = VehicleAssembler.assemble(definition,GarageCatalog.shared().driver(animal))
 	add_child(visual)
 	chassis = visual.get_node("Chassis")
+	vehicle_lighting = chassis.get_node_or_null("VehicleLighting")
 	driver = visual.get_node_or_null("Driver")
 	for binding in definition.wheels:
 		if not binding.steering: rear_tire_positions.append(chassis.transform * binding.pivot)
@@ -402,6 +404,8 @@ func _physics_process(dt: float) -> void:
 	if throttle < 0 and speed > 0: rate = 34
 	if boost_time > 0: rate = 35
 	if not active: target_speed = 0; rate = 22
+	if vehicle_lighting:
+		vehicle_lighting.update_state(active and speed > .5 and target_speed < speed - .5)
 	speed = move_toward(speed, target_speed, dt * rate)
 	var grip := clampf(absf(speed) / 8, 0, 1)
 	var turn_rate := lerpf(2.2, 1.65, clampf(absf(speed) / 40, 0, 1)) * handling

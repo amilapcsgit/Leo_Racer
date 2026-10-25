@@ -64,7 +64,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 	var errors:=PackedStringArray()
 	if not data is Dictionary:return ["vehicle.json must contain an object"]
 	if data.get("format")!=1 or data.get("vehicle_api")!=1:errors.append("Unsupported Vehicle API; expected 1")
-	for field in ["display_name","version","fixed_driver_id","attribution"]:
+	for field in ["display_name","version","fixed_driver_id","attribution","visual_profile"]:
 		if data.has(field) and not data[field] is String:errors.append("Invalid "+field)
 	for field in ["electric_boost","hovering","preserve_materials","setup_complete"]:
 		if data.has(field) and not data[field] is bool:errors.append("Invalid "+field)
