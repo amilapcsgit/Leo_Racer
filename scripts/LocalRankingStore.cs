@@ -52,7 +52,7 @@ PRAGMA user_version=1;";
     public int save_session(string sessionId, int mode, GArray rows, bool modified, bool diagnostic)
         => save_session_for_track(sessionId, mode, rows, modified, diagnostic, "astra_coast", 1);
 
-    public int save_session_for_track(string sessionId, int mode, GArray rows, bool modified, bool diagnostic, string trackId, int courseRevision)
+    public int save_session_for_track(string sessionId, int mode, GArray rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset = "balanced_v1")
     {
         if (modified || diagnostic) return 0;
         if (string.IsNullOrWhiteSpace(trackId) || courseRevision < 1) { error = "Invalid course identity."; return -1; }
@@ -63,10 +63,11 @@ PRAGMA user_version=1;";
             using (var session = connection.CreateCommand())
             {
                 session.Transaction = transaction;
-                session.CommandText = "INSERT OR IGNORE INTO sessions VALUES ($id,$track,$mode,'balanced_v1',$ended)";
+                session.CommandText = "INSERT OR IGNORE INTO sessions VALUES ($id,$track,$mode,$rules,$ended)";
                 session.Parameters.AddWithValue("$id",sessionId);
                 session.Parameters.AddWithValue("$track",trackId);
                 session.Parameters.AddWithValue("$mode",mode);
+                session.Parameters.AddWithValue("$rules",ruleset);
                 session.Parameters.AddWithValue("$ended",DateTime.UtcNow.ToString("O"));
                 session.ExecuteNonQuery();
             }
@@ -108,7 +109,7 @@ PRAGMA user_version=1;";
     public GArray best_times(int mode, string performanceClass, string vehicle, bool laps)
         => best_times_for_track(mode, performanceClass, vehicle, laps, "astra_coast", 1);
 
-    public GArray best_times_for_track(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision)
+    public GArray best_times_for_track(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset = "balanced_v1")
     {
         var result = new GArray();
         if (connection == null) { error = "Ranking database is unavailable."; return result; }
@@ -120,10 +121,11 @@ PRAGMA user_version=1;";
 SELECT r.*,s.ended_utc, ROW_NUMBER() OVER(PARTITION BY r.profile_id ORDER BY r.{metric},s.ended_utc,r.session_id) AS number
 FROM results r JOIN sessions s ON r.session_id=s.id
 LEFT JOIN session_courses c ON c.session_id=s.id
-WHERE s.track_id=$track AND COALESCE(c.revision,1)=$revision AND s.ruleset='balanced_v1' AND s.mode=$mode
+WHERE s.track_id=$track AND COALESCE(c.revision,1)=$revision AND s.ruleset=$rules AND s.mode=$mode
 AND r.class_id=$class AND ($vehicle='' OR r.vehicle_id=$vehicle))
 WHERE number=1 ORDER BY {metric},ended_utc,profile_id LIMIT 100";
             command.Parameters.AddWithValue("$mode",mode);
+            command.Parameters.AddWithValue("$rules",ruleset);
             command.Parameters.AddWithValue("$track",trackId);
             command.Parameters.AddWithValue("$revision",courseRevision);
             command.Parameters.AddWithValue("$class",performanceClass);

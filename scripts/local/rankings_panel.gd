@@ -54,7 +54,7 @@ func refresh() -> void:
  for child in entries.get_children():entries.remove_child(child);child.queue_free()
  var selected_vehicle: String="" if vehicle.selected==0 else String(game.catalog.vehicles[vehicle.selected-1].id)
  var rows: Array=[]
- if game.ranking_store:rows=game.ranking_store.best_times_for_track(mode.get_selected_id(),"standard165" if performance.selected==0 else "suv180",selected_vehicle,metric.selected==1,game.tracks[track.selected].id,game.tracks[track.selected].revision)
+ if game.ranking_store:rows=game.ranking_store.best_times_for_track(mode.get_selected_id(),"standard165" if performance.selected==0 else "suv180",selected_vehicle,metric.selected==1,game.tracks[track.selected].id,game.tracks[track.selected].revision,game.tracks[track.selected].ruleset_id())
  status.text="Best time for each racer. Can you beat yours?"
  var failed: bool=not game.ranking_store or not game.ranking_store.get_error().is_empty()
  var retry:=find_child("Retry",true,false) as Button

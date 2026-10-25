@@ -35,14 +35,14 @@ static func discover() -> Array[LeoTrackDefinition]:
 
 func read_manifest(path: String) -> void:
 	var parsed=JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not parsed is Dictionary or parsed.get("format",0)!=1 or (parsed.get("asset_api",0)!=1 and parsed.get("asset_api",0)!=2):
+	if not parsed is Dictionary or parsed.get("format",0)!=1 or int(parsed.get("asset_api",0)) not in [1,2,3]:
 		error="Unsupported track format";return
 	if not parsed.get("id","") is String or not parsed.get("name","") is String or not (parsed.get("course_revision",1) is float or parsed.get("course_revision",1) is int):error="Invalid track identity";return
 	metadata=parsed;id=String(metadata.get("id",""));display_name=String(metadata.get("name",id));revision=int(metadata.get("course_revision",1))
-	if int(metadata.asset_api)==2:
+	if int(metadata.asset_api)>=2:
 		if not metadata.get("core",{}) is Dictionary:error="Invalid core compatibility";return
 		var minimum:=String(metadata.get("core",{}).get("min","999.0.0")).split(".")
-		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2002000 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
+		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2003000 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
 		if metadata.get("world_kind")!="external":error="Track API 2 requires external world data";return
 		if not metadata.get("lighting",{}) is Dictionary:error="Invalid lighting parameters";return
 		var lighting: Dictionary=metadata.get("lighting",{})
@@ -83,11 +83,11 @@ func read_manifest(path: String) -> void:
 		for value in p:
 			if not value is float and not value is int:error="Invalid point coordinate";return
 			if not is_finite(float(value)):error="Non-finite point coordinate";return
-	if int(metadata.asset_api)==2:
+	if int(metadata.asset_api)>=2:
 		var measured:=0.
 		for i in points.size():
 			var a:=LeoVehicleCodec.vector(points[i]);var b:=LeoVehicleCodec.vector(points[(i+1)%points.size()]);var distance:=a.distance_to(b)
-			if distance<.01 or absf(a.y)>.05:error="External circuit must have distinct, flat route samples at road level";return
+			if distance<.01 or (int(metadata.asset_api)==2 and absf(a.y)>.05):error="External circuit must have distinct, flat route samples at road level";return
 			measured+=distance
 		if absf(measured-float(route.length))>maxf(1.,measured*.005):error="Route length does not match its samples";return
 		if not route.get("features",{}) is Dictionary:error="Invalid track features";return
@@ -97,6 +97,10 @@ func read_manifest(path: String) -> void:
 			if not recoveries[i] is Dictionary or not (recoveries[i].get("distance") is int or recoveries[i].get("distance") is float):error="Invalid recovery location";return
 			var distance:=float(recoveries[i].distance)
 			if not is_finite(distance) or distance<measured*i/8. or distance>measured*(i+.25)/8.:error="Recovery must follow its ordered checkpoint";return
+	if int(metadata.asset_api)==3:
+		if metadata.get("surface_profile")!="arcade_elevation_v1":error="Unsupported elevated surface profile";return
+		var issue:=elevation_problem(route)
+		if not issue.is_empty():error=issue;return
 	var widths=route.get("widths",[])
 	if not widths is Array or (not widths.is_empty() and widths.size()!=points.size()):error="Invalid route widths";return
 	for width in widths:
@@ -151,3 +155,25 @@ func profile() -> LeoArtProfile:
 	return load(String(metadata.get("lighting","res://assets/config/astra.tres"))) as LeoArtProfile
 
 func world_kind() -> String:return String(metadata.get("world_kind","astra"))
+
+func elevated() -> bool:return int(metadata.get("asset_api",1))==3
+func ruleset_id() -> String:return "balanced_v1+arcade_elevation_v1" if elevated() else "balanced_v1"
+
+static func elevation_problem(data: Dictionary) -> String:
+	var samples: Array=data.get("points",[])
+	var widths: Variant=data.get("widths",[])
+	if not widths is Array:return "Invalid elevated road widths"
+	if float(data.get("width",18.))<14.:return "Elevated road width must be at least 14 m"
+	var grades: Array[float]=[];var spans: Array[float]=[]
+	for i in samples.size():
+		var delta:=LeoVehicleCodec.vector(samples[(i+1)%samples.size()])-LeoVehicleCodec.vector(samples[i])
+		var horizontal:=Vector2(delta.x,delta.z).length()
+		if horizontal<.01:return "Elevated samples must have horizontal separation"
+		var grade:=delta.y/horizontal
+		if absf(grade)>.06005:return "Road grade exceeds 6 percent"
+		if not widths.is_empty() and (i>=widths.size() or float(widths[i])<14.):return "Elevated road width must be at least 14 m"
+		grades.append(grade);spans.append(horizontal)
+	for i in grades.size():
+		var previous:=posmod(i-1,grades.size())
+		if absf(grades[i]-grades[previous])/((spans[i]+spans[previous])*.5)>.001005:return "Vertical curvature radius must be at least 1000 m"
+	return ""

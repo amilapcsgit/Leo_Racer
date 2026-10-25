@@ -217,7 +217,7 @@ func update_wheel_motion(movement: Vector3, dt: float) -> void:
 	# Include the final soft-barrier correction as well as move_and_slide.
 	# Commanded speed remains high while pushing a wall and cannot drive rims.
 	var forward := -global_basis.z
-	forward.y = 0
+	if not circuit.elevated:forward.y = 0
 	wheel_motion_speed = clampf(movement.dot(forward.normalized()) / maxf(dt, .00001), -max_speed * 1.6, max_speed * 1.6)
 	if absf(wheel_motion_speed) < .025: wheel_motion_speed = 0
 
@@ -280,6 +280,7 @@ func place(distance: float, lane: float) -> void:
 	position = circuit.sample(distance, lane) + Vector3.UP * .12
 	var t := circuit.direction(distance)
 	rotation.y = atan2(-t.x, -t.z)
+	if circuit.elevated:basis=circuit.frame_at(distance if not is_nan(distance) else 0.,rotation.y)
 	progress = distance
 	last_s = fposmod(distance, circuit.length)
 	nearest_index = int(last_s / circuit.step)
@@ -306,7 +307,7 @@ func recover() -> void:
 			for candidate in [lane,-lane,0.,-5.5,5.5]:
 				var point:=circuit.sample(safe-setback,candidate)+Vector3.UP*.2
 				var facing:=circuit.direction(safe-setback)
-				var basis:=Basis(Vector3.UP,atan2(-facing.x,-facing.z))
+				var basis:=circuit.frame_at(safe-setback,atan2(-facing.x,-facing.z)) if circuit.elevated else Basis(Vector3.UP,atan2(-facing.x,-facing.z))
 				query.transform=Transform3D(basis,point+basis*definition.collision_position)
 				if get_world_3d().direct_space_state.intersect_shape(query,1).is_empty():
 					chosen=point;safe-=setback;found=true;break
@@ -315,6 +316,7 @@ func recover() -> void:
 	position = chosen
 	var t := circuit.direction(safe)
 	rotation.y = atan2(-t.x, -t.z)
+	if circuit.elevated:basis=circuit.frame_at(safe,rotation.y)
 	progress = safe
 	last_s = fposmod(safe, circuit.length)
 	nearest_index = int(last_s / circuit.step)
@@ -410,11 +412,15 @@ func _physics_process(dt: float) -> void:
 	var grip := clampf(absf(speed) / 8, 0, 1)
 	var turn_rate := lerpf(2.2, 1.65, clampf(absf(speed) / 40, 0, 1)) * handling
 	rotation.y -= steer * turn_rate * grip * dt * (-1.0 if speed < -.1 else 1.0) * (1.12 if drifting else 1.0)
+	if circuit.elevated:basis=circuit.frame_at(last_s,rotation.y)
 	var forward := -global_basis.z
 	var target_vel := forward * speed
 	var lateral_grip := 3.0 if drifting else 10.0
 	velocity.x = lerpf(velocity.x, target_vel.x, minf(1, dt * lateral_grip))
 	velocity.z = lerpf(velocity.z, target_vel.z, minf(1, dt * lateral_grip))
+	if circuit.elevated and is_on_floor():
+		var up:=circuit.frame_at(last_s).y
+		velocity.y=-(velocity.x*up.x+velocity.z*up.z)/maxf(up.y,.5)
 	velocity.y -= 18 * dt
 	var motion_origin := global_position
 	var contact_velocity := Vector3(velocity.x,0,velocity.z)
@@ -431,10 +437,11 @@ func _physics_process(dt: float) -> void:
 	nearest_index = projection.index
 	var offset: float = projection.offset
 	var track_normal:=Vector3(-projection.tangent.z,0,projection.tangent.x)
+	if circuit.elevated:track_normal=track_normal.normalized()
 	var footprint:=absf(global_basis.x.dot(track_normal))*definition.collision_size.x*.5+absf(global_basis.z.dot(track_normal))*definition.collision_size.z*.5
 	var lane_limit:=maxf(3.,circuit.width_at(projection.distance)*.5-footprint-.15)
 	if absf(offset) > lane_limit:
-		var normal := Vector3(-projection.tangent.z, 0, projection.tangent.x) * signf(offset)
+		var normal := track_normal * signf(offset)
 		position -= normal * (absf(offset) - lane_limit)
 		velocity -= normal * maxf(0, velocity.dot(normal))
 		speed *= .985
@@ -442,6 +449,7 @@ func _physics_process(dt: float) -> void:
 			emit_impact_feedback(position+normal*1.0,-normal)
 			impact.play()
 			bump_cooldown = .65
+	if circuit.elevated and position.y<float(projection.center.y)-5.:recover();return
 	update_wheel_motion(global_position - motion_origin, dt)
 	if is_player and not auto_drive and active and throttle>.5 and absf(wheel_motion_speed)<.5:
 		stuck_time += dt

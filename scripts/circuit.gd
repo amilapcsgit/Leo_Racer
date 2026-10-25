@@ -1,6 +1,7 @@
 class_name LeoCircuit
 extends RefCounted
 
+var elevated := false
 var definition: LeoTrackDefinition
 var widths: Array = []
 var bounds := AABB()
@@ -16,6 +17,7 @@ var features: Dictionary = {}
 
 func _init(track: LeoTrackDefinition = null) -> void:
 	definition=track
+	elevated=track.elevated() if track else false
 	var data: Dictionary
 	if track:data=track.route
 	else:data=JSON.parse_string(FileAccess.get_file_as_string("res://assets/track-astra.json"))
@@ -53,7 +55,8 @@ func sample(distance: float, lane: float = 0.0) -> Vector3:
 	var i := int(f)
 	var p := points[i].lerp(points[(i + 1) % points.size()], f - i)
 	var t := direction(distance)
-	return p + Vector3(-t.z, 0, t.x) * lane
+	var side:=Vector3(-t.z,0,t.x)
+	return p + (side.normalized() if elevated else side) * lane
 
 func direction(distance: float) -> Vector3:
 	var i := int(fposmod(distance, length) / step)
@@ -74,7 +77,8 @@ func project(p: Vector3, hint: int = -1) -> Dictionary:
 	for i in candidates:
 		var a := points[i]
 		var ab := points[(i + 1) % points.size()] - a
-		var t := clampf((p - a).dot(ab) / ab.length_squared(), 0, 1)
+		var planar:=Vector2(ab.x,ab.z)
+		var t := clampf(Vector2(p.x-a.x,p.z-a.z).dot(planar)/planar.length_squared() if elevated else (p-a).dot(ab)/ab.length_squared(),0,1)
 		var closest := a + ab * t
 		var d := Vector2(p.x - closest.x, p.z - closest.z).length_squared()
 		if d < best:
@@ -90,3 +94,10 @@ func project(p: Vector3, hint: int = -1) -> Dictionary:
 
 func delta_distance(a: float, b: float) -> float:
 	return fposmod(b - a + length * 0.5, length) - length * 0.5
+
+func frame_at(distance: float, yaw: float = NAN) -> Basis:
+	var forward:=direction(distance)
+	var side:=Vector3(-forward.z,0,forward.x).normalized()
+	var up:=side.cross(forward).normalized()
+	if not is_nan(yaw):forward=Vector3(-sin(yaw),0,-cos(yaw)).slide(up).normalized()
+	return Basis(forward.cross(up).normalized(),up,-forward)
