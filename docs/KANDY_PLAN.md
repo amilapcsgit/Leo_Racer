@@ -117,3 +117,49 @@ course, exclusion polygons and saved Terrain3D regions remain separate. The
 SDK displays six grid markers and eight checkpoint/recovery helpers. The
 original Earth2Road dependency lock and source pin are tracked under
 content/toolchain/earth2road; staging rejects a different source revision/lock.
+
+
+## Scenery repair and supplied-landmark checkpoint (2026-10-25)
+
+User playtesting exposed terrain rendered over the road; earlier collision-only
+checks did not detect this. The offline Terrain3D bake now cuts an exact protected
+race corridor from detail terrain and a wider hole from distant terrain. Pavement
+and verges join the retained terrain. A new test probes actual exported render
+meshes across seven lanes, rather than trusting the independent road collider.
+The first corrected pass checked 4,949 stations/lanes: zero terrain intersections,
+zero road gaps, maximum road-height error 0.026m.
+
+Shared Sri Lankan scenery reuses licensed trees, flags, lamps, surface materials,
+complete building recipes and Leo Racer artwork from the existing tracks. Static
+components are batched within 200m cells. Generated Kandy billboard art and a
+matching artistic depth image have prompts and provenance beside the PNGs.
+A resource-baker defect reset non-texture shader parameters when remapping shaders;
+the baker now preserves all uniform values. The loaded-pack material regression
+passes 145 checks, including lake mode, shoreline distance map and terrain flags.
+
+The user authorized the four supplied models. The Mahaweli Seya model by
+sachinthabasna is converted to a grounded 60m landmark near the western starting
+section. This is an artistic relocation from Kotmale, not a geographically exact
+Kandy claim. A reserved plaza and start-grid sightline keep normal shops away.
+The MiniWorld3D STL replaces proxy massing at the protected Sacred Tooth precinct;
+it is reduced to approximately 20k triangles and given ivory/clay materials.
+A 676-triangle tree is extracted from the supplied forest scene without importing
+its night lighting, ground or road. The supplied FBX was inspected but has missing
+external texture dependencies, so it remains excluded pending material repair.
+Source files are unchanged; source hashes, creator reference and conversion counts
+are recorded in content/scenery/kandy-supplied-models.json. Converted GLBs remain
+local development content, not new public repository uploads.
+
+Rebuild supplied models with Blender 4.5:
+`blender --background --python tools/convert_kandy_landmarks.py`
+Then stage the SDK, import its GLBs and run the existing content-only export.
+Use tests/kandy_landmark_test.gd, kandy_surface_test.gd and kandy_material_test.gd
+with the corrected track folder. Capture the existing twelve fixed locations in
+both renderers. The terrain/material tests supersede earlier visual acceptance;
+new scenery performance and extracted-package results must be recorded separately.
+
+The final supplied-landmark pass confirms a 48.51m-wide, 60m-tall stupa with
+51m corner clearance from the route centerline, plus the retained 14m temple.
+The converter must evaluate modifiers before deleting guide curves: removing the
+stupa fence's curve first unwinds it into a straight strip. This was caught and
+fixed before installation. Final terrain and 145-check material tests pass.

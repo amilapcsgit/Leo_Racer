@@ -11,6 +11,10 @@ def stage(output,bundle=False):
  for name in ['road-generator','terrain_3d','EZ-Tree-Godot-Port']:
   for p in (ROOT/'addons'/name).rglob('*'):
    if p.is_file() and p.suffix not in ['.import','.uid','.so','.dylib'] and not any(s in ['.godot','__pycache__'] for s in p.parts):copy(p,output/'addons'/name/p.relative_to(ROOT/'addons'/name))
+ assert (ROOT/'build/kandy/supplied-models/runtime/mahaweli.glb').is_file(),'Run Blender --background --python tools/convert_kandy_landmarks.py with the supplied local models first'
+ copy(ROOT/'content/scenery/kandy-supplied-models.json',output/'licenses/Kandy-supplied-models.json')
+ for p in (ROOT/'build/kandy/supplied-models/runtime').glob('*'):
+  if p.suffix in ['.glb','.json']:copy(p,output/'shared/landmarks'/p.name)
  # Godot 4.7 removed an old editor setting; retain upstream copyright/version
  # and apply a documented one-line editor-only compatibility fallback.
  slider=output/'addons/terrain_3d/src/double_slider.gd'
@@ -18,11 +22,32 @@ def stage(output,bundle=False):
  slider.write_text(text,encoding='utf-8')
  for name in ['author-python','engine','inputs','licenses','exported','rebuilt-world']:
   directory=output/name;directory.mkdir(parents=True,exist_ok=True);(directory/'.gdignore').write_text('',encoding='utf-8')
+ leaf=output/'addons/EZ-Tree-Godot-Port/leaf_wind.gdshader'
+ text=leaf.read_text(encoding='utf-8').replace('void vertex() {','varying float leaf_view_distance;\nvoid vertex() {\n leaf_view_distance=length((MODELVIEW_MATRIX*vec4(VERTEX,1.)).xyz);').replace('ALPHA_SCISSOR_THRESHOLD = alpha_scissor;', 'ALPHA_SCISSOR_THRESHOLD = mix(alpha_scissor,.025,smoothstep(55.,240.,leaf_view_distance));')
+ leaf.write_text(text,encoding='utf-8')
  (output/'dependency-patches.json').write_text(json.dumps({'terrain3d-1.0.2':['double_slider.gd: default old removed display_scale setting to 100% under Godot4.7']},indent=2),encoding='utf-8')
+ copy(ROOT/'content/scenery/srilanka.json',output/'shared/scenery.json')
+ copy(ROOT/'tools/shared_srilanka_scenery.gd',output/'shared_srilanka_scenery.gd')
+ for name in ['city_water.gdshader','sri_flag.gdshader','road_surface.gdshader','paving_pbr.gdshader','city_ground.gdshader']:
+  copy(ROOT/'shaders'/name,output/'shared'/name)
+ water_shader=output/'shared/city_water.gdshader'
+ text=water_shader.read_text(encoding='utf-8').replace('varying vec3 world_position;', 'uniform bool shaped_shoreline=false;\nuniform sampler2D shore_distance : filter_linear,repeat_disable;\nuniform vec2 shore_origin=vec2(0.);\nuniform vec2 shore_extent=vec2(1000.);\nvarying vec3 world_position;')
+ text=text.replace('float near_shore=', 'if(shaped_shoreline){shore=texture(shore_distance,(p-shore_origin)/shore_extent).r*50.;}\n float near_shore=')
+ water_shader.write_text(text,encoding='utf-8')
+ ground_shader=output/'shared/city_ground.gdshader';text=ground_shader.read_text(encoding='utf-8').replace('uniform bool landscaped = false;', 'uniform bool landscaped = false;\nuniform bool coastal = true;').replace('float sand=1.-smoothstep(-865.,-849.,world.x);','float sand=coastal ? 1.-smoothstep(-865.,-849.,world.x) : 0.;');ground_shader.write_text(text,encoding='utf-8')
+ for shader in ['city_ground.gdshader','road_surface.gdshader','paving_pbr.gdshader']:
+  path=output/'shared'/shader;path.write_text(path.read_text(encoding='utf-8').replace('shader_type spatial;', 'shader_type spatial;\nrender_mode cull_disabled;'),encoding='utf-8')
+ copy(ROOT/'assets/flags/sri_lanka_flag.svg',output/'shared/sri_lanka_flag.svg')
+ for name in ['colombo_gp.png','coast_race.png','portrait_leo.png']:
+  copy(ROOT/'assets/art/srilanka'/name,output/'shared/art'/name)
+ for p in (ROOT/'assets/materials').glob('*'):
+  if p.suffix in ['.jpg','.png']:copy(p,output/'shared/materials'/p.name)
+ for p in (ROOT/'assets/models/colombo').glob('*.glb'):copy(p,output/'assets/models/colombo'/p.name)
  modules=set()
  for p in (ROOT/'assets/models/colombo_city/recipes').glob('*.tscn'):
   text=p.read_text(encoding='utf-8');modules.update(re.findall(r'res://assets/models/colombo_city/(modules/[^" ]+)',text))
   target=output/'library/recipes'/p.name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(text.replace('res://assets/models/colombo_city/','res://library/'),encoding='utf-8')
+ for p in (ROOT/'assets/models/colombo_city/modules').glob('module_*.glb'):modules.add('modules/'+p.name)
  for relative in modules:copy(ROOT/'assets/models/colombo_city'/relative,output/'library'/relative)
  # GLBs retain their external material images, shared once in the SDK.
  for p in (ROOT/'assets/models/colombo_city/modules/textures').glob('*'):

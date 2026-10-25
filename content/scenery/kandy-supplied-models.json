@@ -1,0 +1,38 @@
+{
+  "models": [
+    {
+      "id": "mahaweli",
+      "source": "Mahaweli+Seya.blend",
+      "source_sha256": "b3b1c8d03aa77451b18ab6a1ac347da56031ce6bcec3e7aa0c9d6818aeff8098",
+      "triangles": 127248,
+      "height_m": 60,
+      "model": "mahaweli.glb",
+      "bytes": 3311328,
+      "permission": "User explicitly authorized supplied model use on 2026-10-25"
+    },
+    {
+      "id": "tooth_temple",
+      "source": "Temple-of-Tooth Relic-Sri-Lanka-MiniWorld3D.stl",
+      "source_sha256": "45b4c038d8c598f45fce99767dfe2056b27c668b40800a4ebac05e5f5b3aeb8f",
+      "triangles": 19998,
+      "height_m": 14,
+      "model": "tooth_temple.glb",
+      "bytes": 1385088,
+      "permission": "User explicitly authorized supplied model use on 2026-10-25"
+    },
+    {
+      "id": "forest",
+      "source": "a_forest_3_with_a_road_at_night_for_game.glb",
+      "source_sha256": "ba57bc2a8c20ea796ae287d50ad9ce7ca425a52497edef7bce79bdd9812e4bb4",
+      "triangles": 676,
+      "height_m": 13,
+      "model": "forest.glb",
+      "bytes": 3846588,
+      "permission": "User explicitly authorized supplied model use on 2026-10-25"
+    }
+  ],
+  "fbx_exception": "Inspected 609 meshes/129524 triangles. All referenced original texture files are missing; not installed pending material reconstruction. No source edited.",
+  "mahaweli_reference": "https://www.cgtrader.com/free-3d-models/architectural/other/mahaweli-stupa-3d-model",
+  "mahaweli_creator": "sachinthabasna",
+  "placement": "Artistic Kandy-inspired landmark, not geographically accurate relocation claim."
+}

@@ -26,6 +26,11 @@ var paint: Dictionary={}
 var rng:=RandomNumberGenerator.new()
 var building_count:=0
 var native_road_meshes:=0
+var terrain_clearance: Dictionary={}
+var shared_scenery: Dictionary={}
+var shared_builder: RefCounted
+var terrain_cutter: RefCounted
+var landmark_exclusions: Array[PackedVector2Array]=[]
 func read(path: String) -> Dictionary:return JSON.parse_string(FileAccess.get_file_as_string(path))
 func fail(message: String) -> bool:last_error=message;push_error(message);return false
 func import_geography() -> void:
@@ -39,6 +44,11 @@ func load_data() -> bool:
 	if not FileAccess.file_exists(data_folder.path_join("course.json")):return fail("Import geography and provide course.json first")
 	route=read(data_folder.path_join("course.json"));geography=read(data_folder.path_join("geography.json"));points.clear()
 	for p in route.points:points.append(Vector3(p[0],p[1],p[2]))
+	landmark_exclusions.clear()
+	for landmark in geography.get("landmarks",[]):
+		var polygon:=PackedVector2Array()
+		for p in landmark.footprint:polygon.append(Vector2(p[0],p[1]))
+		for expanded in Geometry2D.offset_polygon(polygon,6.):landmark_exclusions.append(expanded)
 	length=float(route.length);road_half=float(route.get("width",18.))*.5;rng.seed=procedural_seed
 	var corrections_file:=data_folder.path_join("corrections.json")
 	corrections=read(corrections_file) if FileAccess.file_exists(corrections_file) else {}
@@ -76,7 +86,8 @@ func edit_course() -> void:
 	for i in points.size():length+=points[i].distance_to(points[(i+1)%points.size()])
 	var holder:=clear_group("RoadAuthoring");var manager:=RoadManager.new();manager.auto_refresh=false;holder.add_child(manager)
 	var container:=RoadContainer.new();container._auto_refresh=false;container.density=3.;manager.add_child(container)
-	var asphalt:=StandardMaterial3D.new();asphalt.albedo_color=Color("353a3a");asphalt.roughness=.92;asphalt.cull_mode=BaseMaterial3D.CULL_DISABLED;container.material_resource=asphalt
+	shared_builder=load("res://shared_srilanka_scenery.gd").new(self)
+	container.material_resource=shared_builder.pbr("surface.asphalt")
 	var handles: Array[RoadPoint]=[]
 	for i in curve.point_count:
 		var point:=RoadPoint.new();point.name="Point%03d"%i;container.add_child(point);point.position=curve.get_point_position(i)
@@ -124,23 +135,38 @@ func barriers_and_collision(resident: Node3D) -> void:
 	var lines:=MultiMeshInstance3D.new();lines.multimesh=marks;lines.material_override=material("eae4c9");resident.add_child(lines);load("res://scene_instances.gd").store(lines,mark_transforms)
 	var floor_node:=StaticBody3D.new();var collision:=CollisionShape3D.new();collision.shape=surface.commit().create_trimesh_shape();floor_node.add_child(collision);resident.add_child(floor_node)
 func building(parent: Node3D,position_at: Vector3,yaw: float,index: int) -> void:
+	for reserved in landmark_exclusions:
+		if Geometry2D.is_point_in_polygon(Vector2(position_at.x,position_at.z),reserved):return
 	for area in corrections.get("exclude_buildings",[]):
 		var polygon:=PackedVector2Array()
 		for p in area:polygon.append(Vector2(p[0],p[1]))
 		if Geometry2D.is_point_in_polygon(Vector2(position_at.x,position_at.z),polygon):return
-	var recipes:=["tea_shop","shophouse","lake_residence","balcony_house","fort_apartments","bakery"]
+	var recipes:=["tea_shop","shophouse","lake_residence","balcony_house","fort_apartments","bakery","market_terrace","commercial_corner","courtyard_shops","coast_cafe","fort_corner","garden_cafe"]
 	var scene:=load("res://library/recipes/"+recipes[index%recipes.size()]+".tscn") as PackedScene
 	var house:=scene.instantiate() as Node3D;house.position=position_at;house.rotation.y=yaw;parent.add_child(house);building_count+=1
 	# A real foundation hides sloping terrain below each retained modular recipe.
-	box(house,Vector3(11.,24.,9.),Vector3(0,-12,0),"999587")
+	var bounds:=AABB();var first:=true
+	for node in house.find_children("*","MeshInstance3D",true,false):
+		var local: AABB=(house.global_transform.affine_inverse()*node.global_transform)*node.get_aabb();bounds=local if first else bounds.merge(local);first=false
+	var highest:=-INF;var lowest:=INF;var clear:=terrain_cutter
+	for x in [bounds.position.x,bounds.end.x]:
+		for z in [bounds.position.z,bounds.end.z]:
+			var p: Vector3=house.global_transform*Vector3(x,0,z)
+			if clear.distance(Vector2(p.x,p.z))<17.:house.free();building_count-=1;return
+			for reserved in landmark_exclusions:
+				if Geometry2D.is_point_in_polygon(Vector2(p.x,p.z),reserved):house.free();building_count-=1;return
+			var y:=ground(p.x,p.z);highest=maxf(highest,y);lowest=minf(lowest,y)
+	house.position.y=highest+.08-bounds.position.y
+	var foundation_height:=maxf(.65,highest-lowest+.65)
+	box(house,Vector3(bounds.size.x+.1,foundation_height,bounds.size.z+.1),Vector3(bounds.get_center().x,bounds.position.y-foundation_height*.5,bounds.get_center().z),"999587")
 	var shader:=load("res://building_material.gdshader") as Shader
 	for node in house.find_children("*","MeshInstance3D",true,false):
 		for i in node.mesh.get_surface_count():
 			var old: Material=node.get_active_material(i)
 			if old is StandardMaterial3D and old.albedo_texture:
-				var key:="facade_"+str(old.albedo_texture.get_instance_id())
+				var key:="facade_"+str(old.albedo_texture.get_instance_id())+"_"+str(index%5)
 				if not paint.has(key):
-					var finish:=ShaderMaterial.new();finish.shader=shader;finish.set_shader_parameter("source_atlas",old.albedo_texture);finish.set_shader_parameter("local_atlas",load("res://art/local_materials_atlas.png"));paint[key]=finish
+					var finish:=ShaderMaterial.new();finish.shader=shader;finish.set_shader_parameter("source_atlas",old.albedo_texture);finish.set_shader_parameter("local_atlas",load("res://art/local_materials_atlas.png"));finish.set_shader_parameter("plaster_tint",[Color("dfd9c4"),Color("b8c7b7"),Color("d8c3a4"),Color("e7ddc4"),Color("c2c9c7")][index%5]);paint[key]=finish
 				node.set_surface_override_material(i,paint[key])
 func dress_scenery() -> void:
 	if route.is_empty():
@@ -152,8 +178,8 @@ func dress_scenery() -> void:
 		var paving:=SurfaceTool.new();paving.begin(Mesh.PRIMITIVE_TRIANGLES)
 		for i in points.size():
 			var s:=length*i/points.size();var n:=length*(i+1)/points.size()
-			for v in [sample(s,side*10.),sample(n,side*10.),sample(s,side*17.),sample(s,side*17.),sample(n,side*10.),sample(n,side*17.)]:paving.set_normal(Vector3.UP);paving.add_vertex(v+Vector3.UP*.025)
-		var walk:=MeshInstance3D.new();walk.mesh=paving.commit();var mat:=material("b6b5a6").duplicate();mat.cull_mode=BaseMaterial3D.CULL_DISABLED;walk.material_override=mat;resident.add_child(walk)
+			for v in [sample(s,side*road_half),sample(n,side*road_half),sample(s,side*(road_half+8.)),sample(s,side*(road_half+8.)),sample(n,side*road_half),sample(n,side*(road_half+8.))]:paving.set_normal(Vector3.UP);paving.add_vertex(v+Vector3.UP*.025)
+		var walk:=MeshInstance3D.new();walk.mesh=paving.commit();walk.material_override=shared_builder.pbr("surface.paving");resident.add_child(walk)
 	# Static terrain baking keeps the native extension out of exported tracks.
 	var terrain:=get_node_or_null("TerrainAuthoring") as Terrain3D
 	if not terrain:
@@ -162,9 +188,19 @@ func dress_scenery() -> void:
 		if DirAccess.dir_exists_absolute(saved):terrain.data_directory=saved
 		add_child(terrain);terrain.owner=self
 		var images: Array[Image]=[terrain_image,null,null];if terrain.data.get_region_count()==0:terrain.data.import_images(images,Vector3(float(terrain_info.origin[0]),0,float(terrain_info.origin[1])),0,1)
-	var landscape:=MeshInstance3D.new();landscape.mesh=terrain.bake_mesh(4);landscape.position.y=-2.;var terrain_mat:=ShaderMaterial.new();terrain_mat.shader=load("res://terrain_material.gdshader");landscape.material_override=terrain_mat;landscape.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;resident.add_child(landscape)
+	terrain_cutter=load("res://terrain_corridor.gd").new(points);var cutter=terrain_cutter
+	var landscape:=MeshInstance3D.new();landscape.mesh=cutter.cut(terrain.bake_mesh(4),150.,"backdrop");landscape.position.y=-4.;landscape.set_meta("surface_role","terrain_backdrop");var terrain_mat:=ShaderMaterial.new();terrain_mat.shader=load("res://shared/city_ground.gdshader");terrain_mat.set_shader_parameter("landscaped",true);terrain_mat.set_shader_parameter("coastal",false);terrain_mat.set_shader_parameter("ground_albedo",load("res://shared/materials/Concrete034_2K-JPG_Color.jpg"));terrain_mat.set_shader_parameter("ground_normal",load("res://shared/materials/Concrete034_2K-JPG_NormalGL.jpg"));landscape.material_override=terrain_mat;landscape.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;resident.add_child(landscape)
 	# Decorative near terrain is streamed; only the cheap distant silhouette stays resident.
-	var faces: PackedVector3Array=terrain.bake_mesh(2).get_faces();var patches: Dictionary={}
+	# Graded grass verges close the pavement-to-cut-terrain join without covering asphalt.
+	for side in [-1.,1.]:
+		var verge:=SurfaceTool.new();verge.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for i in points.size():
+			var s:=length*i/points.size();var n:=length*(i+1)/points.size()
+			var a:=sample(s,side*17.);var b:=sample(n,side*17.);var c:=sample(s,side*21.);var d:=sample(n,side*21.)
+			a.y+=.025;b.y+=.025;c.y=ground(c.x,c.z)-.03;d.y=ground(d.x,d.z)-.03
+			for vertex in [a,b,c,c,b,d]:verge.set_normal(Vector3.UP);verge.add_vertex(vertex)
+		var join:=MeshInstance3D.new();join.mesh=verge.commit();join.material_override=terrain_mat;join.set_meta("surface_role","terrain_verge");resident.add_child(join)
+	var faces: PackedVector3Array=cutter.cut(terrain.bake_mesh(1),20.,"detail").get_faces();terrain_clearance=cutter.report;var patches: Dictionary={}
 	for i in range(0,faces.size(),3):
 		var center: Vector3=(faces[i]+faces[i+1]+faces[i+2])/3.;var key:=Vector2i(floori(center.x/200),floori(center.z/200))
 		if not patches.has(key):patches[key]=PackedVector3Array()
@@ -172,7 +208,7 @@ func dress_scenery() -> void:
 	for key in patches:
 		var tool:=SurfaceTool.new();tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 		for vertex in patches[key]:tool.add_vertex(vertex)
-		tool.generate_normals();var tile:=MeshInstance3D.new();tile.mesh=tool.commit();tile.material_override=terrain_mat;tile.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;tile.set_meta("cell",key);details.add_child(tile)
+		tool.generate_normals();var tile:=MeshInstance3D.new();tile.mesh=tool.commit();tile.material_override=terrain_mat;tile.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;tile.set_meta("cell",key);tile.set_meta("surface_role","terrain_detail");details.add_child(tile)
 	var connector:=get_node("RoadAuthoring").find_child("*",true,false)
 	for node in get_node("RoadAuthoring").find_children("*","RoadTerrain3DConnector",true,false):node.terrain=terrain
 	terrain.visible=false;terrain.set_physics_process(false)
@@ -183,8 +219,8 @@ func dress_scenery() -> void:
 	for p in geography.lake:polygon.append(Vector2(p[0],p[1]))
 	if polygon[0].is_equal_approx(polygon[-1]):polygon.resize(polygon.size()-1)
 	var triangles:=Geometry2D.triangulate_polygon(polygon);var water:=SurfaceTool.new();water.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for index in triangles:water.set_normal(Vector3.UP);water.add_vertex(Vector3(polygon[index].x,-1.1,polygon[index].y))
-	var lake:=MeshInstance3D.new();lake.mesh=water.commit();var water_mat:=ShaderMaterial.new();water_mat.shader=load("res://lake.gdshader");lake.material_override=water_mat;resident.add_child(lake)
+	for index in triangles:water.set_normal(Vector3.UP);water.set_tangent(Plane(Vector3.RIGHT,1.));water.set_uv(polygon[index]*.05);water.add_vertex(Vector3(polygon[index].x,-1.1,polygon[index].y))
+	var lake:=MeshInstance3D.new();lake.name="KandyLakeColomboWater";lake.set_meta("surface_role","water");lake.mesh=water.commit();var water_mat:=ShaderMaterial.new();water_mat.shader=load("res://shared/city_water.gdshader");water_mat.set_shader_parameter("ocean",false);water_mat.set_shader_parameter("deep_color",Color("225e5c"));water_mat.set_shader_parameter("shallow_color",Color("477d68"));water_mat.set_shader_parameter("lake_center",Vector2.ZERO);water_mat.set_shader_parameter("lake_radius",300.);var water_info: Dictionary=read(data_folder.path_join("water.json"));water_mat.set_shader_parameter("shaped_shoreline",true);water_mat.set_shader_parameter("shore_distance",load(data_folder.path_join("shore_distance.png")));water_mat.set_shader_parameter("shore_origin",Vector2(water_info.origin[0],water_info.origin[1]));water_mat.set_shader_parameter("shore_extent",Vector2(water_info.extent[0],water_info.extent[1]));lake.material_override=water_mat;resident.add_child(lake)
 	var wall:=clear_group("WallSource");var wall_mesh:=BoxMesh.new();wall_mesh.size=Vector3(.45,.65,length/points.size()+.1)
 	var cloud_mesh:=SphereMesh.new();cloud_mesh.radius=.55;cloud_mesh.height=1.1;cloud_mesh.radial_segments=8;cloud_mesh.rings=4
 	var walls: Array[Transform3D]=[];var caps: Array[Transform3D]=[]
@@ -209,27 +245,10 @@ func dress_scenery() -> void:
 		if near>65 and near<240 and ground(center.x,center.y)<45 and not Geometry2D.is_point_in_polygon(center,polygon):building(details,Vector3(center.x,ground(center.x,center.y),center.y),rng.randf()*TAU,source_index)
 		source_index+=1
 	# Premade roof modules compose the north-shore landmark massing.
-	for i in 5:building(details,Vector3(-90.+i*10.,ground(-90.+i*10.,-430.),-430.),0,2)
 	var island:=Node3D.new();island.position=Vector3(30,-.5,10);resident.add_child(island)
 	var mound:=CylinderMesh.new();mound.top_radius=12.;mound.bottom_radius=15.;mound.height=1.5;var island_mesh:=MeshInstance3D.new();island_mesh.mesh=mound;island_mesh.material_override=material("798354");island.add_child(island_mesh)
-	# Broadleaf canopies, varied by seed; never regular palm rows.
-	var trunks: Array[Transform3D]=[];var crowns: Array[Transform3D]=[]
-	for i in 2500:
-		var p:=Vector3(rng.randf_range(-1300,1300),0,rng.randf_range(-1000,1000));var xy:=Vector2(p.x,p.z)
-		if Geometry2D.is_point_in_polygon(xy,polygon):continue
-		var near:=INF
-		for j in range(0,points.size(),12):near=minf(near,Vector2(points[j].x,points[j].z).distance_to(xy))
-		if near<80:continue
-		p.y=ground(p.x,p.z);var scale_value:=rng.randf_range(.8,1.7);trunks.append(Transform3D(Basis.IDENTITY.scaled(Vector3.ONE*scale_value),p+Vector3.UP*3.*scale_value));crowns.append(Transform3D(Basis.IDENTITY.scaled(Vector3(1.5,1.,1.3)*scale_value),p+Vector3.UP*7.*scale_value))
-	var trunk:=CylinderMesh.new();trunk.top_radius=.18;trunk.bottom_radius=.35;trunk.height=6.;trunk.radial_segments=6
-	var crown:=SphereMesh.new();crown.radius=3.;crown.height=5.;crown.radial_segments=8;crown.rings=5
-	batch(details,trunk,trunks,"77634b");batch(details,crown,crowns,"38613b")
-	var shade:=load("res://assets/models/colombo/shade_tree_0.res") as Mesh
-	var shade_poses: Array[Transform3D]=[]
-	for i in int(length/20.):
-		var s:=i*20.;var p:=sample(s,19. if i%3 else -23.);p.y=ground(p.x,p.z)
-		shade_poses.append(Transform3D(Basis(Vector3.UP,rng.randf()*TAU).scaled(Vector3.ONE*rng.randf_range(.45,.65)),p))
-	batch(details,shade,shade_poses,"")
+	shared_scenery=shared_builder.dress(details)
+	shared_scenery.batching=load("res://static_scenery_batcher.gd").bake(details)
 	var welcome:=Node3D.new();welcome.position=sample(0,-15.);welcome.rotation.y=atan2(frame(0).x.x,frame(0).x.z);details.add_child(welcome)
 	box(welcome,Vector3(7.,3.,.2),Vector3(0,3,0),"1d493e")
 	label(welcome,"KANDY LAKE",Vector3(0,3.9,.15));label(welcome,"මහනුවර",Vector3(0,3.,.15),0,"res://art/fonts/NotoSansSinhala.ttf");label(welcome,"கண்டி",Vector3(0,2.1,.15),0,"res://art/fonts/NotoSansTamil.ttf")
@@ -262,15 +281,16 @@ func validate() -> bool:
 	print("TRACK_VALIDATED length=",length);return true
 func export_track() -> bool:
 	if not validate():return false
+	if terrain_clearance.is_empty() or not shared_scenery.has("batching"):return fail("Terrain/scenery assembly did not finish; export cancelled")
 	var folder:=ProjectSettings.globalize_path(destination).path_join(track_id);DirAccess.make_dir_recursive_absolute(folder)
-	var authored_signature:=JSON.stringify(Array(points))+FileAccess.get_sha256("res://elevated_author.gd")+FileAccess.get_sha256("res://resource_baker.gd")+FileAccess.get_sha256(data_folder.path_join("terrain.r32"))+FileAccess.get_sha256("res://art/local_materials_atlas.png")+JSON.stringify(corrections)+str(procedural_seed)
+	var authored_signature:=authoring_fingerprint()+JSON.stringify(Array(points))+str(procedural_seed)
 	var prefix:="res://mods/tracks/"+track_id+"/"+authored_signature.sha256_text().left(16)+"/"
 	var baker=load("res://resource_baker.gd").new(folder.get_base_dir().path_join(".bake-"+track_id),prefix)
 	var resident:=get_node("Resident").duplicate() as Node3D
 	native_road_meshes=0
 	for node in get_node("RoadAuthoring").find_children("*","MeshInstance3D",true,false):
 		if node.mesh:
-			var mesh:=MeshInstance3D.new();mesh.mesh=node.mesh;mesh.material_override=node.get_active_material(0);mesh.transform=global_transform.affine_inverse()*node.global_transform;resident.add_child(mesh);native_road_meshes+=1
+			var mesh:=MeshInstance3D.new();mesh.mesh=node.mesh;mesh.material_override=node.get_active_material(0);mesh.transform=global_transform.affine_inverse()*node.global_transform;mesh.set_meta("surface_role","race_road");resident.add_child(mesh);native_road_meshes+=1
 	if native_road_meshes==0:resident.free();return fail("Road Generator did not produce meshes")
 	var scene_path: String=baker.pack(resident,"resident");resident.free()
 	var groups: Dictionary={}
@@ -313,6 +333,7 @@ func export_track() -> bool:
 		var h:=Vector2(b.x-a.x,b.z-a.z).length();var hn:=Vector2(c.x-b.x,c.z-b.z).length();var grade:=(b.y-a.y)/h
 		max_grade=maxf(max_grade,absf(grade));max_curvature=maxf(max_curvature,absf(grade-(c.y-b.y)/hn)/((h+hn)*.5))
 	baked_job.baked_max_grade=max_grade;baked_job.baked_minimum_vertical_radius_m=1./maxf(max_curvature,.000000001)
+	baked_job.terrain_clearance=terrain_clearance;baked_job.shared_scenery=shared_scenery;
 	baked_job.baked_length_m=length;baked_job.seed=procedural_seed;baked_job.uniform_3d_samples=points.size();baked_job.tools={"road_generator":"0.9.5","terrain3d":"1.0.2","godot":Engine.get_version_info().string};baked_job.native_road_meshes=native_road_meshes;baked_job.scenery_cells=cells.size();baked_job.export_namespace=prefix
 	FileAccess.open(folder.path_join("provenance.json"),FileAccess.WRITE).store_string(JSON.stringify(baked_job,"  "))
 	var sums: Dictionary={}
@@ -320,3 +341,19 @@ func export_track() -> bool:
 		if name!="checksums.json":sums[name]=FileAccess.get_sha256(folder.path_join(name))
 	FileAccess.open(folder.path_join("checksums.json"),FileAccess.WRITE).store_string(JSON.stringify(sums,"  "))
 	print("ELEVATED_TRACK_EXPORTED ",JSON.stringify({"id":track_id,"length":length,"cells":cells.size(),"buildings":building_count,"native_road_meshes":native_road_meshes,"resources":baker.files.size(),"core_export_invoked":false}));return true
+
+func fingerprint_folder(path: String,hashing: HashingContext) -> void:
+	var files:=DirAccess.get_files_at(path);files.sort()
+	for name in files:
+		if name.ends_with(".import") or name.ends_with(".uid") or name==".gdignore":continue
+		var file:=path.path_join(name);hashing.update((file+FileAccess.get_sha256(file)).to_utf8_buffer())
+	var directories:=DirAccess.get_directories_at(path);directories.sort()
+	for name in directories:
+		if not name.begins_with("."):fingerprint_folder(path.path_join(name),hashing)
+func authoring_fingerprint() -> String:
+	if Engine.is_editor_hint() and EditorInterface.get_edited_scene_root()==self:EditorInterface.save_scene()
+	var hashing:=HashingContext.new();hashing.start(HashingContext.HASH_SHA256)
+	for path in [data_folder,"res://library","res://art","res://shared","res://assets/models","res://addons/EZ-Tree-Godot-Port"]:fingerprint_folder(path,hashing)
+	for name in ["elevated_author.gd","terrain_corridor.gd","shared_srilanka_scenery.gd","static_scenery_batcher.gd","resource_baker.gd","building_material.gdshader","billboard_depth.gdshader"]:hashing.update(FileAccess.get_sha256("res://"+name).to_utf8_buffer())
+	if not scene_file_path.is_empty():hashing.update(FileAccess.get_sha256(scene_file_path).to_utf8_buffer())
+	return hashing.finish().hex_encode()

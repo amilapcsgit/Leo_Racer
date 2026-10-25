@@ -42,6 +42,13 @@ def import_world(world,output):
    a=np.asarray([[p[0],p[2]] for p in b['points']])-center
    if np.linalg.norm(a.mean(axis=0))<1400:buildings.append({'id':b['id'],'footprint':a.tolist(),'height':b['height'],'height_source':b.get('height_source'),'visual_source':b.get('visual_source')})
  data={'format':1,'lake':ring.tolist(),'buildings':buildings,'origin_world':center.tolist(),'source_world_sha256':sha(world/'world.json'),'osm_sha256':sha(raw),'attribution':index['attribution'],'earth2road_commit':'fec38c79441585e5ff719dd37fa516db809eef9b','lake_osm_relation':lake.get('id')}
+ landmarks=[]
+ for way in osm.findall('way'):
+  tags={t.get('k'):t.get('v') for t in way.findall('tag')};name=tags.get('name:en',tags.get('name',''))
+  if name=='Temple of the Sacred Tooth Relic':
+   footprint=np.asarray([nodes[n.get('ref')] for n in way.findall('nd')])-center
+   landmark=Polygon(footprint);landmarks.append({'id':'sacred_tooth_precinct','name':name,'center':list(landmark.centroid.coords[0]),'footprint':footprint.tolist(),'protected':True,'source_osm_way':way.get('id')})
+ data['landmarks']=landmarks
  write(output/'geography.json',data);return data
 
 def course(geography,output):
@@ -86,14 +93,22 @@ def terrain(world,geography,output):
  distances=shapely.distance(line,points).reshape(x.shape);at=shapely.line_locate_point(line,points)
  spans=np.r_[0,np.cumsum(np.linalg.norm(np.diff(p[:,[0,2]],axis=0),axis=1))]
  road_y=np.interp(at,spans,p[:,1]).reshape(x.shape)
- blend=np.clip((distances-15)/55,0,1);blend=blend*blend*(3-2*blend)
+ blend=np.clip((distances-70)/120,0,1);blend=blend*blend*(3-2*blend)
  height=height*blend+(road_y-.3)*(1-blend);height[inside]=-2.4
  (output/'terrain.r32').write_bytes(height.astype('<f4').tobytes())
  write(output/'terrain.json',{'format':1,'size':size,'spacing':spacing,'origin':[-1536,-1536],'source':'Archived Mapzen Terrarium DEM, flattened outside the race corridor','terrain_sha256':sha(output/'terrain.r32'),'minimum':float(height.min()),'maximum':float(height.max())})
+def water(geography,output):
+ polygon=Polygon(geography['lake']);x0,z0,x1,z1=polygon.bounds;x0-=4;z0-=4;x1+=4;z1+=4
+ x,z=np.meshgrid(np.linspace(x0,x1,512),np.linspace(z0,z1,512));points=shapely.points(x.ravel(),z.ravel())
+ distance=shapely.distance(points,polygon.boundary).reshape(x.shape)
+ Image.fromarray(np.clip(distance/50*255,0,255).astype('uint8')).save(output/'shore_distance.png')
+ write(output/'water.json',{'origin':[x0,z0],'extent':[x1-x0,z1-z0],'distance_range_m':50,'source':'Observed lake boundary; Colombo city water shader with shaped shoreline adapter'})
+
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--world',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
  data=import_world(a.world,a.output)
  # Existing authored course edits are authoritative across geography refreshes.
  if not (a.output/'course.json').exists():course(data,a.output)
  terrain(a.world,data,a.output)
+ water(data,a.output)
 if __name__=='__main__':main()

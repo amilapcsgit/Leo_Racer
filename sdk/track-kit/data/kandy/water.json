@@ -1,0 +1,12 @@
+{
+  "origin": [
+    -432.6420189085803,
+    -228.4110369819408
+  ],
+  "extent": [
+    989.5270858456497,
+    633.477631698479
+  ],
+  "distance_range_m": 50,
+  "source": "Observed lake boundary; Colombo city water shader with shaped shoreline adapter"
+}

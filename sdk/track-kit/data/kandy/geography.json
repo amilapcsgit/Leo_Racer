@@ -100616,5 +100616,39 @@
   "osm_sha256": "43158abec20a26b62f056551ab93796bd0e1c439c7fd6630ff51fd4923b91e7e",
   "attribution": "© OpenStreetMap contributors · ODbL | Terrain: Mapzen / source attribution in docs/SOURCES.md",
   "earth2road_commit": "fec38c79441585e5ff719dd37fa516db809eef9b",
-  "lake_osm_relation": "8161133"
+  "lake_osm_relation": "8161133",
+  "landmarks": [
+    {
+      "id": "sacred_tooth_precinct",
+      "name": "Temple of the Sacred Tooth Relic",
+      "center": [
+        -8.728330681273553,
+        -284.79912417787455
+      ],
+      "footprint": [
+        [
+          -17.53234534577146,
+          -290.4939245596487
+        ],
+        [
+          0.1398453332911629,
+          -290.39144018790273
+        ],
+        [
+          0.07568603934109319,
+          -279.1043243086623
+        ],
+        [
+          -17.596508644525017,
+          -279.20680850706583
+        ],
+        [
+          -17.53234534577146,
+          -290.4939245596487
+        ]
+      ],
+      "protected": true,
+      "source_osm_way": "191377765"
+    }
+  ]
 }

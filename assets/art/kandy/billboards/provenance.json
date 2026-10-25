@@ -1,0 +1,17 @@
+{
+  "generator": "Built-in imagegen",
+  "date": "2026-10-25",
+  "assets": [
+    {
+      "file": "kandy_lake.png",
+      "role": "billboard color",
+      "prompt": "Create a finished landscape 16:9 tourism billboard artwork PNG for the offline Sri Lankan racing game Leo Racer. Edge-to-edge artwork only, no physical billboard frame, no mockup, no margins. Photorealistic Kandy Lake in Sri Lanka in beautiful bright tropical midday: calm jade-green lake, the distinctive white lakeside cloud wall, rich layered wooded hills, warm terracotta-roofed Kandyan town architecture and a small island, attractive natural depth and foreground-to-distance layering, atmospheric haze, balanced exposure, restrained vivid natural colors, professionally composed tourism photography. Recognizable Kandy-inspired setting, not a claim of documentary photographic accuracy. The only lettering is large impeccably readable English text 'KANDY' and below it 'THE HILL COUNTRY CIRCUIT'. Leave the lake and hill panorama dominant. Premium realistic tourism campaign quality, detailed materials and foliage, no cartoon rendering, no cars, no people, no unrelated logos, no extra text, no national flag invented by AI. This will be used as a roadside billboard texture, keep lettering legible at driving distance."
+    },
+    {
+      "file": "kandy_lake_depth.png",
+      "role": "artistic relative depth, not measured geographic data",
+      "reference": "kandy_lake.png",
+      "prompt": "Create a matching grayscale relative depth map for the supplied Kandy billboard artwork. Preserve its exact 16:9 composition, pixel-aligned subject positions, lettering silhouettes, all landscape boundaries and crop. This is technical texture data, not a new art composition. White represents nearest foreground roofs and plants; gray represents the lake/island and middle-distance buildings/trees; near-black represents distant hills; sky is black. Smooth physically coherent depth planes and clean object edges; no lighting, no shading baked into depth, no colors. Keep the white headline lettering as a uniform very-near flat overlay shape, while preserving the letter positions exactly. No new text, no gradients unrelated to scene depth, no borders. Output the depth map alone."
+    }
+  ]
+}

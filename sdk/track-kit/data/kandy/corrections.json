@@ -1,1 +1,24 @@
-{"format":1,"exclude_buildings":[]}
+{
+  "format": 1,
+  "exclude_buildings": [
+    [
+      [
+        -570,
+        -210
+      ],
+      [
+        -475,
+        -210
+      ],
+      [
+        -475,
+        -15
+      ],
+      [
+        -570,
+        -15
+      ]
+    ]
+  ],
+  "notes": "Protected Mahaweli Seya plaza and start-grid sightline; artistic placement."
+}

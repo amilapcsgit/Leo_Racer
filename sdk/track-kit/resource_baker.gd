@@ -38,7 +38,7 @@ func resource(original: Resource) -> Resource:
 			value.shader=resource(original.shader)
 			for property in original.shader.get_shader_uniform_list():
 				var parameter: Variant=original.get_shader_parameter(property.name)
-				if parameter is Texture2D:value.set_shader_parameter(property.name,resource(parameter))
+				if parameter!=null:value.set_shader_parameter(property.name,resource(parameter) if parameter is Resource else parameter)
 		elif value is MultiMesh:value.mesh=resource(original.mesh)
 	var local:=folder.path_join("resources/resource_%06d.res"%cache.size())
 	if ResourceSaver.save(value,local)!=OK:push_error("Could not save "+local);return null
@@ -59,8 +59,9 @@ func prepare(node: Node) -> void:
 	for child in node.get_children():prepare(child)
 func flatten(node: Node) -> Node:
 	var fresh: Node=ClassDB.instantiate(node.get_class())
+	if not String(node.name).is_empty():fresh.name=node.name
 	for property in node.get_property_list():
-		if property.usage & PROPERTY_USAGE_STORAGE and property.name not in ["script","owner","scene_file_path"]:
+		if property.usage & PROPERTY_USAGE_STORAGE and property.name not in ["script","owner","scene_file_path","name"]:
 			fresh.set(property.name,node.get(property.name))
 	for child in node.get_children():fresh.add_child(flatten(child))
 	return fresh
