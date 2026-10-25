@@ -255,6 +255,10 @@ def main():
             if state['source_hash']!=item['source_hash']:raise RuntimeError('Changed source requires prepare: '+item['filename'])
             if not state.get('optimized',{}).get('target_met') or not state.get('textures',{}).get('ok') or 'facing_angle' not in state:raise RuntimeError('Complete optimization, textures and facing before installation: '+item['filename'])
             source=Path(state['output']);destination=args.destination/item['id']
+            report=read(source/'conversion-report.json')
+            report.setdefault('inspected_source_sha256',report.get('source_sha256'))
+            report.update({'source_sha256':item['source_hash'],'source_filename':item['filename'],'final_model_sha256':sha(source/'model.glb'),'final_triangles':state['optimized']['triangles_after'],'maximum_texture':2048,'facing_correction_degrees':state['facing_angle'],'runtime_validation':state['validation'],'modded':True,'ranked':False})
+            write(source/'conversion-report.json',report)
             install_folder(source,destination,state.get('installed_files'))
             state['installed']=str(destination);state['installed_files']={p.relative_to(destination).as_posix():sha(p) for p in destination.rglob('*') if p.is_file()};write(progress,state)
         if args.reuse_folder:
@@ -307,9 +311,12 @@ def build_report(items,destination):
     for item in items:
         progress=WORK/item['id']/'progress.json';state=read(progress) if progress.is_file() else item
         folder=Path(state.get('output',''))
-        rows.append({k:v for k,v in state.items() if k!='converted'}|{'conversion_ok':state.get('converted',{}).get('ok',False),'conversion_error':state.get('converted',{}).get('error',''),'model_bytes':(folder/'model.glb').stat().st_size if (folder/'model.glb').is_file() else 0,'folder_bytes':sum(p.stat().st_size for p in folder.rglob('*') if p.is_file()) if folder.is_dir() and state.get('output') else 0})
+        installed=destination/item['id']
+        files=list(folder.rglob('*')) if folder.is_dir() and state.get('output') else []
+        matches=bool(files) and all((installed/p.relative_to(folder)).is_file() and sha(installed/p.relative_to(folder))==sha(p) for p in files if p.is_file())
+        rows.append({k:v for k,v in state.items() if k!='converted'}|{'installed_matches_staged':matches,'conversion_ok':state.get('converted',{}).get('ok',False),'conversion_error':state.get('converted',{}).get('error',''),'model_bytes':(folder/'model.glb').stat().st_size if (folder/'model.glb').is_file() else 0,'folder_bytes':sum(p.stat().st_size for p in files if p.is_file())})
     baseline=read(WORK/'game-baseline.json');game=destination.resolve().parents[1]
-    report={'format':1,'offline':True,'driver_tests':0,'cars':rows,'installed':sum('installed' in r for r in rows),'source_files':len(rows),'sources_unchanged':all(sha(i['source'])==i['source_hash'] for i in items),'core_unchanged':all(sha(game/n)==h for n,h in baseline['core'].items()),'stock_unchanged':all((destination/n).is_file() and sha(destination/n)==h for n,h in baseline['stock'].items()),'source_bytes':sum(r['source_bytes'] for r in rows),'model_bytes':sum(r['model_bytes'] for r in rows),'folder_bytes':sum(r['folder_bytes'] for r in rows),'exceptions':[r['filename'] for r in rows if not r.get('validation',{}).get('ok')],'reused':read(WORK/'reused.json') if (WORK/'reused.json').is_file() else None}
+    report={'format':1,'offline':True,'driver_tests':0,'cars':rows,'installed':sum(r['installed_matches_staged'] for r in rows),'source_files':len(rows),'sources_unchanged':all(sha(i['source'])==i['source_hash'] for i in items),'core_unchanged':all(sha(game/n)==h for n,h in baseline['core'].items()),'stock_unchanged':all((destination/n).is_file() and sha(destination/n)==h for n,h in baseline['stock'].items()),'source_bytes':sum(r['source_bytes'] for r in rows),'model_bytes':sum(r['model_bytes'] for r in rows),'folder_bytes':sum(r['folder_bytes'] for r in rows),'exceptions':[r['filename'] for r in rows if not r.get('validation',{}).get('ok')],'reused':read(WORK/'reused.json') if (WORK/'reused.json').is_file() else None}
     write(WORK/'batch-report.json',report);print(json.dumps({k:v for k,v in report.items() if k!='cars'},indent=2))
     return report
 
