@@ -117,9 +117,16 @@ func validate() -> void:
 		for path in definition.wheels[index].stationary_groups:
 			var caliper:=VehicleAssembler.find_group(actor.chassis,path)
 			if caliper.get_parent()!=actor.wheel_steering_pivots[index]:errors.append("Caliper rolls with tyre")
+	# Start reverse from rest, avoiding the intentional speed smoothing interval.
+	actor.wheel_visual_speed=0.;actor.wheel_motion_speed=-12.
+	for index in 4:actor.wheel_angles[index]=0.
+	actor.animate_wheels(.01)
+	for index in 4:
+		if actor.wheel_angles[index]<=0.:errors.append("Reverse rotation direction: "+str(index))
+		if actor.wheels[index].to_global(actor.wheels[index].mesh.get_aabb().get_center()).distance_to(before[index])>.025:errors.append("Reverse wheel center moved: "+str(index))
 	if data.driver_policy!=1:errors.append("No-driver policy required")
 	if data.exhausts.size()!=2 or not data.electric_boost:errors.append("Two blue boost emitters required")
-	actor.free();emit_report({"ok":errors.is_empty(),"errors":Array(errors),"triangles":triangles,"surfaces":surfaces,"wheels":4,"driver_tests":0,"boost_emitters":2,"import_seconds":imported.seconds,"cache_hit":imported.cache_hit})
+	actor.free();emit_report({"ok":errors.is_empty(),"errors":Array(errors),"triangles":triangles,"surfaces":surfaces,"wheels":4,"reverse_checked":true,"driver_tests":0,"boost_emitters":2,"import_seconds":imported.seconds,"cache_hit":imported.cache_hit})
 
 func render_model() -> void:
 	root.size=Vector2i(720,500);root.content_scale_size=Vector2i.ZERO
@@ -127,6 +134,9 @@ func render_model() -> void:
 	var document:=GLTFDocument.new();var state:=GLTFState.new()
 	if document.append_from_file(job.model,state)!=OK:emit_report({"ok":false,"error":"Preview import failed"});return
 	var model:=document.generate_scene(state) as Node3D;LeoVehicleImporter.strip_nonvisual(model);world.add_child(model)
+	if job.has("vehicle_folder"):
+		var metadata: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(String(job.vehicle_folder).path_join("vehicle.json")))
+		model.transform=LeoVehicleCodec.transform(metadata.normalization)*model.transform
 	var box:=AABB();var found:=false
 	for node in model.find_children("*","MeshInstance3D",true,false):
 		var b: AABB=Converter.node_transform(node,model)*node.mesh.get_aabb();box=box.merge(b) if found else b;found=true
