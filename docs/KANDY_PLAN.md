@@ -89,3 +89,31 @@ LeoRacer.exe -- --drive-test --track-check=performance --track=kandy_lake
 folder>` selects report output; otherwise reports go to user://track-check.
 Routine QA uses `--vehicles=<folder containing Bigster and Duster>`; installed
 community cars remain untouched. No driver content is regenerated.
+
+## Checkpoint 4 verification
+
+The final curve bake is 2,827.52m with uniformly spaced three-dimensional
+samples. Road, barriers, AI/checkpoints, map and recovery derive from that same
+route. Twelve fixed driving-camera stations were captured in Forward+ and
+Compatibility; Bigster front/rear, projected headlights, brake state and all six
+retained cabin fits were captured separately. Forward+ and Compatibility Bigster
+validation passes (130 checks in the final Compatibility run).
+
+The final 256-cell streaming bake passes 178 checks: separated players retain
+scenery and resident collision; three round trips through Astra/Colombo/Kandy
+retain 8,058 nodes and approximately 172–177MB static memory with no upward
+trend. Diagnostic shutdown can still print Godot dummy-renderer/RID and GL texture
+cleanup warnings; these are recorded, not treated as measured runtime growth.
+
+All three tracks pass exported single and two-player three-lap sessions. The
+final core also passes an additional Kandy split run. Official Astra/Colombo
+fingerprints remain valid; Kandy is unranked. Thirteen malformed-definition,
+missing-pack and corrupt-pack checks pass. The SDK has an editor-only Terrain3D
+1.0.2 compatibility fallback for a removed Godot4.7 editor setting; the original
+addon source remains untouched, with the staged patch and file hashes recorded.
+
+Manual scenery belongs under SceneryCorrections. Imported geography, authored
+course, exclusion polygons and saved Terrain3D regions remain separate. The
+SDK displays six grid markers and eight checkpoint/recovery helpers. The
+original Earth2Road dependency lock and source pin are tracked under
+content/toolchain/earth2road; staging rejects a different source revision/lock.

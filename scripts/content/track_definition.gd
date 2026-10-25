@@ -41,7 +41,10 @@ func read_manifest(path: String) -> void:
 	metadata=parsed;id=String(metadata.get("id",""));display_name=String(metadata.get("name",id));revision=int(metadata.get("course_revision",1))
 	if int(metadata.asset_api)>=2:
 		if not metadata.get("core",{}) is Dictionary:error="Invalid core compatibility";return
-		var minimum:=String(metadata.get("core",{}).get("min","999.0.0")).split(".")
+		var core: Dictionary=metadata.core
+		var version_pattern:=RegEx.new();version_pattern.compile("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
+		if not core.get("min") is String or not version_pattern.search(core.min) or (not core.get("max_major") is int and not core.get("max_major") is float):error="Invalid core compatibility";return
+		var minimum:=String(core.min).split(".")
 		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2003000 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
 		if metadata.get("world_kind")!="external":error="Track API 2 requires external world data";return
 		if not metadata.get("lighting",{}) is Dictionary:error="Invalid lighting parameters";return
@@ -60,7 +63,7 @@ func read_manifest(path: String) -> void:
 	if id.is_empty() or revision<1:error="Invalid track identity";return
 	if not metadata.get("packs",[]) is Array or not metadata.get("dependencies",[]) is Array:error="Invalid track dependencies";return
 	for pack in metadata.get("packs",[]):
-		if not pack is Dictionary:error="Invalid track pack entry";return
+		if not pack is Dictionary or not pack.get("file") is String or not pack.get("sha256","") is String:error="Invalid track pack entry";return
 	var relative:=String(metadata.get("route","route.json"))
 	if relative.is_absolute_path() or relative.contains("..") or relative.contains(":"):error="Invalid route location";return
 	var route_path:=folder.path_join(relative)
@@ -133,7 +136,10 @@ func mount() -> bool:
 		var data=JSON.parse_string(FileAccess.get_file_as_string(index))
 		if not data is Dictionary or not data.get("cells",[]) is Array:error="Invalid scenery index";return false
 		for cell in data.get("cells",[]):
-			if not cell is Dictionary or not ResourceLoader.exists(String(cell.get("scene",""))):error="Missing scenery cell";return false
+			if not cell is Dictionary or not cell.get("scene") is String or not ResourceLoader.exists(String(cell.scene)):error="Missing scenery cell";return false
+			if not cell.get("id") is String or not cell.get("center") is Array or cell.center.size()!=2:error="Invalid scenery cell location";return false
+			for coordinate in cell.center:
+				if (not coordinate is int and not coordinate is float) or not is_finite(float(coordinate)):error="Invalid scenery cell coordinate";return false
 	var registry_path:="res://assets/config/official-track-content.json"
 	if not LeoAssets.directory.is_empty() and FileAccess.file_exists(registry_path):
 		var registry: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(registry_path))
@@ -163,6 +169,8 @@ static func elevation_problem(data: Dictionary) -> String:
 	var samples: Array=data.get("points",[])
 	var widths: Variant=data.get("widths",[])
 	if not widths is Array:return "Invalid elevated road widths"
+	for width in widths:
+		if (not width is int and not width is float) or not is_finite(float(width)):return "Invalid elevated road width"
 	if float(data.get("width",18.))<14.:return "Elevated road width must be at least 14 m"
 	var grades: Array[float]=[];var spans: Array[float]=[]
 	for i in samples.size():

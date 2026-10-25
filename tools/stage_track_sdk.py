@@ -1,6 +1,6 @@
 """Assemble the offline authoring project without exporting the game."""
 from pathlib import Path
-import argparse,hashlib,json,re,shutil,sys
+import argparse,hashlib,json,re,shutil,sys,subprocess
 ROOT=Path(__file__).resolve().parents[1]
 def copy(source,target):
  target.parent.mkdir(parents=True,exist_ok=True)
@@ -30,12 +30,15 @@ def stage(output,bundle=False):
  for p in (ROOT/'assets/art/kandy').rglob('*'):
   if p.is_file() and p.suffix!='.import':copy(p,output/'art'/p.relative_to(ROOT/'assets/art/kandy'))
  copy(ROOT/'tools/prepare_kandy.py',output/'tools/prepare_kandy.py')
+ copy(ROOT/'LICENSE',output/'LICENSE.txt')
  for p in (ROOT/'assets/models/colombo').glob('*'):
   if p.is_file() and p.suffix in ['.res','.png']:copy(p,output/'assets/models/colombo'/p.name)
 
  for p in (ROOT/'licenses').glob('*'):
   if p.is_file():copy(p,output/'licenses'/p.name)
  upstream=ROOT/'build/kandy/earth2road-upstream'
+ assert subprocess.check_output(['git','-C',str(upstream),'rev-parse','HEAD'],text=True).strip()=='fec38c79441585e5ff719dd37fa516db809eef9b','Earth2Road source is not the reviewed pinned revision'
+ assert hashlib.file_digest((upstream/'requirements.lock').open('rb'),'sha256').hexdigest()==hashlib.file_digest((ROOT/'content/toolchain/earth2road/requirements.lock').open('rb'),'sha256').hexdigest(),'Earth2Road dependency lock changed'
  for name in ['LICENSE','THIRD_PARTY_NOTICES.md','requirements.lock','docs/SOURCES.md','docs/WORLD_FORMAT.md','docs/CLI.md']:
   copy(upstream/name,output/'licenses/earth2road'/name)
  (output/'dependencies.json').write_text(json.dumps({'earth2road':'fec38c79441585e5ff719dd37fa516db809eef9b','world_api':2,'road_generator':'0.9.5','terrain3d':'1.0.2','godot':'4.7.2','offline':True},indent=2),encoding='utf-8')
@@ -43,6 +46,7 @@ def stage(output,bundle=False):
   # A portable standard library plus pinned generator dependencies; no pip or
   # first-run installation is needed in the delivered SDK.
   base=Path(sys.base_prefix);python=output/'author-python'
+  copy(base/'LICENSE.txt',python/'LICENSE.txt')
   for p in base.iterdir():
    if p.is_file() and p.suffix.lower() in ['.exe','.dll','.zip','.pyd']:copy(p,python/p.name)
   for name in ['DLLs','Lib']:

@@ -7,6 +7,7 @@ extends Node3D
 @export var track_id := "kandy_lake"
 @export var display_name := "Kandy Lake Circuit"
 @export var course_revision := 1
+@export var procedural_seed := 311
 @export_tool_button("1 Import Geography (offline)") var import_action: Callable=import_geography
 @export_tool_button("2 Edit Course / refresh Road Generator") var edit_action: Callable=edit_course
 @export_tool_button("3 Dress Scenery") var dress_action: Callable=dress_scenery
@@ -14,8 +15,10 @@ extends Node3D
 @export_tool_button("5 Export Track") var export_action: Callable=export_track
 var route: Dictionary={}
 var geography: Dictionary={}
+var corrections: Dictionary={}
 var points:=PackedVector3Array()
 var length:=0.
+var road_half:=9.
 var last_error:=""
 var terrain_image: Image
 var terrain_info: Dictionary
@@ -36,7 +39,11 @@ func load_data() -> bool:
 	if not FileAccess.file_exists(data_folder.path_join("course.json")):return fail("Import geography and provide course.json first")
 	route=read(data_folder.path_join("course.json"));geography=read(data_folder.path_join("geography.json"));points.clear()
 	for p in route.points:points.append(Vector3(p[0],p[1],p[2]))
-	length=float(route.length);rng.seed=311
+	length=float(route.length);road_half=float(route.get("width",18.))*.5;rng.seed=procedural_seed
+	var corrections_file:=data_folder.path_join("corrections.json")
+	corrections=read(corrections_file) if FileAccess.file_exists(corrections_file) else {}
+	if not get_node_or_null("SceneryCorrections"):
+		var authored:=Node3D.new();authored.name="SceneryCorrections";add_child(authored);authored.owner=self
 	terrain_info=read(data_folder.path_join("terrain.json"))
 	terrain_image=Image.create_from_data(int(terrain_info.size),int(terrain_info.size),false,Image.FORMAT_RF,FileAccess.get_file_as_bytes(data_folder.path_join("terrain.r32")))
 	return true
@@ -64,7 +71,7 @@ func edit_course() -> void:
 			var tangent:=(points[(i+32)%points.size()]-points[posmod(i-32,points.size())])/6.
 			path.curve.add_point(points[i],-tangent,tangent)
 	var curve:=path.curve;var count:=points.size();length=curve.get_baked_length();points.clear()
-	for i in count:points.append(curve.sample_baked(length*i/count,true))
+	for i in count:points.append(curve.sample_baked(length*i/count,false))
 	length=0.
 	for i in points.size():length+=points[i].distance_to(points[(i+1)%points.size()])
 	var holder:=clear_group("RoadAuthoring");var manager:=RoadManager.new();manager.auto_refresh=false;holder.add_child(manager)
@@ -75,13 +82,19 @@ func edit_course() -> void:
 		var point:=RoadPoint.new();point.name="Point%03d"%i;container.add_child(point);point.position=curve.get_point_position(i)
 		var tangent:=curve.get_point_out(i).normalized();point.basis=Basis.looking_at(-tangent,Vector3.UP)
 		point.prior_mag=curve.get_point_in(i).length();point.next_mag=curve.get_point_out(i).length()
-		point.traffic_dir=[RoadPoint.LaneDir.REVERSE,RoadPoint.LaneDir.FORWARD];point.lane_width=9.;point.shoulder_width_l=0.;point.shoulder_width_r=0.;point.gutter_profile=Vector2.ZERO
+		point.traffic_dir=[RoadPoint.LaneDir.REVERSE,RoadPoint.LaneDir.FORWARD];point.lane_width=road_half;point.shoulder_width_l=0.;point.shoulder_width_r=0.;point.gutter_profile=Vector2.ZERO
 		handles.append(point)
 	for i in handles.size():handles[i].prior_pt_init=handles[i].get_path_to(handles[posmod(i-1,handles.size())]);handles[i].next_pt_init=handles[i].get_path_to(handles[(i+1)%handles.size()])
 	container.rebuild_segments(true)
 	var connector:=RoadTerrain3DConnector.new();connector.auto_refresh=false;connector.road_manager=manager;holder.add_child(connector)
 	load("res://scene_instances.gd") # Portable instancing helper.
 	load("res://resource_baker.gd").new("res://.author-scratch","res://author/").own(holder,self)
+	var helpers:=clear_group("CourseHelpers")
+	for slot in 6:
+		var marker:=Marker3D.new();marker.name="Grid_%d"%(slot+1);helpers.add_child(marker);marker.transform=Transform3D(frame(-8.-floori(slot/2.)*10.),sample(-8.-floori(slot/2.)*10.,-3.2 if slot%2==0 else 3.2))
+	for i in 8:
+		var marker:=Marker3D.new();marker.name="Checkpoint_Recovery_%d"%i;helpers.add_child(marker);marker.transform=Transform3D(frame(length*(i+.025)/8.),sample(length*(i+.025)/8.))
+	load("res://resource_baker.gd").new("res://.author-scratch","res://author/").own(helpers,self)
 	print("ROAD_AUTHOR_READY handles=",handles.size()," metres=",length)
 func material(color: String) -> StandardMaterial3D:
 	if not paint.has(color):
@@ -102,15 +115,19 @@ func barriers_and_collision(resident: Node3D) -> void:
 	var marks:=MultiMesh.new();marks.transform_format=MultiMesh.TRANSFORM_3D;marks.mesh=mark_mesh;marks.instance_count=int(length/7.)
 	for i in points.size():
 		var s:=length*i/points.size();var next:=length*(i+1)/points.size()
-		for v in [sample(s,-9.),sample(next,-9.),sample(s,9.),sample(s,9.),sample(next,-9.),sample(next,9.)]:surface.add_vertex(v+Vector3.UP*.015)
+		for v in [sample(s,-road_half),sample(next,-road_half),sample(s,road_half),sample(s,road_half),sample(next,-road_half),sample(next,road_half)]:surface.add_vertex(v+Vector3.UP*.015)
 		for j in 2:
-			var body:=StaticBody3D.new();body.transform=Transform3D(frame(s),sample(s,-9.5 if j==0 else 9.5)+Vector3.UP*.4)
+			var body:=StaticBody3D.new();body.transform=Transform3D(frame(s),sample(s,-road_half-.5 if j==0 else road_half+.5)+Vector3.UP*.4)
 			var shape:=CollisionShape3D.new();var collision:=BoxShape3D.new();collision.size=rail_mesh.size;shape.shape=collision;body.add_child(shape);resident.add_child(body);mm.set_instance_transform(i*2+j,body.transform);rail_transforms.append(body.transform)
 	for i in marks.instance_count:mark_transforms.append(Transform3D(frame(i*7.),sample(i*7.)+Vector3.UP*.035))
 	var rails:=MultiMeshInstance3D.new();rails.multimesh=mm;rails.material_override=material("c9c9bb");resident.add_child(rails);load("res://scene_instances.gd").store(rails,rail_transforms)
 	var lines:=MultiMeshInstance3D.new();lines.multimesh=marks;lines.material_override=material("eae4c9");resident.add_child(lines);load("res://scene_instances.gd").store(lines,mark_transforms)
 	var floor_node:=StaticBody3D.new();var collision:=CollisionShape3D.new();collision.shape=surface.commit().create_trimesh_shape();floor_node.add_child(collision);resident.add_child(floor_node)
 func building(parent: Node3D,position_at: Vector3,yaw: float,index: int) -> void:
+	for area in corrections.get("exclude_buildings",[]):
+		var polygon:=PackedVector2Array()
+		for p in area:polygon.append(Vector2(p[0],p[1]))
+		if Geometry2D.is_point_in_polygon(Vector2(position_at.x,position_at.z),polygon):return
 	var recipes:=["tea_shop","shophouse","lake_residence","balcony_house","fort_apartments","bakery"]
 	var scene:=load("res://library/recipes/"+recipes[index%recipes.size()]+".tscn") as PackedScene
 	var house:=scene.instantiate() as Node3D;house.position=position_at;house.rotation.y=yaw;parent.add_child(house);building_count+=1
@@ -234,6 +251,7 @@ func batch(parent: Node3D,mesh: Mesh,transforms: Array[Transform3D],color: Strin
 		load("res://scene_instances.gd").store(node,retained)
 func validate() -> bool:
 	if points.size()<16:return fail("No course")
+	if road_half<7.:return fail("Race corridor must be at least 14m wide")
 	for i in points.size():
 		var a:=points[i];var b:=points[(i+1)%points.size()];var c:=points[(i+2)%points.size()]
 		var horizontal:=Vector2(b.x-a.x,b.z-a.z).length();var next_horizontal:=Vector2(c.x-b.x,c.z-b.z).length()
@@ -245,7 +263,7 @@ func validate() -> bool:
 func export_track() -> bool:
 	if not validate():return false
 	var folder:=ProjectSettings.globalize_path(destination).path_join(track_id);DirAccess.make_dir_recursive_absolute(folder)
-	var authored_signature:=JSON.stringify(Array(points))+FileAccess.get_sha256("res://elevated_author.gd")+FileAccess.get_sha256("res://resource_baker.gd")+FileAccess.get_sha256(data_folder.path_join("terrain.r32"))+FileAccess.get_sha256("res://art/local_materials_atlas.png")
+	var authored_signature:=JSON.stringify(Array(points))+FileAccess.get_sha256("res://elevated_author.gd")+FileAccess.get_sha256("res://resource_baker.gd")+FileAccess.get_sha256(data_folder.path_join("terrain.r32"))+FileAccess.get_sha256("res://art/local_materials_atlas.png")+JSON.stringify(corrections)+str(procedural_seed)
 	var prefix:="res://mods/tracks/"+track_id+"/"+authored_signature.sha256_text().left(16)+"/"
 	var baker=load("res://resource_baker.gd").new(folder.get_base_dir().path_join(".bake-"+track_id),prefix)
 	var resident:=get_node("Resident").duplicate() as Node3D
@@ -256,7 +274,7 @@ func export_track() -> bool:
 	if native_road_meshes==0:resident.free();return fail("Road Generator did not produce meshes")
 	var scene_path: String=baker.pack(resident,"resident");resident.free()
 	var groups: Dictionary={}
-	for node in get_node("Details").get_children():
+	for node in get_node("Details").get_children()+get_node("SceneryCorrections").get_children():
 		var key: Vector2i=node.get_meta("cell",Vector2i(floori(node.position.x/200),floori(node.position.z/200)))
 		if not groups.has(key):groups[key]=[]
 		groups[key].append(node)
@@ -289,7 +307,13 @@ func export_track() -> bool:
 		if name.ends_with(".txt"):DirAccess.copy_absolute("res://art/fonts/"+name,folder.path_join("licenses").path_join(name))
 	for name in ["geography.json","job.json"]:DirAccess.copy_absolute(data_folder.path_join(name),folder.path_join(name))
 	var baked_job: Dictionary=read(data_folder.path_join("job.json"))
-	baked_job.baked_length_m=length;baked_job.uniform_3d_samples=points.size();baked_job.tools={"road_generator":"0.9.5","terrain3d":"1.0.2","godot":Engine.get_version_info().string};baked_job.native_road_meshes=native_road_meshes;baked_job.scenery_cells=cells.size();baked_job.export_namespace=prefix
+	var max_grade:=0.;var max_curvature:=0.
+	for i in points.size():
+		var a:=points[i];var b:=points[(i+1)%points.size()];var c:=points[(i+2)%points.size()]
+		var h:=Vector2(b.x-a.x,b.z-a.z).length();var hn:=Vector2(c.x-b.x,c.z-b.z).length();var grade:=(b.y-a.y)/h
+		max_grade=maxf(max_grade,absf(grade));max_curvature=maxf(max_curvature,absf(grade-(c.y-b.y)/hn)/((h+hn)*.5))
+	baked_job.baked_max_grade=max_grade;baked_job.baked_minimum_vertical_radius_m=1./maxf(max_curvature,.000000001)
+	baked_job.baked_length_m=length;baked_job.seed=procedural_seed;baked_job.uniform_3d_samples=points.size();baked_job.tools={"road_generator":"0.9.5","terrain3d":"1.0.2","godot":Engine.get_version_info().string};baked_job.native_road_meshes=native_road_meshes;baked_job.scenery_cells=cells.size();baked_job.export_namespace=prefix
 	FileAccess.open(folder.path_join("provenance.json"),FileAccess.WRITE).store_string(JSON.stringify(baked_job,"  "))
 	var sums: Dictionary={}
 	for name in DirAccess.get_files_at(folder):

@@ -1,12 +1,13 @@
 extends SceneTree
-var out := ProjectSettings.globalize_path("res://../../Bigster/leo_racer_024")
+var out := OS.get_environment("BIGSTER_QA_ROOT") if OS.has_environment("BIGSTER_QA_ROOT") else ProjectSettings.globalize_path("res://../../Bigster/leo_racer_024")
 func _initialize() -> void: run.call_deferred()
 func shot(view: SubViewport, path: String) -> void:
 	for i in 8: await process_frame
 	await RenderingServer.frame_post_draw
 	view.get_texture().get_image().save_png(path)
 func run() -> void:
-	LeoAssets.configure(ProjectSettings.globalize_path("res://build/CustomCars-delivery/LeoRacer/GameAssets"))
+	LeoAssets.configure(OS.get_environment("LEO_ASSET_ROOT") if OS.has_environment("LEO_ASSET_ROOT") else ProjectSettings.globalize_path("res://build/CustomCars-delivery/LeoRacer/GameAssets"))
+	LeoAssets.mount_packs()
 	LeoVehicleLibrary.discover(out.path_join("stage/vehicles"))
 	var catalog := GarageCatalog.shared();var v := catalog.vehicle(&"bigster")
 	await LeoAssets.scene_async(v.model_path,self)
