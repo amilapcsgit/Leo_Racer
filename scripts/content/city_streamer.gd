@@ -4,6 +4,10 @@ var game: Node3D
 var definition: LeoTrackDefinition
 var cells: Array = []
 var loaded: Dictionary = {}
+# Keep shared resource graphs alive for this track. Cells still release their
+# scene instances; eviction during threaded loads can invalidate shared shader
+# resources in the native release renderer. The owner dies on track change.
+var scene_resources: Dictionary = {}
 var timer := 0.
 var busy := false
 var halted := false
@@ -51,7 +55,10 @@ func refresh(initial: bool = false) -> void:
 			if not wanted(center,unload_radius,positions):
 				var node: Node=loaded[id];remove_child(node);node.queue_free();loaded.erase(id);stats.unloads+=1
 		elif wanted(center,load_radius,positions):
-			var scene:=await LeoAssets.scene_async(String(cell.scene),get_tree())
+			var scene: PackedScene=scene_resources.get(String(cell.scene))
+			if not scene:
+				scene=await LeoAssets.scene_async(String(cell.scene),get_tree())
+				if scene:scene_resources[String(cell.scene)]=scene
 			if not is_inside_tree():return
 			# Cameras can move while a resource is loading.
 			if scene and not halted and (initial or wanted(center,load_radius,anchors())):

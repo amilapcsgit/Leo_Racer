@@ -911,12 +911,9 @@ func quit_game(exit_code: int = 0) -> void:
 	stop_all_audio()
 	if ranking_store:ranking_store.close_store()
 	set_process(false);set_physics_process(false);set_process_input(false);set_process_unhandled_input(false)
-	# Release scene instances while rendering and .NET are still running. Engine
-	# shutdown must not race deferred frees or outstanding resource owners.
-	for child in get_children():child.queue_free()
-	for frame in 3:await get_tree().process_frame
-	LeoAssets.cache.clear();LeoAssets._patched_meshes.clear()
-	await get_tree().process_frame
+	# Let SceneTree perform its normal ordered teardown. Manually queue-freeing
+	# the entire world before quit can destroy materials while renderer callbacks
+	# are pending (native release builds reported heap corruption on Colombo).
 	get_tree().quit(exit_code)
 
 func stop_all_audio() -> void:

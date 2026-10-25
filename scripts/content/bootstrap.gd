@@ -1,6 +1,7 @@
 extends Node
 var screen: LeoLoadingScreen
 func _ready() -> void:
+	DisplayServer.window_set_title("Leo Racer")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
 	await begin()

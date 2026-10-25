@@ -1,0 +1,175 @@
+{
+  "version": "2.3.0",
+  "runtime": "Godot 4.7.2 checked template; no remote-debugger/network flags",
+  "all_48": {
+    "status": "PASS",
+    "vehicles": 48,
+    "official": 16
+  },
+  "import_motion": {
+    "status": "PASS",
+    "cars": 32,
+    "driver_tests": 0
+  },
+  "representative_driving": {
+    "cars": [
+      {
+        "id": "import_1968_volkswagen_beetle",
+        "travelled_m": 2975.04482156911,
+        "unranked": true,
+        "wheels": 4
+      },
+      {
+        "id": "byd_yangwang_u8",
+        "travelled_m": 2928.42714059077,
+        "unranked": true,
+        "wheels": 4
+      },
+      {
+        "id": "import_toyota_landcruiser_v8_2022",
+        "travelled_m": 2996.98934273336,
+        "unranked": true,
+        "wheels": 4
+      }
+    ],
+    "driver_tests": 0,
+    "errors": [],
+    "status": "PASS"
+  },
+  "six_races": {
+    "status": "PASS",
+    "races": [
+      {
+        "checks": 3,
+        "errors": [],
+        "length_m": 1905.071996,
+        "mode": "single",
+        "renderer": "forward_plus",
+        "revision": 1,
+        "status": "PASS",
+        "track": "astra_coast",
+        "unranked": false,
+        "vehicle_load_ms": 279
+      },
+      {
+        "checks": 84,
+        "errors": [],
+        "length_m": 1905.071996,
+        "mode": "split",
+        "renderer": "forward_plus",
+        "revision": 1,
+        "status": "PASS",
+        "track": "astra_coast",
+        "unranked": false,
+        "vehicle_load_ms": 264
+      },
+      {
+        "checks": 3,
+        "errors": [],
+        "length_m": 5499.99501037598,
+        "mode": "single",
+        "renderer": "forward_plus",
+        "revision": 1,
+        "status": "PASS",
+        "track": "colombo_city",
+        "unranked": false,
+        "vehicle_load_ms": 269
+      },
+      {
+        "checks": 139,
+        "errors": [],
+        "length_m": 5499.99501037598,
+        "mode": "split",
+        "renderer": "forward_plus",
+        "revision": 1,
+        "status": "PASS",
+        "track": "colombo_city",
+        "unranked": false,
+        "vehicle_load_ms": 311
+      },
+      {
+        "checks": 3,
+        "errors": [],
+        "length_m": 2827.51662683487,
+        "mode": "single",
+        "renderer": "forward_plus",
+        "revision": 1,
+        "status": "PASS",
+        "track": "kandy_lake",
+        "unranked": true,
+        "vehicle_load_ms": 245
+      },
+      {
+        "checks": 6,
+        "errors": [],
+        "length_m": 2827.51662683487,
+        "mode": "split",
+        "renderer": "forward_plus",
+        "revision": 1,
+        "status": "PASS",
+        "track": "kandy_lake",
+        "unranked": true,
+        "vehicle_load_ms": 4750
+      }
+    ]
+  },
+  "installer": {
+    "status": "PASS",
+    "cases": [
+      {
+        "case": "default",
+        "default_cars": 16,
+        "optional_cars": 0,
+        "status": "PASS"
+      },
+      {
+        "case": "individual",
+        "default_cars": 16,
+        "optional_cars": 1,
+        "status": "PASS"
+      },
+      {
+        "case": "mixed",
+        "default_cars": 16,
+        "optional_cars": 2,
+        "status": "PASS"
+      },
+      {
+        "case": "all",
+        "default_cars": 16,
+        "optional_cars": 32,
+        "status": "PASS"
+      }
+    ],
+    "upgrade_additions": true,
+    "deselection_preserves_existing": true,
+    "modified_backups": true,
+    "uninstall_preserves_custom_and_modified": true
+  },
+  "streaming": {
+    "cache_entries": 12,
+    "cells": 256,
+    "checks": 178,
+    "errors": [],
+    "memory_static_bytes": [
+      232642533.0,
+      227938357.0,
+      232663325.0
+    ],
+    "node_counts": [
+      9954,
+      9954,
+      9954
+    ],
+    "resident_cells": 29,
+    "status": "PASS"
+  },
+  "bigster_checks": 130,
+  "ranking_checks": 26,
+  "pointer_test": "Not verified: Computer Use app-access approval timed out. Component configurations tested through the real installer command-line selection interface.",
+  "rejected_candidate": "Unchecked optimized template completed races but crashed during native shutdown; excluded from publication.",
+  "known_limitations": [
+    "Compatibility frame-time spikes remain; prior 1080p Kandy split-screen benchmark max190ms.",
+    "Diagnostic shutdown reports Godot resource/ObjectDB cleanup warnings, without native process failure in the checked-runtime race matrix."
+  ]
+}

@@ -19,4 +19,4 @@ static func vehicles(tree: SceneTree) -> Dictionary:
 		rows.append({"id":String(vehicle.id),"official":vehicle.official,"fingerprint":LeoVehicleLibrary.fingerprint_details.get(String(vehicle.id),{}),"wheels":vehicle.wheels.size(),"compressed_materials":compressed,"cache_hit":LeoVehicleImporter.last_report.get("cache_hit",false),"import_seconds":LeoVehicleImporter.last_report.get("seconds",0.)})
 		await tree.process_frame
 	if rows.is_empty():errors.append("No compatible vehicles are installed")
-	return {"status":"PASS" if errors.is_empty() else "FAIL","vehicles":rows,"needs_setup":LeoVehicleLibrary.pending.map(func(path):return path.get_file()),"errors":errors,"vehicle_api":1,"core_version":"2.2.0"}
+	return {"status":"PASS" if errors.is_empty() else "FAIL","vehicles":rows,"needs_setup":LeoVehicleLibrary.pending.map(func(path):return path.get_file()),"errors":errors,"vehicle_api":1,"core_version":ProjectSettings.get_setting("application/config/version","2.3.0")}

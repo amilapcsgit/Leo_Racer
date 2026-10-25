@@ -69,3 +69,19 @@ docs/qa-local2player/driving-*.jpg
 docs/qa-colombo-visuals/*.import
 
 /installer/payload-files.nsh
+
+# Generated release installer payload lists.
+installer/release-required.nsh
+installer/release-cars.nsh
+installer/release-selection.nsh
+installer/release-descriptions.nsh
+
+# Short isolated installer test destinations (Windows path limits).
+/i230/
+/j230/
+/iui/
+/k0/
+/k1/
+/k2/
+/k3/
+/p0/

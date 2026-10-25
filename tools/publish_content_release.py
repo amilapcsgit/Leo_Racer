@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 REPO='amilapcsgit/Leo_Racer'
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True);p.add_argument('--notes',type=Path,required=True);p.add_argument('--publish',action='store_true');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True);p.add_argument('--notes',type=Path,required=True);p.add_argument('--publish',action='store_true');p.add_argument('--title');a=p.parse_args()
     manifest=json.loads(a.manifest.read_text(encoding='utf-8'));version=manifest['version'];tag='v'+version;commit=manifest['commit'];files=[]
     for row in manifest['files']:
         assert Path(row['name']).name==row['name']
@@ -34,7 +34,7 @@ def main():
         obj=ref['object'];actual=api('/git/tags/'+obj['sha'])['object']['sha'] if obj['type']=='tag' else obj['sha'];assert actual==commit,'Existing tag points elsewhere'
     else:api('/git/refs','POST',{'ref':'refs/tags/'+tag,'sha':commit})
     release=api('/releases/tags/'+tag,missing=True)
-    if not release:release=api('/releases','POST',{'tag_name':tag,'target_commitish':commit,'name':'Leo Racer '+version+' — Modular Content','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':False})
+    if not release:release=api('/releases','POST',{'tag_name':tag,'target_commitish':commit,'name':a.title or 'Leo Racer '+version+' — Modular Content','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':False})
     existing={row['name']:row for row in release['assets']}
     if not release['draft']:
         assert all(row['name'] in existing and existing[row['name']]['size']==row['bytes'] for _,row in files),'Public release differs; refusing replacement'
