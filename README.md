@@ -24,11 +24,11 @@
 <p align="center">
   <a href="#download">Install</a> &nbsp; · &nbsp;
   <a href="#tracks">Tracks</a> &nbsp; · &nbsp;
-  <a href="#the-race">The race</a> &nbsp; · &nbsp;
+  <a href="#the-race">The&nbsp;race</a> &nbsp; · &nbsp;
   <a href="#garage">Garage</a> &nbsp; · &nbsp;
   <a href="#controls">Controls</a> &nbsp; · &nbsp;
   <a href="#artbook">Artbook</a> &nbsp; · &nbsp;
-  <a href="#build--create">Build &amp; create</a>
+  <a href="#build--create">Build&nbsp;&amp;&nbsp;create</a>
 </p>
 
 <p align="center">
@@ -84,21 +84,23 @@ Prefer a ZIP? **[Portable v2.3.2](https://github.com/amilapcsgit/Leo_Racer/relea
 
 <table>
   <tr>
+    <td width="33%" align="center" valign="middle"><img src="assets/ui/art/astra_coast.png" alt="Illustrated Astra Lotus Coast waterfront and illuminated Lotus Tower" width="100%"></td>
+    <td width="33%" align="center" valign="middle"><img src="assets/ui/art/colombo_city.png" alt="Illustrated Colombo city boulevard with warm street lights and the Lotus Tower" width="100%"></td>
+    <td width="33%" align="center" valign="middle"><img src="assets/art/kandy/billboards/kandy_lake.png" alt="Kandy Hill Country Circuit artwork showing the lake, temple and wooded mountain ridges" width="100%"></td>
+  </tr>
+  <tr>
     <td width="33%" valign="top">
-      <img src="assets/ui/art/astra_coast.png" alt="Illustrated Astra Lotus Coast waterfront and illuminated Lotus Tower" width="100%">
-      <h3>Astra Lotus Coast</h3>
+      <h3>Astra<br>Lotus Coast</h3>
       <strong>1.9 km · Coastal circuit</strong>
       <p>Palm-lined straights, Port City esses, a harbor hairpin, lagoon causeway, and a Lotus Tower skyline.</p>
     </td>
     <td width="33%" valign="top">
-      <img src="assets/ui/art/colombo_city.png" alt="Illustrated Colombo city boulevard with warm street lights and the Lotus Tower" width="100%">
-      <h3>Colombo City Grand Prix</h3>
+      <h3>Colombo City<br>Grand Prix</h3>
       <strong>5.5 km · Urban circuit</strong>
       <p>Fort streets, tropical gardens, lake shores, and the Galle Face coastline across a longer city lap.</p>
     </td>
     <td width="33%" valign="top">
-      <img src="assets/art/kandy/billboards/kandy_lake.png" alt="Kandy Hill Country Circuit artwork showing the lake, temple and wooded mountain ridges" width="100%">
-      <h3>Kandy Lake Circuit</h3>
+      <h3>Kandy<br>Lake Circuit</h3>
       <strong>2.83 km · Lakeside circuit</strong>
       <p>Hill-country daylight, wooded ridgelines, Buddhist landmarks, local signs, and a physical start arch.</p>
     </td>
