@@ -1,6 +1,7 @@
 extends RefCounted
 ## Shared offline static batching; every exported cell owns its instance buffers.
 static func collect(node: Node,result: Array) -> void:
+ if node.has_meta("baked_precinct"):return
  if node is MeshInstance3D and node.mesh and not node.has_meta("surface_role"):result.append(node)
  for child in node.get_children():collect(child,result)
 static func bake(root: Node3D) -> Dictionary:
@@ -28,6 +29,7 @@ static func bake(root: Node3D) -> Dictionary:
    mesh_cache[group.resource_key]=mesh
   var mm:=MultiMesh.new();mm.transform_format=MultiMesh.TRANSFORM_3D;mm.mesh=mesh;mm.instance_count=group.nodes.size()
   var output:=MultiMeshInstance3D.new();output.multimesh=mm;output.cast_shadow=source.cast_shadow;output.visibility_range_end=source.visibility_range_end;output.visibility_range_end_margin=source.visibility_range_end_margin;output.material_override=source.material_override;output.set_meta("cell",group.cell)
+  if source.has_meta("flag_hoist_uv"):output.set_meta("flag_hoist_uv",source.get_meta("flag_hoist_uv"))
   root.add_child(output);var transforms: Array[Transform3D]=[]
   for node in group.nodes:transforms.append(root.global_transform.affine_inverse()*node.global_transform)
   load("res://scene_instances.gd").store(output,transforms)

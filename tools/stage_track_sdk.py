@@ -11,6 +11,8 @@ def stage(output,bundle=False):
  for name in ['road-generator','terrain_3d','EZ-Tree-Godot-Port']:
   for p in (ROOT/'addons'/name).rglob('*'):
    if p.is_file() and p.suffix not in ['.import','.uid','.so','.dylib'] and not any(s in ['.godot','__pycache__'] for s in p.parts):copy(p,output/'addons'/name/p.relative_to(ROOT/'addons'/name))
+ for p in (ROOT/'sdk/track-kit/auto_lightmap').rglob('*'):
+  if p.is_file() and p.suffix not in ['.uid','.import']:copy(p,output/'addons/auto_lightmap'/p.relative_to(ROOT/'sdk/track-kit/auto_lightmap'))
  assert (ROOT/'build/kandy/supplied-models/runtime/mahaweli.glb').is_file(),'Run Blender --background --python tools/convert_kandy_landmarks.py with the supplied local models first'
  copy(ROOT/'content/scenery/kandy-supplied-models.json',output/'licenses/Kandy-supplied-models.json')
  for p in (ROOT/'build/kandy/supplied-models/runtime').glob('*'):
@@ -28,6 +30,9 @@ def stage(output,bundle=False):
  (output/'dependency-patches.json').write_text(json.dumps({'terrain3d-1.0.2':['double_slider.gd: default old removed display_scale setting to 100% under Godot4.7']},indent=2),encoding='utf-8')
  copy(ROOT/'content/scenery/srilanka.json',output/'shared/scenery.json')
  copy(ROOT/'tools/shared_srilanka_scenery.gd',output/'shared_srilanka_scenery.gd')
+ copy(ROOT/'tools/kandy_presentation.gd',output/'kandy_presentation.gd')
+ copy(ROOT/'shaders/kandy_ground.gdshader',output/'shared/kandy_ground.gdshader')
+ copy(ROOT/'shaders/kandy_mountains.gdshader',output/'shared/kandy_mountains.gdshader')
  for name in ['city_water.gdshader','sri_flag.gdshader','road_surface.gdshader','paving_pbr.gdshader','city_ground.gdshader']:
   copy(ROOT/'shaders'/name,output/'shared'/name)
  water_shader=output/'shared/city_water.gdshader'

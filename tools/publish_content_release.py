@@ -48,7 +48,11 @@ def main():
         for name,value in headers.items():connection.putheader(name,value)
         connection.putheader('Content-Type','application/octet-stream');connection.putheader('Content-Length',str(row['bytes']));connection.endheaders()
         with file.open('rb') as stream:
-            while chunk:=stream.read(4*1024*1024):connection.send(chunk)
+            sent=0;last_progress=0
+            while chunk:=stream.read(4*1024*1024):
+                connection.send(chunk);sent+=len(chunk)
+                if sent-last_progress>=64*1024*1024:
+                    print('UPLOAD_PROGRESS',file.name,str(sent)+'/'+str(row['bytes']),flush=True);last_progress=sent
         response=connection.getresponse();body=response.read();connection.close()
         if response.status!=201:raise RuntimeError('Asset upload failed: '+file.name+' HTTP '+str(response.status))
         uploaded=json.loads(body);assert uploaded['size']==row['bytes'] and uploaded.get('digest')=='sha256:'+row['sha256'],'Server asset hash mismatch'

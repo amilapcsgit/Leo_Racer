@@ -59,6 +59,26 @@
     },
     "surface_profile": {
       "const": "arcade_elevation_v1"
+    },
+    "authored_signage": {
+      "type": "boolean",
+      "default": false
+    },
+    "lighting": {
+      "type": "object",
+      "properties": {
+        "sky_visual_path": {
+          "type": "string"
+        },
+        "sky_lighting_path": {
+          "type": "string"
+        },
+        "sky_horizon_offset": {
+          "type": "number",
+          "minimum": -0.25,
+          "maximum": 0.25
+        }
+      }
     }
   }
 }

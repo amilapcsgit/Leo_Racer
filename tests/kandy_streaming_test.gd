@@ -48,8 +48,13 @@ func run() -> void:
 	var node_counts: Array[int]=[]
 	for cycle in 3:
 		check(await game.select_track("astra_coast"),"Return to preserved circuit "+str(cycle))
+		check(game.camera.far==1100.,"Astra retains its original camera range")
 		check(await game.select_track("colombo_city"),"Preserved Colombo loads")
+		check(game.camera.far==1100.,"Colombo retains its original camera range")
 		check(await game.select_track("kandy_lake"),"Reload city without stale cells "+str(cycle))
+		game.split_view.activate(true)
+		for view_camera in game.split_view.cameras:check(view_camera.far==5000.,"Split camera refreshes mountain range after track change")
+		game.split_view.activate(false)
 		streamer=game.world.find_child("ColomboSceneryStreaming",true,false);await settle(streamer)
 		for frame in 4:await process_frame
 		memory_samples.append(Performance.get_monitor(Performance.MEMORY_STATIC));node_counts.append(get_node_count())

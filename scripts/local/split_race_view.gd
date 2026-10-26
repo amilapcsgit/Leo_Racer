@@ -12,7 +12,7 @@ func _ready() -> void:
  for slot in 2:
   var container:=SubViewportContainer.new();container.stretch=true;container.size_flags_horizontal=Control.SIZE_EXPAND_FILL;container.size_flags_vertical=Control.SIZE_EXPAND_FILL;container.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(container)
   var viewport:=SubViewport.new();viewport.name="Player%dView" % (slot+1);viewport.world_3d=game.get_world_3d();viewport.handle_input_locally=false;viewport.size=Vector2i(960,1080);viewport.msaa_3d=Viewport.MSAA_2X;viewport.render_target_update_mode=SubViewport.UPDATE_DISABLED;container.add_child(viewport);views.append(viewport)
-  var camera:=Camera3D.new();camera.name="Player%dCamera" % (slot+1);camera.fov=63.;camera.far=1100.;camera.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;viewport.add_child(camera);cameras.append(camera)
+  var camera:=Camera3D.new();camera.name="Player%dCamera" % (slot+1);camera.fov=63.;camera.far=game.race_camera_far();camera.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;viewport.add_child(camera);cameras.append(camera)
   var layer:=CanvasLayer.new();viewport.add_child(layer)
   var overlay:=LeoPlayerHUD.new();overlay.game=game;overlay.slot=slot;layer.add_child(overlay);overlays.append(overlay)
  hide()
@@ -20,6 +20,7 @@ func activate(enabled: bool) -> void:
  get_tree().root.content_scale_size=Vector2i.ZERO if enabled else original_canvas_size
  visible=enabled
  for slot in 2:
+  cameras[slot].far=game.race_camera_far()
   views[slot].render_target_update_mode=SubViewport.UPDATE_ALWAYS if enabled else SubViewport.UPDATE_DISABLED
   overlays[slot].set_process(enabled)
   if enabled:

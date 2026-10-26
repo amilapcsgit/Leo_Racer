@@ -45,10 +45,16 @@ func read_manifest(path: String) -> void:
 		var version_pattern:=RegEx.new();version_pattern.compile("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
 		if not core.get("min") is String or not version_pattern.search(core.min) or (not core.get("max_major") is int and not core.get("max_major") is float):error="Invalid core compatibility";return
 		var minimum:=String(core.min).split(".")
-		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2003000 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
+		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2003001 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
 		if metadata.get("world_kind")!="external":error="Track API 2 requires external world data";return
 		if not metadata.get("lighting",{}) is Dictionary:error="Invalid lighting parameters";return
 		var lighting: Dictionary=metadata.get("lighting",{})
+		var sky_prefix:="res://mods/tracks/"+id+"/"
+		for key in ["sky_visual_path","sky_lighting_path"]:
+			if lighting.has(key) and (not lighting[key] is String or not String(lighting[key]).begins_with(sky_prefix) or String(lighting[key]).contains("..")):error="Sky resources must use the track namespace";return
+		if lighting.has("sky_visual_path")!=lighting.has("sky_lighting_path"):error="Supply both sky panoramas";return
+		if lighting.has("sky_horizon_offset") and (not (lighting.sky_horizon_offset is float or lighting.sky_horizon_offset is int) or not is_finite(float(lighting.sky_horizon_offset)) or absf(float(lighting.sky_horizon_offset))>.25):error="Invalid sky horizon";return
+		if metadata.has("authored_signage") and not metadata.authored_signage is bool:error="Invalid authored signage flag";return
 		if lighting.has("sun_angles") and not LeoVehicleLibrary.finite_vector(lighting.sun_angles):error="Invalid sun angles";return
 		for key in ["sun_color","sky_top","sky_horizon"]:
 			if lighting.has(key) and not lighting[key] is String:error="Invalid lighting color";return
@@ -157,6 +163,10 @@ func profile() -> LeoArtProfile:
 			if settings.has(key):result.set(key,Color.from_string(String(settings[key]),result.get(key)))
 		for key in ["sun_energy","ambient_energy"]:
 			if settings.has(key):result.set(key,float(settings[key]))
+		for key in ["sky_visual_path","sky_lighting_path"]:
+			if settings.has(key):result.set(key,String(settings[key]))
+		if settings.has("sky_horizon_offset"):result.sky_horizon_offset=float(settings.sky_horizon_offset)
+		if not result.sky_visual_path.is_empty():result.haze_color=Color("b5c8ca");result.haze_density=.00018;result.exposure=.95
 		return result
 	return load(String(metadata.get("lighting","res://assets/config/astra.tres"))) as LeoArtProfile
 

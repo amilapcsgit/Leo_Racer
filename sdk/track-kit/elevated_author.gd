@@ -65,9 +65,10 @@ func frame(distance: float) -> Basis:
 	var t:=(sample(distance+1)-sample(distance-1)).normalized();var side:=Vector3(-t.z,0,t.x).normalized()
 	return Basis(side,side.cross(t).normalized(),-t)
 func ground(x: float,z: float) -> float:
-	var u:=clampi(roundi((x-float(terrain_info.origin[0]))/float(terrain_info.spacing)),0,int(terrain_info.size)-1)
-	var v:=clampi(roundi((z-float(terrain_info.origin[1]))/float(terrain_info.spacing)),0,int(terrain_info.size)-1)
-	return terrain_image.get_pixel(u,v).r
+	var u:=clampf((x-float(terrain_info.origin[0]))/float(terrain_info.spacing),0,int(terrain_info.size)-1)
+	var v:=clampf((z-float(terrain_info.origin[1]))/float(terrain_info.spacing),0,int(terrain_info.size)-1)
+	var x0:=floori(u);var z0:=floori(v);var x1:=mini(x0+1,int(terrain_info.size)-1);var z1:=mini(z0+1,int(terrain_info.size)-1)
+	return lerpf(lerpf(terrain_image.get_pixel(x0,z0).r,terrain_image.get_pixel(x1,z0).r,u-x0),lerpf(terrain_image.get_pixel(x0,z1).r,terrain_image.get_pixel(x1,z1).r,u-x0),v-z0)
 func clear_group(label: String) -> Node3D:
 	var old:=get_node_or_null(label)
 	if old:old.free()
@@ -141,6 +142,7 @@ func building(parent: Node3D,position_at: Vector3,yaw: float,index: int) -> void
 		var polygon:=PackedVector2Array()
 		for p in area:polygon.append(Vector2(p[0],p[1]))
 		if Geometry2D.is_point_in_polygon(Vector2(position_at.x,position_at.z),polygon):return
+	if shared_builder.presentation.is_reserved(position_at,12.):return
 	var recipes:=["tea_shop","shophouse","lake_residence","balcony_house","fort_apartments","bakery","market_terrace","commercial_corner","courtyard_shops","coast_cafe","fort_corner","garden_cafe"]
 	var scene:=load("res://library/recipes/"+recipes[index%recipes.size()]+".tscn") as PackedScene
 	var house:=scene.instantiate() as Node3D;house.position=position_at;house.rotation.y=yaw;parent.add_child(house);building_count+=1
@@ -189,7 +191,7 @@ func dress_scenery() -> void:
 		add_child(terrain);terrain.owner=self
 		var images: Array[Image]=[terrain_image,null,null];if terrain.data.get_region_count()==0:terrain.data.import_images(images,Vector3(float(terrain_info.origin[0]),0,float(terrain_info.origin[1])),0,1)
 	terrain_cutter=load("res://terrain_corridor.gd").new(points);var cutter=terrain_cutter
-	var landscape:=MeshInstance3D.new();landscape.mesh=cutter.cut(terrain.bake_mesh(4),150.,"backdrop");landscape.position.y=-4.;landscape.set_meta("surface_role","terrain_backdrop");var terrain_mat:=ShaderMaterial.new();terrain_mat.shader=load("res://shared/city_ground.gdshader");terrain_mat.set_shader_parameter("landscaped",true);terrain_mat.set_shader_parameter("coastal",false);terrain_mat.set_shader_parameter("ground_albedo",load("res://shared/materials/Concrete034_2K-JPG_Color.jpg"));terrain_mat.set_shader_parameter("ground_normal",load("res://shared/materials/Concrete034_2K-JPG_NormalGL.jpg"));landscape.material_override=terrain_mat;landscape.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;resident.add_child(landscape)
+	var landscape:=MeshInstance3D.new();landscape.mesh=cutter.cut(terrain.bake_mesh(2),150.,"backdrop");landscape.position.y=-4.;landscape.set_meta("surface_role","terrain_backdrop");var terrain_mat:=ShaderMaterial.new();terrain_mat.shader=load("res://shared/kandy_ground.gdshader");terrain_mat.set_shader_parameter("landscaped",true);terrain_mat.set_shader_parameter("coastal",false);terrain_mat.set_shader_parameter("ground_albedo",load("res://shared/materials/Concrete034_2K-JPG_Color.jpg"));terrain_mat.set_shader_parameter("ground_normal",load("res://shared/materials/Concrete034_2K-JPG_NormalGL.jpg"));landscape.material_override=terrain_mat;landscape.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;resident.add_child(landscape)
 	# Decorative near terrain is streamed; only the cheap distant silhouette stays resident.
 	# Graded grass verges close the pavement-to-cut-terrain join without covering asphalt.
 	for side in [-1.,1.]:
@@ -231,9 +233,6 @@ func dress_scenery() -> void:
 		var s:=i*13.;var p:=sample(s,-26.-rng.randf_range(0,2));p.y=ground(p.x,p.z)
 		if i%9==0:continue
 		building(details,p,atan2(frame(s).x.x,frame(s).x.z),i)
-		if i%5==0:
-			var sign:=Node3D.new();sign.position=sample(s,-21.);sign.rotation.y=atan2(frame(s).x.x,frame(s).x.z);details.add_child(sign)
-			box(sign,Vector3(5.,.9,.12),Vector3(0,3.,0),"203b34");label(sign,"CEYLON TEA  /  KANDY",Vector3(0,3.,.09))
 	var source_index:=0
 	for b in geography.buildings:
 		var center:=Vector2.ZERO
@@ -249,9 +248,6 @@ func dress_scenery() -> void:
 	var mound:=CylinderMesh.new();mound.top_radius=12.;mound.bottom_radius=15.;mound.height=1.5;var island_mesh:=MeshInstance3D.new();island_mesh.mesh=mound;island_mesh.material_override=material("798354");island.add_child(island_mesh)
 	shared_scenery=shared_builder.dress(details)
 	shared_scenery.batching=load("res://static_scenery_batcher.gd").bake(details)
-	var welcome:=Node3D.new();welcome.position=sample(0,-15.);welcome.rotation.y=atan2(frame(0).x.x,frame(0).x.z);details.add_child(welcome)
-	box(welcome,Vector3(7.,3.,.2),Vector3(0,3,0),"1d493e")
-	label(welcome,"KANDY LAKE",Vector3(0,3.9,.15));label(welcome,"මහනුවර",Vector3(0,3.,.15),0,"res://art/fonts/NotoSansSinhala.ttf");label(welcome,"கண்டி",Vector3(0,2.1,.15),0,"res://art/fonts/NotoSansTamil.ttf")
 	print("SCENERY_DRESSED buildings=",building_count," terrain=Terrain3D baked=true")
 func batch(parent: Node3D,mesh: Mesh,transforms: Array[Transform3D],color: String) -> void:
 	if not mesh:fail("Missing source mesh");return
@@ -303,12 +299,16 @@ func export_track() -> bool:
 		var root_node:=Node3D.new();var id:="cell_%d_%d"%[key.x,key.y]
 		for node in groups[key]:root_node.add_child(node.duplicate())
 		var path: String=baker.pack(root_node,id);root_node.free();cells.append({"id":id,"center":[key.x*200+100,key.y*200+100],"scene":path})
+	var visual: Texture2D=baker.resource(load("res://art/environment/daylight.png"));var radiance: Texture2D=baker.resource(load("res://art/environment/daylight.exr"))
 	if not baker.flush(folder.path_join("scenery.pck")):return fail("Could not write scenery pack")
 	var route_points: Array=[]
 	for p in points:route_points.append([p.x,p.y,p.z])
 	route.points=route_points;route.length=length
 	for i in 8:route.features.recoveries[i].distance=length*(i+.025)/8.
-	var manifest:={"format":1,"asset_api":3,"id":track_id,"name":display_name,"version":"1.0.0","course_revision":course_revision,"core":{"min":"2.3.0","max_major":2},"surface_profile":"arcade_elevation_v1","world_kind":"external","scene":scene_path,"route":"route.json","dependencies":[],"packs":[{"file":"scenery.pck","sha256":FileAccess.get_sha256(folder.path_join("scenery.pck"))}],"lighting":{"sun_angles":[-62,-120,0],"sun_color":"fff4df","sun_energy":1.25,"ambient_energy":.7,"sky_top":"479bce","sky_horizon":"d0e4dc"}}
+	var manifest:={"format":1,"asset_api":3,"id":track_id,"name":display_name,"version":"1.0.1","course_revision":course_revision,"core":{"min":"2.3.1","max_major":2},"surface_profile":"arcade_elevation_v1","world_kind":"external","scene":scene_path,"route":"route.json","dependencies":[],"packs":[{"file":"scenery.pck","sha256":FileAccess.get_sha256(folder.path_join("scenery.pck"))}],"lighting":{"sun_angles":[-62,-120,0],"sun_color":"fff4df","sun_energy":1.25,"ambient_energy":.7,"sky_top":"479bce","sky_horizon":"d0e4dc"}}
+	manifest.authored_signage=true
+	manifest.lighting.sky_visual_path=visual.resource_path;manifest.lighting.sky_lighting_path=radiance.resource_path;manifest.lighting.sky_horizon_offset=0.
+	manifest.lighting.sun_energy=1.1;manifest.lighting.ambient_energy=.55
 	for name in ["manifest.json","route.json","cells.json","provenance.json"]:
 		var data: Dictionary=manifest if name=="manifest.json" else route if name=="route.json" else {"format":1,"cells":cells} if name=="cells.json" else read(data_folder.path_join("job.json"))
 		FileAccess.open(folder.path_join(name),FileAccess.WRITE).store_string(JSON.stringify(data,"  "))
@@ -354,6 +354,6 @@ func authoring_fingerprint() -> String:
 	if Engine.is_editor_hint() and EditorInterface.get_edited_scene_root()==self:EditorInterface.save_scene()
 	var hashing:=HashingContext.new();hashing.start(HashingContext.HASH_SHA256)
 	for path in [data_folder,"res://library","res://art","res://shared","res://assets/models","res://addons/EZ-Tree-Godot-Port"]:fingerprint_folder(path,hashing)
-	for name in ["elevated_author.gd","terrain_corridor.gd","shared_srilanka_scenery.gd","static_scenery_batcher.gd","resource_baker.gd","building_material.gdshader","billboard_depth.gdshader"]:hashing.update(FileAccess.get_sha256("res://"+name).to_utf8_buffer())
+	for name in ["elevated_author.gd","terrain_corridor.gd","shared_srilanka_scenery.gd","static_scenery_batcher.gd","kandy_presentation.gd","resource_baker.gd","building_material.gdshader","billboard_depth.gdshader"]:hashing.update(FileAccess.get_sha256("res://"+name).to_utf8_buffer())
 	if not scene_file_path.is_empty():hashing.update(FileAccess.get_sha256(scene_file_path).to_utf8_buffer())
 	return hashing.finish().hex_encode()

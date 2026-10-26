@@ -1,0 +1,36 @@
+{
+  "generator": "Built-in imagegen + deterministic Pillow text shaping",
+  "raqm": false,
+  "date": "2026-10-26",
+  "copy": {
+    "welcome": [
+      "KANDY LAKE",
+      "මහනුවර",
+      "கண்டி"
+    ],
+    "start": [
+      "LEO RACER",
+      "KANDY LAKE"
+    ]
+  },
+  "prompts": [
+    "Original print-ready horizontal Ceylon tea shop advertisement: tea leaves and bud, copper kettle, porcelain tea cup, hill-country plantation, dark forest-green background and restrained aged gold border; natural daylight; empty upper center for typography; no text/logos or support hardware.",
+    "Original Kandy Lake tourism photograph: island, white cloud wall, tropical trees, Temple of the Tooth, hazy green hills, late morning cumulus clouds; natural colors; open upper sky for typography; no text, cars or mockup."
+  ],
+  "files": {
+    "bakery.png": "a8028ba20c8b855901fa406a5634b32367a73bfdaa41e0272335efcb516dbc42",
+    "cafe.png": "2996939cc9961f98465515e6702476a9730080773cb506318b71d19f66bd1936",
+    "market.png": "aabd5dc7fc3a7f55f901f5c2e0d656905f006b9d0ed7fd8d3378db9d25e708f7",
+    "sector-0.png": "8429273a884501e323f4648556d9dd1364240264e7bae1138db2ccec5c31f04b",
+    "sector-1.png": "0ae70659c8d19acbf67c8ef9c57358677d6171483deb48a28afb0b50394a4856",
+    "sector-2.png": "a3685f353a093e1f5d571643487a9027446ccd5aa0d2807160fd36a8c60affd5",
+    "sector-3.png": "be7668db6b17d08c98198f9aa9a9f5e06f300066b3d7327faf74154f01ecf92e",
+    "start.png": "e03ccecaeb8e90c416cb066c9510dbb8be65add9c03e1fbd87ff79e6b4741029",
+    "tea-artwork.png": "e17ef7741f73c785d5ff5642dc378ada6653bd099db90cc091d9364c260471f2",
+    "tea-shop.png": "b285501f47e95ccd0f958bf4b2aefd89be900b825b906ca80bdcd91b97125f1d",
+    "tourism-artwork.png": "fafbc21c1b125b764d18a037f61cdb1c1a1671d5a957d7041fd0bcfca528cb9d",
+    "tourism.png": "784cde3c461f60e541726251bfa1d062422fc913a5207cc2dbe7ea005277973a",
+    "welcome.png": "a5164ef16691037fc1f5267f8152bca56d251bca0e36558a10efbae6dbd80da3"
+  },
+  "text_shaper": "Godot advanced text server for Sinhala and Tamil"
+}

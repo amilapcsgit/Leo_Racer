@@ -1,0 +1,26 @@
+Kandy Lake scenery, Leo Racer 2.3.1
+
+Mahaweli Seya: sachinthabasna, supplied Blender model.
+https://www.cgtrader.com/free-3d-models/architectural/other/mahaweli-stupa-3d-model
+Runtime derivative removes the lower dark supports; originals remain unchanged.
+
+CEYPETCO: Chamuditha K (author recorded in supplied COLLADA document).
+Tooth Temple, jungle temple, and standing Buddha: supplied by the project owner.
+Original names and SHA-256 hashes are retained in Kandy-supplied-models.json.
+These imports retain their original creator rights; no replacement license is asserted.
+
+Tea, tourism and cloud artwork: original built-in imagegen outputs for Leo Racer.
+Final text is typeset separately; see Kandy-image-provenance.json.
+Noto Sans Sinhala and Noto Sans Tamil: SIL Open Font License, retained alongside fonts.
+Barlow Condensed: retained font license in the game's licenses directory.
+The sky uses authored linear radiance with explicit solar energy. It is not a measured HDR photograph.
+
+OpenSKP Import/Export 0.2.4: Copyright (c) 2024-2026 Ahsan Mehmood, MIT.
+https://github.com/iamahsanmehmood/blender-openskp
+Blender 4.5.1 and Godot 4.7.2 are authoring tools; their notices remain applicable.
+Existing map, terrain, modular building and vegetation notices are retained.
+Map data: (c) OpenStreetMap contributors, ODbL 1.0.
+https://www.openstreetmap.org/copyright
+
+Reference photographs and Street View screenshots were visual references only.
+The course and landmark placements are adapted for racing, not a surveyed reconstruction.

@@ -15,6 +15,7 @@ func run() -> void:
  var success: bool=author.validate()
  if success and action!="validate":
   author.dress_scenery();await process_frame;await process_frame
+  if action=="lightmaps":load("res://lightmap_author.gd").new().prepare(author)
   if action=="export":success=author.export_track()
  if not success:printerr(author.last_error)
  root.remove_child(author);author.free();quit(0 if success else 2)

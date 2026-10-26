@@ -1,0 +1,15 @@
+{
+  "name": "OpenSKP Import/Export",
+  "version": "0.2.4",
+  "url": "https://github.com/iamahsanmehmood/blender-openskp/releases/tag/v0.2.4",
+  "archive": "blender-openskp-v0.2.4.zip",
+  "sha256": "bd21f9199f76bdfd5a01dc5fe1e38d5e007e0fcec7d431f6a70dcdb987ec4bf9",
+  "blender": "4.5.1",
+  "python_dependencies": {
+    "defusedxml": "0.7.1",
+    "mapbox-earcut": "2.1.0",
+    "numpy": "Blender bundled",
+    "shapely": "2.2.0",
+    "pillow": "13.0.0"
+  }
+}

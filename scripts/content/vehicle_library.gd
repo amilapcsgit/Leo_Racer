@@ -114,7 +114,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 		if not finite_vector(wheel.get("pivot")) or not finite_vector(wheel.get("axle")):errors.append("Invalid wheel pivot/axle")
 		elif not is_equal_approx(LeoVehicleCodec.vector(wheel.axle).length(),1.):errors.append("Wheel axle must be normalized")
 		if not wheel.get("radius") is float and not wheel.get("radius") is int:errors.append("Invalid wheel radius")
-		elif float(wheel.radius)<=.01 or float(wheel.radius)>3.:errors.append("Wheel radius outside 0.01â€“3 m")
+		elif float(wheel.radius)<=.01 or float(wheel.radius)>3.:errors.append("Wheel radius outside 0.01–3 m")
 		for key in ["rotating","stationary"]:
 			var paths: Variant=wheel.get(key,[])
 			if not paths is Array:errors.append("Invalid wheel groups");continue

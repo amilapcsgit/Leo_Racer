@@ -1,38 +1,57 @@
 {
   "models": [
     {
+      "id": "tooth_temple",
+      "source": "kandy toothtemple.skp",
+      "source_sha256": "aca435434c37c782e59429eefca1f282d5e150b49212a356915b32cd275b64ea",
+      "triangles": 109077,
+      "height_m": 14.0,
+      "bytes": 11223268,
+      "model": "tooth_temple.glb"
+    },
+    {
+      "id": "buddha",
+      "source": "Standing+Buddha+statue+Srilanka.zip",
+      "source_sha256": "aa0183f87eb2aa6e16efac84f6e02f857a05a46b710b0b57443f875e89ba38e7",
+      "triangles": 19327,
+      "height_m": 18.0,
+      "bytes": 7874124,
+      "model": "buddha.glb"
+    },
+    {
       "id": "mahaweli",
       "source": "Mahaweli+Seya.blend",
       "source_sha256": "b3b1c8d03aa77451b18ab6a1ac347da56031ce6bcec3e7aa0c9d6818aeff8098",
-      "triangles": 127248,
-      "height_m": 60,
-      "model": "mahaweli.glb",
-      "bytes": 3311328,
-      "permission": "User explicitly authorized supplied model use on 2026-10-25"
+      "triangles": 178960,
+      "height_m": 60.0,
+      "bytes": 5648372,
+      "model": "mahaweli.glb"
     },
     {
-      "id": "tooth_temple",
-      "source": "Temple-of-Tooth Relic-Sri-Lanka-MiniWorld3D.stl",
-      "source_sha256": "45b4c038d8c598f45fce99767dfe2056b27c668b40800a4ebac05e5f5b3aeb8f",
-      "triangles": 19998,
-      "height_m": 14,
-      "model": "tooth_temple.glb",
-      "bytes": 1385088,
-      "permission": "User explicitly authorized supplied model use on 2026-10-25"
+      "id": "jungle_temple",
+      "source": "jungle temple.skp",
+      "source_sha256": "23a954bcf88376436473b51ffdd7a7bcd706bd768df7cb9d274182616baa1df4",
+      "triangles": 1301,
+      "height_m": 10.4452,
+      "bytes": 1989472,
+      "model": "jungle_temple.glb"
     },
     {
-      "id": "forest",
-      "source": "a_forest_3_with_a_road_at_night_for_game.glb",
-      "source_sha256": "ba57bc2a8c20ea796ae287d50ad9ce7ca425a52497edef7bce79bdd9812e4bb4",
-      "triangles": 676,
-      "height_m": 13,
-      "model": "forest.glb",
-      "bytes": 3846588,
-      "permission": "User explicitly authorized supplied model use on 2026-10-25"
+      "id": "ceypetco",
+      "source": "CEYPETCO.zip",
+      "source_sha256": "898d2361baf15f939ff9c06e5b78d237fdf4bcb3cf6ff30cd998c6487226414a",
+      "triangles": 8454,
+      "height_m": 4.4791,
+      "bytes": 1000796,
+      "model": "ceypetco.glb",
+      "creator": "Chamuditha K (COLLADA author metadata)"
     }
   ],
   "fbx_exception": "Inspected 609 meshes/129524 triangles. All referenced original texture files are missing; not installed pending material reconstruction. No source edited.",
   "mahaweli_reference": "https://www.cgtrader.com/free-3d-models/architectural/other/mahaweli-stupa-3d-model",
   "mahaweli_creator": "sachinthabasna",
-  "placement": "Artistic Kandy-inspired landmark, not geographically accurate relocation claim."
+  "placement": "Artistic Kandy-inspired landmark, not geographically accurate relocation claim.",
+  "importer": "OpenSKP v0.2.4, Blender 4.5.1",
+  "source_files_unchanged": true,
+  "release_request": "User explicitly requested integration and a new public v2.3.1 release on 2026-10-26. Original creator rights and notices remain applicable."
 }

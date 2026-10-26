@@ -8,6 +8,7 @@ func inspect(node: Node) -> void:
  if id in ["mahaweli_seya","sacred_tooth_precinct"] or (not id.is_empty() and id.contains("191377765")):
   var bounds:=AABB();var first:=true
   for mesh in node.find_children("*","MeshInstance3D",true,false):
+   if mesh.get_meta("surface_role","")=="landmark_ground":continue
    var box: AABB=mesh.global_transform*mesh.get_aabb();bounds=box if first else bounds.merge(box);first=false
   if not first:
    var clearance:=INF

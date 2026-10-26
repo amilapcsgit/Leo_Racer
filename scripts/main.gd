@@ -119,7 +119,7 @@ func _ready() -> void:
 	get_tree().root.close_requested.connect(quit_game)
 	loading=LeoLoadingScreen.new();add_child(loading)
 	await get_tree().process_frame
-	loading.stage("Loading garage catalogâ€¦",25)
+	loading.stage("Loading garage catalog…",25)
 	if not LeoVehicleLibrary.legacy():await LeoVehicleLibrary.discover_async(get_tree())
 	catalog = GarageCatalog.shared()
 	var args := OS.get_cmdline_user_args()
@@ -165,12 +165,12 @@ func _ready() -> void:
 	art_profile=track_definition.profile()
 	circuit = LeoCircuit.new(track_definition)
 	await build_world()
-	loading.stage("Preparing interfaceâ€¦",85)
+	loading.stage("Preparing interface…",85)
 	await get_tree().process_frame
 	build_stage()
 	camera = Camera3D.new()
 	camera.fov = 63
-	camera.far = 1100
+	camera.far = race_camera_far()
 	camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(camera)
 	camera.current = true
@@ -253,6 +253,9 @@ func configure_input() -> void:
 		event.button_index = entry[1]
 		InputMap.action_add_event(entry[0], event)
 
+func race_camera_far() -> float:
+	return 5000. if int(track_definition.metadata.get("asset_api",1))>=3 and not art_profile.sky_visual_path.is_empty() else 1100.
+
 func build_world() -> void:
 	world = Node3D.new()
 	world.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -262,18 +265,18 @@ func build_world() -> void:
 		world.add_child(scenery)
 		polish_materials(scenery)
 	if track_definition.world_kind()=="astra":
-		loading.stage("Building city streetsâ€¦",40)
+		loading.stage("Building city streets…",40)
 		await get_tree().process_frame
 		var city := LeoCity.new()
 		world.add_child(city)
 		city.setup(circuit,art_profile)
-		loading.stage("Preparing coast and race surfaceâ€¦",55)
+		loading.stage("Preparing coast and race surface…",55)
 		await get_tree().process_frame
 		var colombo := LeoAstraWorld.new()
 		world.add_child(colombo)
 		colombo.setup(circuit,art_profile)
 	else:
-		loading.stage("Loading course and sceneryâ€¦",45)
+		loading.stage("Loading course and scenery…",45)
 		var scene_path:=String(track_definition.metadata.get("scene",""))
 		var scene:=await LeoAssets.scene_async(scene_path,get_tree())
 		if scene:
@@ -286,7 +289,7 @@ func build_world() -> void:
 		var scenery: Node3D=load("res://scripts/content/city_streamer.gd").new()
 		world.add_child(scenery)
 		await scenery.setup(self,track_definition)
-	loading.stage("Loading landmarksâ€¦",70)
+	loading.stage("Loading landmarks…",70)
 	await get_tree().process_frame
 	if not art_profile.landmark_model.is_empty():
 		var tower: Node3D = load(art_profile.landmark_model).instantiate()
@@ -358,7 +361,7 @@ func build_world() -> void:
 			daylight.process_mode=Sky.PROCESS_MODE_QUALITY
 			environment.adjustment_saturation=1.0;environment.adjustment_contrast=1.03
 	LeoRaceVisuals.build_boosts(world,circuit)
-	LeoRaceVisuals.build_signs(world,circuit)
+	if not track_definition.metadata.get("authored_signage",false):LeoRaceVisuals.build_signs(world,circuit)
 	if track_definition.world_kind()=="astra":LeoAstraDecals.build(world,circuit)
 	if track_definition.world_kind()=="astra" and ResourceLoader.exists("res://assets/models/kenney/decoration-tents.glb"):
 		for i in range(3):
@@ -367,6 +370,7 @@ func build_world() -> void:
 			tent.scale = Vector3.ONE*3
 			world.add_child(tent)
 	LeoAssets.apply_overrides(world)
+	if is_instance_valid(camera):camera.far=race_camera_far()
 
 func polish_materials(node: Node, landmark: bool=false) -> void:
 	if node is MeshInstance3D:
@@ -506,9 +510,9 @@ func return_menu() -> void:
 func start_race() -> void:
 	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
-	loading.race_summary=track_definition.display_name+" Â· "+str(human_count)+(" player" if human_count==1 else " players")+" Â· 3 laps"
+	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
 	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"))
-	state="loading";loading.stage("Preparing racersâ€¦",15)
+	state="loading";loading.stage("Preparing racers…",15)
 	get_tree().paused=false
 	remove_racers()
 	for i in 6:
@@ -519,7 +523,7 @@ func start_race() -> void:
 		var driver_path:=d.cabin_model_path if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else d.seated_model_path
 		if not driver_path.is_empty() and not await LeoAssets.scene_async(driver_path,get_tree()):
 			loading.show_failure(LeoAssets.failure,start_race,func():loading.hide();return_menu());return
-		loading.stage("Preparing racers %d / 6â€¦"%[i+1],15.+float(i+1)*12.)
+		loading.stage("Preparing racers %d / 6…"%[i+1],15.+float(i+1)*12.)
 		await get_tree().process_frame
 	garage_from_pause=false
 	race_modified=track_definition.modified or LeoAssets.modified_rules
@@ -572,7 +576,7 @@ func start_race() -> void:
 	camera.position=player.position+Vector3(sin(cam_heading),0,cos(cam_heading))*9+Vector3.UP*5
 	camera.look_at(player.position+Vector3.UP*1.2)
 	if split_view:split_view.activate(human_count==2)
-	loading.stage("Warming up the race viewâ€¦",95)
+	loading.stage("Warming up the race view…",95)
 	for frame in 4:await get_tree().process_frame
 	state="countdown";countdown=3.6
 	loading.hide()
@@ -720,7 +724,7 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 			safe_position=position_at;found=true;break
 	if not found:
 		fresh.stop_audio();fresh.queue_free()
-		hud.garage_selector.policy.text="TRACK BUSY â€” BACK TO PAUSE, RESUME, THEN TRY AGAIN"
+		hud.garage_selector.policy.text="TRACK BUSY — BACK TO PAUSE, RESUME, THEN TRY AGAIN"
 		return false
 	fresh.position=safe_position;fresh.rotation.y=heading
 	for property in ["progress","next_gate","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
@@ -741,7 +745,7 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	paused=false;get_tree().paused=false
 	input_router.clear_all()
 	if split_view:split_view.set_frozen(false)
-	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE â€” NO RECORD",3.0)
+	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
 	return true
 
 func toggle_pause() -> void:
@@ -1182,7 +1186,7 @@ func select_track(id: String) -> bool:
 		if candidate.id==id:target=candidate;break
 	if not target:return false
 	if not loading.visible:loading.begin_load(LeoLoadingBackdrops.new_operation("track"))
-	loading.stage("Checking "+target.display_name+"â€¦",10)
+	loading.stage("Checking "+target.display_name+"…",10)
 	await get_tree().process_frame
 	if not target.mount():
 		loading.show_failure(target.error,func():hud.frontend.choose_track(target),func():loading.hide();hud.frontend.show_tracks());return false

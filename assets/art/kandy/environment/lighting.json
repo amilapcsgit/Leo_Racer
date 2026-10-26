@@ -1,0 +1,17 @@
+{
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "linear_peak": 240.3154754638672,
+  "sun_angles": [
+    -62,
+    -120,
+    0
+  ],
+  "source": "tools/bake_kandy231_sky.py",
+  "radiance_is_linear": true,
+  "cloud_source": "original built-in imagegen artwork; not a measured HDR photograph",
+  "radiance_model": "linear sky/cloud field plus explicit 240-unit solar radiance",
+  "left_right_wrap": "periodic zero-slope boundary baked into PNG and linear EXR; runtime wrap blend retained"
+}

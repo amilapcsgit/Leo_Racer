@@ -1,10 +1,12 @@
-# Leo Racer 2.2 — modular content
+# Leo Racer 2.3.1 — Kandy Lake
+
+**Version 2.3.1** improves the 2.83 km Kandy Lake Circuit with a physical start arch, supported local signs, corrected flags, grounded Buddhist landmarks, a 360° daylight environment, distant mountain geometry, and baked landmark lighting. It also repairs corrupted loading punctuation. The release includes three tracks, 16 default cars, and 32 optional offline cars. See [Kandy implementation and verification](docs/KANDY_231.md).
 
 **Version 2.2.0** adds loose vehicle folders, automatic content discovery, the in-game vehicle workshop and a contributor track SDK. All sixteen shipped cars are visible under GameAssets/vehicles; the development profile uses only Bigster and Duster. See [modularity checks](docs/MODULARITY_VALIDATION.md) and the [contributor SDK](sdk/README.md).
 
 **Version 2.1.0** fills the 5.5 km Colombo circuit with complete modular buildings, coherent districts, a shaped coastline, lake shores and bright tropical midday lighting. Lotus Tower, Galle Face Green and custom landmarks remain, alongside the neon UI, all vehicles, multiplayer and existing rankings. See [visual improvements and validation](docs/COLOMBO_VISUALS.md).
 
-A local Windows arcade racer with six drivers, sixteen vehicles, the 1.9 km **Astra Lotus Coast** and 5.5 km **Colombo City Grand Prix**. Both tracks support single player and vertical two-player split screen. Existing settings, vehicles, race rules, and offline rankings are retained.
+A local Windows arcade racer with six drivers, sixteen default vehicles, **Astra Lotus Coast** (1.9 km), **Colombo City Grand Prix** (5.5 km), and **Kandy Lake Circuit** (2.83 km). All three tracks support single player and vertical two-player split screen. Existing settings, vehicles, race rules, and offline rankings are retained.
 
 ![Colombo City in Leo Racer 2.1](docs/qa-colombo-visuals/streets-final.jpg)
 
@@ -12,7 +14,7 @@ A local Windows arcade racer with six drivers, sixteen vehicles, the 1.9 km **As
 
 ## Play
 
-Download **LeoRacer-Setup-2.2.0.exe** to install, or extract the entire **LeoRacer-2.2.0-win64.zip** folder and run **LeoRacer.exe**. Keep the complete folder together. Godot, a .NET installation, and an internet connection are not required to play. [Downloads and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.2.0).
+Download **LeoRacer-Setup-2.3.1.exe** to install, or extract the entire **LeoRacer-2.3.1-win64.zip** folder and run **LeoRacer.exe**. Keep the complete folder together. Godot, a .NET installation, and an internet connection are not required to play. [Downloads and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.3.1).
 
 Use **Play Compatibility.cmd** if Vulkan is unavailable. Compatibility mode uses simpler effects. Previous releases remain available for rollback.
 
