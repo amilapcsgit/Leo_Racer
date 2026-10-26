@@ -1,23 +1,23 @@
 {
   "acceleration": 18.0,
   "ai_lateral_acceleration": 13.5,
-  "attribution": "",
+  "attribution": " | Modular checkpoint 024 derivative; source geometry and UVs retained. Godot clearcoat/glass and opt-in functional lighting.",
   "boosted_speed": 62.5,
   "braking_regeneration": 0.035,
   "camera_height": 0.455,
   "collision_position": [
-    0.0,
-    1.21679997444153,
-    0.0
+    0,
+    1.072898030281067,
+    0.10412697792053223
   ],
   "collision_size": [
-    2.40499997138977,
-    2.22560000419617,
-    5.94099998474121
+    2.405,
+    2.145796060562134,
+    5.940746068954468
   ],
   "core": {
     "max_major": 2,
-    "min": "2.2.0"
+    "min": "2.3.2"
   },
   "dependencies": [],
   "display_name": "Dacia Bigster Extreme",
@@ -41,9 +41,9 @@
         ]
       ],
       "origin": [
-        -0.481000006198883,
-        0.910000026226044,
-        -0.104000002145767
+        -0.4762095093727111,
+        0.9688761047124866,
+        -0.011700006484985134
       ]
     },
     "hedgehog": {
@@ -65,9 +65,9 @@
         ]
       ],
       "origin": [
-        -0.481000006198883,
-        0.910000026226044,
-        -0.104000002145767
+        -0.4762095093727111,
+        0.9688761047124866,
+        -0.011700006484985134
       ]
     },
     "human": {
@@ -89,9 +89,9 @@
         ]
       ],
       "origin": [
-        -0.481000006198883,
-        0.910000026226044,
-        -0.104000002145767
+        -0.4762095093727111,
+        0.9688761047124866,
+        -0.011700006484985134
       ]
     },
     "lion": {
@@ -113,9 +113,9 @@
         ]
       ],
       "origin": [
-        -0.481000006198883,
-        0.910000026226044,
-        -0.104000002145767
+        -0.4762095093727111,
+        0.9688761047124866,
+        -0.011700006484985134
       ]
     },
     "mario": {
@@ -137,9 +137,9 @@
         ]
       ],
       "origin": [
-        -0.481000006198883,
-        0.910000026226044,
-        -0.104000002145767
+        -0.4762095093727111,
+        0.9688761047124866,
+        -0.011700006484985134
       ]
     },
     "parrot": {
@@ -161,9 +161,9 @@
         ]
       ],
       "origin": [
-        -0.481000006198883,
-        0.910000026226044,
-        -0.104000002145767
+        -0.4762095093727111,
+        0.9688761047124866,
+        -0.011700006484985134
       ]
     }
   },
@@ -191,6 +191,37 @@
   "normalization": {
     "basis": [
       [
+        1.3,
+        0,
+        0
+      ],
+      [
+        0,
+        1.3,
+        0
+      ],
+      [
+        0,
+        0,
+        1.3
+      ]
+    ],
+    "origin": [
+      0,
+      0,
+      0
+    ]
+  },
+  "preserve_materials": true,
+  "preview_distance": 10.53,
+  "preview_target": [
+    0,
+    1.072898030281067,
+    0
+  ],
+  "seat": {
+    "basis": [
+      [
         1.29999995231628,
         0.0,
         0.0
@@ -207,46 +238,15 @@
       ]
     ],
     "origin": [
-      0.0,
-      0.104000002145767,
-      0.0
-    ]
-  },
-  "preserve_materials": true,
-  "preview_distance": 10.53,
-  "preview_target": [
-    0.0,
-    1.0683399438858,
-    0.0
-  ],
-  "seat": {
-    "basis": [
-      [
-        1.0,
-        0.0,
-        0.0
-      ],
-      [
-        0.0,
-        1.0,
-        0.0
-      ],
-      [
-        0.0,
-        0.0,
-        1.0
-      ]
-    ],
-    "origin": [
-      0.0,
-      0.0,
-      0.0
+      -0.4762095093727111,
+      0.9688761047124866,
+      -0.011700006484985134
     ]
   },
   "setup_complete": true,
   "thumbnail": "thumbnail.png",
   "vehicle_api": 1,
-  "version": "1.0.0",
+  "version": "1.2.1",
   "wheels": [
     {
       "axle": [
@@ -255,11 +255,11 @@
         0.0
       ],
       "pivot": [
-        -0.779999971389771,
-        0.354999989271164,
-        -1.35099995136261
+        -0.8084248304367065,
+        0.3589998483657837,
+        -1.3510000705718994
       ],
-      "radius": 0.4615,
+      "radius": 0.4666998028755188,
       "rotating": [
         "wheel_0"
       ],
@@ -275,11 +275,11 @@
         0.0
       ],
       "pivot": [
-        0.779999971389771,
-        0.354999989271164,
-        -1.35099995136261
+        0.8084250688552856,
+        0.3589998483657837,
+        -1.3509999513626099
       ],
-      "radius": 0.4615,
+      "radius": 0.4666998028755188,
       "rotating": [
         "wheel_1"
       ],
@@ -295,11 +295,11 @@
         0.0
       ],
       "pivot": [
-        -0.779999971389771,
-        0.354999989271164,
-        1.35099995136261
+        -0.8084250688552856,
+        0.3589998483657837,
+        1.3509999513626099
       ],
-      "radius": 0.4615,
+      "radius": 0.4666998028755188,
       "rotating": [
         "wheel_2"
       ],
@@ -315,11 +315,11 @@
         0.0
       ],
       "pivot": [
-        0.779999971389771,
-        0.354999989271164,
-        1.35099995136261
+        0.8084248304367065,
+        0.3589998483657837,
+        1.3510000705718994
       ],
-      "radius": 0.4615,
+      "radius": 0.4666998028755188,
       "rotating": [
         "wheel_3"
       ],
@@ -327,6 +327,122 @@
         "caliper_3"
       ],
       "steering": false
+    }
+  ],
+  "visual_profile": "bigster_pbr_v1",
+  "source_checkpoint": "Bigster_v7_024_front_flat_faceted.blend",
+  "lighting": [
+    {
+      "role": "head",
+      "targets": [
+        {
+          "node": "Bigster_024/Front_Assembly/dust25_headlight_R_001",
+          "material": "Lamp_Head_dust25_ledR.001_Runtime"
+        }
+      ]
+    },
+    {
+      "role": "head",
+      "targets": [
+        {
+          "node": "Bigster_024/Front_Assembly/dust25_headlight_R_001",
+          "material": "Lamp_Head_Main_R_232"
+        }
+      ],
+      "range": 26,
+      "energy": 2.2,
+      "anchor": [
+        0.62,
+        0.85,
+        -2.1
+      ]
+    },
+    {
+      "role": "brake",
+      "targets": [
+        {
+          "node": "Bigster_024/Rear_Assembly/dust25_taillight_R",
+          "material": "Lamp_Tail_Y_LED_232"
+        }
+      ]
+    },
+    {
+      "role": "head",
+      "targets": [
+        {
+          "node": "Bigster_024/Front_Assembly/dust25_headlight_L_001",
+          "material": "Lamp_Head_dust25_ledL.001_Runtime"
+        }
+      ]
+    },
+    {
+      "role": "head",
+      "targets": [
+        {
+          "node": "Bigster_024/Front_Assembly/dust25_headlight_L_001",
+          "material": "Lamp_Head_Main_L_232"
+        }
+      ],
+      "range": 26,
+      "energy": 2.2,
+      "anchor": [
+        -0.62,
+        0.85,
+        -2.1
+      ]
+    },
+    {
+      "role": "brake",
+      "targets": [
+        {
+          "node": "Bigster_024/Rear_Assembly/dust25_taillight_L",
+          "material": "Lamp_Tail_Y_LED_232"
+        }
+      ]
+    },
+    {
+      "role": "reverse",
+      "targets": [
+        {
+          "node": "Bigster_024/Rear_Assembly/dust25_bumper_a_R__Reflector_Lens_L",
+          "material": "Lamp_Reverse_Bumper_White_232"
+        }
+      ],
+      "range": 3.5,
+      "energy": 0.5,
+      "anchor": [
+        0.75,
+        0.45,
+        2.39
+      ]
+    },
+    {
+      "role": "brake",
+      "targets": [
+        {
+          "node": "Bigster_024/Exterior_Trim/dust25_tailgate_chmsl",
+          "material": "Lamp_TailBrake_dust25_brake.001_Runtime"
+        }
+      ],
+      "running": false
+    }
+  ],
+  "actions": [
+    {
+      "slot": 1,
+      "name": "Sunroof",
+      "type": "transform",
+      "duration": 1.6,
+      "targets": [
+        {
+          "node": "Bigster_024/Glass_and_Seals/Bigster_Sunroof_Opening_Glass",
+          "open_position": [
+            0,
+            0.065,
+            -0.68
+          ]
+        }
+      ]
     }
   ]
 }

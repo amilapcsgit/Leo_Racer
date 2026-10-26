@@ -1,0 +1,37 @@
+{
+  "checks": 53,
+  "driving_states": [
+    {
+      "brake": false,
+      "case": "accelerate",
+      "reverse": false
+    },
+    {
+      "brake": false,
+      "case": "coast",
+      "reverse": false
+    },
+    {
+      "brake": true,
+      "case": "brake forward",
+      "reverse": false
+    },
+    {
+      "brake": true,
+      "case": "brake at rest",
+      "reverse": false
+    },
+    {
+      "brake": false,
+      "case": "reverse",
+      "reverse": true
+    },
+    {
+      "brake": true,
+      "case": "brake reverse",
+      "reverse": true
+    }
+  ],
+  "errors": [],
+  "status": "PASS"
+}

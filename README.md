@@ -1,4 +1,12 @@
-# Leo Racer 2.3.1 — Kandy Lake
+# Leo Racer 2.3.2 — Orbit Camera and Vehicle Features
+
+[![Download latest Windows installer](https://img.shields.io/badge/Download-Latest_Windows_Installer-22a8cf?style=for-the-badge&logo=windows)](https://github.com/amilapcsgit/Leo_Racer/releases/latest/download/LeoRacer-Setup.exe)
+
+[Latest release, portable build and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/latest)
+
+**New in 2.3.2:** automatic reverse camera, held Look Back, mouse/controller orbit, remappable headlights and vehicle actions, and Bigster's sliding sunroof. Bigster 1.2.1 has corrected red Y-shaped rear LEDs, a separate bumper reversing lamp, and working main headlights. Each local player keeps independent camera and vehicle states. See the [vehicle features and controls guide](https://github.com/amilapcsgit/Leo_Racer/blob/v2.3.2/docs/VEHICLE_FEATURES.md).
+
+The offline installer includes **Astra Lotus Coast, Colombo City Grand Prix and Kandy Lake Circuit**, 16 default cars and 32 additional cars. Choose **Complete** for everything, **Standard** for three tracks and 16 cars, or **Custom** to select tracks and additional cars. At least one track is required. Existing user-added cars, settings and records are preserved; modified files replaced during upgrade are backed up.
 
 **Version 2.3.1** improves the 2.83 km Kandy Lake Circuit with a physical start arch, supported local signs, corrected flags, grounded Buddhist landmarks, a 360° daylight environment, distant mountain geometry, and baked landmark lighting. It also repairs corrupted loading punctuation. The release includes three tracks, 16 default cars, and 32 optional offline cars. See [Kandy implementation and verification](docs/KANDY_231.md).
 
@@ -14,7 +22,7 @@ A local Windows arcade racer with six drivers, sixteen default vehicles, **Astra
 
 ## Play
 
-Download **LeoRacer-Setup-2.3.1.exe** to install, or extract the entire **LeoRacer-2.3.1-win64.zip** folder and run **LeoRacer.exe**. Keep the complete folder together. Godot, a .NET installation, and an internet connection are not required to play. [Downloads and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.3.1).
+Use the **Download** button above for the latest **LeoRacer-Setup.exe**, or download **LeoRacer-2.3.2-win64.zip**, extract the entire folder and run **LeoRacer.exe**. Keep the complete folder together. Godot, a .NET installation, and an internet connection are not required to play. [Downloads and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/latest).
 
 Use **Play Compatibility.cmd** if Vulkan is unavailable. Compatibility mode uses simpler effects. Previous releases remain available for rollback.
 
@@ -28,6 +36,11 @@ Use **Play Compatibility.cmd** if Vulkan is unavailable. Compatibility mode uses
 | Horn | H | B |
 | Pause | Esc or P | Start |
 | Hide HUD for photos | F8 | — |
+| Headlights | L | D-pad left |
+| Vehicle Action 1 (Bigster sunroof) | O | D-pad up |
+| Vehicle Action 2 | K | D-pad down |
+| Look Back (hold) | C | Right-stick click |
+| Orbit camera | Right-mouse drag | Right stick |
 
 Choose **Go Race → 2 Players → Start Race** for P1 left / P2 right, two humans and four AI. Single-player retains five AI opponents. Both modes use three laps. Each human chooses a name, driver, vehicle and input device; the second human continues when the first finishes. Tap accelerate on the final countdown beat for a launch boost. Recharge nitro through drifting and by slipstreaming behind another moving racer. Hold drift through steering corrections, then release a charged drift for a mini-turbo; longer charges earn SUPER DRIFT. Eight boost pads reward a flowing racing line. Recovery preserves ordered checkpoints, and a kart stuck under throttle resets safely after three seconds. Six identities and sixteen vehicles share the catalog; both Dacias display the selected driver in a cabin-specific pose. Pause → Change Car retains race progress; changed races cannot set records.
 
@@ -38,6 +51,8 @@ Race Setup → **Controls** saves per-player remapping and calibration for keybo
 Standard vehicles and Duster: **165/198 km/h**; Bigster: **180/225 km/h**. Common acceleration **18 m/s²**, handling **1.0**. Bigster retains 130% game scale, corrected tire centers, electric boost and regeneration. Logitech Formula Force EX physical compatibility is unverified; wheel force feedback is not included.
 
 ## Develop
+
+Source for this release is on branch **orbitcamera** and tag **v2.3.2**. Check out that branch or tag before following the build instructions.
 
 The modular core requires one initial upgrade. After that, compatible vehicle and track folders can be replaced without exporting the executable. The default development profile contains Bigster and Duster; the full profile contains sixteen loose GLBs.
 

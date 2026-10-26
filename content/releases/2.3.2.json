@@ -1,0 +1,170 @@
+{
+  "version": "2.3.2",
+  "default_vehicles": [
+    "aqua",
+    "bigster",
+    "blue",
+    "colombo_tuk",
+    "coral",
+    "cyberpunk",
+    "duster",
+    "formula_blue",
+    "formula_red",
+    "hover",
+    "mclaren",
+    "pink",
+    "pony",
+    "race_bus",
+    "race_tuk",
+    "roadster_gold"
+  ],
+  "optional_vehicles": [
+    {
+      "id": "byd_yangwang_u8",
+      "name": "2023 BYD Yangwang U8"
+    },
+    {
+      "id": "import_1937_auto_union_type_c_streamliner",
+      "name": "1937 auto union type c streamliner"
+    },
+    {
+      "id": "import_1968_volkswagen_beetle",
+      "name": "1968 volkswagen beetle"
+    },
+    {
+      "id": "import_1985_delorean_dmc_12_time_machine_bttf",
+      "name": "1985 delorean dmc 12 time machine bttf"
+    },
+    {
+      "id": "import_1989_lamborghini_countach_25th_anniversary",
+      "name": "1989 lamborghini countach 25th anniversary"
+    },
+    {
+      "id": "import_1999_nissan_skyline_gtr_r34_c_west_2f2f",
+      "name": "1999 nissan skyline gtr r34 c west  2f2f"
+    },
+    {
+      "id": "import_2004_porsche_carrera_gt",
+      "name": "2004 porsche carrera gt"
+    },
+    {
+      "id": "import_2013_chevrolet_corvette_z06",
+      "name": "2013 chevrolet corvette z06"
+    },
+    {
+      "id": "import_2013_equipped_jeep_wrangler_unlimited_rubicon",
+      "name": "2013 equipped jeep wrangler unlimited rubicon"
+    },
+    {
+      "id": "import_2019_ford_mustang_rtr_spec5_10th_anniversary",
+      "name": "2019 ford mustang rtr spec5 10th anniversary"
+    },
+    {
+      "id": "import_2020_ferrari_roma",
+      "name": "2020 ferrari roma"
+    },
+    {
+      "id": "import_2020_jeep_gladiator",
+      "name": "2020 jeep gladiator"
+    },
+    {
+      "id": "import_2020_lbworks_toyota_supra_a90_ver_2",
+      "name": "2020 lbworks toyota supra a90 ver.2"
+    },
+    {
+      "id": "import_2021_pininfarina_teorema_concept",
+      "name": "2021 pininfarina teorema concept"
+    },
+    {
+      "id": "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit",
+      "name": "2022 bmw g82 m4 adro carbon fiber widebody kit"
+    },
+    {
+      "id": "import_2022_mclaren_765lt",
+      "name": "2022 mclaren 765lt"
+    },
+    {
+      "id": "import_2023_ferrari_sf90_xx_stradale",
+      "name": "2023 ferrari sf90 xx stradale"
+    },
+    {
+      "id": "import_2024_byd_atto_2",
+      "name": "2024 byd atto 2"
+    },
+    {
+      "id": "import_2024_byd_atto_3",
+      "name": "2024 byd atto 3"
+    },
+    {
+      "id": "import_2024_byd_seal",
+      "name": "2024 byd seal"
+    },
+    {
+      "id": "import_chevrolet_cruze_ltz",
+      "name": "chevrolet cruze ltz"
+    },
+    {
+      "id": "import_dacia_duster_low_poly",
+      "name": "dacia duster low poly"
+    },
+    {
+      "id": "import_dacia_duster_widebody_highpoly",
+      "name": "dacia duster widebody   highpoly"
+    },
+    {
+      "id": "import_escapamento_carro_da_barbie_1956",
+      "name": "escapamento carro da barbie 1956"
+    },
+    {
+      "id": "import_fiat_500_x_outlaw",
+      "name": "fiat 500 x outlaw"
+    },
+    {
+      "id": "import_future_car",
+      "name": "future car"
+    },
+    {
+      "id": "import_hiluxbf",
+      "name": "hiluxbf"
+    },
+    {
+      "id": "import_mclaren_f1_1993_by_alex_ka",
+      "name": "mclaren f1 1993 by alex.ka"
+    },
+    {
+      "id": "import_pininfarina_h2_speed",
+      "name": "pininfarina h2 speed"
+    },
+    {
+      "id": "import_toyota_kijang_innova_zenix_2023_highpoly",
+      "name": "toyota kijang innova zenix 2023 highpoly"
+    },
+    {
+      "id": "import_toyota_landcruiser_v8_2022",
+      "name": "toyota landcruiser v8 2022"
+    },
+    {
+      "id": "import_valentines_day_car",
+      "name": "valentines day car"
+    }
+  ],
+  "redistribution_confirmation": {
+    "date": "2026-10-25",
+    "scope": "All 32 imported cars",
+    "statement": "User confirmed permission for public redistribution of all imports during release planning. Original individual licenses and attribution remain applicable; this confirmation does not replace or broaden those terms."
+  },
+  "tracks": [
+    {
+      "id": "astra_coast",
+      "name": "Astra Lotus Coast"
+    },
+    {
+      "id": "colombo_city",
+      "name": "Colombo City Grand Prix"
+    },
+    {
+      "id": "kandy_lake",
+      "name": "Kandy Lake Circuit"
+    }
+  ]
+}

@@ -246,7 +246,11 @@ func show_guide() -> void:
 func show_controls(slot: int=0) -> void:
  var leave: Callable=show_pause if game.paused else close_modal
  var box:=dialog("CONTROLS","Press a button. See it light up.",leave,1300)
- var panel:=LeoControlsPanel.new();panel.router=game.input_router;panel.slot=slot;panel.embedded=true;panel.custom_minimum_size=Vector2(1200,570);box.add_child(panel)
+ var panel:=LeoControlsPanel.new();panel.router=game.input_router;panel.slot=slot;panel.embedded=true;
+ var selected_vehicle: VehicleDefinition=game.catalog.vehicle(game.local_players[slot].vehicle_id)
+ if selected_vehicle:
+  for feature in selected_vehicle.actions:panel.action_names["vehicle_action_%d" % int(feature.slot)]=feature.name
+ panel.custom_minimum_size=Vector2(1200,570);box.add_child(panel)
  panel.closed.connect(leave)
  game.input_router.controls_testing=true
 func show_tracks() -> void:
@@ -281,7 +285,8 @@ func choose_track(track: LeoTrackDefinition) -> void:
  starting=false
 func show_records() -> void:
  var box:=dialog("RECORDS","Your best races, all on this PC.",close_modal,1300)
- var panel:=LeoRankingsPanel.new();panel.game=game;panel.embedded=true;panel.custom_minimum_size=Vector2(1200,540);box.add_child(panel)
+ var panel:=LeoRankingsPanel.new();panel.game=game;panel.embedded=true;
+ panel.custom_minimum_size=Vector2(1200,540);box.add_child(panel)
  panel.closed.connect(close_modal)
 func show_results() -> void:
  close_modal(false);game.input_router.gameplay_enabled=false;screen="results";hud.scene_mode="results"

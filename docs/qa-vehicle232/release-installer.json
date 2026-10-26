@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "profile": "complete",
+      "cars": 48,
+      "tracks": 3,
+      "status": "PASS"
+    },
+    {
+      "profile": "standard",
+      "cars": 16,
+      "tracks": 3,
+      "status": "PASS"
+    },
+    {
+      "profile": "custom",
+      "cars": 18,
+      "tracks": 1,
+      "status": "PASS"
+    }
+  ],
+  "zero_tracks_rejected": true,
+  "upgrade_from": "2.3.1",
+  "user_cars_preserved": true,
+  "prior_deselected_content_preserved": true,
+  "modified_files_backed_up": true,
+  "uninstall_preserves_custom_and_modified": true,
+  "settings_inputs_records_preserved": true,
+  "sdk_free_content_checks": true,
+  "diagnostic_destination_guard": true
+}

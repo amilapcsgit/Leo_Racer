@@ -1,4 +1,4 @@
-param([ValidateSet('Install','Uninstall')][string]$Mode,[string]$Destination,[string]$Payload)
+param([ValidateSet('Install','Uninstall')][string]$Mode,[string]$Destination,[string]$Payload,[string]$Version='2.3.0')
 $ErrorActionPreference='Stop'
 try {
  $root=[IO.Path]::GetFullPath($Destination).TrimEnd('\')
@@ -45,7 +45,7 @@ try {
    Move-Item -LiteralPath $temporary -Destination $target -Force
    $owned[$relative]=$newHash
   }
-  $json=@{format=1;version='2.3.0';files=$owned} | ConvertTo-Json -Depth 5
+  $json=@{format=1;version=$Version;files=$owned} | ConvertTo-Json -Depth 5
   [IO.File]::WriteAllText($ledger+'.new',$json,[Text.UTF8Encoding]::new($false))
   Move-Item -LiteralPath ($ledger+'.new') -Destination $ledger -Force
  }else{

@@ -1,0 +1,30 @@
+{
+  "source_sha256": "1039614f1727528061f75aad2a4ddd47753f7491adbb3a45463e76e05ea52959",
+  "output_sha256": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
+  "source_unchanged": true,
+  "corrections": [
+    {
+      "node": "Bigster_024/Rear_Assembly/dust25_taillight_L",
+      "role": "red_y_signature",
+      "led_triangles": 36,
+      "upper_reverse_targets": 0
+    },
+    {
+      "node": "Bigster_024/Rear_Assembly/dust25_taillight_R",
+      "role": "red_y_signature",
+      "led_triangles": 36,
+      "upper_reverse_targets": 0
+    },
+    {
+      "node": "Bigster_024/Rear_Assembly/dust25_bumper_a_R__Reflector_Lens_L",
+      "role": "bumper_reverse",
+      "reverse_triangles": 240,
+      "raw_max_height": 0.37359699606895447
+    }
+  ],
+  "sunroof_slide_local": [
+    0,
+    0.065,
+    -0.68
+  ]
+}

@@ -7,6 +7,7 @@ var driver_id: StringName = &"hedgehog"
 var vehicle_id: StringName = &"blue"
 var preferred_vehicle_id: StringName
 var kart: LeoKart
+var camera_rig := preload("res://scripts/local/race_camera.gd").new()
 var camera: Camera3D
 var feedback: Node
 var lap_started := 0.
@@ -27,6 +28,7 @@ func _init(index: int = 0) -> void:
  profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
  if index==1:driver_id=&"mario";vehicle_id=&"duster";player_name="Player 2"
 func reset_race() -> void:
+ camera_rig=preload("res://scripts/local/race_camera.gd").new()
  kart=null;lap_started=0.;best_lap=99999.;launch_charged=false;wrong_way=0.;slipstream_time=0.;slipstream_cooldown=0.;horn_cooldown=0.;boost_count=0;heading=0.;roll=0.;announcement="";announcement_time=0.;photo=false
 func selection() -> Dictionary:
  return {"profile_id":profile_id,"name":player_name,"driver":String(driver_id),"vehicle":String(preferred_vehicle_id if not preferred_vehicle_id.is_empty() else vehicle_id)}

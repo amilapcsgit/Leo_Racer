@@ -1,0 +1,82 @@
+{
+  "2.3.1": {
+    "forward": {
+      "fps": 93.1334087264105,
+      "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+      "humans": 2,
+      "max_frame_ms": 19.895,
+      "p50_ms": 10.69,
+      "p95_ms": 14.635,
+      "p99_ms": 16.358,
+      "racers": 6,
+      "renderer": "forward_plus",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "separated_players": true,
+      "static_peak_mb": 231.442332,
+      "vehicle_load_ms": 8787,
+      "vram_peak_mb": 1483.835776
+    },
+    "compatibility": {
+      "fps": 58.3524558985735,
+      "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+      "humans": 2,
+      "max_frame_ms": 297.734,
+      "p50_ms": 15.971,
+      "p95_ms": 23.16,
+      "p99_ms": 27.46,
+      "racers": 6,
+      "renderer": "gl_compatibility",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "separated_players": true,
+      "static_peak_mb": 156.165575,
+      "vehicle_load_ms": 21630,
+      "vram_peak_mb": 837.802717
+    }
+  },
+  "2.3.2": {
+    "forward": {
+      "fps": 95.284922749057,
+      "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+      "humans": 2,
+      "max_frame_ms": 146.649,
+      "p50_ms": 10.389,
+      "p95_ms": 14.312,
+      "p99_ms": 16.144,
+      "racers": 6,
+      "renderer": "forward_plus",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "separated_players": true,
+      "static_peak_mb": 226.409873,
+      "vehicle_load_ms": 5402,
+      "vram_peak_mb": 1483.838624
+    },
+    "compatibility": {
+      "fps": 62.3592500731913,
+      "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+      "humans": 2,
+      "max_frame_ms": 84.662,
+      "p50_ms": 15.47,
+      "p95_ms": 23.79,
+      "p99_ms": 27.187,
+      "racers": 6,
+      "renderer": "gl_compatibility",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "separated_players": true,
+      "static_peak_mb": 157.151985,
+      "vehicle_load_ms": 5458,
+      "vram_peak_mb": 831.514921
+    }
+  }
+}

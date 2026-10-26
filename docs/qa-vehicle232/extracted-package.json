@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "archive_crc": true,
+  "member_hashes_match": true,
+  "files": 366,
+  "default_vehicles": 16,
+  "self_contained_runtime": true,
+  "checks": [
+    {
+      "label": "zip-content",
+      "exit_code": 0,
+      "sdk_on_path": false
+    },
+    {
+      "label": "zip-boot-art",
+      "exit_code": 0,
+      "sdk_on_path": false
+    },
+    {
+      "label": "zip-cameras",
+      "exit_code": 0,
+      "sdk_on_path": false
+    }
+  ],
+  "exe_sha256": "5858b9e93aa450cf5f6b8b0fed326ec691c9129fbea0bd5bc740eee1154fae52",
+  "core_sha256": "fe6f9885cfce5ab33158b555bd2dac790b8d6a069ca73509996489eb1ef34c5d"
+}

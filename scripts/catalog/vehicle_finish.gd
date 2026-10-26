@@ -1,46 +1,9 @@
-extends Node3D
-## Opt-in finish for the checkpoint 024 portable Bigster. Materials are per vehicle;
-## mesh resources stay shared, so one car braking never changes another car.
-var brake_materials: Array[StandardMaterial3D] = []
-var tail_lights: Array[OmniLight3D] = []
-var headlights: Array[SpotLight3D] = []
-var braking := false
+extends RefCounted
+## Preserve the checkpoint paint/glass finish independently of lamp controls.
+static func install(body: Node3D, profile: String) -> void:
+	if profile == "bigster_pbr_v1":apply_finish(body,{})
 
-static func install(body: Node3D, profile: String) -> Node3D:
-	if profile != "bigster_pbr_v1": return null
-	var controller := new()
-	controller.name = "VehicleLighting"
-	body.add_child(controller)
-	controller.apply_finish(body, {})
-	for side in [-1., 1.]:
-		var lamp := SpotLight3D.new()
-		lamp.name = "LowBeamLeft" if side < 0 else "LowBeamRight"
-		lamp.position = Vector3(side * .64, .91, -2.09)
-		lamp.rotation.x = deg_to_rad(-5.)
-		lamp.light_color = Color(.88, .94, 1.)
-		lamp.light_energy = 2.2
-		lamp.spot_range = 26.
-		lamp.spot_angle = 32.
-		lamp.spot_attenuation = 1.25
-		lamp.shadow_enabled = false
-		lamp.distance_fade_enabled = true
-		lamp.distance_fade_begin = 40.
-		lamp.distance_fade_length = 15.
-		controller.add_child(lamp)
-		controller.headlights.append(lamp)
-		var tail := OmniLight3D.new()
-		tail.name = "TailGlowLeft" if side < 0 else "TailGlowRight"
-		tail.position = Vector3(side * .77, 1.05, 2.19)
-		tail.light_color = Color(1., .015, .008)
-		tail.omni_range = 1.35
-		tail.light_energy = .12
-		tail.shadow_enabled = false
-		controller.add_child(tail)
-		controller.tail_lights.append(tail)
-	controller.update_state(false)
-	return controller
-
-func apply_finish(node: Node, shared: Dictionary) -> void:
+static func apply_finish(node: Node, shared: Dictionary) -> void:
 	if node is MeshInstance3D:
 		for i in node.mesh.get_surface_count():
 			var old: Material = node.get_active_material(i)
@@ -64,19 +27,13 @@ func apply_finish(node: Node, shared: Dictionary) -> void:
 				elif label.begins_with("Lamp_Head_"):
 					m.emission_enabled = true
 					m.emission = Color(.8, .88, 1.)
-					m.emission_energy_multiplier = 3.
+					m.emission_energy_multiplier = 0.
 				elif label.begins_with("Lamp_TailBrake_"):
 					m.emission_enabled = true
 					m.emission = Color(1., .008, .012)
-					brake_materials.append(m)
+					m.emission_energy_multiplier = 0.
 				shared[old] = m
 			node.set_surface_override_material(i, shared[old])
 		if node.name.contains("glass") or node.name.contains("Glass"):
 			node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for child in node.get_children(): apply_finish(child, shared)
-
-func update_state(is_braking: bool) -> void:
-	braking = is_braking
-	for material in brake_materials:
-		material.emission_energy_multiplier = 3.5 if braking else .45
-	for lamp in tail_lights: lamp.light_energy = .8 if braking else .12

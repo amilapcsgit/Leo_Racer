@@ -1,0 +1,74 @@
+[
+  {
+    "checks": 3,
+    "errors": [],
+    "length_m": 1905.071996,
+    "mode": "single",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "astra_coast",
+    "unranked": true,
+    "vehicle_load_ms": 5092
+  },
+  {
+    "checks": 87,
+    "errors": [],
+    "length_m": 1905.071996,
+    "mode": "split",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "astra_coast",
+    "unranked": true,
+    "vehicle_load_ms": 5136
+  },
+  {
+    "checks": 3,
+    "errors": [],
+    "length_m": 5499.99501037598,
+    "mode": "single",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "colombo_city",
+    "unranked": true,
+    "vehicle_load_ms": 4425
+  },
+  {
+    "checks": 135,
+    "errors": [],
+    "length_m": 5499.99501037598,
+    "mode": "split",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "colombo_city",
+    "unranked": true,
+    "vehicle_load_ms": 5155
+  },
+  {
+    "checks": 3,
+    "errors": [],
+    "length_m": 2827.51662683487,
+    "mode": "single",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "kandy_lake",
+    "unranked": true,
+    "vehicle_load_ms": 4277
+  },
+  {
+    "checks": 12,
+    "errors": [],
+    "length_m": 2827.51662683487,
+    "mode": "split",
+    "renderer": "forward_plus",
+    "revision": 1,
+    "status": "PASS",
+    "track": "kandy_lake",
+    "unranked": true,
+    "vehicle_load_ms": 4589
+  }
+]

@@ -407,7 +407,8 @@ func _physics_process(dt: float) -> void:
 	if boost_time > 0: rate = 35
 	if not active: target_speed = 0; rate = 22
 	if vehicle_lighting:
-		vehicle_lighting.update_state(active and speed > .5 and target_speed < speed - .5)
+		var lamps := LeoVehicleFeatures.driving_state(speed,control_input.value("accelerate") if control_input else maxf(throttle,0.),control_input.value("brake") if control_input else maxf(-throttle,0.),active,not is_player or auto_drive,target_speed)
+		vehicle_lighting.update_state(lamps.x>.5,lamps.y>.5)
 	speed = move_toward(speed, target_speed, dt * rate)
 	var grip := clampf(absf(speed) / 8, 0, 1)
 	var turn_rate := lerpf(2.2, 1.65, clampf(absf(speed) / 40, 0, 1)) * handling

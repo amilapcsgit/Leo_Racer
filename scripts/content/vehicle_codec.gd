@@ -1,7 +1,7 @@
 class_name LeoVehicleCodec
 extends RefCounted
 ## JSON adapter; never evaluates expressions or accepts user scripts.
-const FIELDS := ["display_name","collision_size","collision_position","max_speed","boosted_speed","electric_boost","braking_regeneration","ai_lateral_acceleration","acceleration","handling","camera_height","preview_target","preview_distance","exhausts","driver_policy","seat","normalization","driver_fits","hovering","preserve_materials","visual_profile","fixed_driver_id","setup_complete","attribution"]
+const FIELDS := ["display_name","collision_size","collision_position","max_speed","boosted_speed","electric_boost","braking_regeneration","ai_lateral_acceleration","acceleration","handling","camera_height","preview_target","preview_distance","exhausts","driver_policy","seat","normalization","driver_fits","hovering","preserve_materials","visual_profile","lighting","actions","fixed_driver_id","setup_complete","attribution"]
 
 static func encode(value: Variant) -> Variant:
 	if value is Vector3:return [value.x,value.y,value.z]

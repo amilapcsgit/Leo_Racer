@@ -1,7 +1,7 @@
 class_name LeoVehicleLibrary
 extends RefCounted
 ## Metadata-only discovery. A bad optional car never prevents boot.
-const CORE_VERSION := Vector3i(2,3,0)
+const CORE_VERSION := Vector3i(2,3,2)
 static var generation := 0
 static var entries: Array[VehicleDefinition]=[]
 static var unavailable: Array[Dictionary]=[]
@@ -130,6 +130,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 	if not (data.get("driver_policy",0) is int or data.get("driver_policy",0) is float):errors.append("Unsupported driver policy")
 	elif float(data.get("driver_policy",0))!=int(data.get("driver_policy",0)) or int(data.get("driver_policy",0)) not in [0,1,2,3]:errors.append("Unsupported driver policy")
 	elif int(data.get("driver_policy",0))==2 and String(data.get("fixed_driver_id","")) not in ["human","mario","hedgehog","lion","elephant","parrot"]:errors.append("Choose a valid fixed driver")
+	errors.append_array(preload("res://scripts/content/vehicle_feature_spec.gd").problems(data))
 	return errors
 
 static func discover(directory: String="") -> void:

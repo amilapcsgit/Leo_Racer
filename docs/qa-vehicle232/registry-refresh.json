@@ -1,0 +1,10 @@
+{
+  "changed_resources": [
+    "assets/config/official-vehicles.json"
+  ],
+  "other_resources_byte_identical": true,
+  "bigster": {
+    "definition": "2be27397520db26a7d9c54e0830f86edfb8ef0841dc508901ff15d5624e63757",
+    "model": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62"
+  }
+}

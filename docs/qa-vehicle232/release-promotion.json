@@ -1,0 +1,7 @@
+{
+  "source_candidate": "user-accepted 2.3.2 / Bigster 1.2.1",
+  "exe_sha256": "5858b9e93aa450cf5f6b8b0fed326ec691c9129fbea0bd5bc740eee1154fae52",
+  "core_sha256": "52e64e79f5b5c9fcb4bdb88d578d50e790c2ea6b67b915b41fef7d45a4385faf",
+  "tracks": 3,
+  "source_branch": "orbitcamera"
+}

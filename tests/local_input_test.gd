@@ -67,8 +67,8 @@ func run() -> void:
  router.start_capture(1,"brake");router._capture(key(KEY_ESCAPE))
  check(router.capture_slot==-1 and router.players[1].value("accelerate")==0.,"Escape cancels capture and clears held inputs")
  var panel:=LeoControlsPanel.new();panel.router=router;root.add_child(panel);await process_frame
- check(panel.live.size()==10,"Controls expose every driving action")
- panel.slot=1;panel.refresh();check(panel.live.size()==10,"Second-player controls are editable")
+ check(panel.live.size()==LeoPlayerInput.ACTIONS.size(),"Controls expose every driving action")
+ panel.slot=1;panel.refresh();check(panel.live.size()==LeoPlayerInput.ACTIONS.size(),"Second-player controls are editable")
  panel.free()
  var report:={"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"errors":failures,"physical_wheel":"unverified / hardware unavailable"}
  DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://build/qa-ui"))

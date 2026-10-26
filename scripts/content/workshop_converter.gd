@@ -204,6 +204,25 @@ static func mesh_for(islands: Array) -> ArrayMesh:
 	return mesh
 
 static func convert(path: String, options: Dictionary={}) -> Dictionary:
+	# Reimporting an authored portable car must not flatten its moving parts into
+	# Body or discard animation tracks. Geometry corrections remain available via
+	# Set Up Vehicle, which edits normalization and bindings without reconversion.
+	var sidecar := path.get_base_dir().path_join("vehicle.json")
+	if FileAccess.file_exists(sidecar):
+		var authored: Variant=JSON.parse_string(FileAccess.get_file_as_string(sidecar))
+		if authored is Dictionary and (not authored.get("lighting",[]).is_empty() or not authored.get("actions",[]).is_empty()):
+			var errors:=LeoVehicleLibrary.problems(authored,path.get_base_dir())
+			if not errors.is_empty():return failure("Invalid authored vehicle: "+"; ".join(errors))
+			if String(authored.model)!=path.get_file():return failure("Authored manifest identifies a different model.")
+			var document:=GLTFDocument.new();var state:=GLTFState.new()
+			if document.append_from_file(path,state)!=OK:return failure("Cannot preserve authored model.")
+			var preserved:=document.generate_scene(state) as Node3D
+			if not preserved:return failure("Authored model has no scene.")
+			LeoVehicleImporter.strip_nonvisual(preserved)
+			authored=authored.duplicate(true)
+			for key in ["id","display_name","attribution"]:
+				if options.has(key):authored[key]=options[key]
+			return {"ok":true,"error":"","scene":preserved,"source_model":path,"definition":authored,"report":{"converter":VERSION,"source_sha256":FileAccess.get_sha256(path),"preserved_features":true,"correction_note":"Authored transforms, wheel bindings and animations retained; edit them in Set Up Vehicle."}}
 	var inspection: Dictionary=options.get("inspection",{})
 	if inspection.is_empty():inspection=inspect(path,options.get("rotation_degrees",Vector3.ZERO),float(options.get("scale",1.)))
 	if not inspection.get("ok",false):return inspection
@@ -259,7 +278,11 @@ static func export_folder(converted: Dictionary, destination: String) -> Diction
 	var temporary:=staging_root.path_join(destination.get_file()+"-"+str(Time.get_ticks_usec()))
 	if DirAccess.make_dir_absolute(temporary)!=OK:return failure("Cannot create staging folder.")
 	var doc:=GLTFDocument.new();var state:=GLTFState.new()
-	if doc.append_from_scene(converted.scene,state)!=OK or doc.write_to_filesystem(state,temporary.path_join("model.glb"))!=OK:return failure("Cannot export the converted GLB; staging folder retained for recovery.")
+	if converted.has("source_model"):
+		# Copy authored GLBs exactly: re-export changes node prefixes/material names
+		# and can alter embedded animation tracks and precision.
+		if DirAccess.copy_absolute(ProjectSettings.globalize_path(converted.source_model),temporary.path_join("model.glb"))!=OK:return failure("Cannot copy authored model; staging folder retained.")
+	elif doc.append_from_scene(converted.scene,state)!=OK or doc.write_to_filesystem(state,temporary.path_join("model.glb"))!=OK:return failure("Cannot export the converted GLB; staging folder retained for recovery.")
 	for item in [["vehicle.json",JSON.stringify(converted.definition,"\t")+"\n"],["conversion-report.json",JSON.stringify(converted.get("report",{}),"\t")+"\n"],["LICENSE.txt",String(converted.definition.get("attribution","User supplied content; retain its original license."))+"\n"]]:
 		var file:=FileAccess.open(temporary.path_join(item[0]),FileAccess.WRITE)
 		if not file:return failure("Cannot write vehicle metadata; staging folder retained.")
@@ -290,7 +313,9 @@ static func bindings_problem(data: Dictionary, scene: Node3D) -> String:
 	var assigned: Array[String]=[]
 	for wheel in wheels:
 		for path in wheel.get("rotating",[])+wheel.get("stationary",[]):
-			if not VehicleAssembler.find_group(scene,NodePath(path)) is MeshInstance3D:return "Wheel binding does not identify a mesh: "+String(path)
+			var group:=VehicleAssembler.find_group(scene,NodePath(path))
+			if not group:return "Wheel binding does not identify a node: "+String(path)
+			if path in wheel.get("rotating",[]) and not group is MeshInstance3D and group.find_children("*","MeshInstance3D",true,false).is_empty():return "Wheel binding does not identify mesh geometry: "+String(path)
 			for previous in assigned:
 				if path==previous or String(path).begins_with(previous+"/") or previous.begins_with(String(path)+"/"):return "Wheel bindings overlap: "+String(path)
 			assigned.append(String(path))

@@ -39,7 +39,7 @@ def vehicle(key, destination, source_folder=None):
         model_document(relative_file(source_folder,data.get('model','model.glb')))
         folder=Path(destination)/key;folder.mkdir(parents=True,exist_ok=True)
         names=['vehicle.json',data.get('model','model.glb')]
-        names += [n for n in [data.get('thumbnail','thumbnail.png'),'LICENSE.txt','conversion-report.json','optimized-textures.json'] if (source_folder/n).is_file()]
+        names += [n for n in [data.get('thumbnail','thumbnail.png'),'LICENSE.txt','conversion-report.json','feature-authoring.json','optimized-textures.json'] if (source_folder/n).is_file()]
         if 'optimized-textures.json' in names:
             names += [entry['file'] for entry in read(source_folder/'optimized-textures.json').get('textures',[])]
         for name in names:

@@ -197,6 +197,8 @@ func build_fields() -> void:
 	scalar("Handling multiplier","handling",1.,.1,3.)
 	scalar("Driving camera height offset","camera_height",1.,-2.,5.)
 	label(fields,"Custom content and tuning cannot set official records.")
+	var feature_editor:=preload("res://scripts/content/vehicle_feature_editor.gd").new()
+	fields.add_child(feature_editor);feature_editor.configure(self)
 
 func candidate() -> VehicleDefinition:
 	var vehicle:=LeoVehicleCodec.deserialize(data,source_path.get_base_dir());vehicle.model_path=source_path;vehicle.official=false;return vehicle
@@ -337,5 +339,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:end_trial();get_viewport().set_input_as_handled();return
 	for action in trial_input.feed(event):
 		if action=="recover":trial.recover()
+		if trial.vehicle_lighting:
+			if action=="headlights":trial.vehicle_lighting.toggle_headlights()
+			if action in ["vehicle_action_1","vehicle_action_2"]:trial.vehicle_lighting.trigger(1 if action=="vehicle_action_1" else 2)
 		if action=="pause_race":end_trial()
 	if event is InputEventKey or event is InputEventJoypadButton or event is InputEventJoypadMotion:get_viewport().set_input_as_handled()

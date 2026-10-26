@@ -1,0 +1,777 @@
+{
+  "core_version": "2.3.2",
+  "errors": [],
+  "needs_setup": [],
+  "status": "PASS",
+  "vehicle_api": 1,
+  "vehicles": [
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "a6f4b64bd01ac099fde261b7b5baf0a93d5ec2def7d9939c99132a49a4e580c0",
+        "model_match": true,
+        "model_sha256": "f631be5c2f3dbc5858f2ebaf05f843af3e6fe68d7dea5c14fc91939941444170",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "aqua",
+      "import_seconds": 0.00267,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "2be27397520db26a7d9c54e0830f86edfb8ef0841dc508901ff15d5624e63757",
+        "model_match": true,
+        "model_sha256": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "bigster",
+      "import_seconds": 0.07109,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "65aca1ba8f8a8b32c1ce953a9bcc6c6dfd351d2a9c722f96cb16bd121f4fe198",
+        "model_match": true,
+        "model_sha256": "60551ab75ac62cd2ffbaf6e076c825f5d46562cb5d009d5aabf8eab08de1eae1",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "blue",
+      "import_seconds": 0.00271,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "e8e4d9c80e7164fdee6b0b3e70b1b2a14d879261e6bcb85242749d7eddba5dbe",
+        "model_match": false,
+        "model_sha256": "b2def85b8387c95bdb44f2efd30d86521950ad59563f266eb83f69c418db8877",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "byd_yangwang_u8",
+      "import_seconds": 0.031199,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "3ecd6b35eaaf3f078b6ba74104d3c31d8291537c299a0b6e8069bf8e266d3831",
+        "model_match": true,
+        "model_sha256": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "colombo_tuk",
+      "import_seconds": 0.047696,
+      "official": true,
+      "wheels": 3
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "bcdcc473d82c6a61768af8ba3fde03f60a83445c0ea35d00add5b85b3e753dae",
+        "model_match": true,
+        "model_sha256": "9169a61fcfd682f8dc48745bc2af493bd9bdff2675eb64501a17dff754a0f2f3",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "coral",
+      "import_seconds": 0.002305,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "e3b4774fc5f77e00ad25a3df5ec663a4806fbff1ed8aad53756f4ef0f5026045",
+        "model_match": true,
+        "model_sha256": "482dc51f4670b7c10fca83b6e74f24c13b9c4d62408105ddf10b9bea45b2cf8d",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "cyberpunk",
+      "import_seconds": 0.042559,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7631a7f088226ddadc83558ab59190907379ea51dc63e4a87777e659bd7e1925",
+        "model_match": true,
+        "model_sha256": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "duster",
+      "import_seconds": 0.011906,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "b515e6c346134f716fd3298eed2b7a6474f2caff7db797490c0465c6a89d711d",
+        "model_match": true,
+        "model_sha256": "d9bb41c33ae5e2ba695f7162165065a3d9bdcb6094a76a851f71a930931637ba",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "formula_blue",
+      "import_seconds": 0.003322,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "709e006323cb2adb1836b2f728ee97c34991759b8adafe8e9e0462d53018fb57",
+        "model_match": true,
+        "model_sha256": "0991af23884e31c76f9a4d04101b0b59570da170447cea01ec3bc33589acae63",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "formula_red",
+      "import_seconds": 0.004111,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "1b1060ee52e1a4ab254321e6a16bf1eeefed1cad992b881a764d1c20fe5db478",
+        "model_match": true,
+        "model_sha256": "c174a2d0d17598af72280fa4bfb019b28db381a3b8506d52cd94edbc64e5ac21",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "hover",
+      "import_seconds": 0.060369,
+      "official": true,
+      "wheels": 0
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 40,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "f67b402bd0cf9c4861f4b029fe6fec8a8388c7b82069fa4628745af3033eb382",
+        "model_match": false,
+        "model_sha256": "105c2602969f23e9990aad9901e2a3ae5e5f60aa00dc534407d419a73ab9938d",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_1937_auto_union_type_c_streamliner",
+      "import_seconds": 0.140329,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 26,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "679c5dc513a3630e10e5d53d021e23bdae55c639f5d228b56e5338df689a313e",
+        "model_match": false,
+        "model_sha256": "5069094b60e60b783558d42c4777a1da20093464b8ef64645ca492584414b23f",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_1968_volkswagen_beetle",
+      "import_seconds": 0.058549,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 36,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "02a4c237665d3db2c04f8535771afe80f16112b0083c58bf3c326a9189660780",
+        "model_match": false,
+        "model_sha256": "e967e4863242b2c679decbfb4433c51842d4f8dcd9ad35e9a2e5f0e6b36611bb",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_1985_delorean_dmc_12_time_machine_bttf",
+      "import_seconds": 0.136531,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 48,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "70111369c545615094336ae897dce2860f1bac9dca626af3b89d515c8d1378c8",
+        "model_match": false,
+        "model_sha256": "2da55b81377256569e130b3297ca5c7f3cb44aff20e3bc35a4a803b40dc8c6c8",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_1989_lamborghini_countach_25th_anniversary",
+      "import_seconds": 0.077336,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 22,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "e0d434bedecdadcc2dcff09b27e3d9913f6ca125c589a3f62237983e95c06f4c",
+        "model_match": false,
+        "model_sha256": "1de73e26e5f09cf6d2afa6fe3ee1a23a081497e7395c2c3ec154a18e738f1c5e",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_1999_nissan_skyline_gtr_r34_c_west_2f2f",
+      "import_seconds": 0.094714,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 23,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "df07843abbf7b0abef1c46f39614a339f09e372ee73c2402a0fa2c75faa828a5",
+        "model_match": false,
+        "model_sha256": "138ed443753061b6ccce2689c38a1be51be83f87dd5fd1b4e9ad6b250c63925b",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2004_porsche_carrera_gt",
+      "import_seconds": 0.098717,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 685,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "7840b5306a9f6dc59986795008486c4d269aef91b07b9d4d6b82c707b5ee1ff3",
+        "model_match": false,
+        "model_sha256": "7ff40cca0bfd1878f94004c5312aef3127a6af922257415fa9bb27a1b30f880c",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2013_chevrolet_corvette_z06",
+      "import_seconds": 0.062412,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 39,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "d3afb7c78cb47fec9f81986b4a0e8a95607af957788361bbf5be923afee08ea9",
+        "model_match": false,
+        "model_sha256": "5050454922592fccccc13710bf2bde90d8a5be353a0302b4aa0bf6776e667a11",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2013_equipped_jeep_wrangler_unlimited_rubicon",
+      "import_seconds": 0.122823,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 25,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "f241f8fe5809a4557157b37c8156eb19a61d00fd72b138106c2bf81396f59404",
+        "model_match": false,
+        "model_sha256": "9e3e2bd85138cde1f7e9e0ec4bb0958854ab805d9a74a563ff5d7ac7b3dd89dc",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2019_ford_mustang_rtr_spec5_10th_anniversary",
+      "import_seconds": 0.108141,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 17,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "64eecba99c908948d5a992000cc91c88081916f9aa01116bba575c4dff8dfa73",
+        "model_match": false,
+        "model_sha256": "3179e45727f0e1fb2df1d5c6572c60fc4c6276536f21d6974af962e078beef3c",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2020_ferrari_roma",
+      "import_seconds": 0.093743,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 28,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "8bd69a38f668f27a90ee55826be07cea150241193eea2adc6c551f3a8d7489c4",
+        "model_match": false,
+        "model_sha256": "48e9d52153ac7c756e553abbcd5f9b4246f03d5097ff6974597163f0de5531a0",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2020_jeep_gladiator",
+      "import_seconds": 0.116211,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 33,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "1c1765839a932198078809218d7d99685262559f4d38e47a8ab916600788fc7e",
+        "model_match": false,
+        "model_sha256": "1d905beb125578dee92b52b38c2e4f0dda179e89fd3e76b2383469f34ef200cd",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2020_lbworks_toyota_supra_a90_ver_2",
+      "import_seconds": 0.0989,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 35,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "c6be9d18391c4847eab0f517b1f987de6058b3aa23057d4c8240fcd694426a3f",
+        "model_match": false,
+        "model_sha256": "d7989c8ab53d5887d6b5678ebb8eb3a8e9c5f77a13d70c6e695efc3440b4b831",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2021_pininfarina_teorema_concept",
+      "import_seconds": 0.126013,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 28,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "76134e563521c2310bf5cb38481303967a15195520a495c7ef4d2a3525489e21",
+        "model_match": false,
+        "model_sha256": "d227ed0b1bc82a41b555cba23464e17c200f88fd360d4875f94fbd9445f405aa",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit",
+      "import_seconds": 0.097986,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 18,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "9481240e97e7aa3d52647afe466b87d8c4f6e025b48b951764f5c2a2026e1f51",
+        "model_match": false,
+        "model_sha256": "e95c413ab67d60ddd85722041af116c45a2c565a5569aca6ffa65e63fb8f4d56",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2022_mclaren_765lt",
+      "import_seconds": 0.091079,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 27,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "8895baa4a11f863ee4f8babfea5f1c9a1382d796fb112afc7635dcaea262c998",
+        "model_match": false,
+        "model_sha256": "d6e3fa04cb2dbcea6dc5071b5835b5a18459bbe5dbdbf04fc93fbde4b64e3455",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2023_ferrari_sf90_xx_stradale",
+      "import_seconds": 0.114511,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 27,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "443b4d91408a386a5cf858e5bd2e079f0902920c29f6ecd12f1d42a349ddd25f",
+        "model_match": false,
+        "model_sha256": "ef2af21196f336c0c83d6fa573b0f4f60a71911e6a4f4964102061b4c1af5b40",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2024_byd_atto_2",
+      "import_seconds": 0.070295,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 59,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "6afa23edbc3b7eef5300c4b8e4616768901f9654dce9226b1ce19fc16019728f",
+        "model_match": false,
+        "model_sha256": "e288292bbf80395b8f9b9465273ec4ba54123866d75cc57109024ce518141441",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2024_byd_atto_3",
+      "import_seconds": 0.287244,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 35,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "e17a0be9949d815c8795c662e39791ff23c69d326080f2a42754606285400e68",
+        "model_match": false,
+        "model_sha256": "efc8e01b0d64e4ed870b5ba7d8b4b94eb8b67bda0fc9e1ef6b492136a7453310",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_2024_byd_seal",
+      "import_seconds": 0.248634,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 3,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "ee67b892c57bf75be45dd11ef81bcb85e1dd691552bc08ba4037713437f8afbd",
+        "model_match": false,
+        "model_sha256": "a9ae463766624431227a2499e4654d9452960b8c4d38c216b74bb1e070479d16",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_chevrolet_cruze_ltz",
+      "import_seconds": 0.0521,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 28,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "5f50f82d90b372ac49ebe77a26b33ee381b9c43a7ff6ae5a7aa6600a7c50697b",
+        "model_match": false,
+        "model_sha256": "58028667d7bca6b3f2ca5e68739f9f8aa3d67acc108e0729a1790f415b66dd7c",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_dacia_duster_low_poly",
+      "import_seconds": 0.230837,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 1,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "3ee60615306a7b4333679447c73af87793d6daa07c51b1d23e66f05ffd7d3f11",
+        "model_match": false,
+        "model_sha256": "7a5deba27972b2f53b16af2c6746949d71b9bf8c915755036eb509e766cd07c7",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_dacia_duster_widebody_highpoly",
+      "import_seconds": 0.09707,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 10,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "e0da326b17087e0ad45159c3df3a848d8d9c45f27ea4bfe0c8f159fee9a912fd",
+        "model_match": false,
+        "model_sha256": "b158efb0492f5b6c6ce7c7e4db9c4325e16c11a3e562318c798c60c2107624df",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_escapamento_carro_da_barbie_1956",
+      "import_seconds": 0.138333,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 20,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "6a5ee54f98e41709d73859ad42f4d98d9209bf4d07d2dfde3e3d9bf76e4b218c",
+        "model_match": false,
+        "model_sha256": "f0a207899c059d1ca9f81947d831b83604eb461c471407b5643741a80769a204",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_fiat_500_x_outlaw",
+      "import_seconds": 0.313138,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 9,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "faad9a01b7759304928dd66f4cd2bc3d1b2569c5f1cc95cbc7b789d5c6cf23e1",
+        "model_match": false,
+        "model_sha256": "ce696d1a0c9a7cb2457c96b85aaab4730184f1d2e30a79ac103d57f3025b8bdd",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_future_car",
+      "import_seconds": 0.084804,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 8,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "6ada83428521598cda8955dd1dea68437ee143f2c7dde24c3a27fceb26e61b6b",
+        "model_match": false,
+        "model_sha256": "08414dfcffc8cdcd46042ce9a72cf289a5b067e8e37e8a218fa640b355e9190d",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_hiluxbf",
+      "import_seconds": 0.065248,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 83,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "db19492191c1b117f5b6325654a21cbb01d4a80aa6a7e2b985272280a47e27e0",
+        "model_match": false,
+        "model_sha256": "91f279a5f897ac8026743727dbe3ede95515f68e0b51e67520ae327b80bf8df5",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_mclaren_f1_1993_by_alex_ka",
+      "import_seconds": 0.178821,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 26,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "4d6697d51e2d9fa134f34a013247365575f7b03e545f2f3cee9da4971a5ed556",
+        "model_match": false,
+        "model_sha256": "89b2a6814528f88c01d741dae3768b78393adfec3747ecee9ba37a26b0bf19a8",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_pininfarina_h2_speed",
+      "import_seconds": 0.037035,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 46,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "34c76d244de5db05e02635f7c1bce90cfd7b92fc9b46053fdaba731647617e4b",
+        "model_match": false,
+        "model_sha256": "4f153cb6d30dbbb61d2bbaef8283d1503c5d68aaaba5f8e5beb26cc25b9d4867",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_toyota_kijang_innova_zenix_2023_highpoly",
+      "import_seconds": 0.127897,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "0bc6b186011df003fdb5f130d71c073fd1988d35c082261d8098d5f32accfe76",
+        "model_match": false,
+        "model_sha256": "04c006c6cda4c3b40522270154782fc6d51bde517a4b3a237cdb3f85b342a822",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_toyota_landcruiser_v8_2022",
+      "import_seconds": 0.036548,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 95,
+      "fingerprint": {
+        "definition_match": false,
+        "definition_sha256": "dbeece7e6bfe07b3401d2d79eca8aa5b4a817967abe660aa885463e0d6e4f69d",
+        "model_match": false,
+        "model_sha256": "d55881c1c1af55d5e572713efd1f5b13d24c175679d3e52e662e676745426a30",
+        "registry_found": true,
+        "trusted_id": false
+      },
+      "id": "import_valentines_day_car",
+      "import_seconds": 0.235225,
+      "official": false,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "95842174a24054ca777da64e40d1caf47890ee864e5219f7c3c19a931ca4aaed",
+        "model_match": true,
+        "model_sha256": "7c453693ed68961e49333cc598218f8a9ea0d2e3ed3acdaaaf912d8dc425de16",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "mclaren",
+      "import_seconds": 0.018218,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "62be79aa2640a4eae4e3413b7d42adc000a4d66bb979520494b7bc92b48e955f",
+        "model_match": true,
+        "model_sha256": "e92f82380c22538777bef2486cc53189c347a86e0143f68ce89889a49366ceac",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "pink",
+      "import_seconds": 0.002338,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "586a091ac99b5a059c07c6806f2354eb82705fb8c2825120e7c735c9554d82c4",
+        "model_match": true,
+        "model_sha256": "fbdf41b6ed3ce471fb8524f18a28a5dbbfc596ca964369149d513f4bb3ac5ad1",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "pony",
+      "import_seconds": 0.020614,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "7e4dfe56d3735fd138744e9dd902efec240029679ad0671ab9c63d266b9e4bb7",
+        "model_match": true,
+        "model_sha256": "809237545e8ba34de782da0c1383b3e670479b26d54df697ae8413c9b74dec62",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "race_bus",
+      "import_seconds": 0.003826,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "8c2a6412106120b534410ccc2787d6695b089df42481d131a8e1df3973a7f8e1",
+        "model_match": true,
+        "model_sha256": "26863f467ca0fecbecba3ea232484209188138716b3bcd1f8d1ca9146916ef1f",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "race_tuk",
+      "import_seconds": 0.003357,
+      "official": true,
+      "wheels": 4
+    },
+    {
+      "cache_hit": true,
+      "compressed_materials": 0,
+      "fingerprint": {
+        "definition_match": true,
+        "definition_sha256": "b9295a138c54a3db093e39130ba5a75785080286ff23b31af3ff2219aceb0b1c",
+        "model_match": true,
+        "model_sha256": "a8f2abbed820be931001ad70685b2f3777c6b60198af5115bad1edb44bfd522f",
+        "registry_found": true,
+        "trusted_id": true
+      },
+      "id": "roadster_gold",
+      "import_seconds": 0.003414,
+      "official": true,
+      "wheels": 4
+    }
+  ]
+}

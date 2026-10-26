@@ -562,6 +562,7 @@ func start_race() -> void:
 		var grid: Dictionary=circuit.features.get("grid",{})
 		var lanes: Array=grid.get("lanes",[-3.2,3.2])
 		kart.place(float(grid.get("start",-8.))-(i/2)*row_span,float(lanes[i%2]))
+		if i<human_count:local_players[i].heading=kart.rotation.y
 		kart.gate_crossed.connect(on_gate);kart.boosted.connect(on_boost);kart.impacted.connect(on_impact);kart.recovered.connect(on_recover)
 		karts.append(kart)
 		await get_tree().process_frame
@@ -1097,6 +1098,9 @@ func _on_local_command(slot: int, action: String) -> void:
 	if action=="accelerate" and state=="countdown" and countdown>0 and countdown<=1.05:
 		local.launch_charged=true
 		if slot==0:launch_charged=true
+	if kart and state in ["countdown","race"] and kart.vehicle_lighting:
+		if action=="headlights":kart.vehicle_lighting.toggle_headlights()
+		if action in ["vehicle_action_1","vehicle_action_2"]:kart.vehicle_lighting.trigger(1 if action=="vehicle_action_1" else 2)
 	if not kart or state!="race" or not kart.active:return
 	if action=="recover":kart.recover()
 	if action=="horn" and local.horn_cooldown<=0:
@@ -1110,13 +1114,7 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	var view:=local.camera
 	var pose: Transform3D=kart.get_global_transform_interpolated()
 	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
-	var behind:=Vector3(sin(local.heading),0,cos(local.heading))
-	view.position=pose.origin+behind*(6.4+absf(kart.speed)*.012+(maxf(0.,kart.definition.collision_size.z-4.)*.5 if human_count==2 else 0.))+Vector3.UP*(3.1+kart.camera_height_offset)
-	if circuit.elevated:
-		var query:=PhysicsRayQueryParameters3D.create(pose.origin+Vector3.UP*1.5,view.position,1)
-		var hit:=get_world_3d().direct_space_state.intersect_ray(query)
-		if not hit.is_empty():view.position=hit.position+hit.normal*.4
-	view.look_at(pose.origin-behind*6.+Vector3.UP*(1.85+kart.camera_height_offset*.5))
+	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2)
 	if local.feedback:
 		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
 		view.fov=lerpf(view.fov,63.+absf(kart.speed)*.1+float(local.feedback.get_fov_offset()),1.-exp(-dt*12.))

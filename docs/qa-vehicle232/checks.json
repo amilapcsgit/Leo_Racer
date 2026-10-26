@@ -1,0 +1,39 @@
+{
+  "existing-input": {
+    "status": "PASS",
+    "checks": 35,
+    "errors": [],
+    "physical_wheel": "unverified / hardware unavailable"
+  },
+  "existing-workshop": {
+    "checks": 22,
+    "errors": [],
+    "private_test_uses_game_physics": true,
+    "source_models_untouched": true,
+    "status": "PASS"
+  },
+  "existing-presentation": {
+    "status": "PASS",
+    "checks": 21,
+    "errors": [],
+    "renderer": "forward_plus",
+    "captures": false
+  },
+  "existing-local-race": {
+    "status": "PASS",
+    "checks": 21,
+    "errors": []
+  },
+  "package-cameras-forward": {
+    "checks": 69,
+    "errors": [],
+    "renderer": "forward_plus",
+    "status": "PASS"
+  },
+  "package-cameras-compatibility": {
+    "checks": 69,
+    "errors": [],
+    "renderer": "gl_compatibility",
+    "status": "PASS"
+  }
+}

@@ -44,7 +44,7 @@ func ready_problem(slot: int) -> String:
  for action in ["accelerate","brake","left","right"]:
   if p.bindings.get(action,[]).is_empty(): return "Player %d: bind %s." % [slot+1,action]
  if active_slots==2 and players[0].kind=="keyboard" and players[1].kind=="keyboard":
-  for action in ["accelerate","brake","left","right","drift","boost","recover","horn"]:
+  for action in LeoPlayerInput.ACTIONS:
    for binding in p.bindings.get(action,[]):
     if not conflicts(slot,action,binding).is_empty():return "Keyboard controls overlap. Open Controls to choose another key."
  return ""
@@ -55,6 +55,12 @@ func _input(event: InputEvent) -> void:
   _capture(event); return
  if gameplay_enabled or controls_testing:feed(event)
 func feed(event: InputEvent) -> void:
+ if event is InputEventMouseButton or event is InputEventMouseMotion:
+  var owner:=0
+  if active_slots==2 and players[0].kind!="keyboard" and players[1].kind=="keyboard":owner=1
+  if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_RIGHT:players[owner].orbit_dragging=event.pressed
+  if event is InputEventMouseMotion and players[owner].orbit_dragging:players[owner].mouse_orbit+=event.relative
+  return
  var pause_sent:=false
  for slot in players.size():
   for action in players[slot].feed(event):
@@ -92,9 +98,18 @@ func save_profiles() -> Error:
 func load_profiles() -> void:
  var cfg := ConfigFile.new()
  if cfg.load(settings_path) != OK: return
+ var added: Array=[]
  for i in players.size():
   var data: Variant = cfg.get_value("player_%d" % i,"profile",{})
-  if data is Dictionary and not data.is_empty(): players[i].restore(data)
+  if data is Dictionary and not data.is_empty():
+   players[i].restore(data)
+   if int(data.get("version",1))<3:
+    for action in LeoPlayerInput.FEATURE_ACTIONS:
+     if not data.get("bindings",{}).has(action):added.append({"slot":i,"action":action})
+ for entry in added:
+  var p:=players[int(entry.slot)]
+  for binding in p.bindings.get(entry.action,[]):
+   if not conflicts(int(entry.slot),entry.action,binding).is_empty():p.bindings[entry.action]=[];break
  var identities: Dictionary={}
  for id in Input.get_connected_joypads():identities[id]=fingerprint(id)
  restore_assignments(Input.get_connected_joypads(),identities)
@@ -175,7 +190,13 @@ func set_automatic(slot: int) -> void:
 
 func conflicts(slot: int, action: String, binding: Dictionary) -> Array[Dictionary]:
  var result: Array[Dictionary]=[]
- if binding.get("type")!="key" or action in ["pause_race","photo"]:return result
+ if action in ["pause_race","photo"]:return result
+ if binding.get("type")!="key":
+  for other_action in players[slot].bindings:
+   if other_action==action:continue
+   for entry in players[slot].bindings[other_action]:
+    if LeoPlayerInput.binding_overlap(binding,entry):result.append({"slot":slot,"action":other_action,"binding":entry})
+  return result
  for other_slot in active_slots:
   var other:=players[other_slot]
   if other.kind!="keyboard":continue

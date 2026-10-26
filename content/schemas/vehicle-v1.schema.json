@@ -139,6 +139,20 @@
       "type": "number",
       "minimum": 0,
       "maximum": 1000
+    },
+    "lighting": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/lamp"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/$defs/action"
+      }
     }
   },
   "$defs": {
@@ -167,6 +181,139 @@
           "items": {
             "$ref": "#/$defs/vector"
           }
+        }
+      }
+    },
+    "lamp_target": {
+      "type": "object",
+      "required": [
+        "node",
+        "material"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 511
+        },
+        "material": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "lamp": {
+      "type": "object",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "head",
+            "tail",
+            "brake",
+            "reverse"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/lamp_target"
+          }
+        },
+        "anchor": {
+          "$ref": "#/$defs/vector"
+        },
+        "rotation": {
+          "$ref": "#/$defs/vector"
+        },
+        "range": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 40
+        },
+        "energy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "running": {
+          "type": "boolean"
+        }
+      }
+    },
+    "action_target": {
+      "type": "object",
+      "required": [
+        "node"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 511
+        },
+        "closed_position": {
+          "$ref": "#/$defs/vector"
+        },
+        "open_position": {
+          "$ref": "#/$defs/vector"
+        },
+        "closed_rotation": {
+          "$ref": "#/$defs/vector"
+        },
+        "open_rotation": {
+          "$ref": "#/$defs/vector"
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": [
+        "slot",
+        "name"
+      ],
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "type": {
+          "enum": [
+            "transform",
+            "animation"
+          ]
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/action_target"
+          }
+        },
+        "player": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clip": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }

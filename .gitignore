@@ -85,3 +85,8 @@ installer/release-descriptions.nsh
 /k2/
 /k3/
 /p0/
+
+# Generated 2.3.2 installer lists and QA import sidecars.
+installer/release232-*.nsh
+docs/qa-vehicle232/**/*.import
+docs/qa-vehicle232/*.import

@@ -8,6 +8,7 @@ func check(value: bool,message: String) -> void:
 func run() -> void:
 	root.size=Vector2i(1280,720);root.content_scale_size=Vector2i.ZERO
 	var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished
+	var original_roster_size: int=game.catalog.vehicles.size()
 	var editor:=LeoVehicleSetup.new();editor.game=game;editor.configure(game.catalog.vehicle(&"bigster"));root.add_child(editor)
 	var deadline:=Time.get_ticks_msec()+30000
 	while not is_instance_valid(editor.preview) and Time.get_ticks_msec()<deadline:await process_frame
@@ -27,7 +28,7 @@ func run() -> void:
 	await editor.save_vehicle();check(editor.status.text.contains("Private Test Drive"),"Test drive required before save")
 	editor.test_drive();await physics_frame
 	check(is_instance_valid(editor.trial) and editor.trial.definition.max_speed==20.,"Private drive uses unsaved tuning")
-	check(game.catalog.vehicles.size()==2 and game.state=="menu","Private viewport never changes race roster or session")
+	check(game.catalog.vehicles.size()==original_roster_size and game.state=="menu","Private viewport never changes race roster or session")
 	editor.trial_input.inject_test("accelerate",1.)
 	for i in 100:await physics_frame
 	check(editor.trial.speed>10 and editor.trial.position.is_finite(),"Private drive uses actual arcade physics")

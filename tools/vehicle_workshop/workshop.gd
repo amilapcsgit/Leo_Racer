@@ -595,7 +595,7 @@ func build_preview() -> bool:
 	collision_hint.visible = collision_toggle.button_pressed
 	converted.dirty = false
 	build_fields()
-	status.text = "Preview ready: verify four wheels, front steering, collision and blue boost. Install creates a portable Vehicle API 1 folder."
+	status.text = "Authored lights/actions and original model retained. After installing, use Content > Vehicles > Set Up Vehicle to adjust their poses and bindings." if converted.get("source_model","")!="" else "Preview ready: verify four wheels, front steering, collision and blue boost. Install creates a portable Vehicle API 1 folder."
 	return true
 
 func clear_preview() -> void:

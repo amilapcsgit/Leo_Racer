@@ -1,6 +1,9 @@
 class_name LeoPlayerInput
 extends RefCounted
-const ACTIONS := ["accelerate","brake","left","right","drift","boost","recover","horn","pause_race","photo"]
+const ACTIONS := ["accelerate","brake","left","right","drift","boost","recover","horn","pause_race","photo","headlights","vehicle_action_1","vehicle_action_2","look_back","camera_left","camera_right","camera_up","camera_down"]
+const FEATURE_ACTIONS := ["headlights", "vehicle_action_1", "vehicle_action_2", "look_back", "camera_left", "camera_right", "camera_up", "camera_down"]
+var mouse_orbit := Vector2.ZERO
+var orbit_dragging := false
 var kind := "keyboard"
 var device := -1
 var identity: Dictionary = {}
@@ -19,6 +22,7 @@ var keyboard_profiles: Dictionary = {}
 func _init(input_kind: String = "keyboard") -> void: reset_defaults(input_kind)
 func reset_defaults(input_kind: String) -> void:
  kind = input_kind
+ keyboard_preset="solo"
  bindings.clear()
  if kind == "keyboard":
   var defaults := {"accelerate":[KEY_W,KEY_UP],"brake":[KEY_S,KEY_DOWN],"left":[KEY_A,KEY_LEFT],"right":[KEY_D,KEY_RIGHT],"drift":[KEY_SPACE],"boost":[KEY_SHIFT],"recover":[KEY_R],"horn":[KEY_H],"pause_race":[KEY_P],"photo":[KEY_F8]}
@@ -32,9 +36,10 @@ func reset_defaults(input_kind: String) -> void:
   if kind == "gamepad":
    set_axis("accelerate",JOY_AXIS_TRIGGER_RIGHT,0.,1.,.05)
    set_axis("brake",JOY_AXIS_TRIGGER_LEFT,0.,1.,.05)
+ bindings=upgrade_bindings(bindings,kind,keyboard_preset)
  clear()
 func clear() -> void:
- keys.clear(); buttons.clear(); axes.clear(); pending.clear(); test_values.clear()
+ keys.clear(); buttons.clear(); axes.clear(); pending.clear(); test_values.clear();mouse_orbit=Vector2.ZERO;orbit_dragging=false
 func set_axis(action: String, index: int, rest: float, pressed: float, deadzone: float = .03, sensitivity: float = 1.) -> bool:
  if absf(pressed-rest) < .1: return false
  bindings[action] = [{"type":"axis","index":index,"rest":rest,"pressed":pressed,"deadzone":clampf(deadzone,0.,.5),"sensitivity":clampf(sensitivity,.25,3.)}]
@@ -90,12 +95,12 @@ func describe(action: String) -> String:
   var n := int(binding.get("index",0))
   match str(binding.get("type","")):
    "key": labels.append(("Left " if int(binding.get("location",0))==1 else "Right " if int(binding.get("location",0))==2 else "")+OS.get_keycode_string(n))
-   "button": labels.append({JOY_BUTTON_A:"A",JOY_BUTTON_B:"B",JOY_BUTTON_X:"X",JOY_BUTTON_Y:"Y",JOY_BUTTON_START:"Start"}.get(n,"Button %d" % n))
+   "button": labels.append({JOY_BUTTON_A:"A",JOY_BUTTON_B:"B",JOY_BUTTON_X:"X",JOY_BUTTON_Y:"Y",JOY_BUTTON_START:"Start",JOY_BUTTON_DPAD_LEFT:"D-pad Left",JOY_BUTTON_DPAD_UP:"D-pad Up",JOY_BUTTON_DPAD_DOWN:"D-pad Down",JOY_BUTTON_RIGHT_STICK:"Right Stick Click"}.get(n,"Button %d" % n))
    "axis":
-    if kind=="gamepad":labels.append("RT" if n==JOY_AXIS_TRIGGER_RIGHT else "LT" if n==JOY_AXIS_TRIGGER_LEFT else "Left Stick ←" if action=="left" else "Left Stick →" if action=="right" else "Stick")
+    if kind=="gamepad":labels.append("RT" if n==JOY_AXIS_TRIGGER_RIGHT else "LT" if n==JOY_AXIS_TRIGGER_LEFT else "Left Stick ←" if action=="left" else "Left Stick →" if action=="right" else "Right Stick "+action.trim_prefix("camera_") if action.begins_with("camera_") else "Stick")
     else:labels.append("Steering Wheel" if action in ["left","right"] else "Accelerator" if action=="accelerate" else "Brake Pedal" if action=="brake" else "Wheel Axis")
  return " / ".join(labels) if not labels.is_empty() else "UNBOUND"
-func serialize() -> Dictionary: return {"version":2,"preference":preference,"keyboard_preset":keyboard_preset,"custom_bindings":custom_bindings,"solo_bindings":solo_bindings.duplicate(true),"stored_bindings":stored_bindings.duplicate(true),"keyboard_profiles":keyboard_profiles.duplicate(true),"kind":kind,"identity":identity.duplicate(true),"bindings":bindings.duplicate(true)}
+func serialize() -> Dictionary: return {"version":3,"preference":preference,"keyboard_preset":keyboard_preset,"custom_bindings":custom_bindings,"solo_bindings":solo_bindings.duplicate(true),"stored_bindings":stored_bindings.duplicate(true),"keyboard_profiles":keyboard_profiles.duplicate(true),"kind":kind,"identity":identity.duplicate(true),"bindings":bindings.duplicate(true)}
 func restore(data: Dictionary) -> void:
  reset_defaults(str(data.get("kind","keyboard")))
  preference=str(data.get("preference","manual"))
@@ -117,6 +122,15 @@ func restore(data: Dictionary) -> void:
     if type == "axis" and absf(float(binding.get("pressed",1.))-float(binding.get("rest",0.)))<.1: continue
     valid.append(binding.duplicate(true))
    bindings[action] = valid
+ for action in FEATURE_ACTIONS:
+  if not incoming.has(action):bindings.erase(action)
+ bindings=upgrade_bindings(bindings,kind,keyboard_preset)
+ if not solo_bindings.is_empty():solo_bindings=upgrade_bindings(solo_bindings,"keyboard","solo")
+ for preset in keyboard_profiles:keyboard_profiles[preset]=upgrade_bindings(keyboard_profiles[preset],"keyboard",preset)
+ for saved_kind in stored_bindings:
+  var saved: Dictionary=stored_bindings[saved_kind]
+  saved.bindings=upgrade_bindings(saved.get("bindings",{}),saved_kind,saved.get("keyboard_preset","solo"))
+  if not saved.get("solo_bindings",{}).is_empty():saved.solo_bindings=upgrade_bindings(saved.solo_bindings,"keyboard","solo")
  device = -1
  if int(data.get("version",1))<2 and kind=="gamepad" and identity.is_empty() and not custom_bindings:preference="auto"
  clear()
@@ -137,7 +151,10 @@ func use_keyboard_preset(preset: String) -> void:
  var defaults: Dictionary={"accelerate":KEY_W,"brake":KEY_S,"left":KEY_A,"right":KEY_D,"drift":KEY_SPACE,"boost":KEY_SHIFT,"recover":KEY_R,"horn":KEY_H,"pause_race":KEY_P,"photo":KEY_F8} if preset=="shared1" else {"accelerate":KEY_UP,"brake":KEY_DOWN,"left":KEY_LEFT,"right":KEY_RIGHT,"drift":KEY_CTRL,"boost":KEY_SHIFT,"recover":KEY_BACKSPACE,"horn":KEY_ENTER,"pause_race":KEY_P,"photo":KEY_F9}
  for action in defaults:bindings[action]=[{"type":"key","index":defaults[action]}]
  bindings.boost[0]["location"]=1 if preset=="shared1" else 2
- if preset=="shared2":bindings.drift[0]["location"]=2
+ if preset=="shared2":
+  bindings.drift[0]["location"]=2
+  for action in FEATURE_ACTIONS:bindings.erase(action)
+  bindings=upgrade_bindings(bindings,"keyboard","shared2")
  for action in original:
   if original[action]!=baseline.bindings.get(action,[]):bindings[action]=original[action].duplicate(true)
  keyboard_preset=preset;clear()
@@ -147,10 +164,39 @@ func switch_kind(target: String) -> void:
  reset_defaults(target);keyboard_preset="solo";custom_bindings=false;solo_bindings={}
  var saved: Dictionary=stored_bindings.get(target,{})
  if not saved.is_empty():
-  bindings=saved.get("bindings",bindings).duplicate(true);custom_bindings=bool(saved.get("custom_bindings",false));keyboard_preset=str(saved.get("keyboard_preset","solo"));solo_bindings=saved.get("solo_bindings",{}).duplicate(true)
+  bindings=upgrade_bindings(saved.get("bindings",bindings),target,saved.get("keyboard_preset","solo"));custom_bindings=bool(saved.get("custom_bindings",false));keyboard_preset=str(saved.get("keyboard_preset","solo"));solo_bindings=saved.get("solo_bindings",{}).duplicate(true)
  clear()
 
 func inject_test(action: String, strength: float) -> void:
  var before := value(action)
  test_values[action] = clampf(strength,0.,1.)
  if before<=.5 and strength>.5: pending[action]=true
+
+static func binding_overlap(a: Dictionary,b: Dictionary) -> bool:
+ if a.get("type")!=b.get("type") or a.get("index")!=b.get("index"):return false
+ if a.get("type")=="key":return int(a.get("location",0))==0 or int(b.get("location",0))==0 or a.get("location")==b.get("location")
+ if a.get("type")=="axis":return signf(float(a.get("pressed",1))-float(a.get("rest",0)))==signf(float(b.get("pressed",1))-float(b.get("rest",0)))
+ return true
+
+static func upgrade_bindings(source: Dictionary,input_kind: String,preset: String="solo") -> Dictionary:
+ var result:=source.duplicate(true)
+ var keys_default: Dictionary={"headlights":KEY_L,"vehicle_action_1":KEY_O,"vehicle_action_2":KEY_K,"look_back":KEY_C} if preset!="shared2" else {"headlights":KEY_KP_1,"vehicle_action_1":KEY_KP_2,"vehicle_action_2":KEY_KP_3,"look_back":KEY_KP_0}
+ var pad: Dictionary={"headlights":JOY_BUTTON_DPAD_LEFT,"vehicle_action_1":JOY_BUTTON_DPAD_UP,"vehicle_action_2":JOY_BUTTON_DPAD_DOWN,"look_back":JOY_BUTTON_RIGHT_STICK}
+ for action in FEATURE_ACTIONS:
+  if result.has(action):continue
+  var candidates: Array=[]
+  if input_kind=="keyboard" and keys_default.has(action):candidates=[{"type":"key","index":keys_default[action]}]
+  elif input_kind=="gamepad":
+   if pad.has(action):candidates=[{"type":"button","index":pad[action]}]
+   elif action.begins_with("camera_"):candidates=[{"type":"axis","index":JOY_AXIS_RIGHT_X if action in ["camera_left","camera_right"] else JOY_AXIS_RIGHT_Y,"rest":0.,"pressed":-1. if action in ["camera_left","camera_up"] else 1.,"deadzone":.16,"sensitivity":1.}]
+  result[action]=[]
+  for binding in candidates:
+   var conflict:=false
+   for existing in result.values():
+    for old in existing:
+     if binding_overlap(binding,old):conflict=true
+   if not conflict:result[action].append(binding)
+ return result
+
+func orbit_delta() -> Vector2:
+ var delta:=mouse_orbit;mouse_orbit=Vector2.ZERO;return delta

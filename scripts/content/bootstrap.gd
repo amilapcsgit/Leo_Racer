@@ -65,6 +65,8 @@ func begin() -> void:
 	get_tree().current_scene=game
 	if "--drive-test" in OS.get_cmdline_user_args():
 		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--vehicle-check="):
+				screen.hide();var probe: Node=load("res://scripts/content/vehicle_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
 			if argument.begins_with("--track-check="):
 				screen.hide();var probe: Node=load("res://scripts/content/track_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
 	queue_free()
