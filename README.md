@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/art/astra/leo_road_crest.png" alt="Leo Racer lion and lotus racing crest" width="96">
+  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/astra/leo_road_crest.png" alt="Leo Racer lion and lotus racing crest" width="96">
 </p>
 
 <h1 align="center">LEO RACER</h1>
@@ -102,9 +102,9 @@ Prefer a ZIP? **[Portable v2.5.0](https://github.com/amilapcsgit/Leo_Racer/relea
 
 <table>
   <tr>
-    <td width="33%" align="center" valign="middle"><img src="assets/ui/art/astra_coast.png" alt="Illustrated Astra Lotus Coast waterfront and illuminated Lotus Tower" width="100%"></td>
-    <td width="33%" align="center" valign="middle"><img src="assets/ui/art/colombo_city.png" alt="Illustrated Colombo city boulevard with warm street lights and the Lotus Tower" width="100%"></td>
-    <td width="33%" align="center" valign="middle"><img src="assets/art/kandy/billboards/kandy_lake.png" alt="Kandy Hill Country Circuit artwork showing the lake, temple and wooded mountain ridges" width="100%"></td>
+    <td width="33%" align="center" valign="middle"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/ui/art/astra_coast.png" alt="Illustrated Astra Lotus Coast waterfront and illuminated Lotus Tower" width="100%"></td>
+    <td width="33%" align="center" valign="middle"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/ui/art/colombo_city.png" alt="Illustrated Colombo city boulevard with warm street lights and the Lotus Tower" width="100%"></td>
+    <td width="33%" align="center" valign="middle"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/kandy/billboards/kandy_lake.png" alt="Kandy Hill Country Circuit artwork showing the lake, temple and wooded mountain ridges" width="100%"></td>
   </tr>
   <tr>
     <td width="33%" valign="top">
@@ -130,11 +130,11 @@ Prefer a ZIP? **[Portable v2.5.0](https://github.com/amilapcsgit/Leo_Racer/relea
 <details>
 <summary><strong>Explore the circuits in game</strong></summary>
 
-<p><img src="docs/qa-astra/captures/05-coast.png" alt="In-game chase camera on Astra Lotus Coast" width="100%"><br><sub>Astra Lotus Coast · coastal racing line.</sub></p>
-<p><img src="docs/qa-vehicle232/package-cameras-forward/colombo_city-1-reverse.png" alt="In-game front-of-car camera on Colombo City Grand Prix" width="100%"><br><sub>Colombo City Grand Prix · reverse camera.</sub></p>
-<p><img src="docs/qa-vehicle232/package-cameras-forward/kandy_lake-1-reverse.png" alt="In-game front-of-car camera on Kandy Lake Circuit" width="100%"><br><sub>Kandy Lake Circuit · the hill-country course.</sub></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-astra/captures/05-coast.png" alt="In-game chase camera on Astra Lotus Coast" width="100%"><br><sub>Astra Lotus Coast · coastal racing line.</sub></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-vehicle232/package-cameras-forward/colombo_city-1-reverse.png" alt="In-game front-of-car camera on Colombo City Grand Prix" width="100%"><br><sub>Colombo City Grand Prix · reverse camera.</sub></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-vehicle232/package-cameras-forward/kandy_lake-1-reverse.png" alt="In-game front-of-car camera on Kandy Lake Circuit" width="100%"><br><sub>Kandy Lake Circuit · the hill-country course.</sub></p>
 
-[Coast pipeline](docs/ASTRA_SETUP.md) · [Colombo scenery](docs/COLOMBO_VISUALS.md) · [Kandy landmarks and lighting](docs/KANDY_231.md)
+[Coast pipeline](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/ASTRA_SETUP.md) · [Colombo scenery](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/COLOMBO_VISUALS.md) · [Kandy landmarks and lighting](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/KANDY_231.md)
 
 </details>
 
@@ -156,7 +156,7 @@ Prefer a ZIP? **[Portable v2.5.0](https://github.com/amilapcsgit/Leo_Racer/relea
 </table>
 
 <p align="center">
-  <img src="docs/qa-vehicle232/package-cameras-forward/kandy_lake-2-reverse.png" alt="Actual two-player vertical split-screen racing on Kandy Lake Circuit" width="100%">
+  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-vehicle232/package-cameras-forward/kandy_lake-2-reverse.png" alt="Actual two-player vertical split-screen racing on Kandy Lake Circuit" width="100%">
   <br><sub>Actual gameplay · independent cameras for both local players.</sub>
 </p>
 
@@ -165,7 +165,7 @@ Prefer a ZIP? **[Portable v2.5.0](https://github.com/amilapcsgit/Leo_Racer/relea
 ## Garage
 
 <p align="center">
-  <img src="assets/ui/art/garage.png" alt="Leo Racer garage artwork overlooking the illuminated Colombo waterfront" width="100%">
+  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/ui/art/garage.png" alt="Leo Racer garage artwork overlooking the illuminated Colombo waterfront" width="100%">
   <br><sub>Garage environment artwork.</sub>
 </p>
 
@@ -191,11 +191,11 @@ SUVs, Formula racers, a Colombo tuk-tuk, sports cars, concepts and both Dacias s
 <details>
 <summary><strong>See Bigster's lights and sunroof</strong></summary>
 
-<p><img src="docs/qa-vehicle232/lamps-forward/close-rear-bumper-reverse.png" alt="Bigster red Y-shaped tail lamps with the separate white reversing lamp in the lower bumper" width="100%"><br><sub>Rear optical groups · white reverse light below the bumper.</sub></p>
-<p><img src="docs/qa-vehicle232/lamps-forward/close-front-main-and-signature.png" alt="Bigster's main headlamp cells and signature strips illuminated" width="100%"><br><sub>Main headlights and signature strips.</sub></p>
-<p><img src="docs/qa-vehicle232/lamps-forward/sunroof-open-left-closed-right.png" alt="Two Bigsters with independent sunroof states, open on the left and closed on the right" width="100%"><br><sub>Action 1 · open on the left, closed on the right.</sub></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-vehicle232/lamps-forward/close-rear-bumper-reverse.png" alt="Bigster red Y-shaped tail lamps with the separate white reversing lamp in the lower bumper" width="100%"><br><sub>Rear optical groups · white reverse light below the bumper.</sub></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-vehicle232/lamps-forward/close-front-main-and-signature.png" alt="Bigster's main headlamp cells and signature strips illuminated" width="100%"><br><sub>Main headlights and signature strips.</sub></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/qa-vehicle232/lamps-forward/sunroof-open-left-closed-right.png" alt="Two Bigsters with independent sunroof states, open on the left and closed on the right" width="100%"><br><sub>Action 1 · open on the left, closed on the right.</sub></p>
 
-Other vehicles can opt into lights and actions through Workshop metadata. This release does not add new lamp geometry or actions to every car. [Vehicle features and authoring guide](docs/VEHICLE_FEATURES.md).
+Other vehicles can opt into lights and actions through Workshop metadata. This release does not add new lamp geometry or actions to every car. [Vehicle features and authoring guide](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/VEHICLE_FEATURES.md).
 
 </details>
 
@@ -203,7 +203,7 @@ Other vehicles can opt into lights and actions through Workshop metadata. This r
 
 Open **Content → Vehicles → Set Up Vehicle** to configure a portable car, bind lamp surfaces and anchors, name vehicle actions, preview them, and take a private test drive. Compatible vehicle and track packages can be updated independently of the executable.
 
-[Vehicle authoring](docs/VEHICLE_FEATURES.md) · [Contributor SDK](sdk/README.md) · [Modular content](docs/MODULARITY_VALIDATION.md)
+[Vehicle authoring](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/VEHICLE_FEATURES.md) · [Contributor SDK](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/sdk/README.md) · [Modular content](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/MODULARITY_VALIDATION.md)
 
 ## Controls
 
@@ -236,7 +236,7 @@ Existing assignments take precedence over conflicting new defaults. Bigster's Ac
 ## Artbook
 
 <p align="center">
-  <img src="assets/ui/art/home.png" alt="Leo Racer home-screen hero artwork with a Bigster and blue kart beside Colombo's night waterfront" width="100%">
+  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/ui/art/home.png" alt="Leo Racer home-screen hero artwork with a Bigster and blue kart beside Colombo's night waterfront" width="100%">
   <br><sub>Colombo after dark · home-screen hero artwork.</sub>
 </p>
 
@@ -245,31 +245,31 @@ Existing assignments take precedence over conflicting new defaults. Bigster's Ac
 
 <table>
   <tr>
-    <td width="50%" valign="top"><img src="assets/art/menu.png" alt="Daytime menu hero artwork with a blue kart on the tropical coast" width="100%"><br><sub>Daylight menu artwork.</sub></td>
-    <td width="50%" valign="top"><img src="assets/ui/boot/loading.png" alt="Night loading-screen artwork with headlights and neon trails beside the Colombo skyline" width="100%"><br><sub>Night loading artwork.</sub></td>
+    <td width="50%" valign="top"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/menu.png" alt="Daytime menu hero artwork with a blue kart on the tropical coast" width="100%"><br><sub>Daylight menu artwork.</sub></td>
+    <td width="50%" valign="top"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/ui/boot/loading.png" alt="Night loading-screen artwork with headlights and neon trails beside the Colombo skyline" width="100%"><br><sub>Night loading artwork.</sub></td>
   </tr>
 </table>
 
-<p><img src="assets/art/srilanka/chase_coast.png" alt="Chase the Coast racing poster with palm trees, ocean waves and a kart" width="100%"></p>
-<p><img src="assets/art/srilanka/colombo_gp.png" alt="Colombo Grand Prix poster with racing tuk-tuks and the Lotus Tower" width="100%"></p>
-<p><img src="assets/art/srilanka/lotus_coast.png" alt="Lotus Coast 2026 poster with seaside racers, tropical flowers and the Colombo skyline" width="100%"></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/chase_coast.png" alt="Chase the Coast racing poster with palm trees, ocean waves and a kart" width="100%"></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/colombo_gp.png" alt="Colombo Grand Prix poster with racing tuk-tuks and the Lotus Tower" width="100%"></p>
+<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/lotus_coast.png" alt="Lotus Coast 2026 poster with seaside racers, tropical flowers and the Colombo skyline" width="100%"></p>
 
 <table>
   <tr>
-    <td width="25%"><img src="assets/art/srilanka/portrait_leo.png" alt="Leo Racer portrait poster with a golden lion crest and a racing kart" width="100%"></td>
-    <td width="25%"><img src="assets/art/srilanka/portrait_coast.png" alt="Chase the Coast portrait racing poster" width="100%"></td>
-    <td width="25%"><img src="assets/art/srilanka/portrait_gp.png" alt="Colombo Grand Prix portrait poster with tuk-tuks" width="100%"></td>
-    <td width="25%"><img src="assets/art/srilanka/portrait_lotus.png" alt="Lotus Coast 2026 portrait poster with coastal roads and tropical flowers" width="100%"></td>
+    <td width="25%"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/portrait_leo.png" alt="Leo Racer portrait poster with a golden lion crest and a racing kart" width="100%"></td>
+    <td width="25%"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/portrait_coast.png" alt="Chase the Coast portrait racing poster" width="100%"></td>
+    <td width="25%"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/portrait_gp.png" alt="Colombo Grand Prix portrait poster with tuk-tuks" width="100%"></td>
+    <td width="25%"><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/portrait_lotus.png" alt="Lotus Coast 2026 portrait poster with coastal roads and tropical flowers" width="100%"></td>
   </tr>
 </table>
 
 <p align="center">
-  <img src="assets/art/astra/lotus_road_emblem.png" alt="Lotus Coast floral racing emblem" width="120">
+  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/astra/lotus_road_emblem.png" alt="Lotus Coast floral racing emblem" width="120">
   &nbsp; &nbsp;
-  <img src="assets/art/astra/colombo_road_stencil.png" alt="Colombo Grand Prix floral wordmark" width="340">
+  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/astra/colombo_road_stencil.png" alt="Colombo Grand Prix floral wordmark" width="340">
 </p>
 
-[Artwork and audio provenance](licenses/ASTRA_ASSETS.md) · [Sri Lankan asset notices](licenses/SRILANKA_ASSETS.md)
+[Artwork and audio provenance](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/ASTRA_ASSETS.md) · [Sri Lankan asset notices](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/SRILANKA_ASSETS.md)
 
 </details>
 
@@ -280,7 +280,7 @@ Existing assignments take precedence over conflicting new defaults. Bigster's Ac
 
 The released game uses **Godot 4.7.2 .NET**, GDScript gameplay, and C# presentation/SQLite bridges. Source for this release is tagged **v2.5.0** on **release/2.5.0**.
 
-Start with [setup and pinned dependencies](docs/COLOMBO_SETUP.md). With the required original asset archives, run:
+Start with [setup and pinned dependencies](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/COLOMBO_SETUP.md). With the required original asset archives, run:
 
 ```powershell
 & ".\Setup Colombo.cmd" -AssetArchives "C:\assets\AI"
@@ -296,7 +296,7 @@ Build compatible content independently:
 ./tools/build_content.ps1 -Target sdk
 ```
 
-Vehicle and track targets do not export a new executable. See the [SDK requirements](sdk/README.md) before importing third-party models.
+Vehicle and track targets do not export a new executable. See the [SDK requirements](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/sdk/README.md) before importing third-party models.
 
 [2.5.0 release notes](docs/RELEASE_NOTES_250.md) · [Art pipeline](docs/COLOMBO_ASSETS.md) · [Supplied model setup](docs/SRILANKA_SETUP.md) · [Astra circuit pipeline](docs/ASTRA_SETUP.md)
 
@@ -317,7 +317,7 @@ Vehicle and track targets do not export a new executable. See the [SDK requireme
 
 The 2.5 validation includes 60 clean-lap measurements across the selected cars and three tracks, 180/180 seeded AI finishes, unchanged Bigster free-space input replay, eighty fleet framing checks and collision regression scenarios. See the [measured report and known limits](docs/QUALITY25.md) for native executable, installer and renderer evidence.
 
-[Release notes](docs/RELEASE_NOTES_232.md) · [Vehicle verification](docs/qa-vehicle232/TEST_REPORT.md) · [Installer results](docs/qa-vehicle232/release-installer.json) · [Kandy implementation](docs/KANDY_231.md) · [Neon UI](docs/NEON_UI.md)
+[Release notes](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/RELEASE_NOTES_232.md) · [Vehicle verification](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/qa-vehicle232/TEST_REPORT.md) · [Installer results](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/qa-vehicle232/release-installer.json) · [Kandy implementation](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/KANDY_231.md) · [Neon UI](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/NEON_UI.md)
 
 </details>
 
@@ -328,7 +328,7 @@ Kenney's Racing Starter Kit and City Kit remain the foundation. The project also
 
 Rokojori source is obtained separately under its Public Indie License and is not republished as a standalone toolkit. Existing character and vehicle meshes retain their original notices. Leo Racer is an independent project.
 
-[Licenses](licenses/) · [Astra artwork and audio](licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](licenses/SRILANKA_ASSETS.md) · [Kandy attribution](licenses/Kandy-2.3.1.txt)
+[Licenses](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/) · [Astra artwork and audio](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/SRILANKA_ASSETS.md) · [Kandy attribution](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/Kandy-2.3.1.txt)
 
 </details>
 
