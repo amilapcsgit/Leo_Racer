@@ -228,6 +228,13 @@ func show_settings() -> void:
  add_toggle(content,"Fullscreen",DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN,game.set_fullscreen)
  add_toggle(content,"Music",game.music_enabled,game.set_music)
  add_toggle(content,"Reduced Motion",game.reduced_motion,game.set_reduced_motion)
+ var graphics_row:=HBoxContainer.new();content.add_child(graphics_row);label(graphics_row,"Graphics quality").custom_minimum_size.x=260
+ var graphics:=OptionButton.new()
+ for quality in LeoGraphics.NAMES:graphics.add_item(quality)
+ graphics.select(game.graphics_quality);graphics.item_selected.connect(game.set_graphics_quality);graphics_row.add_child(graphics)
+ label(content,"Split-screen uses up to Medium quality.",20)
+ var fov_row:=HBoxContainer.new();content.add_child(fov_row);label(fov_row,"Camera field of view").custom_minimum_size.x=260
+ var fov:=HSlider.new();fov.min_value=55.;fov.max_value=75.;fov.step=1.;fov.value=game.base_camera_fov;fov.custom_minimum_size=Vector2(400,42);fov_row.add_child(fov);fov.value_changed.connect(game.set_camera_fov)
  action(box,"Back",leave).grab_focus()
 func add_slider(parent: Node,words: String,value: float,changed: Callable) -> void:
  var row:=HBoxContainer.new();parent.add_child(row);label(row,words).custom_minimum_size.x=260

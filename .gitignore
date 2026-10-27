@@ -90,3 +90,7 @@ installer/release-descriptions.nsh
 installer/release232-*.nsh
 docs/qa-vehicle232/**/*.import
 docs/qa-vehicle232/*.import
+
+# Generated 2.4.1 installer payload lists and marketing import sidecars.
+installer/release241-*.nsh
+docs/screenshots/2.4.1/*.import

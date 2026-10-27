@@ -59,6 +59,7 @@ func _process(dt: float) -> void:
  last_ready=ready
  message.position=Vector2(24,height*.3);message.size=Vector2(width-48,100)
  message.text="Race finished · Waiting for Player %d" % (2 if slot==0 else 1) if kart.finished and game.human_count==2 else "Race finished" if kart.finished else "Turn around!" if local.wrong_way>1. else local.announcement if local.announcement_time>0 else "Release Drift for a boost!" if kart.drifting and kart.drift_charge>=.65 else ""
+ if kart.checkpoint_missed and not kart.finished:message.text="Checkpoint missed / "+p.describe("recover")+" Recover"
  countdown.position=Vector2(width*.5-130,height*.43);countdown.size=Vector2(260,140);countdown.text=str(clampi(int(ceil(game.countdown)),1,3)) if game.state=="countdown" else "GO!" if game.race_time<.85 else ""
  tip.position=Vector2(210,height-56);tip.size=Vector2(maxf(100,width-530),50);tip.text="Drift "+p.describe("drift")+"   ·   Nitro "+p.describe("boost")+"   ·   Esc Pause";tip.visible=not compact and game.race_time<9.
  track.position=Vector2(width*.15,110);track.size=Vector2(width*.7,60);track.text=game.track_definition.display_name;track.visible=game.race_time<4.

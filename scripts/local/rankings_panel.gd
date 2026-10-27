@@ -30,8 +30,8 @@ func _ready() -> void:
  filters.add_child(track)
  mode=OptionButton.new();mode.add_item("1 PLAYER",1);mode.add_item("2 PLAYERS",2);filters.add_child(mode)
  mode.select(game.human_count-1)
- performance=OptionButton.new();performance.add_item("165 KM/H CLASS");performance.add_item("BIGSTER / 180 KM/H");filters.add_child(performance)
- performance.select(1 if game.local_players[0].vehicle_id==&"bigster" else 0)
+ performance=OptionButton.new();performance.add_item("CURRENT VEHICLE BALANCE");performance.add_item("LEGACY / 165 KM/H");performance.add_item("LEGACY / BIGSTER");performance.add_item("LEGACY / DISTINCT V2");filters.add_child(performance)
+ performance.select(0)
  vehicle=OptionButton.new();vehicle.add_item("ALL VEHICLES")
  for v in game.catalog.vehicles:vehicle.add_item(v.display_name)
  filters.add_child(vehicle)
@@ -54,7 +54,11 @@ func refresh() -> void:
  for child in entries.get_children():entries.remove_child(child);child.queue_free()
  var selected_vehicle: String="" if vehicle.selected==0 else String(game.catalog.vehicles[vehicle.selected-1].id)
  var rows: Array=[]
- if game.ranking_store:rows=game.ranking_store.best_times_for_track(mode.get_selected_id(),"standard165" if performance.selected==0 else "suv180",selected_vehicle,metric.selected==1,game.tracks[track.selected].id,game.tracks[track.selected].revision,game.tracks[track.selected].ruleset_id())
+ var course: LeoTrackDefinition=game.tracks[track.selected]
+ var ruleset := course.ruleset_id() if performance.selected==0 else ("balanced_v1+arcade_elevation_v1" if course.elevated() else "balanced_v1")
+ if performance.selected==3:ruleset="distinct_v2"+("+arcade_elevation_v1" if course.elevated() else "")
+ var class_id := LeoRaceRules.CLASS if performance.selected in [0,3] else ("standard165" if performance.selected==1 else "suv180")
+ if game.ranking_store:rows=game.ranking_store.best_times_for_track(mode.get_selected_id(),class_id,selected_vehicle,metric.selected==1,course.id,course.revision,ruleset)
  status.text="Best time for each racer. Can you beat yours?"
  var failed: bool=not game.ranking_store or not game.ranking_store.get_error().is_empty()
  var retry:=find_child("Retry",true,false) as Button
@@ -65,8 +69,12 @@ func refresh() -> void:
   var empty:=Label.new();empty.text="No records yet. Finish a race to set your first time!";empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;entries.add_child(empty)
  for i in rows.size():
   var row: Dictionary=rows[i]
-  var label:=Label.new();label.text="%02d   %-32s  %s   /   %s" % [i+1,row.name,game.format_time(float(row.lap_ms if metric.selected==1 else row.race_ms)/1000.),game.catalog.vehicle(StringName(row.vehicle)).display_name]
+  var label:=Label.new();label.text="%02d   %-32s  %s   /   %s" % [i+1,row.name,game.format_time(float(row.lap_ms if metric.selected==1 else row.race_ms)/1000.),vehicle_label(String(row.vehicle))]
   label.add_theme_font_size_override("font_size",24);entries.add_child(label)
 
 func for_filter_visibility() -> void:
  for control in extra_filters:control.visible=advanced
+
+func vehicle_label(key: String) -> String:
+ var found: VehicleDefinition=game.catalog.vehicle(StringName(key))
+ return found.display_name if found else key

@@ -67,6 +67,9 @@ var content_refreshing := false
 var content_panel: CanvasLayer
 var art_profile: LeoArtProfile = preload("res://assets/config/astra.tres")
 var feedback: Node
+var graphics_quality := 1
+var base_camera_fov := 63.0
+var opponent_audio: LeoOpponentAudio
 var reduced_motion := false
 var camera_roll := 0.0
 var launch_charged := false
@@ -174,6 +177,7 @@ func _ready() -> void:
 	camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(camera)
 	camera.current = true
+	opponent_audio=LeoOpponentAudio.new();add_child(opponent_audio)
 	feedback = load("res://scripts/RaceFeedbackBridge.cs").new()
 	feedback.name = "RaceFeedback"
 	add_child(feedback)
@@ -336,6 +340,7 @@ func build_world() -> void:
 	env_node.environment = environment
 	world.add_child(env_node)
 	var sun := DirectionalLight3D.new()
+	sun.name="RaceSun"
 	sun.rotation_degrees = Vector3(-28,-145,0)
 	sun.light_color = Color("ffe0af")
 	sun.light_energy = 1.25
@@ -370,6 +375,8 @@ func build_world() -> void:
 			tent.scale = Vector3.ONE*3
 			world.add_child(tent)
 	LeoAssets.apply_overrides(world)
+	LeoGraphics.install_reflections(world,circuit)
+	apply_graphics()
 	if is_instance_valid(camera):camera.far=race_camera_far()
 
 func polish_materials(node: Node, landmark: bool=false) -> void:
@@ -467,11 +474,23 @@ func enter_garage(retain_race: bool=false) -> void:
 
 func showroom_lighting(enabled: bool) -> void:
 	environment.fog_enabled = not enabled
-	environment.volumetric_fog_enabled = not enabled and track_definition.world_kind()=="astra" and RenderingServer.get_current_rendering_method()=="forward_plus"
+	environment.volumetric_fog_enabled = not enabled and graphics_quality==2 and human_count==1 and RenderingServer.get_current_rendering_method()=="forward_plus"
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR if enabled else Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_color = Color("558fa2")
 	environment.ambient_light_energy = .55 if enabled else art_profile.ambient_energy
 	environment.tonemap_exposure = .9 if enabled else art_profile.exposure
+
+func apply_graphics() -> void:
+	if not is_instance_valid(world) or not environment:return
+	if not world.has_node("RaceReflection0") and (human_count==1 or RenderingServer.get_current_rendering_method()=="forward_plus"):
+		LeoGraphics.install_reflections(world,circuit)
+	LeoGraphics.apply(world,environment,graphics_quality,human_count==2,state=="garage")
+
+func set_graphics_quality(value: int) -> void:
+	graphics_quality=clampi(value,0,2);apply_graphics();save_settings()
+
+func set_camera_fov(value: float) -> void:
+	base_camera_fov=clampf(value,55.,75.);save_settings()
 
 func select_driver(index: int) -> void:
 	selected_driver = index
@@ -482,6 +501,7 @@ func select_kart(index: int) -> void:
 	save_settings()
 
 func remove_racers() -> void:
+	if opponent_audio:opponent_audio.stop()
 	if split_view:split_view.activate(false)
 	if feedback: feedback.reset_feedback()
 	camera_roll = 0.0
@@ -533,6 +553,7 @@ func start_race() -> void:
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	rankings_written=false;ranking_message=""
 	showroom_lighting(false)
+	apply_graphics()
 	get_tree().paused=false;paused=false
 	remove_racers()
 	stage.hide();world.show()
@@ -584,6 +605,8 @@ func start_race() -> void:
 	hud.show_race()
 
 func on_gate(kart: LeoKart, gate: int) -> void:
+	if kart.finished or kart.retired or gate<=kart.last_reported_gate:return
+	kart.last_reported_gate=gate
 	var local:=state_for(kart)
 	if gate>0 and gate%LeoCircuit.GATES==0 and local:
 		local.best_lap=minf(local.best_lap,race_time-local.lap_started)
@@ -617,7 +640,7 @@ func on_recover(kart: LeoKart) -> void:
 	var local:=state_for(kart)
 	if local:
 		if local.feedback:local.feedback.play_recover()
-		local.heading=kart.rotation.y;local.roll=0.;local.slipstream_time=0.
+		local.camera_rig.reset();local.heading=kart.rotation.y;local.roll=0.;local.slipstream_time=0.
 		if local.slot==0:cam_heading=kart.rotation.y;camera_roll=0.;slipstream_time=0.
 		announce_player(local.slot,"BACK ON TRACK",1.2)
 
@@ -728,8 +751,9 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 		hud.garage_selector.policy.text="TRACK BUSY — BACK TO PAUSE, RESUME, THEN TRY AGAIN"
 		return false
 	fresh.position=safe_position;fresh.rotation.y=heading
-	for property in ["progress","next_gate","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
+	for property in ["progress","next_gate","last_reported_gate","checkpoint_missed","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
 	fresh.speed=clampf(old.speed,-10.,fresh.max_speed)
+	fresh.road_offset=circuit.project(fresh.position,fresh.nearest_index).offset
 	fresh.velocity=-fresh.global_basis.z*fresh.speed
 	fresh.boost_fuel=old.boost_fuel
 	fresh.racer_name=player_name.strip_edges() if not player_name.strip_edges().is_empty() else catalog.driver(d).display_name
@@ -807,6 +831,7 @@ func _process(dt: float) -> void:
 			if player.retired or all_finished or race_time-player.finish_time>(70. if test_mode or diagnostics_mode else 4.):finish_race()
 	if state in ["countdown","race","finishing"] and player:
 		for slot in human_count:update_local_camera(local_players[slot],dt)
+		if opponent_audio:opponent_audio.update(self,dt)
 		wrong_way_time=local_players[0].wrong_way
 	if smoke_mode:
 		test_tick+=1
@@ -875,6 +900,8 @@ func save_settings() -> void:
 	for local in local_players:cfg.set_value("local_players",str(local.slot),local.selection())
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
+	cfg.set_value("display","graphics_quality",graphics_quality)
+	cfg.set_value("display","camera_fov",base_camera_fov)
 	cfg.save("user://leo_racer.cfg")
 
 func load_settings() -> void:
@@ -883,6 +910,8 @@ func load_settings() -> void:
 		master_volume = cfg.get_value("audio", "volume", .72)
 		music_enabled = cfg.get_value("audio", "music", true)
 		reduced_motion = cfg.get_value("display", "reduced_motion", false)
+		graphics_quality=clampi(int(cfg.get_value("display","graphics_quality",1)),0,2)
+		base_camera_fov=clampf(float(cfg.get_value("display","camera_fov",63.)),55.,75.)
 		var selection := catalog.migrate(cfg)
 		selected_driver = selection.x
 		selected_kart = selection.y
@@ -1112,16 +1141,19 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	if not is_instance_valid(local.camera) or not is_instance_valid(local.kart):return
 	var kart:=local.kart
 	var view:=local.camera
+	if reduced_motion:view.fov=base_camera_fov
 	var pose: Transform3D=kart.get_global_transform_interpolated()
 	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
-	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2)
+	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2,reduced_motion)
 	if local.feedback:
 		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
-		view.fov=lerpf(view.fov,63.+absf(kart.speed)*.1+float(local.feedback.get_fov_offset()),1.-exp(-dt*12.))
+		var desired_fov: float=local.camera_rig.field_of_view(kart.wheel_motion_speed,float(local.feedback.get_fov_offset()),reduced_motion,base_camera_fov)
+		view.fov=base_camera_fov if reduced_motion else lerpf(view.fov,desired_fov,1.-exp(-dt*12.))
 		var target:=0. if reduced_motion else -kart.steer*deg_to_rad(art_profile.camera_roll_degrees)*clampf(absf(kart.speed)/36.,0.,1.)
-		local.roll=lerpf(local.roll,target,1.-exp(-dt*6.))
+		local.roll=0. if reduced_motion else lerpf(local.roll,target,1.-exp(-dt*6.))
 		view.rotate_object_local(Vector3.FORWARD,local.roll+float(local.feedback.get_shake_roll()))
 		view.position+=view.global_basis*Vector3(local.feedback.get_shake_offset())
+	local.camera_rig.protect(view,kart,get_world_3d().direct_space_state)
 func test_input(action: String, strength: float = 1., slot: int = 0) -> void:
 	if not diagnostics_mode and not smoke_mode and not test_mode and not "--drive-test" in OS.get_cmdline_user_args():return
 	input_router.players[slot].inject_test(action,strength)

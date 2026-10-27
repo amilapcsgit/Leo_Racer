@@ -19,7 +19,7 @@ func _ready() -> void:
  else:add_theme_stylebox_override("panel",StyleBoxEmpty.new())
  var margin := MarginContainer.new(); margin.add_theme_constant_override("margin_left",40);margin.add_theme_constant_override("margin_right",40);margin.add_theme_constant_override("margin_top",24);margin.add_theme_constant_override("margin_bottom",24);add_child(margin)
  body = VBoxContainer.new();body.add_theme_constant_override("separation",9);margin.add_child(body)
- router.binding_changed.connect(refresh)
+ router.binding_changed.connect(refresh,CONNECT_DEFERRED)
  router.binding_conflict.connect(show_conflict)
  refresh()
 func label(text: String, parent: Node = null) -> Label:
@@ -37,7 +37,7 @@ func refresh() -> void:
  for i in 2:
   var target := i
   button(("✓ " if i==slot else "")+"Player %d" % (i+1),func():slot=target;refresh(),tabs)
- button("BACK",func():router.cancel_capture();closed.emit(),tabs)
+ button("BACK",func():pending_device={};router.cancel_capture();closed.emit(),tabs)
  button("Test Controls" if not testing else "Back to Bindings",func():testing=not testing;refresh(),tabs)
  button("Advanced" if not advanced else "Simple",func():advanced=not advanced;refresh(),tabs)
  var devices := OptionButton.new();body.add_child(devices)
@@ -97,6 +97,8 @@ func _process(_dt: float) -> void:
    live[action].modulate=Color("43e7ef") if p.value(action)>.5 else Color("b9c7d6")
   if other_live.has(action):other_live[action].text="● Pressed" if router.players[1-slot].value(action)>.5 else "○"
 func _exit_tree() -> void:
+ pending_device={}
+ if router:router.cancel_capture()
  if router and router.binding_changed.is_connected(refresh):router.binding_changed.disconnect(refresh)
  if router and router.binding_conflict.is_connected(show_conflict):router.binding_conflict.disconnect(show_conflict)
 
@@ -113,18 +115,17 @@ func ambiguous_device(id: int) -> bool:
  var matches:=0
  for device in Input.get_connected_joypads():
   if router.fingerprint(device)==identity:matches+=1
- if matches>1:return true
- for index in 2:
-  if index!=slot and router.players[index].kind!="keyboard" and router.players[index].identity==identity:return true
- return false
+ return matches>1
 
 func _input(event: InputEvent) -> void:
  if not pending_device.is_empty():
-  if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE:
+  if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE):
    pending_device={};refresh()
   elif event is InputEventJoypadButton and event.pressed and event.device==int(pending_device.device):
    var data:=pending_device;pending_device={}
    if not router.assign(slot,data.kind,data.device):status.text=router.last_error
   get_viewport().set_input_as_handled();return
- if event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE and router.capture_slot<0:
-  closed.emit();get_viewport().set_input_as_handled()
+ if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE):
+  if router.capture_slot>=0:router.cancel_capture();refresh()
+  else:closed.emit()
+  get_viewport().set_input_as_handled()

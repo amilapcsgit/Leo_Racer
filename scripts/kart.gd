@@ -26,6 +26,9 @@ var next_gate := 0
 var lap := 1
 var nearest_index := -1
 var last_s := 0.0
+var road_offset := 0.0
+var checkpoint_missed := false
+var last_reported_gate := -1
 var speed := 0.0
 var max_speed := 33.0
 var acceleration := 18.0
@@ -53,10 +56,13 @@ var effect_clock := 0.0
 var spark_left: GPUParticles3D
 var spark_right: GPUParticles3D
 var tire_sparks: Array[GPUParticles3D] = []
+var motor_audio: LeoVehicleAudio
 var engine: AudioStreamPlayer
 var skid: AudioStreamPlayer
 var boost_sound: AudioStreamPlayer
 var impact: AudioStreamPlayer
+var ai := LeoRaceAI.new()
+var ai_seed := 0
 var ai_lane := 0.0
 var ai_phase := 0.0
 var auto_drive := false
@@ -86,21 +92,19 @@ static func vector(value: Array) -> Vector3:
 	return Vector3(float(value[0]),float(value[1]),float(value[2]))
 
 static func vehicle_spec(key: String) -> Dictionary:
-	var v := GarageCatalog.shared().vehicle(key)
+	var v := LeoVehiclePresentation.resolve(GarageCatalog.shared().vehicle(key))
 	return {"driver_position":[v.seat.origin.x,v.seat.origin.y,v.seat.origin.z],"driver_scale":[v.seat.basis.get_scale().x,v.seat.basis.get_scale().y,v.seat.basis.get_scale().z],"collision_size":[v.collision_size.x,v.collision_size.y,v.collision_size.z],"collision_position":[v.collision_position.x,v.collision_position.y,v.collision_position.z],"wheel_radius":v.wheels[0].radius if not v.wheels.is_empty() else .49,"exhausts":v.exhausts}
 
 static func seat_driver(model: Node3D,key: String) -> void:
-	model.transform = GarageCatalog.shared().vehicle(key).seat * model.transform
+	model.transform = LeoVehiclePresentation.resolve(GarageCatalog.shared().vehicle(key)).seat * model.transform
 
-func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String) -> void:
+func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String, authored: VehicleDefinition = null) -> void:
 	circuit = track
 	racer_id = id
 	is_player = player
 	vehicle_key = kart_color
-	definition = GarageCatalog.shared().vehicle(kart_color)
-	max_speed = definition.max_speed
-	acceleration = definition.acceleration
-	handling = definition.handling
+	definition = LeoVehiclePresentation.resolve(authored if authored else GarageCatalog.shared().vehicle(kart_color))
+	LeoRaceRules.apply(self)
 	wheel_radius = definition.wheels[0].radius if not definition.wheels.is_empty() else .49
 	camera_height_offset = definition.camera_height
 	engine_pitch = .65 if kart_color=="race_bus" else (1.22 if kart_color in ["race_tuk","colombo_tuk"] else (1.12 if kart_color.begins_with("formula") else 1.0))
@@ -163,11 +167,13 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		skid = sound("skid.ogg", -50, true)
 		boost_sound = sound("boost.wav", -12, false)
 		impact = sound("impact.ogg", -14, false)
+		motor_audio=LeoVehicleAudio.new();add_child(motor_audio);motor_audio.setup(self)
 	ai_phase = float(id) * 1.73
 	ai_lane = [-3.8, 0.0, 3.8, -2.5, 2.5, 0.5][id % 6]
 	effects = LeoKartEffects.new()
 	visual.add_child(effects)
 	effects.setup(self)
+	ai.reset(ai_seed+racer_id*7919+int(circuit.length),ai_lane)
 	reset_physics_interpolation()
 
 func attach_binding(binding: WheelBinding) -> void:
@@ -233,6 +239,7 @@ func sound(file: String, volume: float, playing: bool) -> AudioStreamPlayer:
 	return p
 
 func stop_audio() -> void:
+	if motor_audio:motor_audio.stop()
 	for child in get_children():
 		if child is AudioStreamPlayer: child.stop()
 
@@ -277,6 +284,7 @@ func make_particles(p: Vector3, exhaust := false) -> GPUParticles3D:
 	return fx
 
 func place(distance: float, lane: float) -> void:
+	road_offset=lane
 	position = circuit.sample(distance, lane) + Vector3.UP * .12
 	var t := circuit.direction(distance)
 	rotation.y = atan2(-t.x, -t.z)
@@ -291,11 +299,39 @@ func place(distance: float, lane: float) -> void:
 	wheel_visual_speed = 0
 	reset_physics_interpolation()
 
+func advance_checkpoints(projection: Dictionary, motion: Vector3) -> void:
+	var s: float=projection.distance
+	var previous:=last_s
+	var change:=circuit.delta_distance(previous,s)
+	last_s=s
+	if not active or finished or retired:return
+	var segment:=circuit.length/LeoCircuit.GATES
+	var expected:=float(next_gate)*segment
+	var gate_s:=fposmod(expected,circuit.length)
+	var valid:=motion.length()<=8. and absf(change)<=maxf(2.,motion.length()*2.+1.)
+	valid=valid and absf(float(projection.offset))<=circuit.width_at(s)*.5+.5
+	valid=valid and absf(position.y-float(projection.center.y))<maxf(3.,definition.collision_size.y)
+	var to_gate:=circuit.delta_distance(previous,gate_s)
+	if valid and change>0. and to_gate>=-.001 and to_gate<=change+.001:
+		var crossed:=next_gate
+		next_gate+=1
+		lap=mini(3,1+maxi(0,next_gate-1)/LeoCircuit.GATES)
+		checkpoint_missed=false
+		gate_crossed.emit(self,crossed)
+		expected=float(next_gate)*segment
+		gate_s=fposmod(expected,circuit.length)
+	var relative:=circuit.delta_distance(gate_s,s)
+	checkpoint_missed=checkpoint_missed or not valid or (relative>2. and relative<circuit.length*.5)
+	# Rank only within the interval after the last validated checkpoint.
+	progress=clampf(expected+relative,expected-segment,expected-.001)
+
 func recover() -> void:
-	var safe := maxf(0, (next_gate - 1) * circuit.length / LeoCircuit.GATES) + 2.0
+	var completed := maxi(0,next_gate-1)
+	var safe := float(completed) * circuit.length / LeoCircuit.GATES + 2.0
 	var recoveries: Array=circuit.features.get("recoveries",[])
 	if recoveries.size()==LeoCircuit.GATES:
-		safe=float(recoveries[posmod(maxi(0,next_gate-1),LeoCircuit.GATES)].distance)
+		safe=floorf(float(completed)/LeoCircuit.GATES)*circuit.length+float(recoveries[posmod(completed,LeoCircuit.GATES)].distance)
+	if next_gate==0:safe=minf(-2.,float(circuit.features.get("grid",{}).get("start",-8.)))
 	var lane := (-3.2 if local_slot==0 else 3.2) if local_slot>=0 else (0.0 if is_player else ai_lane)
 	var chosen := circuit.sample(safe,lane)+Vector3.UP*.2
 	if is_inside_tree() and definition:
@@ -318,6 +354,7 @@ func recover() -> void:
 	rotation.y = atan2(-t.x, -t.z)
 	if circuit.elevated:basis=circuit.frame_at(safe,rotation.y)
 	progress = safe
+	checkpoint_missed=false
 	last_s = fposmod(safe, circuit.length)
 	nearest_index = int(last_s / circuit.step)
 	velocity = Vector3.ZERO
@@ -331,6 +368,7 @@ func recover() -> void:
 	wheel_motion_speed = 0
 	wheel_visual_speed = 0
 	reset_physics_interpolation()
+	road_offset=circuit.project(position,nearest_index).offset
 	recovered.emit(self)
 
 func boost(duration: float, source: String) -> void:
@@ -351,7 +389,6 @@ func _physics_process(dt: float) -> void:
 	var throttle := 0.0
 	var desired_steer := 0.0
 	var want_drift := false
-	var ai_speed := max_speed
 	if active:
 		if is_player and not auto_drive:
 			throttle = control_input.throttle() if control_input else Input.get_axis("brake", "accelerate")
@@ -361,27 +398,13 @@ func _physics_process(dt: float) -> void:
 				boost_fuel = 0
 				boost(1.6, "HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
 		else:
-			var bend_ahead := absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s+26),Vector3.UP))
-			var look := lerpf(8.0+absf(speed)*.36,9.0+absf(speed)*.18,clampf(bend_ahead,0,1))
-			var target := circuit.sample(last_s + look, ai_lane + sin(progress * .013 + ai_phase) * .7)
-			var dir := (target - position).normalized()
-			var desired_yaw := atan2(-dir.x, -dir.z)
-			var error := wrapf(desired_yaw - rotation.y, -PI, PI)
-			desired_steer = clampf(-error * 2.2, -1, 1)
-			var bend := absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s + 22), Vector3.UP))
-			ai_speed = max_speed * lerpf(1.0, .67, clampf(bend / 1.0, 0, 1))
-			var lateral_limit: float=race_ai_lateral_acceleration if race_ai_lateral_acceleration>=0 else definition.ai_lateral_acceleration
-			if lateral_limit>0:
-				var braking_look:=maxf(26.,absf(speed)*1.25)
-				var preview_bend:=absf(circuit.direction(last_s).signed_angle_to(circuit.direction(last_s+braking_look),Vector3.UP))
-				ai_speed=minf(ai_speed,sqrt(lateral_limit*braking_look/maxf(preview_bend,.001)))
-				bend=maxf(bend,preview_bend)
-			throttle = 1 if speed < ai_speed else .15
-			if boost_fuel >= 1 and bend < .2 and next_gate > 1:
-				boost_fuel = 0
-				boost(1.5, "NITRO BOOST")
+			var command := ai.commands(self,dt)
+			if command.recover:recover();return
+			throttle=command.throttle;desired_steer=command.steer;want_drift=command.drift
+			if command.boost and boost_fuel>=1.:
+				boost_fuel=0.;boost(1.6,"HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
 	steer = lerpf(steer, desired_steer, minf(1, dt * 8))
-	if is_player and not auto_drive and throttle < -.1:
+	if throttle < -.1:
 		boost_time = 0
 		if active and speed>5 and definition.braking_regeneration>0:
 			boost_fuel=minf(1.,boost_fuel+dt*definition.braking_regeneration*clampf(speed/max_speed,0,1))
@@ -401,7 +424,6 @@ func _physics_process(dt: float) -> void:
 	var target_speed := max_speed * throttle
 	if throttle < 0: target_speed = -10.0
 	if boost_time > 0 and active: target_speed = boosted_ceiling()
-	if not is_player or auto_drive: target_speed = minf(target_speed, ai_speed * (1.3 if boost_time > 0 else 1.0))
 	var rate := acceleration if throttle > .1 else 9.0
 	if throttle < 0 and speed > 0: rate = 34
 	if boost_time > 0: rate = 35
@@ -450,25 +472,17 @@ func _physics_process(dt: float) -> void:
 			emit_impact_feedback(position+normal*1.0,-normal)
 			impact.play()
 			bump_cooldown = .65
+	road_offset=clampf(offset,-lane_limit,lane_limit)
 	if circuit.elevated and position.y<float(projection.center.y)-5.:recover();return
 	update_wheel_motion(global_position - motion_origin, dt)
 	if is_player and not auto_drive and active and throttle>.5 and absf(wheel_motion_speed)<.5:
 		stuck_time += dt
 		if stuck_time>3.0: recover(); return
 	else: stuck_time = 0
-	var s: float = projection.distance
-	var change := circuit.delta_distance(last_s, s)
-	last_s = s
-	if active and absf(change) < 8:
-		progress += change
-		var gate_distance := float(next_gate) * circuit.length / LeoCircuit.GATES
-		if progress >= gate_distance and change > 0:
-			gate_crossed.emit(self, next_gate)
-			next_gate += 1
-			lap = mini(3, maxi(0, next_gate - 1) / LeoCircuit.GATES + 1)
+	advance_checkpoints(projection,global_position-motion_origin)
 	if active and boost_cooldown <= 0:
 		for fraction in circuit.boosts:
-			if absf(circuit.delta_distance(s, float(fraction) * circuit.length)) < 2.5 and absf(offset) < 6.5:
+			if absf(circuit.delta_distance(projection.distance, float(fraction) * circuit.length)) < 2.5 and absf(offset) < 6.5:
 				boost(1.5, "BOOST PAD")
 				boost_cooldown = 2.0
 	# Kenney-style independent wheel and body response.
@@ -477,8 +491,7 @@ func _physics_process(dt: float) -> void:
 	visual.rotation.z = lerp_angle(visual.rotation.z, -steer * .075 * grip, dt * 7)
 	visual.rotation.y = lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
 	if is_player and engine:
-		engine.pitch_scale = lerpf(engine.pitch_scale, (.7 + absf(speed) / 20)*engine_pitch, dt * 3)
-		engine.volume_db = -24 if not active else -17
+		if motor_audio:motor_audio.throttle=throttle;motor_audio.update(dt)
 		skid.volume_db = lerpf(skid.volume_db, -13.0 if drifting else -65.0, dt * 8)
 
 func _process(dt: float) -> void:

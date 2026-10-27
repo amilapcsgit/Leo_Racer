@@ -1,7 +1,7 @@
 class_name LeoVehicleLibrary
 extends RefCounted
 ## Metadata-only discovery. A bad optional car never prevents boot.
-const CORE_VERSION := Vector3i(2,3,2)
+const CORE_VERSION := Vector3i(2,4,1)
 static var generation := 0
 static var entries: Array[VehicleDefinition]=[]
 static var unavailable: Array[Dictionary]=[]

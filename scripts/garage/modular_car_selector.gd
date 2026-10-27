@@ -121,9 +121,9 @@ func build_interface() -> void:
 	positioned_label(("PLAYER %d · " % (player_slot+1) if player_slot>=0 else "")+"CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
 	carousel=LeoDriverCarousel.new();carousel.catalog=catalog;carousel.reduced_motion=reduced_motion;carousel.position=Vector2(40,300);carousel.size=Vector2(432,224);ui.add_child(carousel);carousel.driver_selected.connect(choose_driver);driver_buttons=carousel.cards
 	caption=positioned_label("",Vector2(40,526),22,Color("b9c7d6"));caption.size=Vector2(432,56);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	for i in 3:
-		var caption_label:=positioned_label("",Vector2(40,604+i*52),21,cream);stat_labels.append(caption_label)
-		var bar: LeoStatBar=load("res://scenes/ui/StatBar.tscn").instantiate();bar.position=Vector2(268,608+i*52);bar.size=Vector2(200,18);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
+	for i in 4:
+		var caption_label:=positioned_label("",Vector2(40,604+i*44),21,cream);stat_labels.append(caption_label)
+		var bar: LeoStatBar=load("res://scenes/ui/StatBar.tscn").instantiate();bar.position=Vector2(268,608+i*44);bar.size=Vector2(200,18);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
 	positioned_label("Your combo. Your coast.",Vector2(40,770),22,cyan)
 	race_button=button(ui,"Keep Racing" if race_context else "Use This Ride",func():
 		if race_context:continue_requested.emit(driver_id,vehicle_id)
@@ -159,16 +159,16 @@ func refresh_labels() -> void:
 	name_field.placeholder_text="ENTER DRIVER NAME  /  "+d.display_name.to_upper()
 	identity.text="%d RACERS × %d MACHINES // YOUR COMBO. YOUR COAST."%[catalog.drivers.size(),catalog.vehicles.size()]
 	caption.text=d.tagline
-	stats.text="TOP SPEED     %03d KM/H\nCORNER GRIP   %.2f\nLAUNCH POWER  %.1f M/S²"%[roundi(float(LeoRaceRules.resolve(v).max_speed)*3.6),float(LeoRaceRules.resolve(v).handling),float(LeoRaceRules.resolve(v).acceleration)]
+	stats.text="TOP SPEED     %03d KM/H\nBOOST SPEED   %03d KM/H\nCORNER GRIP   %.2f\nLAUNCH POWER  %.1f M/S²"%[roundi(float(LeoRaceRules.resolve(v).max_speed)*3.6),roundi(float(LeoRaceRules.resolve(v).boosted_speed)*3.6),float(LeoRaceRules.resolve(v).handling),float(LeoRaceRules.resolve(v).acceleration)]
 	var rules:=LeoRaceRules.resolve(v)
-	var values: Array[float]=[float(rules.max_speed)*3.6,float(rules.handling),float(rules.acceleration)]
-	var maxima: Array[float]=[0.,0.,0.]
+	var values: Array[float]=[float(rules.max_speed)*3.6,float(rules.boosted_speed)*3.6,float(rules.handling),float(rules.acceleration)]
+	var maxima: Array[float]=[0.,0.,0.,0.]
 	for vehicle in catalog.vehicles:
 		var resolved:=LeoRaceRules.resolve(vehicle)
-		maxima[0]=maxf(maxima[0],float(resolved.max_speed)*3.6);maxima[1]=maxf(maxima[1],float(resolved.handling));maxima[2]=maxf(maxima[2],float(resolved.acceleration))
-	for i in 3:
+		maxima[0]=maxf(maxima[0],float(resolved.max_speed)*3.6);maxima[1]=maxf(maxima[1],float(resolved.boosted_speed)*3.6);maxima[2]=maxf(maxima[2],float(resolved.handling));maxima[3]=maxf(maxima[3],float(resolved.acceleration))
+	for i in 4:
 		stat_bars[i].set_value(values[i]/maxf(.001,maxima[i]))
-		stat_labels[i].text=["Speed · %d km/h" % roundi(values[0]),"Grip · %.2f" % values[1],"Launch · %.1f m/s²" % values[2]][i]
+		stat_labels[i].text=["Speed · %d km/h" % roundi(values[0]),"Boost · %d km/h" % roundi(values[1]),"Grip · %.2f" % values[2],"Launch · %.1f m/s²" % values[3]][i]
 	policy.text="SELECTED RACER // CABIN POSE" if v.driver_policy==VehicleDefinition.DriverPolicy.CABIN else "HELMETED SHAVEN LEO // FIXED CABIN DRIVER" if v.driver_policy==VehicleDefinition.DriverPolicy.FIXED else ("IDENTITY + PORTRAIT // DRIVER-FREE BODY" if v.driver_policy==VehicleDefinition.DriverPolicy.IDENTITY_ONLY else "OPEN COCKPIT // LIVE DRIVER")
 	if not v.official:policy.text+=" · MODDED / NO OFFICIAL RECORDS"
 	carousel.select_id(driver_id)
@@ -271,7 +271,8 @@ func set_selection(d: StringName,v: StringName) -> void:
 	if generation!=selection_generation or not is_inside_tree():return
 	if is_instance_valid(assembly):showroom.remove_child(assembly);assembly.queue_free()
 	assembly=VehicleAssembler.assemble(catalog.vehicle(v),catalog.driver(d));showroom.add_child(assembly)
-	base_distance=catalog.vehicle(v).preview_distance;target=catalog.vehicle(v).preview_target
+	var presented:=LeoVehiclePresentation.resolve(catalog.vehicle(v))
+	base_distance=presented.preview_distance;target=presented.preview_target
 	if changed:reset_view()
 	else:update_camera()
 	refresh_labels()

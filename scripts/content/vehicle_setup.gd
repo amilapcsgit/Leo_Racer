@@ -191,10 +191,9 @@ func build_fields() -> void:
 	heading("Camera and performance")
 	vector_field(fields,"Preview camera target",data.preview_target,func(value):data.preview_target=value;changed())
 	scalar("Preview distance (m)","preview_distance",1.,1.,60.)
-	scalar("Top speed (km/h)","max_speed",3.6,1.,360.)
-	scalar("Boost speed (km/h)","boosted_speed",3.6,1.,450.)
-	scalar("Acceleration (m/s²)","acceleration",1.,.1,60.)
-	scalar("Handling multiplier","handling",1.,.1,3.)
+	var race_profile := LeoRaceRules.resolve(candidate())
+	label(fields,"Race performance: %d km/h · %d km/h boost · %.1f launch · %.2f handling" % [roundi(race_profile.max_speed*3.6),roundi(race_profile.boosted_speed*3.6),race_profile.acceleration,race_profile.handling])
+	label(fields,"Your vehicle's race class sets its performance. New imports use the Compact class.")
 	scalar("Driving camera height offset","camera_height",1.,-2.,5.)
 	label(fields,"Custom content and tuning cannot set official records.")
 	var feature_editor:=preload("res://scripts/content/vehicle_feature_editor.gd").new()
@@ -280,11 +279,9 @@ func test_drive() -> void:
 		var angle:=TAU*float(i)/128.;points.append([50.*cos(angle),0.,50.*sin(angle)])
 	route.route={"points":points,"length":TAU*50.,"width":18.}
 	var circuit:=LeoCircuit.new(route)
-	# setup normally resolves catalog IDs. Temporarily register only this editor
-	# definition during setup, never change a race roster or persistent selection.
-	var vehicle:=candidate();vehicle.id=&"workshop_trial"
-	var catalog:=GarageCatalog.shared();catalog.vehicles.append(vehicle)
-	trial=LeoKart.new();studio.add_child(trial);trial.setup(circuit,0,true,driver_id,String(vehicle.id));catalog.vehicles.erase(vehicle)
+	# Pass the unsaved definition directly, retaining its race profile identity.
+	var vehicle:=candidate()
+	trial=LeoKart.new();studio.add_child(trial);trial.setup(circuit,0,true,driver_id,String(vehicle.id),vehicle)
 	trial_time=0.;trial_start=circuit.sample(0)
 	trial_input=LeoPlayerInput.new();trial_input.restore(game.input_router.players[0].serialize());trial_input.device=game.input_router.players[0].device
 	trial.control_input=trial_input;trial.active=true;trial.place(0,0);LeoRaceRules.apply(trial)

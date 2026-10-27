@@ -17,7 +17,7 @@ func run() -> void:
 	check(editor.validation().is_empty(),"Original wheel groups and fits validate")
 	check(editor.preview.wheel_spin_pivots.size()==4,"All four pivot assemblies preview")
 	var original_scale: Vector3=editor.preview.chassis.transform.basis.get_scale()
-	check(original_scale.is_equal_approx(Vector3.ONE*1.3),"Bigster scale applied once")
+	check(original_scale.is_equal_approx(Vector3.ONE),"Bigster 100 percent scale applied once")
 	editor.spin=true;editor.steering=true
 	for i in 5:await process_frame
 	check(editor.preview.wheel_spin_pivots[0].basis!=Basis.IDENTITY,"Spin preview updates wheel rotation")
@@ -27,7 +27,8 @@ func run() -> void:
 	editor.data.id="workshop_test_vehicle";editor.data.display_name="Workshop Test Vehicle";editor.data.max_speed=20.;editor.build_fields()
 	await editor.save_vehicle();check(editor.status.text.contains("Private Test Drive"),"Test drive required before save")
 	editor.test_drive();await physics_frame
-	check(is_instance_valid(editor.trial) and editor.trial.definition.max_speed==20.,"Private drive uses unsaved tuning")
+	check(is_instance_valid(editor.trial) and editor.trial.definition.max_speed==20.,"Private drive keeps unsaved vehicle metadata")
+	check(editor.trial.max_speed==LeoRaceRules.resolve(editor.trial.definition).max_speed,"Private drive uses the same race profile as the garage")
 	check(game.catalog.vehicles.size()==original_roster_size and game.state=="menu","Private viewport never changes race roster or session")
 	editor.trial_input.inject_test("accelerate",1.)
 	for i in 100:await physics_frame

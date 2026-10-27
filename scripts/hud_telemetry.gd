@@ -25,7 +25,7 @@ static func draw(h: LeoHUD) -> void:
 	h.draw_polyline(PackedVector2Array([Vector2(574,36),Vector2(585,75),Vector2(1145,75),Vector2(1174,36)]),Color(cyan,.5),1.2,true)
 	h.draw_line(Vector2(638,81),Vector2(735,81),Color(amber,.8),2,true)
 	glass(h,Rect2(42,836,847,45),cyan)
-	var lap_fraction := fposmod(h.game.player.last_s/h.game.circuit.length,1.0)
+	var lap_fraction := fposmod(maxf(0.,h.game.player.progress)/h.game.circuit.length,1.0)
 	h.draw_line(Vector2(595,136),Vector2(1156,136),Color(cyan,.15),3,true)
 	h.draw_line(Vector2(595,136),Vector2(595+561*lap_fraction,136),Color(cyan,.8),3,true)
 	# Position badge metallic edge.
