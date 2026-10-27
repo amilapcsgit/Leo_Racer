@@ -1,0 +1,67 @@
+{
+  "bigster": [
+    "CarPaint_Body_Gray_Runtime"
+  ],
+  "byd_yangwang_u8": [
+    "u8MAT_BYD_YangWang_U8_Carpaint1",
+    "u8MAT_CarPaint2_009"
+  ],
+  "colombo_tuk": [
+    "Body_01",
+    "Graphite paint"
+  ],
+  "cyberpunk": [
+    "Body_gameasset_Mat_1"
+  ],
+  "duster": [
+    "varnish",
+    "Graphite paint"
+  ],
+  "formula_blue": [
+    "blue"
+  ],
+  "hover": [
+    "cdp_body"
+  ],
+  "import_1968_volkswagen_beetle": [
+    "vMAT_Volkswagen_Beetle_1968_Base1"
+  ],
+  "import_1985_delorean_dmc_12_time_machine_bttf": [
+    "paint_2",
+    "TimeBTTF_TimeMachine1_1985Paint_Material1"
+  ],
+  "import_2013_equipped_jeep_wrangler_unlimited_rubicon": [
+    "CarPaaint"
+  ],
+  "import_2019_ford_mustang_rtr_spec5_10th_anniversary": [
+    "rtr5Ford_MustangRTRSPEC5_2019Paint_Material1"
+  ],
+  "import_2020_ferrari_roma": [
+    "Ferrari_RomaRewardRecycled_2020Paint_Material"
+  ],
+  "import_2020_jeep_gladiator": [
+    "Jeep_GladiatorRewardRecycled_2019Paint_Material"
+  ],
+  "import_2020_lbworks_toyota_supra_a90_ver_2": [
+    "tToyota_GRSupraTNR6_2020PaintTNR_Material1"
+  ],
+  "import_2021_pininfarina_teorema_concept": [
+    "CarPincar_Pininfarina_Teorema_carpaint1"
+  ],
+  "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit": [
+    "untitledBMW_M4CompetitionG82TNR3_2021PaintTNR_Material_008"
+  ],
+  "import_2022_mclaren_765lt": [
+    "McLaren_765LT_2021Paint_Material"
+  ],
+  "import_2024_byd_atto_2": [
+    "Atto218070ecf64afa0b1b7e8ac512b069072SG1"
+  ],
+  "import_future_car": [
+    "Car_lack"
+  ],
+  "mclaren": [
+    "Body21Mtl.004",
+    "Chassis1Mtl.004"
+  ]
+}

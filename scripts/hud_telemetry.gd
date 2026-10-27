@@ -15,6 +15,7 @@ static func glass(h: Control, r: Rect2, cyan: Color) -> void:
 		h.draw_line(Vector2(p.x+8,y),Vector2(e.x-8,y),Color(.6,.8,.8,.018),1)
 
 static func draw(h: LeoHUD) -> void:
+	if not is_instance_valid(h.game.player) or not h.game.circuit:return
 	var cyan := Color("00f2fe")
 	var amber := Color("ff9000")
 	glass(h,Rect2(42,36,230,142),cyan)

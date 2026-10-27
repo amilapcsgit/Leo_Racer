@@ -39,4 +39,4 @@ func restore(data: Dictionary, catalog: GarageCatalog) -> void:
  var v:=StringName(str(data.get("vehicle",vehicle_id)))
  if catalog.driver(d):driver_id=d
  if catalog.vehicle(v):vehicle_id=v;preferred_vehicle_id=&""
- else:preferred_vehicle_id=v;vehicle_id=catalog.vehicles[0].id if not catalog.vehicles.is_empty() else &""
+ else:preferred_vehicle_id=v;vehicle_id=LeoDefaultRoster.fallback(catalog)

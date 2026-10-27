@@ -22,6 +22,16 @@ try {
  if($Mode -eq 'Install'){
   $stage=[IO.Path]::GetFullPath($Payload).TrimEnd('\')
   if(-not (Test-Path -LiteralPath (Join-Path $stage 'LeoRacer.exe'))){throw 'Incomplete selected payload'}
+  $requiredIndex=Join-Path $stage 'required-payload.json'
+  if(Test-Path -LiteralPath $requiredIndex){
+   $required=Get-Content -LiteralPath $requiredIndex -Raw | ConvertFrom-Json
+   foreach($entry in $required.files.PSObject.Properties){
+    $candidate=[IO.Path]::GetFullPath((Join-Path $stage $entry.Name))
+    if(-not $candidate.StartsWith($stage+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Required payload path escapes staging'}
+    if(-not (Test-Path -LiteralPath $candidate)){throw 'Incomplete installer extraction. Choose a shorter TEMP folder and try again.'}
+    if((Get-OwnedHash $candidate) -ne [string]$entry.Value){throw 'Installer payload verification failed'}
+   }
+  }
   New-Item -ItemType Directory -Force -Path $root | Out-Null
   $backup=Join-Path $root ('ContentBackups\'+[guid]::NewGuid().ToString('N'))
   $backupIndex=@{}

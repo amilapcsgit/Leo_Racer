@@ -66,7 +66,9 @@ func ready_problem(slot: int) -> String:
     if not conflicts(slot,action,binding).is_empty():return "Keyboard controls overlap. Open Controls to choose another key."
  return ""
 func clear_all() -> void:
- for p in players: p.clear()
+ for p in players:
+  if p.kind=="gamepad" and p.device>=0:Input.stop_joy_vibration(p.device)
+  p.clear()
 func _input(event: InputEvent) -> void:
  if capture_slot >= 0:
   _capture(event); return

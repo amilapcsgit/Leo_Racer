@@ -8,6 +8,7 @@ signal gate_crossed(kart, gate)
 signal boosted(kart, source)
 signal drift_changed(kart, enabled)
 signal impacted(kart, point, normal, strength)
+signal contact_reported(event)
 signal recovered(kart)
 var circuit: LeoCircuit
 var racer_id := 0
@@ -80,6 +81,10 @@ var definition: VehicleDefinition
 var wheel_radii: Array[float] = []
 var wheel_axes: Array[Vector3] = []
 var wheel_angles: Array[float] = []
+var damage: LeoCosmeticDamage
+var contact_clock:=0.0
+var last_contact_at:=-10.0
+var contact_recoil:=Vector3.ZERO
 var vehicle_lighting: Node
 
 static func chassis_path(key: String) -> String:
@@ -173,6 +178,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	effects = LeoKartEffects.new()
 	visual.add_child(effects)
 	effects.setup(self)
+	damage=LeoCosmeticDamage.new();visual.add_child(damage);damage.setup(self)
 	ai.reset(ai_seed+racer_id*7919+int(circuit.length),ai_lane)
 	reset_physics_interpolation()
 
@@ -239,6 +245,7 @@ func sound(file: String, volume: float, playing: bool) -> AudioStreamPlayer:
 	return p
 
 func stop_audio() -> void:
+	if effects:effects.stop_contact_audio()
 	if motor_audio:motor_audio.stop()
 	for child in get_children():
 		if child is AudioStreamPlayer: child.stop()
@@ -385,6 +392,7 @@ func _physics_process(dt: float) -> void:
 	boost_time = maxf(0, boost_time - dt)
 	boost_cooldown = maxf(0, boost_cooldown - dt)
 	bump_cooldown = maxf(0, bump_cooldown - dt)
+	contact_clock+=dt
 	impact_feedback_cooldown = maxf(0,impact_feedback_cooldown-dt)
 	var throttle := 0.0
 	var desired_steer := 0.0
@@ -446,15 +454,9 @@ func _physics_process(dt: float) -> void:
 		velocity.y=-(velocity.x*up.x+velocity.z*up.z)/maxf(up.y,.5)
 	velocity.y -= 18 * dt
 	var motion_origin := global_position
-	var contact_velocity := Vector3(velocity.x,0,velocity.z)
+	var contact_velocity := velocity
 	move_and_slide()
-	if get_slide_collision_count()>0 and bump_cooldown<=0 and absf(speed)>12 and absf(wheel_motion_speed)>5:
-		for i in get_slide_collision_count():
-			var hit := get_slide_collision(i)
-			# Floor contact is continuous; only a closing lateral impact earns feedback.
-			if absf(hit.get_normal().y)<.6 and -contact_velocity.dot(hit.get_normal())>5:
-				emit_impact_feedback(hit.get_position(),hit.get_normal())
-				break
+	LeoContactSolver.solve(self,contact_velocity)
 	# Soft continuous barrier response avoids gaps between modular rail meshes.
 	var projection := circuit.project(position, nearest_index)
 	nearest_index = projection.index
@@ -463,15 +465,9 @@ func _physics_process(dt: float) -> void:
 	if circuit.elevated:track_normal=track_normal.normalized()
 	var footprint:=absf(global_basis.x.dot(track_normal))*definition.collision_size.x*.5+absf(global_basis.z.dot(track_normal))*definition.collision_size.z*.5
 	var lane_limit:=maxf(3.,circuit.width_at(projection.distance)*.5-footprint-.15)
-	if absf(offset) > lane_limit:
-		var normal := track_normal * signf(offset)
-		position -= normal * (absf(offset) - lane_limit)
-		velocity -= normal * maxf(0, velocity.dot(normal))
-		speed *= .985
-		if is_player and bump_cooldown <= 0 and speed > 12:
-			emit_impact_feedback(position+normal*1.0,-normal)
-			impact.play()
-			bump_cooldown = .65
+	# Physical rails handle ordinary contact. Only escaped/invalid positions recover.
+	if absf(offset)>lane_limit+maxf(6.,definition.collision_size.length()):
+		recover();return
 	road_offset=clampf(offset,-lane_limit,lane_limit)
 	if circuit.elevated and position.y<float(projection.center.y)-5.:recover();return
 	update_wheel_motion(global_position - motion_origin, dt)
@@ -485,11 +481,14 @@ func _physics_process(dt: float) -> void:
 			if absf(circuit.delta_distance(projection.distance, float(fraction) * circuit.length)) < 2.5 and absf(offset) < 6.5:
 				boost(1.5, "BOOST PAD")
 				boost_cooldown = 2.0
-	# Kenney-style independent wheel and body response.
+	# Keep the RC's body response; Reduced Motion suppresses presentation offsets.
+	var reduced:=bool(get_parent().get("reduced_motion")) if get_parent().get("reduced_motion")!=null else false
 	air_hop = move_toward(air_hop, 0, dt * .8)
-	visual.position.y = (.20 + sin(Time.get_ticks_msec()*.0018)*.055 if definition.hovering else 0.0) + air_hop + sin(Time.get_ticks_msec() * .018) * .012 * absf(speed) / 33
-	visual.rotation.z = lerp_angle(visual.rotation.z, -steer * .075 * grip, dt * 7)
-	visual.rotation.y = lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
+	visual.position.y = (.20 if definition.hovering else 0.) if reduced else ((.20 + sin(Time.get_ticks_msec()*.0018)*.055 if definition.hovering else 0.0) + air_hop + sin(Time.get_ticks_msec() * .018) * .012 * absf(speed) / 33)
+	visual.rotation.z = 0. if reduced else lerp_angle(visual.rotation.z, -steer * .075 * grip, dt * 7)
+	visual.rotation.y = 0. if reduced else lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
+	contact_recoil=Vector3.ZERO if reduced else contact_recoil.move_toward(Vector3.ZERO,dt*1.8)
+	visual.rotation.z+=contact_recoil.z;visual.rotation.x=contact_recoil.x
 	if is_player and engine:
 		if motor_audio:motor_audio.throttle=throttle;motor_audio.update(dt)
 		skid.volume_db = lerpf(skid.volume_db, -13.0 if drifting else -65.0, dt * 8)
@@ -509,3 +508,19 @@ func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
 	if impact_feedback_cooldown>0: return
 	impact_feedback_cooldown = .35
 	impacted.emit(self,point,normal,clampf(absf(speed)/42.0,0,1))
+
+func report_contact(point: Vector3, normal: Vector3, relative: Vector3, other: LeoKart, surface: String) -> void:
+	var closing:=maxf(0.,-relative.dot(normal))
+	var tangent:=relative.slide(normal).length()
+	var phase:="impact" if contact_clock-last_contact_at>.18 and closing>2. else "scrape"
+	last_contact_at=contact_clock
+	var event:={"kart":self,"other":other,"point":point,"normal":normal,"normal_speed":closing,"tangent_speed":tangent,"surface":surface,"phase":phase}
+	contact_reported.emit(event)
+	if phase=="impact":
+		var strength:=clampf(closing/35.,0.,1.)
+		contact_recoil=Vector3(-.035*strength,0.,global_basis.x.dot(normal)*.055*strength)
+		if impact_feedback_cooldown<=0.:
+			impact_feedback_cooldown=.18;impacted.emit(self,point,normal,strength)
+
+func _exit_tree() -> void:
+	if control_input and control_input.kind=="gamepad" and control_input.device>=0:Input.stop_joy_vibration(control_input.device)

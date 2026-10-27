@@ -30,7 +30,7 @@ func _ready() -> void:
  filters.add_child(track)
  mode=OptionButton.new();mode.add_item("1 PLAYER",1);mode.add_item("2 PLAYERS",2);filters.add_child(mode)
  mode.select(game.human_count-1)
- performance=OptionButton.new();performance.add_item("CURRENT VEHICLE BALANCE");performance.add_item("LEGACY / 165 KM/H");performance.add_item("LEGACY / BIGSTER");performance.add_item("LEGACY / DISTINCT V2");filters.add_child(performance)
+ performance=OptionButton.new();performance.add_item("CURRENT VEHICLE BALANCE");performance.add_item("LEGACY / 165 KM/H");performance.add_item("LEGACY / BIGSTER");performance.add_item("LEGACY / DISTINCT V2");performance.add_item("LEGACY / DISTINCT V3");filters.add_child(performance)
  performance.select(0)
  vehicle=OptionButton.new();vehicle.add_item("ALL VEHICLES")
  for v in game.catalog.vehicles:vehicle.add_item(v.display_name)
@@ -56,8 +56,9 @@ func refresh() -> void:
  var rows: Array=[]
  var course: LeoTrackDefinition=game.tracks[track.selected]
  var ruleset := course.ruleset_id() if performance.selected==0 else ("balanced_v1+arcade_elevation_v1" if course.elevated() else "balanced_v1")
+ if performance.selected==4:ruleset="distinct_v3"+("+arcade_elevation_v1" if course.elevated() else "")
  if performance.selected==3:ruleset="distinct_v2"+("+arcade_elevation_v1" if course.elevated() else "")
- var class_id := LeoRaceRules.CLASS if performance.selected in [0,3] else ("standard165" if performance.selected==1 else "suv180")
+ var class_id := LeoRaceRules.CLASS if performance.selected in [0,3,4] else ("standard165" if performance.selected==1 else "suv180")
  if game.ranking_store:rows=game.ranking_store.best_times_for_track(mode.get_selected_id(),class_id,selected_vehicle,metric.selected==1,course.id,course.revision,ruleset)
  status.text="Best time for each racer. Can you beat yours?"
  var failed: bool=not game.ranking_store or not game.ranking_store.get_error().is_empty()

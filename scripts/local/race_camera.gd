@@ -18,6 +18,10 @@ func reset() -> void:
 static func field_of_view(speed: float, boost: float, reduced: bool, base: float = 63.) -> float:
 	return base if reduced else clampf(base+10.*smoothstep(0.,50.,absf(speed))+boost,base,85.)
 
+static func speed_pullback(speed: float, reduced: bool) -> float:
+	# Retain the speed effect at half its previous travel; size clearance is separate.
+	return 0. if reduced else absf(speed)*.006
+
 func advance(speed: float,input: LeoPlayerInput,dt: float) -> void:
 	if speed<-.75:reverse_time+=dt
 	else:reverse_time=0.
@@ -48,7 +52,7 @@ func update(local: LeoLocalPlayer,view: Camera3D,kart: LeoKart,input: LeoPlayerI
 	var box:=body_bounds(kart)
 	var center:=box.get_center()
 	var origin:=pose.origin+pose.basis*Vector3(center.x,0.,center.z)
-	var distance := 6.4+(0. if reduced else absf(kart.wheel_motion_speed)*.012)+maxf(0.,maxf(box.size.z,kart.definition.collision_size.z)-3.5)*.7
+	var distance := 6.4+speed_pullback(kart.wheel_motion_speed,reduced)+maxf(0.,maxf(box.size.z,kart.definition.collision_size.z)-3.5)*.7
 	# Bounds-based clearance also protects long imports in single-player. A
 	# narrower selected FOV must still contain the vehicle at rest.
 	distance*=maxf(1.,tan(deg_to_rad(63.)*.5)/tan(deg_to_rad(view.fov)*.5))

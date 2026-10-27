@@ -85,7 +85,7 @@ func ensure_available_selections() -> void:
 			local.vehicle_id=local.preferred_vehicle_id;local.preferred_vehicle_id=&""
 		if not catalog.vehicle(local.vehicle_id):
 			if local.preferred_vehicle_id.is_empty():local.preferred_vehicle_id=local.vehicle_id
-			local.vehicle_id=catalog.vehicles[0].id
+			local.vehicle_id=LeoDefaultRoster.fallback(catalog)
 	if not local_players[0].preferred_vehicle_id.is_empty():selected_kart=catalog.vehicle_index(local_players[0].vehicle_id)
 	else:local_players[0].vehicle_id=catalog.vehicles[clampi(selected_kart,0,catalog.vehicles.size()-1)].id
 
@@ -122,8 +122,10 @@ func _ready() -> void:
 	get_tree().root.close_requested.connect(quit_game)
 	loading=LeoLoadingScreen.new();add_child(loading)
 	await get_tree().process_frame
+	preload("res://scripts/content/boot_trace.gd").mark("garage_discovery_begin")
 	loading.stage("Loading garage catalog…",25)
 	if not LeoVehicleLibrary.legacy():await LeoVehicleLibrary.discover_async(get_tree())
+	preload("res://scripts/content/boot_trace.gd").mark("garage_discovery_complete")
 	catalog = GarageCatalog.shared()
 	var args := OS.get_cmdline_user_args()
 	test_mode = "--race-test" in args
@@ -261,6 +263,7 @@ func race_camera_far() -> float:
 	return 5000. if int(track_definition.metadata.get("asset_api",1))>=3 and not art_profile.sky_visual_path.is_empty() else 1100.
 
 func build_world() -> void:
+	preload("res://scripts/content/boot_trace.gd").mark("world_build_begin")
 	world = Node3D.new()
 	world.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(world)
@@ -375,9 +378,12 @@ func build_world() -> void:
 			tent.scale = Vector3.ONE*3
 			world.add_child(tent)
 	LeoAssets.apply_overrides(world)
+	LeoTrackPolish.install(world,circuit)
+	LeoTrackContact.install(world,circuit)
 	LeoGraphics.install_reflections(world,circuit)
 	apply_graphics()
 	if is_instance_valid(camera):camera.far=race_camera_far()
+	preload("res://scripts/content/boot_trace.gd").mark("world_build_complete")
 
 func polish_materials(node: Node, landmark: bool=false) -> void:
 	if node is MeshInstance3D:
@@ -482,7 +488,7 @@ func showroom_lighting(enabled: bool) -> void:
 
 func apply_graphics() -> void:
 	if not is_instance_valid(world) or not environment:return
-	if not world.has_node("RaceReflection0") and (human_count==1 or RenderingServer.get_current_rendering_method()=="forward_plus"):
+	if world.find_children("RaceReflection*","ReflectionProbe",false,false).is_empty() and (human_count==1 or RenderingServer.get_current_rendering_method()=="forward_plus"):
 		LeoGraphics.install_reflections(world,circuit)
 	LeoGraphics.apply(world,environment,graphics_quality,human_count==2,state=="garage")
 
@@ -527,6 +533,11 @@ func return_menu() -> void:
 	camera.look_at(circuit.sample(35)+Vector3.UP*12.)
 	hud.show_menu()
 
+func default_ai_vehicle(index: int) -> VehicleDefinition:
+	var pool:=LeoDefaultRoster.ai_vehicles(catalog)
+	if pool.is_empty():return catalog.vehicle(LeoDefaultRoster.fallback(catalog))
+	return pool[(selected_kart+index*3)%pool.size()]
+
 func start_race() -> void:
 	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
@@ -536,7 +547,7 @@ func start_race() -> void:
 	get_tree().paused=false
 	remove_racers()
 	for i in 6:
-		var v:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
+		var v:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else default_ai_vehicle(i))
 		var d:=catalog.drivers[selected_driver] if i==0 else (catalog.driver(local_players[i].driver_id) if i<human_count else catalog.drivers[i%catalog.drivers.size()])
 		if not v.model_path.is_empty() and not await LeoAssets.scene_async(v.model_path,get_tree()):
 			loading.show_failure(LeoAssets.failure,start_race,func():loading.hide();return_menu());return
@@ -548,7 +559,7 @@ func start_race() -> void:
 	garage_from_pause=false
 	race_modified=track_definition.modified or LeoAssets.modified_rules
 	for i in 6:
-		var vehicle:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
+		var vehicle:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else default_ai_vehicle(i))
 		race_modified=race_modified or not vehicle.official
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	rankings_written=false;ranking_message=""
@@ -570,7 +581,7 @@ func start_race() -> void:
 	for i in 6:
 		var kart:=LeoKart.new();kart.process_mode=Node.PROCESS_MODE_PAUSABLE;add_child(kart)
 		var d: StringName=local_players[i].driver_id if i<human_count else catalog.drivers[i%catalog.drivers.size()].id
-		var v: StringName=local_players[i].vehicle_id if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()].id
+		var v: StringName=local_players[i].vehicle_id if i<human_count else default_ai_vehicle(i).id
 		kart.setup(circuit,i,i<human_count,String(d),String(v))
 		LeoRaceRules.apply(kart)
 		kart.racer_name=catalog.driver(d).display_name
@@ -635,6 +646,8 @@ func on_boost(kart: LeoKart, source: String) -> void:
 func on_impact(kart: LeoKart, _point: Vector3, _normal: Vector3, strength: float) -> void:
 	var local:=state_for(kart)
 	if local and local.feedback:local.feedback.play_impact(strength)
+	if kart.control_input and kart.control_input.kind=="gamepad" and kart.control_input.device>=0:
+		Input.start_joy_vibration(kart.control_input.device,strength*.3,strength*.6,.12)
 
 func on_recover(kart: LeoKart) -> void:
 	var local:=state_for(kart)

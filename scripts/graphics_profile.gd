@@ -10,6 +10,7 @@ static func apply(world: Node3D, environment: Environment, quality: int, split: 
 	environment.glow_enabled=tier>0
 	environment.glow_intensity=.4;environment.glow_bloom=.035
 	environment.adjustment_saturation=1.03;environment.adjustment_contrast=1.02
+	if not showroom:LeoTrackPolish.lighting(world,environment)
 	environment.ssr_enabled=forward and tier==2 and not showroom
 	environment.volumetric_fog_enabled=forward and tier==2 and not showroom
 	environment.volumetric_fog_density=.002 if tier==2 else 0.
@@ -32,18 +33,18 @@ static func apply(world: Node3D, environment: Environment, quality: int, split: 
 		if probe is FogVolume and String(probe.name).begins_with("RaceMist"):probe.visible=forward and tier==2 and not showroom
 
 static func install_reflections(world: Node3D, circuit: LeoCircuit) -> void:
-	for fraction in [0.,.5]:
+	for fraction in LeoTrackPolish.reflection_positions(circuit):
 		var probe := ReflectionProbe.new()
-		probe.name="RaceReflection"+str(int(fraction*2.))
-		probe.position=circuit.sample(circuit.length*fraction)+Vector3.UP*4.
+		probe.name="RaceReflection"+str(int(float(fraction)*100.))
+		probe.position=circuit.sample(circuit.length*float(fraction))+Vector3.UP*4.
 		probe.size=Vector3(150,40,150);probe.max_distance=100.
 		probe.update_mode=ReflectionProbe.UPDATE_ONCE;probe.intensity=.65
 		probe.enable_shadows=false
 		world.add_child(probe)
-		if RenderingServer.get_current_rendering_method()=="forward_plus":
+		if RenderingServer.get_current_rendering_method()=="forward_plus" and not world.has_node("RaceMist"+str(int(float(fraction)*100.))):
 			var mist := FogVolume.new()
-			mist.name="RaceMist"+str(int(fraction*2.))
-			mist.position=circuit.sample(circuit.length*fraction,circuit.width_at(circuit.length*fraction)*.5+6.)+Vector3.UP*1.5
+			mist.name="RaceMist"+str(int(float(fraction)*100.))
+			mist.position=circuit.sample(circuit.length*float(fraction),circuit.width_at(circuit.length*float(fraction))*.5+6.)+Vector3.UP*1.5
 			mist.size=Vector3(20,4,25);mist.visible=false
 			var fog := FogMaterial.new();fog.density=.025;fog.albedo=Color("cfddd9")
 			mist.material=fog;world.add_child(mist)

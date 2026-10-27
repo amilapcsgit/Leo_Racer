@@ -33,7 +33,7 @@ func driver(key: StringName) -> DriverDefinition:
 func vehicle_index(key: StringName) -> int:
 	for i in vehicles.size():
 		if vehicles[i].id==key: return i
-	return 0
+	return vehicles.find(vehicle(&"bigster")) if vehicle(&"bigster") else 0
 
 func driver_index(key: StringName) -> int:
 	for i in drivers.size():

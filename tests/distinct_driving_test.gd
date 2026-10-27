@@ -47,11 +47,12 @@ func features() -> void:
 		if vehicle.id!=&"bigster":check(rules.max_speed<50. and rules.boosted_speed<62.5,"Bigster owns outright speed / "+String(vehicle.id))
 		if vehicle.official:official+=1;check(rules.class_id==LeoRaceRules.CLASS,"Official comparison class")
 		else:check(rules.class_id=="modded","Imported car remains unranked")
-	check(game.catalog.vehicles.size()==48 and official==16,"All 48 installed cars / 16 official")
+	check(game.catalog.vehicles.size()==20 and official==7,"Selected 20 installed cars / 7 official")
 	var unknown := VehicleDefinition.new();unknown.id=&"unknown_future_car";unknown.official=false
 	check(LeoRaceRules.resolve(unknown).max_speed==162./3.6,"Unknown import receives compact profile")
 	var bigster: VehicleDefinition=game.catalog.vehicle(&"bigster")
 	for pair in [["bigster","suv"],["mclaren","sport"],["formula_blue","sport"],["aqua","small"],["race_bus","bus"],["hover","electric"]]:
+		if not game.catalog.vehicle(StringName(pair[0])):continue
 		check(LeoVehicleAudio.profile(game.catalog.vehicle(StringName(pair[0])))==pair[1],"Vehicle sound class / "+pair[0])
 	var rules := LeoRaceRules.resolve(bigster)
 	check(rules.max_speed==50. and rules.boosted_speed==62.5 and rules.acceleration==18. and rules.handling==1.,"Bigster tuning preserved")
@@ -148,7 +149,7 @@ func straight_measurements() -> void:
 		check(absf(speeds[kart.vehicle_key]-kart.max_speed)<.001,"Measured normal ceiling / "+kart.vehicle_key)
 		check(absf(peaks[kart.vehicle_key]-kart.boosted_ceiling())<.001,"Measured boost ceiling / "+kart.vehicle_key)
 		rows.append({"id":kart.vehicle_key,"zero_to_100_seconds":times.get(kart.vehicle_key,0.),"normal_kmh":speeds[kart.vehicle_key]*3.6,"boost_kmh":peaks[kart.vehicle_key]*3.6})
-	var compact_time: float=times.get("aqua",100.)
+	var compact_time: float=times.get("import_2024_byd_atto_2",100.)
 	check(compact_time<times.get("bigster",0.),"Compact wins the measured launch section")
 	reports.straight_measurements=rows
 	holder.queue_free();await physics_frame
@@ -157,11 +158,17 @@ func replay(kart: LeoKart) -> void:
 	var script := load("res://build/distinct/baseline/manual_controller.gd") as GDScript
 	check(script!=null and script.can_instantiate(),"Baseline controller snapshot loads")
 	if not script:return
-	var initial := kart.circuit.length*.1
+	# Driving preservation must exclude the collision response being changed.
+	var free_definition:=LeoTrackDefinition.new()
+	free_definition.route={"length":30000.,"width":2000.,"points":[[-5000.,0.,0.],[5000.,0.,0.],[5000.,0.,5000.],[-5000.,0.,5000.]]}
+	var free_track:=LeoCircuit.new(free_definition)
+	var floor_body:=StaticBody3D.new();var shape:=BoxShape3D.new();shape.size=Vector3(12000,1,12000)
+	var collider:=CollisionShape3D.new();collider.shape=shape;collider.position.y=-.5;floor_body.add_child(collider);game.add_child(floor_body)
+	var initial := free_track.length*.1
 	var results: Array=[]
 	for baseline in [true,false]:
 		var subject: LeoKart=script.new() if baseline else LeoKart.new()
-		game.add_child(subject);subject.setup(game.circuit,30,true,"human","bigster")
+		game.add_child(subject);subject.setup(free_track,30,true,"human","bigster")
 		subject.set_physics_process(false);subject.collision_mask=1
 		subject.control_input=LeoPlayerInput.new();subject.active=true;subject.place(initial,0.)
 		var trace: Array=[]
@@ -180,7 +187,8 @@ func replay(kart: LeoKart) -> void:
 	for i in results[0].size():
 		for j in results[0][i].size():difference=maxf(difference,absf(results[0][i][j]-results[1][i][j]))
 	check(difference<.001,"Bigster original/new manual input replay matches")
-	reports.manual_replay={"ticks":600,"maximum_difference":difference}
+	reports.manual_replay={"ticks":600,"maximum_difference":difference,"fixture":"unobstructed wide road; collisions tested separately"}
+	floor_body.queue_free();await physics_frame
 
 func races() -> void:
 	game.set_process(false)
@@ -214,7 +222,7 @@ func races() -> void:
 			print("DISTINCT_RACE ",track_id," seed=",seed_value," completed=",completed,"/",total)
 			save_report("race-progress",{"races":rows,"covered":covered.keys(),"completed":completed,"total":total})
 	check(float(completed)/maxi(1,total)>=.95,"At least 95 percent of racers finish")
-	check(covered.size()==48,"All 48 vehicles rotate through race grid")
+	check(covered.size()==game.catalog.vehicles.size(),"All selected vehicles rotate through race grid")
 	reports={"races":rows,"completion_rate":float(completed)/maxi(1,total),"vehicles":covered.size()}
 
 func pace() -> void:

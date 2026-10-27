@@ -26,7 +26,7 @@ def run(label, folder=CANDIDATE, args=(), render=False, compat=False, timeout=24
         try:code=process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:process.kill();process.wait();code=-999
     text=(QA/(label+'.log')).read_text(encoding='utf-8',errors='replace')
-    errors=[line for line in text.splitlines() if any(word in line for word in ['SCRIPT ERROR','Parse Error','Shader compilation failed','CONTENT_VALIDATION_FAILED'])]
+    errors=[line for line in text.splitlines() if any(word in line for word in ['SCRIPT ERROR','Parse Error','Shader compilation failed','CONTENT_VALIDATION_FAILED','Parameter "material" is null'])]
     result=dict(label=label,exit_code=code,seconds=round(time.monotonic()-start,2),errors=errors,sdk_removed=True)
     (output/'process.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result),flush=True)
