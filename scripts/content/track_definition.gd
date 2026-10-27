@@ -45,7 +45,7 @@ func read_manifest(path: String) -> void:
 		var version_pattern:=RegEx.new();version_pattern.compile("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
 		if not core.get("min") is String or not version_pattern.search(core.min) or (not core.get("max_major") is int and not core.get("max_major") is float):error="Invalid core compatibility";return
 		var minimum:=String(core.min).split(".")
-		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2003001 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
+		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2004000 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
 		if metadata.get("world_kind")!="external":error="Track API 2 requires external world data";return
 		if not metadata.get("lighting",{}) is Dictionary:error="Invalid lighting parameters";return
 		var lighting: Dictionary=metadata.get("lighting",{})
@@ -173,7 +173,7 @@ func profile() -> LeoArtProfile:
 func world_kind() -> String:return String(metadata.get("world_kind","astra"))
 
 func elevated() -> bool:return int(metadata.get("asset_api",1))==3
-func ruleset_id() -> String:return "balanced_v1+arcade_elevation_v1" if elevated() else "balanced_v1"
+func ruleset_id() -> String:return LeoRaceRules.ID+("+arcade_elevation_v1" if elevated() else "")
 
 static func elevation_problem(data: Dictionary) -> String:
 	var samples: Array=data.get("points",[])

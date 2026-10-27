@@ -22,12 +22,29 @@ func _ready() -> void:
 func fingerprint(id: int) -> Dictionary:
  var info := Input.get_joy_info(id)
  return {"guid":Input.get_joy_guid(id),"name":Input.get_joy_name(id),"serial":str(info.get("serial_number",""))}
+func connected_devices() -> Array[int]:
+ return Input.get_connected_joypads()
 func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  last_error = ""
+ if slot<0 or slot>=players.size():return false
+ var connected:=connected_devices()
+ var former_kind:=players[slot].kind
+ var former_id:=players[slot].device
  for i in players.size():
   if i == slot: continue
-  if kind != "keyboard" and id >= 0 and players[i].kind != "keyboard" and players[i].device == id: last_error = "This device is already assigned to the other player."
- if not last_error.is_empty(): return false
+  if kind != "keyboard" and id >= 0 and players[i].kind != "keyboard" and players[i].device == id:
+   var replacement:=-1
+   connected.sort()
+   for candidate in connected:
+    if candidate!=id and candidate!=former_id:replacement=candidate;break
+   if replacement<0 and former_kind!="keyboard" and former_id!=id and former_id in connected:replacement=former_id
+   var displaced:=players[i]
+   var target_kind:=former_kind if replacement==former_id and replacement>=0 else "gamepad" if replacement>=0 else "keyboard"
+   if displaced.kind!=target_kind:displaced.switch_kind(target_kind)
+   displaced.device=replacement
+   displaced.identity=fingerprint(replacement) if replacement>=0 else {}
+   displaced.preference="manual"
+   displaced.clear()
  var p := players[slot]
  p.preference="manual"
  if p.kind != kind:p.switch_kind(kind)
@@ -49,7 +66,9 @@ func ready_problem(slot: int) -> String:
     if not conflicts(slot,action,binding).is_empty():return "Keyboard controls overlap. Open Controls to choose another key."
  return ""
 func clear_all() -> void:
- for p in players: p.clear()
+ for p in players:
+  if p.kind=="gamepad" and p.device>=0:Input.stop_joy_vibration(p.device)
+  p.clear()
 func _input(event: InputEvent) -> void:
  if capture_slot >= 0:
   _capture(event); return

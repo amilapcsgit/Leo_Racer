@@ -67,6 +67,9 @@ var content_refreshing := false
 var content_panel: CanvasLayer
 var art_profile: LeoArtProfile = preload("res://assets/config/astra.tres")
 var feedback: Node
+var graphics_quality := 1
+var base_camera_fov := 63.0
+var opponent_audio: LeoOpponentAudio
 var reduced_motion := false
 var camera_roll := 0.0
 var launch_charged := false
@@ -82,7 +85,7 @@ func ensure_available_selections() -> void:
 			local.vehicle_id=local.preferred_vehicle_id;local.preferred_vehicle_id=&""
 		if not catalog.vehicle(local.vehicle_id):
 			if local.preferred_vehicle_id.is_empty():local.preferred_vehicle_id=local.vehicle_id
-			local.vehicle_id=catalog.vehicles[0].id
+			local.vehicle_id=LeoDefaultRoster.fallback(catalog)
 	if not local_players[0].preferred_vehicle_id.is_empty():selected_kart=catalog.vehicle_index(local_players[0].vehicle_id)
 	else:local_players[0].vehicle_id=catalog.vehicles[clampi(selected_kart,0,catalog.vehicles.size()-1)].id
 
@@ -119,8 +122,10 @@ func _ready() -> void:
 	get_tree().root.close_requested.connect(quit_game)
 	loading=LeoLoadingScreen.new();add_child(loading)
 	await get_tree().process_frame
+	preload("res://scripts/content/boot_trace.gd").mark("garage_discovery_begin")
 	loading.stage("Loading garage catalog…",25)
 	if not LeoVehicleLibrary.legacy():await LeoVehicleLibrary.discover_async(get_tree())
+	preload("res://scripts/content/boot_trace.gd").mark("garage_discovery_complete")
 	catalog = GarageCatalog.shared()
 	var args := OS.get_cmdline_user_args()
 	test_mode = "--race-test" in args
@@ -174,6 +179,7 @@ func _ready() -> void:
 	camera.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(camera)
 	camera.current = true
+	opponent_audio=LeoOpponentAudio.new();add_child(opponent_audio)
 	feedback = load("res://scripts/RaceFeedbackBridge.cs").new()
 	feedback.name = "RaceFeedback"
 	add_child(feedback)
@@ -257,6 +263,7 @@ func race_camera_far() -> float:
 	return 5000. if int(track_definition.metadata.get("asset_api",1))>=3 and not art_profile.sky_visual_path.is_empty() else 1100.
 
 func build_world() -> void:
+	preload("res://scripts/content/boot_trace.gd").mark("world_build_begin")
 	world = Node3D.new()
 	world.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(world)
@@ -336,6 +343,7 @@ func build_world() -> void:
 	env_node.environment = environment
 	world.add_child(env_node)
 	var sun := DirectionalLight3D.new()
+	sun.name="RaceSun"
 	sun.rotation_degrees = Vector3(-28,-145,0)
 	sun.light_color = Color("ffe0af")
 	sun.light_energy = 1.25
@@ -370,7 +378,12 @@ func build_world() -> void:
 			tent.scale = Vector3.ONE*3
 			world.add_child(tent)
 	LeoAssets.apply_overrides(world)
+	LeoTrackPolish.install(world,circuit)
+	LeoTrackContact.install(world,circuit)
+	LeoGraphics.install_reflections(world,circuit)
+	apply_graphics()
 	if is_instance_valid(camera):camera.far=race_camera_far()
+	preload("res://scripts/content/boot_trace.gd").mark("world_build_complete")
 
 func polish_materials(node: Node, landmark: bool=false) -> void:
 	if node is MeshInstance3D:
@@ -467,11 +480,23 @@ func enter_garage(retain_race: bool=false) -> void:
 
 func showroom_lighting(enabled: bool) -> void:
 	environment.fog_enabled = not enabled
-	environment.volumetric_fog_enabled = not enabled and track_definition.world_kind()=="astra" and RenderingServer.get_current_rendering_method()=="forward_plus"
+	environment.volumetric_fog_enabled = not enabled and graphics_quality==2 and human_count==1 and RenderingServer.get_current_rendering_method()=="forward_plus"
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR if enabled else Environment.AMBIENT_SOURCE_SKY
 	environment.ambient_light_color = Color("558fa2")
 	environment.ambient_light_energy = .55 if enabled else art_profile.ambient_energy
 	environment.tonemap_exposure = .9 if enabled else art_profile.exposure
+
+func apply_graphics() -> void:
+	if not is_instance_valid(world) or not environment:return
+	if world.find_children("RaceReflection*","ReflectionProbe",false,false).is_empty() and (human_count==1 or RenderingServer.get_current_rendering_method()=="forward_plus"):
+		LeoGraphics.install_reflections(world,circuit)
+	LeoGraphics.apply(world,environment,graphics_quality,human_count==2,state=="garage")
+
+func set_graphics_quality(value: int) -> void:
+	graphics_quality=clampi(value,0,2);apply_graphics();save_settings()
+
+func set_camera_fov(value: float) -> void:
+	base_camera_fov=clampf(value,55.,75.);save_settings()
 
 func select_driver(index: int) -> void:
 	selected_driver = index
@@ -482,6 +507,7 @@ func select_kart(index: int) -> void:
 	save_settings()
 
 func remove_racers() -> void:
+	if opponent_audio:opponent_audio.stop()
 	if split_view:split_view.activate(false)
 	if feedback: feedback.reset_feedback()
 	camera_roll = 0.0
@@ -507,6 +533,11 @@ func return_menu() -> void:
 	camera.look_at(circuit.sample(35)+Vector3.UP*12.)
 	hud.show_menu()
 
+func default_ai_vehicle(index: int) -> VehicleDefinition:
+	var pool:=LeoDefaultRoster.ai_vehicles(catalog)
+	if pool.is_empty():return catalog.vehicle(LeoDefaultRoster.fallback(catalog))
+	return pool[(selected_kart+index*3)%pool.size()]
+
 func start_race() -> void:
 	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
@@ -516,7 +547,7 @@ func start_race() -> void:
 	get_tree().paused=false
 	remove_racers()
 	for i in 6:
-		var v:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
+		var v:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else default_ai_vehicle(i))
 		var d:=catalog.drivers[selected_driver] if i==0 else (catalog.driver(local_players[i].driver_id) if i<human_count else catalog.drivers[i%catalog.drivers.size()])
 		if not v.model_path.is_empty() and not await LeoAssets.scene_async(v.model_path,get_tree()):
 			loading.show_failure(LeoAssets.failure,start_race,func():loading.hide();return_menu());return
@@ -528,11 +559,12 @@ func start_race() -> void:
 	garage_from_pause=false
 	race_modified=track_definition.modified or LeoAssets.modified_rules
 	for i in 6:
-		var vehicle:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()])
+		var vehicle:=catalog.vehicles[selected_kart] if i==0 else (catalog.vehicle(local_players[i].vehicle_id) if i<human_count else default_ai_vehicle(i))
 		race_modified=race_modified or not vehicle.official
 	session_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	rankings_written=false;ranking_message=""
 	showroom_lighting(false)
+	apply_graphics()
 	get_tree().paused=false;paused=false
 	remove_racers()
 	stage.hide();world.show()
@@ -549,7 +581,7 @@ func start_race() -> void:
 	for i in 6:
 		var kart:=LeoKart.new();kart.process_mode=Node.PROCESS_MODE_PAUSABLE;add_child(kart)
 		var d: StringName=local_players[i].driver_id if i<human_count else catalog.drivers[i%catalog.drivers.size()].id
-		var v: StringName=local_players[i].vehicle_id if i<human_count else catalog.vehicles[(selected_kart+i*3)%catalog.vehicles.size()].id
+		var v: StringName=local_players[i].vehicle_id if i<human_count else default_ai_vehicle(i).id
 		kart.setup(circuit,i,i<human_count,String(d),String(v))
 		LeoRaceRules.apply(kart)
 		kart.racer_name=catalog.driver(d).display_name
@@ -584,6 +616,8 @@ func start_race() -> void:
 	hud.show_race()
 
 func on_gate(kart: LeoKart, gate: int) -> void:
+	if kart.finished or kart.retired or gate<=kart.last_reported_gate:return
+	kart.last_reported_gate=gate
 	var local:=state_for(kart)
 	if gate>0 and gate%LeoCircuit.GATES==0 and local:
 		local.best_lap=minf(local.best_lap,race_time-local.lap_started)
@@ -612,12 +646,14 @@ func on_boost(kart: LeoKart, source: String) -> void:
 func on_impact(kart: LeoKart, _point: Vector3, _normal: Vector3, strength: float) -> void:
 	var local:=state_for(kart)
 	if local and local.feedback:local.feedback.play_impact(strength)
+	if kart.control_input and kart.control_input.kind=="gamepad" and kart.control_input.device>=0:
+		Input.start_joy_vibration(kart.control_input.device,strength*.3,strength*.6,.12)
 
 func on_recover(kart: LeoKart) -> void:
 	var local:=state_for(kart)
 	if local:
 		if local.feedback:local.feedback.play_recover()
-		local.heading=kart.rotation.y;local.roll=0.;local.slipstream_time=0.
+		local.camera_rig.reset();local.heading=kart.rotation.y;local.roll=0.;local.slipstream_time=0.
 		if local.slot==0:cam_heading=kart.rotation.y;camera_roll=0.;slipstream_time=0.
 		announce_player(local.slot,"BACK ON TRACK",1.2)
 
@@ -728,8 +764,9 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 		hud.garage_selector.policy.text="TRACK BUSY — BACK TO PAUSE, RESUME, THEN TRY AGAIN"
 		return false
 	fresh.position=safe_position;fresh.rotation.y=heading
-	for property in ["progress","next_gate","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
+	for property in ["progress","next_gate","last_reported_gate","checkpoint_missed","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
 	fresh.speed=clampf(old.speed,-10.,fresh.max_speed)
+	fresh.road_offset=circuit.project(fresh.position,fresh.nearest_index).offset
 	fresh.velocity=-fresh.global_basis.z*fresh.speed
 	fresh.boost_fuel=old.boost_fuel
 	fresh.racer_name=player_name.strip_edges() if not player_name.strip_edges().is_empty() else catalog.driver(d).display_name
@@ -807,6 +844,7 @@ func _process(dt: float) -> void:
 			if player.retired or all_finished or race_time-player.finish_time>(70. if test_mode or diagnostics_mode else 4.):finish_race()
 	if state in ["countdown","race","finishing"] and player:
 		for slot in human_count:update_local_camera(local_players[slot],dt)
+		if opponent_audio:opponent_audio.update(self,dt)
 		wrong_way_time=local_players[0].wrong_way
 	if smoke_mode:
 		test_tick+=1
@@ -875,6 +913,8 @@ func save_settings() -> void:
 	for local in local_players:cfg.set_value("local_players",str(local.slot),local.selection())
 	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
+	cfg.set_value("display","graphics_quality",graphics_quality)
+	cfg.set_value("display","camera_fov",base_camera_fov)
 	cfg.save("user://leo_racer.cfg")
 
 func load_settings() -> void:
@@ -883,6 +923,8 @@ func load_settings() -> void:
 		master_volume = cfg.get_value("audio", "volume", .72)
 		music_enabled = cfg.get_value("audio", "music", true)
 		reduced_motion = cfg.get_value("display", "reduced_motion", false)
+		graphics_quality=clampi(int(cfg.get_value("display","graphics_quality",1)),0,2)
+		base_camera_fov=clampf(float(cfg.get_value("display","camera_fov",63.)),55.,75.)
 		var selection := catalog.migrate(cfg)
 		selected_driver = selection.x
 		selected_kart = selection.y
@@ -1112,16 +1154,19 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	if not is_instance_valid(local.camera) or not is_instance_valid(local.kart):return
 	var kart:=local.kart
 	var view:=local.camera
+	if reduced_motion:view.fov=base_camera_fov
 	var pose: Transform3D=kart.get_global_transform_interpolated()
 	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
-	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2)
+	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2,reduced_motion)
 	if local.feedback:
 		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
-		view.fov=lerpf(view.fov,63.+absf(kart.speed)*.1+float(local.feedback.get_fov_offset()),1.-exp(-dt*12.))
+		var desired_fov: float=local.camera_rig.field_of_view(kart.wheel_motion_speed,float(local.feedback.get_fov_offset()),reduced_motion,base_camera_fov)
+		view.fov=base_camera_fov if reduced_motion else lerpf(view.fov,desired_fov,1.-exp(-dt*12.))
 		var target:=0. if reduced_motion else -kart.steer*deg_to_rad(art_profile.camera_roll_degrees)*clampf(absf(kart.speed)/36.,0.,1.)
-		local.roll=lerpf(local.roll,target,1.-exp(-dt*6.))
+		local.roll=0. if reduced_motion else lerpf(local.roll,target,1.-exp(-dt*6.))
 		view.rotate_object_local(Vector3.FORWARD,local.roll+float(local.feedback.get_shake_roll()))
 		view.position+=view.global_basis*Vector3(local.feedback.get_shake_offset())
+	local.camera_rig.protect(view,kart,get_world_3d().direct_space_state)
 func test_input(action: String, strength: float = 1., slot: int = 0) -> void:
 	if not diagnostics_mode and not smoke_mode and not test_mode and not "--drive-test" in OS.get_cmdline_user_args():return
 	input_router.players[slot].inject_test(action,strength)

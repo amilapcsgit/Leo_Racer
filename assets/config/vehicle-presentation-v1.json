@@ -1,0 +1,149 @@
+{
+  "bigster": {
+    "length": 4.57,
+    "source": "https://www.dacia.co.uk/frequently-asked-questions-vehicles/bigster/dimensions.html"
+  },
+  "duster": {
+    "length": 4.315,
+    "source": "assets/models/bigster/derivative-specs.json (authored Duster generation)"
+  },
+  "import_2020_ferrari_roma": {
+    "length": 4.656,
+    "source": "https://cdn.ferrari.com/cms/network/media/pdf/cs_ferrari_roma_full_gbr.pdf"
+  },
+  "import_2023_ferrari_sf90_xx_stradale": {
+    "length": 4.85,
+    "source": "https://www.ferrari.com/content/dam/ferrari-fcom/news/corporate/2026/01/pdf/CS_SF90XXStradale_SF90XXSpider_gbr_new.pdf"
+  },
+  "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit": {
+    "length": 4.794,
+    "source": "https://www.press.bmwgroup.com/global/article/attachment/T0316649EN/476824"
+  },
+  "import_2024_byd_atto_2": {
+    "length": 4.31,
+    "source": "https://prod.byd.com/material/byd-site/europe-public/brochures/eletric-car/ATTO%202-1125-BPS-EN-LHD-V4.pdf"
+  },
+  "import_2024_byd_atto_3": {
+    "length": 4.455,
+    "source": "https://bydcarsphilippines.com/vehicles/byd-atto-3-dynamic"
+  },
+  "import_2024_byd_seal": {
+    "length": 4.8,
+    "source": "https://www.byd.com/material/byd-site/id/brochure/SEAL-BROCHURE.pdf"
+  },
+  "byd_yangwang_u8": {
+    "length": 5.319,
+    "source": "https://yangwangqatar.com/u8/specifications/",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_1968_volkswagen_beetle": {
+    "length": 4.07,
+    "source": "https://www.volkswagen-newsroom.com/en/vehicle-data-beetle-kaefer-1300-profile-19591",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_1985_delorean_dmc_12_time_machine_bttf": {
+    "length": 4.267,
+    "source": "https://toyota-automobile-museum.jp/archives/car-database/detail.html?id=380",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_1989_lamborghini_countach_25th_anniversary": {
+    "length": 4.14,
+    "source": "https://www.torino-museum.com/lineup/lamborghini-countach-anniversary25-2/",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_1999_nissan_skyline_gtr_r34_c_west_2f2f": {
+    "length": 4.6,
+    "source": "https://www.nissan-global.com/EN/HERITAGE_COLLECTION/306_skyline_gt-r_m-spec_nur.html",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2004_porsche_carrera_gt": {
+    "length": 4.613,
+    "source": "https://newsroom.porsche.com/en_SG/2025/history/porsche-25-years-world-premiere-carrera-gt-40609.html",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2013_chevrolet_corvette_z06": {
+    "length": 4.46,
+    "source": "https://www.corvetteactioncenter.com/specs/c6/2013/2013_Corvette_Order_Guide.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2013_equipped_jeep_wrangler_unlimited_rubicon": {
+    "length": 4.751,
+    "source": "https://www.media.stellantis.com/uploads/fr/FR/2016/JEEP/TARIFS/Tarif_Public_Jeep_Wrangler_-_1er_septembre_2016.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2019_ford_mustang_rtr_spec5_10th_anniversary": {
+    "length": 4.7879,
+    "source": "https://media.ford.com/content/dam/fordmedia/North%20America/US/product/2019/mustang/2019-mustang-techspecs.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2020_jeep_gladiator": {
+    "length": 5.5372,
+    "source": "https://www.jeep.ca/en/gladiator/models",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2020_lbworks_toyota_supra_a90_ver_2": {
+    "length": 4.3815,
+    "source": "https://media.toyota.ca/en/releases/2019/a-legend-returns-2020-toyota-supra-makes-world-debut.html",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_2022_mclaren_765lt": {
+    "length": 4.6,
+    "source": "https://cars.mclaren.com/uk_en/legacy/765lt",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_chevrolet_cruze_ltz": {
+    "length": 4.597,
+    "source": "https://www.centuryu.com/uploads/1/4/4/6/144698822/2014_cruze.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_dacia_duster_low_poly": {
+    "length": 4.341,
+    "source": "https://nd-mediagallery2-public-production.s3.amazonaws.com/ca22c43fe14ed3268b7adeb9d635da5c/duster_brochure_2018_november.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_dacia_duster_widebody_highpoly": {
+    "length": 4.341,
+    "source": "https://nd-mediagallery2-public-production.s3.amazonaws.com/ca22c43fe14ed3268b7adeb9d635da5c/duster_brochure_2018_november.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_fiat_500_x_outlaw": {
+    "length": 3.571,
+    "source": "https://www.fiat.com.au/fiat/500/technical-data",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_hiluxbf": {
+    "length": 5.32,
+    "source": "https://newsroom.toyota.eu/the-all-new-toyota-hilux/",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_mclaren_f1_1993_by_alex_ka": {
+    "length": 4.288,
+    "source": "https://www.mclarenofgreenwich.com/f1/",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_toyota_kijang_innova_zenix_2023_highpoly": {
+    "length": 4.755,
+    "source": "https://www.toyota.astra.co.id/sites/default/files/2023-09/brochures/catalog_all_new_kijang_innova_zenix_hybrid_ev_1_0.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_toyota_landcruiser_v8_2022": {
+    "length": 4.98,
+    "source": "https://www.toyota.com.au/-/media/toyota/main-site/vehicle-hubs/lc300/files/20260505-lc300_spec_table_gto009725.pdf",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_1937_auto_union_type_c_streamliner": {
+    "length": 5.8,
+    "source": "https://www.traumautoarchiv.de/html/4019.html",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "import_pininfarina_h2_speed": {
+    "length": 4.73,
+    "source": "https://www.netcarshow.com/pininfarina/2019-h2_speed/",
+    "note": "Uniform length correction; retain authored proportions and aftermarket bodywork. Reference generation may differ where asset year is ambiguous."
+  },
+  "mclaren": {
+    "length": 4.365,
+    "source": "Authored MP4-25 derivative: fleet-audit.json measured model bounds",
+    "note": "Retain documented authored competition size; no invented homologation dimensions."
+  }
+}

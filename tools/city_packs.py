@@ -48,6 +48,7 @@ def write_pack(path,engine,entries):
 BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png'}
 
 def category(name):
+    if name.removesuffix('.remap') in ['assets/materials/automotive_paint.tres','assets/materials/automotive_glass.tres']:return 'core'
     if name.split('/')[0] in ['i230','j230','iui','k0','k1','k2','k3','p0']:return 'authoring-only-source'
     if name.startswith("assets/art/kandy/"):return "authoring-only-source"
     if name.removesuffix('.import') in BOOT_ART:return 'core'

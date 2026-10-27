@@ -1,0 +1,172 @@
+{
+  "vehicles": {
+    "bigster": [
+      180,
+      225,
+      18,
+      1
+    ],
+    "duster": [
+      171,
+      213,
+      17.8,
+      1.02
+    ],
+    "blue": [
+      166,
+      207,
+      18.4,
+      1.02
+    ],
+    "coral": [
+      171,
+      212,
+      17.8,
+      0.99
+    ],
+    "aqua": [
+      163,
+      204,
+      19,
+      1.06
+    ],
+    "pink": [
+      164,
+      205,
+      19.2,
+      1.04
+    ],
+    "formula_blue": [
+      167,
+      212,
+      18.1,
+      1.05
+    ],
+    "formula_red": [
+      169,
+      213,
+      17.7,
+      1.03
+    ],
+    "roadster_gold": [
+      169,
+      212,
+      18.3,
+      1.03
+    ],
+    "race_tuk": [
+      158,
+      202,
+      19.5,
+      1.08
+    ],
+    "colombo_tuk": [
+      156,
+      200,
+      19,
+      1.07
+    ],
+    "race_bus": [
+      157,
+      201,
+      16.8,
+      0.94
+    ],
+    "cyberpunk": [
+      172,
+      217,
+      17.6,
+      0.98
+    ],
+    "hover": [
+      168,
+      210,
+      18.7,
+      1.04
+    ],
+    "mclaren": [
+      166,
+      210,
+      18,
+      1.06
+    ],
+    "pony": [
+      161,
+      203,
+      19.1,
+      1.05
+    ]
+  },
+  "profiles": {
+    "duster": [
+      171,
+      213,
+      17.8,
+      1.02
+    ],
+    "utility": [
+      164,
+      207,
+      17.2,
+      0.98
+    ],
+    "compact": [
+      162,
+      204,
+      19,
+      1.05
+    ],
+    "street": [
+      169,
+      212,
+      18.5,
+      1.03
+    ],
+    "exotic": [
+      169,
+      213,
+      17.8,
+      1.04
+    ],
+    "concept": [
+      168,
+      211,
+      18.3,
+      1.02
+    ]
+  },
+  "imports": {
+    "import_dacia_duster_low_poly": "duster",
+    "import_dacia_duster_widebody_highpoly": "duster",
+    "byd_yangwang_u8": "utility",
+    "import_2013_equipped_jeep_wrangler_unlimited_rubicon": "utility",
+    "import_2020_jeep_gladiator": "utility",
+    "import_toyota_landcruiser_v8_2022": "utility",
+    "import_hiluxbf": "utility",
+    "import_toyota_kijang_innova_zenix_2023_highpoly": "utility",
+    "import_1968_volkswagen_beetle": "compact",
+    "import_2024_byd_atto_2": "compact",
+    "import_2024_byd_atto_3": "compact",
+    "import_chevrolet_cruze_ltz": "compact",
+    "import_fiat_500_x_outlaw": "compact",
+    "import_escapamento_carro_da_barbie_1956": "compact",
+    "import_valentines_day_car": "compact",
+    "import_1999_nissan_skyline_gtr_r34_c_west_2f2f": "street",
+    "import_2019_ford_mustang_rtr_spec5_10th_anniversary": "street",
+    "import_2020_lbworks_toyota_supra_a90_ver_2": "street",
+    "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit": "street",
+    "import_2013_chevrolet_corvette_z06": "street",
+    "import_2024_byd_seal": "street",
+    "import_2004_porsche_carrera_gt": "exotic",
+    "import_1989_lamborghini_countach_25th_anniversary": "exotic",
+    "import_2020_ferrari_roma": "exotic",
+    "import_2022_mclaren_765lt": "exotic",
+    "import_2023_ferrari_sf90_xx_stradale": "exotic",
+    "import_mclaren_f1_1993_by_alex_ka": "exotic",
+    "import_pininfarina_h2_speed": "exotic",
+    "import_1937_auto_union_type_c_streamliner": "exotic",
+    "import_1985_delorean_dmc_12_time_machine_bttf": "concept",
+    "import_2021_pininfarina_teorema_concept": "concept",
+    "import_future_car": "concept"
+  }
+}

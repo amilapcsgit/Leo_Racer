@@ -11,6 +11,12 @@ var mark_timer := 0.0
 var previous := Vector3.ZERO
 var elapsed := 0.0
 var ribbons: Array[GPUParticles3D] = []
+var contact_audio
+var scrape_audio
+var scrape_level:=0.0
+var contact_shadows: Array[MeshInstance3D]=[]
+var ground_contacts: Array[Dictionary]=[]
+var shadow_timer:=0.0
 var trace_material: StandardMaterial3D
 
 func setup(owner_kart: LeoKart) -> void:
@@ -117,16 +123,26 @@ func setup(owner_kart: LeoKart) -> void:
 	impact_sparks.explosiveness = 1.0
 	impact_sparks.lifetime = .35
 	impact_sparks.local_coords = false
-	kart.impacted.connect(_impact)
+	kart.contact_reported.connect(_contact)
+	# Local impacts share the existing per-player panner/reverb bus and stay
+	# audible when the split-screen cameras are far apart. Rivals remain spatial.
+	scrape_audio=AudioStreamPlayer.new() if kart.is_player else AudioStreamPlayer3D.new()
+	contact_audio=AudioStreamPlayer.new() if kart.is_player else AudioStreamPlayer3D.new()
+	scrape_audio.stream=load("res://assets/audio/skid.ogg");contact_audio.stream=load("res://assets/audio/impact.ogg")
+	var bus:=kart.motor_audio.bus_name if kart.motor_audio else "Effects"
+	scrape_audio.bus=bus;contact_audio.bus=bus;scrape_audio.volume_db=-70.
+	if not kart.is_player:
+		for player in [scrape_audio,contact_audio]:player.max_distance=45.;player.unit_size=4.
+	add_child(scrape_audio);add_child(contact_audio)
 	kart.recovered.connect(_recover)
 	var material := StandardMaterial3D.new()
-	material.albedo_color = Color("217b83")
-	material.emission_enabled = true
+	material.albedo_color = Color("141917")
+	material.emission_enabled = false
 	material.emission = Color("00b5c5")
 	material.emission_energy_multiplier = 1.4
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	trace_material = material
-	for i in range(64 if kart.is_player else 20):
+	for i in range(42):
 		var mark := MeshInstance3D.new()
 		var mesh := BoxMesh.new()
 		mesh.size = Vector3(.13,.006,.8)
@@ -138,6 +154,11 @@ func setup(owner_kart: LeoKart) -> void:
 		mark.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(mark)
 		marks.append(mark)
+	for wheel in kart.wheel_steering_pivots:
+		var shadow:=MeshInstance3D.new();var quad:=QuadMesh.new();quad.size=Vector2(.7,1.05)
+		shadow.mesh=quad;shadow.top_level=true;shadow.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;shadow.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var shade:=ShaderMaterial.new();shade.shader=preload("res://shaders/tire_contact_shadow.gdshader");shadow.material_override=shade
+		add_child(shadow);contact_shadows.append(shadow);ground_contacts.append({})
 	previous = kart.global_position
 	for flame in kart.flames:
 		var cone := CylinderMesh.new()
@@ -156,7 +177,26 @@ func setup(owner_kart: LeoKart) -> void:
 func _process(dt: float) -> void:
 	if not is_instance_valid(kart): return
 	elapsed += dt
+	scrape_level=move_toward(scrape_level,0.,dt*5.)
+	if scrape_audio.stream:
+		scrape_audio.volume_db=linear_to_db(maxf(.0001,scrape_level)) - 18.
+		if scrape_level>.01 and not scrape_audio.playing:scrape_audio.play()
+		elif scrape_level<=.01:scrape_audio.stop()
 	previous = kart.global_position
+	shadow_timer-=dt
+	for i in contact_shadows.size():
+		var origin:=kart.wheel_steering_pivots[i].global_position
+		if shadow_timer<=0.:
+			var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*.8,origin-Vector3.UP*2.5,1)
+			ground_contacts[i]=kart.get_world_3d().direct_space_state.intersect_ray(query)
+		var hit: Dictionary=ground_contacts[i];var shadow:=contact_shadows[i]
+		shadow.visible=not hit.is_empty() and absf((origin-hit.position).dot(hit.normal))<1.5
+		if shadow.visible:
+			var normal: Vector3=hit.normal
+			var position_on_ground: Vector3=origin-normal*(origin-hit.position).dot(normal)+normal*.009
+			var x:=kart.global_basis.x.slide(normal).normalized()
+			shadow.global_transform=Transform3D(Basis(x,normal.cross(x).normalized(),normal),position_on_ground)
+	if shadow_timer<=0.:shadow_timer=.1
 	# The displacement-derived physics speed stays stable between rendered frames.
 	var moving := absf(kart.wheel_motion_speed)>4.0
 	var camera:=get_viewport().get_camera_3d()
@@ -187,22 +227,43 @@ func _process(dt: float) -> void:
 		for tire in kart.rear_tire_positions:
 			var mark := marks[mark_cursor]
 			mark_cursor = (mark_cursor+1)%marks.size()
-			mark.global_position = kart.visual.global_transform*tire
-			mark.global_position.y = .075
-			mark.rotation = Vector3(0,kart.rotation.y+kart.visual.rotation.y,0)
+			var origin:=kart.visual.global_transform*tire
+			var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*1.5,origin-Vector3.UP*3.,1)
+			var hit:=kart.get_world_3d().direct_space_state.intersect_ray(query)
+			if hit.is_empty():mark.visible=false;continue
+			var up: Vector3=hit.normal
+			var forward:=(-kart.global_basis.z).slide(up).normalized()
+			mark.global_transform=Transform3D(Basis.looking_at(forward,up),hit.position+up*.012)
 			(mark.mesh as BoxMesh).size.z = maxf(.8,absf(kart.wheel_motion_speed)*.065)
 			mark.set_meta("expires",elapsed+.9)
 			mark.visible = true
 	for mark in marks:
 		if mark.visible and elapsed>float(mark.get_meta("expires",0)): mark.visible = false
 
-func _impact(_kart: LeoKart, point: Vector3, _normal: Vector3, _strength: float) -> void:
-	impact_sparks.global_position = point+Vector3.UP*.35
+func _contact(event: Dictionary) -> void:
+	if event.phase=="scrape":scrape_level=clampf(event.tangent_speed/35.,0.,.65)
+	if event.phase!="impact" and event.tangent_speed<5.:return
+	if event.phase=="scrape" and impact_sparks.emitting:return
+	var strength:=clampf(event.normal_speed/35.,.1,1.)
+	impact_sparks.global_position=event.point+event.normal*.03
+	var process:=impact_sparks.process_material as ParticleProcessMaterial
+	process.direction=event.normal
+	process.initial_velocity_min=1.+strength*2.;process.initial_velocity_max=3.+strength*7.
+	process.color=Color("ffcc75") if event.surface=="paint" else Color("c0b3a0")
+	impact_sparks.amount_ratio=strength
 	impact_sparks.restart()
+	if event.phase=="impact":
+		contact_audio.volume_db=-22.+strength*10.;contact_audio.play()
 
 func _recover(_kart: LeoKart) -> void:
+	stop_contact_audio()
 	for mark in marks: mark.visible = false
 	for emitter in smoke: emitter.restart(); emitter.emitting=false
 	for trail in kart.exhaust_trails: trail.restart(); trail.emitting=false
 	for ribbon in ribbons: ribbon.restart(); ribbon.emitting=false
 	previous = kart.global_position
+
+func stop_contact_audio() -> void:
+	scrape_level=0.
+	if scrape_audio:scrape_audio.stop()
+	if contact_audio:contact_audio.stop()

@@ -29,13 +29,13 @@ func run() -> void:
  save_report(mode+"-"+game.track_definition.id,report);print("OFFLINE_TRACK_CHECK ",JSON.stringify(report))
  await game.quit_game(0 if errors.is_empty() else 2)
 func race() -> void:
- Engine.time_scale=8.;Engine.max_physics_steps_per_frame=64
+ Engine.time_scale=8.;Engine.physics_ticks_per_second=480;Engine.max_physics_steps_per_frame=64
  var deadline:=Time.get_ticks_msec()+120000;var independent:=false
  while game.state!="results" and Time.get_ticks_msec()<deadline:
   await get_tree().physics_frame
   if game.human_count==2 and game.karts[0].finished!=game.karts[1].finished:
    independent=true;check(game.state=="race","First human finish leaves other racing")
- Engine.time_scale=1.
+ Engine.time_scale=1.;Engine.physics_ticks_per_second=60
  check(game.state=="results","Three-lap race completed")
  for slot in game.human_count:check(game.karts[slot].finished and game.karts[slot].next_gate==25,"Human completed all checkpoints")
  if game.human_count==2:check(independent,"Independent finish observed")

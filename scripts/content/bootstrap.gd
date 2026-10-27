@@ -1,6 +1,8 @@
 extends Node
 var screen: LeoLoadingScreen
+const TRACE=preload("res://scripts/content/boot_trace.gd")
 func _ready() -> void:
+	TRACE.mark("bootstrap_ready")
 	DisplayServer.window_set_title("Leo Racer")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
@@ -15,6 +17,7 @@ func begin() -> void:
 			if not texture or texture.get_width()<1:errors.append(path)
 		print("BOOT_ART_VALIDATION ",JSON.stringify({"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"before_asset_mount":true}))
 		get_tree().quit(0 if errors.is_empty() else 1);return
+	TRACE.mark("asset_validation_begin")
 	screen.stage("Checking game assets…",5)
 	await get_tree().process_frame
 	if not OS.has_feature("editor"):
@@ -23,7 +26,9 @@ func begin() -> void:
 		validator.start(func():return LeoAssets.configure(root))
 		while validator.is_alive():await get_tree().process_frame
 		var error:=int(validator.wait_to_finish())
+		TRACE.mark("asset_validation_complete")
 		if error==OK:error=LeoAssets.mount_packs()
+		TRACE.mark("packs_mounted")
 		if error!=OK:
 			printerr("CONTENT_VALIDATION_FAILED ",LeoAssets.failure)
 			if "--verify-content" in OS.get_cmdline_user_args():get_tree().quit(2);return
@@ -50,21 +55,26 @@ func begin() -> void:
 		var report: Dictionary=await load("res://scripts/content/content_validator.gd").vehicles(get_tree())
 		FileAccess.open("user://content-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 		print("VEHICLE_VALIDATION ",JSON.stringify(report));get_tree().quit(0 if report.status=="PASS" else 2);return
+	TRACE.mark("interface_load_begin")
 	screen.stage("Loading interface…",20)
 	var path:="res://scenes/main.tscn"
 	ResourceLoader.load_threaded_request(path)
 	while ResourceLoader.load_threaded_get_status(path)==ResourceLoader.THREAD_LOAD_IN_PROGRESS:await get_tree().process_frame
 	if ResourceLoader.load_threaded_get_status(path)!=ResourceLoader.THREAD_LOAD_LOADED:
 		screen.show_failure("Game interface could not be loaded.",begin,func():get_tree().quit());return
+	TRACE.mark("interface_resource_loaded")
 	var scene:=ResourceLoader.load_threaded_get(path) as PackedScene
 	var game:=scene.instantiate();get_tree().root.add_child(game)
 	while not game.initialized and game.initialization_error.is_empty():await get_tree().process_frame
 	if not game.initialization_error.is_empty():
 		var message: String=game.initialization_error
 		game.queue_free();screen.show_failure(message,begin,func():get_tree().quit());return
+	TRACE.mark("game_ready")
 	get_tree().current_scene=game
 	if "--drive-test" in OS.get_cmdline_user_args():
 		for argument in OS.get_cmdline_user_args():
+			if argument=="--distinct-check":
+				screen.hide();var probe: Node=load("res://scripts/content/balance_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
 			if argument.begins_with("--vehicle-check="):
 				screen.hide();var probe: Node=load("res://scripts/content/vehicle_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
 			if argument.begins_with("--track-check="):

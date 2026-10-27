@@ -2,6 +2,7 @@ class_name VehicleAssembler
 extends RefCounted
 ## The only assembly path for previews, thumbnails, local racers and AI.
 static func assemble(vehicle: VehicleDefinition, racer: DriverDefinition) -> Node3D:
+	vehicle=LeoVehiclePresentation.resolve(vehicle)
 	var root := Node3D.new()
 	root.name = "VehicleAssembly"
 	root.set_meta("vehicle_id",vehicle.id)
@@ -10,7 +11,6 @@ static func assemble(vehicle: VehicleDefinition, racer: DriverDefinition) -> Nod
 	body.name = "Chassis"
 	body.transform = vehicle.normalization * body.transform
 	root.add_child(body)
-	if not vehicle.preserve_materials: LeoRaceVisuals.polish_chassis(body)
 	if vehicle.driver_policy!=VehicleDefinition.DriverPolicy.IDENTITY_ONLY:
 		if vehicle.driver_policy==VehicleDefinition.DriverPolicy.FIXED:
 			racer=GarageCatalog.shared().driver(vehicle.fixed_driver_id)
@@ -27,6 +27,7 @@ static func assemble(vehicle: VehicleDefinition, racer: DriverDefinition) -> Nod
 			if racer.material_bindings[key] is Texture2D: bind_albedo(driver,String(key),racer.material_bindings[key])
 	LeoAssets.apply_overrides(root)
 	preload("res://scripts/catalog/vehicle_finish.gd").install(body,vehicle.visual_profile)
+	preload("res://scripts/catalog/vehicle_surface_profile.gd").install(body,String(vehicle.id))
 	LeoVehicleFeatures.install(body,vehicle)
 	return root
 

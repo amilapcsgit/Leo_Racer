@@ -1,0 +1,35 @@
+{
+  "kandy_lake": {
+    "exposure": 0.79,
+    "saturation": 1.015,
+    "road_roughness": 0.73,
+    "water_deep": "1b4c50",
+    "water_shallow": "508375",
+    "reflection_stations": [
+      0.04,
+      0.46
+    ]
+  },
+  "colombo_city": {
+    "exposure": 0.83,
+    "saturation": 1.02,
+    "road_roughness": 0.71,
+    "water_deep": "1c515b",
+    "water_shallow": "448477",
+    "reflection_stations": [
+      0.08,
+      0.61
+    ]
+  },
+  "astra_coast": {
+    "exposure": 0.82,
+    "saturation": 1.025,
+    "road_roughness": 0.65,
+    "water_deep": "164857",
+    "water_shallow": "3a897f",
+    "reflection_stations": [
+      0.05,
+      0.58
+    ]
+  }
+}

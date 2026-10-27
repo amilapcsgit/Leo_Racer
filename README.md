@@ -32,8 +32,8 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/srilanka/coast_race.png" alt="Leo Racer racing poster with a blue kart, checkered flags, palms and a golden Colombo skyline" width="100%">
-  <br><sub>Original promotional artwork. Actual gameplay captures appear below.</sub>
+  <img src="docs/screenshots/2.5.0/promotional-key-art-ai.png" alt="Leo Racer 2.5 illustrated Kandy Lake racing poster" width="100%">
+  <br><sub>AI-generated promotional illustration; not gameplay. Untouched game captures appear below.</sub>
 </p>
 
 <table>
@@ -41,38 +41,50 @@
     <td align="center" width="25%"><h3>3</h3><strong>Sri Lankan circuits</strong><br><sub>Coast · City · Hill country</sub></td>
     <td align="center" width="25%"><h3>6</h3><strong>Racers on the grid</strong><br><sub>Three laps. Find your opening.</sub></td>
     <td align="center" width="25%"><h3>1–2</h3><strong>Local players</strong><br><sub>Solo or vertical split-screen</sub></td>
-    <td align="center" width="25%"><h3>16</h3><strong>Official cars</strong><br><sub>Distinct handling and performance</sub></td>
+    <td align="center" width="25%"><h3>20</h3><strong>Included cars</strong><br><sub>Distinct handling and performance</sub></td>
   </tr>
 </table>
 
 **Leo Racer** is a Windows arcade racer set on stylized Sri Lankan roads. Charge a drift, catch a slipstream, and spend your nitro on the next straight. Take on five AI rivals or share the screen with a friend. Pick a driver, pick a ride, and chase a better lap.
 
-## What changed in 2.4.1
+## What changed in 2.5.0
 
-Reliable ordered checkpoints and recovery, independent split-screen finishes, controller conflict reassignment, the restored detailed solo HUD, realistic car sizes, fair corner-planning AI, camera and quality presets, and layered RPM/load audio. Bigster returns to 100% size with its finish and driving coefficients preserved. New records use `distinct_v3`; older records remain available as legacy entries.
+A focused **20-car default roster**, polished track surfaces and lighting, continuous roadside contact and sliding, directional impact feedback, grounded skid marks, and temporary body scratches/dent shading. The dynamic camera keeps its speed effect with **50% less pull-back**.
 
-[Release notes](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/RELEASE_NOTES_241.md) · [Measured validation and limitations](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/DISTINCT_V3.md)
+Built on the tested Distinct-v3-final RC: fair AI, independent split-screen finishes, ordered checkpoints and recovery, controller reassignment, detailed solo HUD, realistic sizing, and layered vehicle audio continue. Bigster's free-space driving coefficients and professional finish are preserved. New collision-era records use `distinct_v4`; previous records remain available as legacy entries.
 
-<p><img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/coast-promotional-ai.png" alt="AI-enhanced promotional version of the actual Bigster coast screenshot" width="100%"><br><sub>AI-enhanced promotional image based on an in-game capture. Lighting and sky differ from gameplay. <a href="https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/screenshots/2.4.1/solo-hud.png">View the untouched original.</a></sub></p>
+[Release notes](docs/RELEASE_NOTES_250.md) · [Validation and known limits](docs/QUALITY25.md) · [Raw performance results](docs/qa-2.5.0/performance.json)
 
-### The current garage and tracks — untouched captures
+### Included roster
 
-| Bigster at 100% size | Duster | Formula Red |
+| | | | |
+|---|---|---|---|
+| Dacia Bigster Extreme | 2023 BYD Yangwang U8 | Colombo Tuk-Tuk | Cyberpunk GT |
+| Dacia Duster | Formula Blue | Neon Hover | Volkswagen Beetle |
+| DeLorean Time Machine | Jeep Wrangler | Ford Mustang RTR | Ferrari Roma |
+| Jeep Gladiator | Toyota Supra A90 | Pininfarina Teorema | BMW M4 Widebody |
+| McLaren 765LT | BYD Atto 2 | Future Car | McLaren MP4-25 |
+
+Seven official vehicles and thirteen imports are included. Imported cars remain modded/unranked. Other compatible cars can still be installed manually; automatic AI grids use this selected twenty-car roster. Existing installations retain their add-ons.
+
+### The garage and tracks — untouched captures
+
+| Bigster | McLaren 765LT | Jeep Wrangler |
 |:--:|:--:|:--:|
-| ![Bigster](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/bigster.png) | ![Duster](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/duster.png) | ![Formula Red](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/formula-red.png) |
+| ![Bigster](docs/screenshots/2.5.0/bigster.png) | ![765LT](docs/screenshots/2.5.0/mclaren-765lt.png) | ![Wrangler](docs/screenshots/2.5.0/wrangler.png) |
 
-![Restored solo HUD on Astra Lotus Coast](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/solo-hud.png)
-![Colombo City gameplay](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/colombo.png)
-![Kandy Lake gameplay](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/kandy.png)
-![Independent split-screen HUDs](https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/docs/screenshots/2.4.1/split-screen.png)
+![Kandy Lake gameplay](docs/screenshots/2.5.0/kandy.png)
+![Astra coast gameplay](docs/screenshots/2.5.0/astra.png)
+![Colombo city gameplay](docs/screenshots/2.5.0/colombo.png)
+![Independent split-screen cameras](docs/screenshots/2.5.0/split-screen.png)
 
 ## Download
 
 **[Download the latest Windows installer](https://github.com/amilapcsgit/Leo_Racer/releases/latest/download/LeoRacer-Setup.exe)** — everything is bundled for offline installation and play.
 
-The 2.4.1 public installer includes **all three tracks and 16 official cars**, with optional track selection. Personal imported models stay local and are not bundled. Existing user-added Vehicle API 1 packages remain supported and unranked.
+The 2.5.0 full offline installer includes **all three tracks and all 20 selected cars**, with optional track selection. Existing user-added Vehicle API 1 packages remain supported and unranked. No additional downloads are needed to play.
 
-Prefer a ZIP? **[Portable v2.4.1](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.4.1/LeoRacer-2.4.1-win64.zip)** includes the same three tracks and 16 official cars. Extract the **complete folder** and run `LeoRacer.exe`. Use `Play Compatibility.cmd` if Vulkan is unavailable.
+Prefer a ZIP? **[Portable v2.5.0](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.5.0/LeoRacer-2.5.0-win64.zip)** includes the same three tracks and twenty cars. Extract the **complete folder** and run `LeoRacer.exe`. Use `Play Compatibility.cmd` if Vulkan is unavailable.
 
 <details>
 <summary><strong>Upgrading, Compatibility mode &amp; checksums</strong></summary>
@@ -159,7 +171,7 @@ Prefer a ZIP? **[Portable v2.4.1](https://github.com/amilapcsgit/Leo_Racer/relea
 
 ### Pick something with personality.
 
-Karts, Formula racers, a racing tuk-tuk, a bus, sports cars, and both Dacias share the default garage. The public release includes **16 official cars** with distinct performance. Personal imports remain local, supported and unranked; no additional-car pack is published for 2.4.1.
+SUVs, Formula racers, a Colombo tuk-tuk, sports cars, concepts and both Dacias share the focused **20-car default garage**. Each uses its calibrated performance profile. Existing professional paint and glass are retained; reviewed body surfaces support temporary cosmetic contact marks.
 
 <table>
   <tr>
@@ -266,7 +278,7 @@ Existing assignments take precedence over conflicting new defaults. Bigster's Ac
 <details>
 <summary><strong>Developer setup, content tools &amp; the track SDK</strong></summary>
 
-The released game uses **Godot 4.7.2 .NET**, GDScript gameplay, and C# presentation/SQLite bridges. Source for this release is tagged **v2.4.1** on **release/2.4.1**.
+The released game uses **Godot 4.7.2 .NET**, GDScript gameplay, and C# presentation/SQLite bridges. Source for this release is tagged **v2.5.0** on **release/2.5.0**.
 
 Start with [setup and pinned dependencies](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/COLOMBO_SETUP.md). With the required original asset archives, run:
 
@@ -286,7 +298,7 @@ Build compatible content independently:
 
 Vehicle and track targets do not export a new executable. See the [SDK requirements](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/sdk/README.md) before importing third-party models.
 
-[2.4.1 release notes](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/RELEASE_NOTES_241.md) · [Art pipeline](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/COLOMBO_ASSETS.md) · [Supplied model setup](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/SRILANKA_SETUP.md) · [Astra circuit pipeline](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/ASTRA_SETUP.md)
+[2.5.0 release notes](docs/RELEASE_NOTES_250.md) · [Art pipeline](docs/COLOMBO_ASSETS.md) · [Supplied model setup](docs/SRILANKA_SETUP.md) · [Astra circuit pipeline](docs/ASTRA_SETUP.md)
 
 </details>
 
@@ -295,6 +307,7 @@ Vehicle and track targets do not export a new executable. See the [SDK requireme
 
 | Release | Highlights |
 |---|---|
+| **2.5.0** | Focused twenty-car roster; track surface and lighting polish; continuous contact/sliding; cosmetic damage and directional effects; half-distance dynamic camera. |
 | **2.4.1** | Distinct cars and fair AI; checkpoint/recovery/controller fixes; restored solo HUD; realistic sizing; selective PBR repairs; camera, quality presets and layered audio. |
 | **2.3.2** | Reverse/orbit cameras, remappable lights and actions, Bigster sunroof and corrected optical groups, Workshop feature authoring, complete/custom installer. |
 | **2.3.1** | Kandy scenery, physical signage and start arch, grounded landmarks, mountain depth, daylight environment, and loading-text fixes. |
@@ -302,7 +315,7 @@ Vehicle and track targets do not export a new executable. See the [SDK requireme
 | **2.1.0** | Expanded Colombo districts, coherent buildings, shoreline, lake shores, and tropical daylight. |
 | **2.0.0** | Neon frontend, driver carousel, animated vehicle statistics, procedural UI audio, and day/night loading art. |
 
-The 2.4.1 validation includes 144 clean-lap measurements, 180/180 seeded AI finishes, unchanged Bigster manual-input response, all-car sizing/framing checks, and both renderers. The public package is separately smoke-tested with 16 official cars. See the [current report and known diagnostic limits](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/DISTINCT_V3.md).
+The 2.5 validation includes 60 clean-lap measurements across the selected cars and three tracks, 180/180 seeded AI finishes, unchanged Bigster free-space input replay, eighty fleet framing checks and collision regression scenarios. See the [measured report and known limits](docs/QUALITY25.md) for native executable, installer and renderer evidence.
 
 [Release notes](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/RELEASE_NOTES_232.md) · [Vehicle verification](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/qa-vehicle232/TEST_REPORT.md) · [Installer results](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/qa-vehicle232/release-installer.json) · [Kandy implementation](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/KANDY_231.md) · [Neon UI](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/docs/NEON_UI.md)
 
