@@ -2,6 +2,8 @@ class_name LeoVehicleImporter
 extends RefCounted
 const REVISION := "loose-glb-2"
 static var last_report: Dictionary={}
+static func safe_relative(path: String) -> bool:
+	return not path.is_empty() and not path.is_absolute_path() and not path.contains(":") and not ".." in path.replace("\\","/").split("/")
 
 static func key(path: String) -> String:
 	var fingerprint: String=FileAccess.get_sha256(path)+REVISION+Engine.get_version_info().string+RenderingServer.get_current_rendering_method()
@@ -9,7 +11,7 @@ static func key(path: String) -> String:
 	if FileAccess.file_exists(metadata):
 		fingerprint+=FileAccess.get_sha256(metadata)
 		for entry in optimization(path).get("textures",[]):
-			if entry is Dictionary and LeoVehicleLibrary.safe_relative(String(entry.get("file",""))):fingerprint+=FileAccess.get_sha256(path.get_base_dir().path_join(String(entry.file)))
+			if entry is Dictionary and safe_relative(String(entry.get("file",""))):fingerprint+=FileAccess.get_sha256(path.get_base_dir().path_join(String(entry.file)))
 	return fingerprint.sha256_text()
 
 static func optimization(path: String) -> Dictionary:
@@ -25,7 +27,7 @@ static func apply_textures(materials: Array, data: Dictionary, folder: String) -
 		if not entry is Dictionary:continue
 		var index:=int(entry.get("material_index",-1));var relative:=String(entry.get("file",""));var slot:=String(entry.get("slot",""))
 		if index<0 or index>=materials.size() or not materials[index] is StandardMaterial3D:continue
-		if not LeoVehicleLibrary.safe_relative(relative) or relative.get_extension()!="dds" or slot not in ["albedo_texture","normal_texture","roughness_texture","metallic_texture","ao_texture","emission_texture"]:continue
+		if not safe_relative(relative) or relative.get_extension()!="dds" or slot not in ["albedo_texture","normal_texture","roughness_texture","metallic_texture","ao_texture","emission_texture"]:continue
 		if not textures.has(relative):
 			var image:=Image.new()
 			if image.load_dds_from_buffer(FileAccess.get_file_as_bytes(folder.path_join(relative)))!=OK:continue

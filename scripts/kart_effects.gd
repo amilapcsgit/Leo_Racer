@@ -5,7 +5,9 @@ var kart: LeoKart
 var smoke: Array[GPUParticles3D] = []
 var impact_sparks: GPUParticles3D
 var heat: Array[MeshInstance3D] = []
-var marks: Array[MeshInstance3D] = []
+var marks: Array[Node3D] = []
+var decal_backend := false
+var wind: LeoDraftingWind
 var mark_cursor := 0
 var mark_timer := 0.0
 var previous := Vector3.ZERO
@@ -21,6 +23,9 @@ var trace_material: StandardMaterial3D
 
 func setup(owner_kart: LeoKart) -> void:
 	kart = owner_kart
+	decal_backend=kart.is_player and RenderingServer.get_current_rendering_method()=="forward_plus" and int(kart.get_parent().get("graphics_quality"))==2 and int(kart.get_parent().get("human_count"))<2
+	if kart.is_player:
+		wind=LeoDraftingWind.new();add_child(wind);wind.setup(kart)
 	for slot in kart.exhaust_positions.size():
 		var ribbon := GPUParticles3D.new()
 		ribbon.amount = 6
@@ -142,18 +147,20 @@ func setup(owner_kart: LeoKart) -> void:
 	material.emission_energy_multiplier = 1.4
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	trace_material = material
+	var mark_image:=Image.create(16,64,false,Image.FORMAT_RGBA8)
+	mark_image.fill(Color(0,0,0,0))
+	for x in range(2,14):
+		for y in range(2,62):mark_image.set_pixel(x,y,Color(.035,.04,.035,.65 if x>3 and x<12 else .25))
+	var mark_texture:=ImageTexture.create_from_image(mark_image)
 	for i in range(42):
-		var mark := MeshInstance3D.new()
-		var mesh := BoxMesh.new()
-		mesh.size = Vector3(.13,.006,.8)
-		mark.mesh = mesh
-		mark.material_override = material
-		mark.top_level = true
-		mark.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-		mark.visible = false
-		mark.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(mark)
-		marks.append(mark)
+		var mark: Node3D
+		if decal_backend:
+			var decal:=Decal.new();decal.texture_albedo=mark_texture;decal.size=Vector3(.16,.05,.8)
+			decal.albedo_mix=1.;decal.normal_fade=.6;decal.distance_fade_enabled=true;decal.distance_fade_begin=35.;decal.distance_fade_length=10.;mark=decal
+		else:
+			var mesh_mark:=MeshInstance3D.new();var mesh:=BoxMesh.new();mesh.size=Vector3(.13,.006,.8)
+			mesh_mark.mesh=mesh;mesh_mark.material_override=material;mesh_mark.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mark=mesh_mark
+		mark.top_level=true;mark.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;mark.visible=false;add_child(mark);marks.append(mark)
 	for wheel in kart.wheel_steering_pivots:
 		var shadow:=MeshInstance3D.new();var quad:=QuadMesh.new();quad.size=Vector2(.7,1.05)
 		shadow.mesh=quad;shadow.top_level=true;shadow.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;shadow.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -209,7 +216,8 @@ func _process(dt: float) -> void:
 		(spark.draw_pass_1.material as StandardMaterial3D).emission = charge_color
 	var gain := 1.0 if kart.boost_time>0 and kart.active else 0.0
 	if kart.is_player and kart.get_parent().get("feedback"):
-		gain = kart.get_parent().feedback.get_boost_gain() if kart.active else 0.0
+		var feedback=kart.get_parent().local_players[kart.local_slot].feedback
+		gain = feedback.get_boost_gain() if feedback and kart.active else 0.0
 	for item in heat:
 		item.visible = gain>0 and near
 		item.material_override.set_shader_parameter("gain",gain)
@@ -234,7 +242,8 @@ func _process(dt: float) -> void:
 			var up: Vector3=hit.normal
 			var forward:=(-kart.global_basis.z).slide(up).normalized()
 			mark.global_transform=Transform3D(Basis.looking_at(forward,up),hit.position+up*.012)
-			(mark.mesh as BoxMesh).size.z = maxf(.8,absf(kart.wheel_motion_speed)*.065)
+			if mark is Decal:mark.size.z=maxf(.8,absf(kart.wheel_motion_speed)*.065)
+			else:(mark.mesh as BoxMesh).size.z=maxf(.8,absf(kart.wheel_motion_speed)*.065)
 			mark.set_meta("expires",elapsed+.9)
 			mark.visible = true
 	for mark in marks:
@@ -256,6 +265,7 @@ func _contact(event: Dictionary) -> void:
 		contact_audio.volume_db=-22.+strength*10.;contact_audio.play()
 
 func _recover(_kart: LeoKart) -> void:
+	if wind:wind.reset()
 	stop_contact_audio()
 	for mark in marks: mark.visible = false
 	for emitter in smoke: emitter.restart(); emitter.emitting=false

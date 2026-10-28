@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "id": "focused20_v1",
+  "id": "focused21_v2",
   "fallback": "bigster",
   "vehicles": [
     {
@@ -9,9 +9,9 @@
       "files": {
         "feature-authoring.json": "98a06625aca246b9999b58a4a6abb9b8f0e52c6fe3ad304d5eb44d7da62f41b4",
         "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
         "thumbnail.png": "1b405a45b0560b14e0e9a1bd0d0718201d795dc4703fc6d979bbf9913b090b30",
-        "vehicle.json": "9fd952d7a9b47830059fa86d1eb5bdd343cc45af84b800f70a026a85bd51df69"
+        "vehicle.json": "6d89779911072381d96faed68e0b077a590bf433ec8971126ddaf15925103aef",
+        "vehicle.pck": "a40837f52e54e4014fce009fb098257e334d39e2928e1f457e435d8cb6e536a7"
       }
     },
     {
@@ -20,9 +20,9 @@
       "files": {
         "conversion-report.json": "fa6dcced82345e6a482cc9ea2b4309251bce5803f90d5c37640a93bd2b60172f",
         "LICENSE.txt": "9c7f8635085a615d5655c13d9c304cb3e5bcc1bf5d8dfb2138f3d82c16535cc8",
-        "model.glb": "b2def85b8387c95bdb44f2efd30d86521950ad59563f266eb83f69c418db8877",
         "thumbnail.png": "37800485b6b8ff392ac8be7531a3ff652421e32ea0c304fc1f205181ec9711a5",
-        "vehicle.json": "e8e4d9c80e7164fdee6b0b3e70b1b2a14d879261e6bcb85242749d7eddba5dbe"
+        "vehicle.json": "fbd1b93f1a5dc7c290ae4764ea57af4b14811cedb21402ebf9156f77d6cd8840",
+        "vehicle.pck": "4c774c9078a1938c740135ab644c344c582a38e75c8967ff12d14ab74049076b"
       }
     },
     {
@@ -30,9 +30,9 @@
       "display_name": "Colombo Tuk-Tuk",
       "files": {
         "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "10abffa4c6a12d536be1de3a4b9f2440d42813c0ca513393385f7320e9cdf771",
         "thumbnail.png": "f7f9ce107c30a0241c2b27451b0b46ab87592560d43942711afe831b2a8e4b11",
-        "vehicle.json": "549509acc8b40f3b10f25d0206ffe6011ad30c1edfc1dc70c30eb33e0a8bef5f"
+        "vehicle.json": "3a2015b781bf7a5c5d5358da06be10f9804037a18efd46994e929e0cc6b5cecb",
+        "vehicle.pck": "ea259ab885bed063e7197bb8a7ada8f03f6197211037a6711fba842aa5ffcc55"
       }
     },
     {
@@ -40,19 +40,24 @@
       "display_name": "Cyberpunk GT",
       "files": {
         "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "482dc51f4670b7c10fca83b6e74f24c13b9c4d62408105ddf10b9bea45b2cf8d",
         "thumbnail.png": "6170640e9c9f7c586e2b2ce549527815ccb4eb1a4ef8f5c6f28bdf6047346995",
-        "vehicle.json": "815beee1d7da0f04af7305380cc2327edb7c68e025167c0bcabf2d244bb3fb9a"
+        "vehicle.json": "3eb35ffdac9f96e4711ba397e92caa080aeab5778acf0936c865321a84acc768",
+        "vehicle.pck": "016ce9dbec6e7656f14003d0979786bf55a07f4110566377fc356844b4b38ff8"
       }
     },
     {
       "id": "duster",
-      "display_name": "Dacia Duster",
+      "display_name": "Duster_My_2014",
       "files": {
-        "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "567a9dcda6e914fb87fbb61d2e06e6834f1f8a1bd7b71909a1e987c3e40fa595",
+        "Duster_My_2014.png": "3b56366e63f717b020f37f228fe1da5dcfc941de2bba158e805048a5376edf2f",
+        "Duster_My_2014_DielectricMask.png": "ae751a9f451927c71263e0ef1ba385682f8dd21873fbb1f3f21fd6544774ea63",
+        "Duster_My_2014_MetallicMask.png": "12304b0cd32ce8f15705d61244f6cf84ead7fbc6f8a0f101d475ccdceda7632e",
+        "Duster_My_2014_paint_presets.json": "b990f8d3d74e9691e3765d9f7c6ec08e8940b0ce078b70bd32235678156aab1f",
+        "Duster_My_2014_SOURCE_CREDITS.json": "bd55fa45b428537e7c5c6df65be602055fc0d051ad831cbcd61eb79477d584a1",
+        "LICENSE.txt": "417abdf77b9dc92a00329186e41bc1de1819b53c058f4cc398d2df033df267d4",
         "thumbnail.png": "2fc6d57c6fa82b847da88a58f330fff60e39a3555f1389af897d6a673c797643",
-        "vehicle.json": "cccc280c94ff73dbf4b0ae562ffe6d03b27a201d72d915f1c50c9f04e1b1c11b"
+        "vehicle.json": "104be1ac2e213bbabd653baab3a4858218d01d879ce4e14c046bfb8b10ba21f0",
+        "vehicle.pck": "9dc0e2df5814b62f184fb0fcf90a433e766542be615a0c8e0d725faef7fc3d09"
       }
     },
     {
@@ -60,9 +65,9 @@
       "display_name": "Formula Blue",
       "files": {
         "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "d9bb41c33ae5e2ba695f7162165065a3d9bdcb6094a76a851f71a930931637ba",
         "thumbnail.png": "da508a0d96489bee285e33704c51b9e5b88f92e1834eb79c660402e11bf11950",
-        "vehicle.json": "64a2a37022e3c914f808886efb3e92d4bb027ccda766061adf7b8a2c1da6edd3"
+        "vehicle.json": "ecc9fd07da8820354f3099e8f69417422f8f2c3c52406e55ff19465dda304b33",
+        "vehicle.pck": "af5612689874dc5e5d9529bb0b79a642c89f137a49018aa5bab4b9edc92be133"
       }
     },
     {
@@ -70,9 +75,9 @@
       "display_name": "Neon Hover",
       "files": {
         "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "c174a2d0d17598af72280fa4bfb019b28db381a3b8506d52cd94edbc64e5ac21",
         "thumbnail.png": "12db7abe1d16010726652b82273a7824945221037b0e3df3861d8cc076fdc5b2",
-        "vehicle.json": "9a72837d42e0447a388a9f06c1ba4b3092d7bd37661165025213fa87c8e5d7bb"
+        "vehicle.json": "adbe4cdfa8a0765cba40ee3c72c3e610e3f77f8e1aa254ff3a7acbfae69f3968",
+        "vehicle.pck": "68deddc52daa8b4166a24e8b53e50b290320746e3c8d3e508b756bd2b915a5cd"
       }
     },
     {
@@ -81,7 +86,10 @@
       "files": {
         "conversion-report.json": "d6b9d45ef4aefc2d4644aa0bd9ca2d05c05e8b0a23b34e5c48c4b9ede9b82fce",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "5069094b60e60b783558d42c4777a1da20093464b8ef64645ca492584414b23f",
+        "optimized-textures.json": "08f63dae22673f6c700237ecdafa8de056a9c6412781d3a9df289075ae27dd02",
+        "thumbnail.png": "7e534b99e95b7a090bed30250695610635c0c2d1aa3cae7ba2fe0ea79a75e30c",
+        "vehicle.json": "0003fcd976f444bd5cb27fcf3ff81d9f229ce452cc08dd6f1a4dc7f509c0a114",
+        "vehicle.pck": "eaeed26a0439d5a9adce1113dcaff146f598f010e0e4523d88515c5e9e8b71b8",
         "optimized/06967ee15cb95905402b51cd178df06aed5198ce1ee9b10d1fd5f67c1717f88c.dds": "dcac2302ae8a6a6d4f87de313d52afbfaa9582a8a9c8266d7728a9bed722e448",
         "optimized/081f13801304029621222ee2bb2eac6c156a09d7142fc371932acb1f5f44c555.dds": "add093f3991cdf17e4d82b878d751a6e977a3f83ed1fb7f650325502f24ea621",
         "optimized/09f5c73e9d504fe22ec18a98815535109b2e0a908f743fe96845023edc1bd8a7.dds": "128aad551aa7eb8d1e235ecb06d20eb9181f2d7c31969acf0f8d4fc9bba8cfcd",
@@ -109,10 +117,7 @@
         "optimized/ea2b16fedf6e3cff5b75fc9b4ecefc869440b63aa49bc365dec8d621c5f8e6f6.dds": "128aad551aa7eb8d1e235ecb06d20eb9181f2d7c31969acf0f8d4fc9bba8cfcd",
         "optimized/eb0d7abdcfc20124e4bf1092b0186cbbf36a19154ffcd38953100e8de9277aec.dds": "e098c502749b36a326919106cfd77e9a1c1a9983c5c88a40221469921a020b84",
         "optimized/f873faa06351d7f14349530674c510f397cd54813865e456ba996404f85e8fcc.dds": "0e677b218a000a29074d7fd8a9d8bb4661d90330f787ceb94759ce4c98246e19",
-        "optimized/fa4e3418fb25e2a6fdd02201324ad3eb0b52f81dc866d41dc305e40f2e4a7a8a.dds": "7a73a542b19692dcf8bbfb2c1ba914fa5a55ddd433b02bd8c97f7eb1b78dd8b3",
-        "optimized-textures.json": "08f63dae22673f6c700237ecdafa8de056a9c6412781d3a9df289075ae27dd02",
-        "thumbnail.png": "7e534b99e95b7a090bed30250695610635c0c2d1aa3cae7ba2fe0ea79a75e30c",
-        "vehicle.json": "8c65d1644265a0cc39455c42ed4bc4b9695792711c621b28d6f4099802e677e5"
+        "optimized/fa4e3418fb25e2a6fdd02201324ad3eb0b52f81dc866d41dc305e40f2e4a7a8a.dds": "7a73a542b19692dcf8bbfb2c1ba914fa5a55ddd433b02bd8c97f7eb1b78dd8b3"
       }
     },
     {
@@ -121,7 +126,10 @@
       "files": {
         "conversion-report.json": "6218b665b9bcd249b6ab1a16dacd48849a7e2240ed2b90a6fcf70bb62320d19c",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "e967e4863242b2c679decbfb4433c51842d4f8dcd9ad35e9a2e5f0e6b36611bb",
+        "optimized-textures.json": "ee98382c799057658ca297d9c053ee0aa92f634eb97fa6f0a8c736855ef19cc2",
+        "thumbnail.png": "2773b101d8db937ca034505dc1e616bcb55900957489c5cdff722723696a06f9",
+        "vehicle.json": "4d2d954124ddea4713c2799a38e04a8de697de3ed85ecefb5767fd2417dd2e63",
+        "vehicle.pck": "9fe293efde463a437abd278c7bf5752af763a349345cb223bb2b983c036a59f1",
         "optimized/05da50660dcb0e428b0ff80dd26393d41defb2150da1dc9cabd7fef3016dbacc.dds": "45641cfb065dd08d6e5a5174fd1d2147459ac8159aabbeda24e9135ad7bc160e",
         "optimized/072a92afcafd6e8a7c0df0711cc3b661f65401cfb5ca3e5039e940c92f301770.dds": "8e3b49bf57fc72a76ebdd60572ca8875bf77a0a25f7f7b335a8a279c951fadc4",
         "optimized/08f88c31e0c0454a7b90289af10da6e193794ebd5b0fa46176adea71cc7c3be7.dds": "5e96c6ab00a7647297ca01c45fcbaeba1f6ed685e0f02684a5f53ad89f685d9b",
@@ -165,10 +173,7 @@
         "optimized/f447720c3c9e5c0ae5ad77cbca2c3402b56b03df9bc9b731c62dfba4397fb88c.dds": "881f55bba1c3343c6bd844e5b5da6eca1f2c9df1f2ad1fe1415485f7d32bfec1",
         "optimized/f6755a901db9afb74e37b6ad5bf9ae56e7f1c1d3826181ee15099de72dbf3862.dds": "886c0c17f77d3b6ea7890cd8c7fc050a84723a8ac8d8ad4c515d85f2c195ac7b",
         "optimized/f7481f67c3b5b09bcd79bf29ae0f9f36788715ead2964f0916cd55d2c6cc2b52.dds": "0b8e8b2d4e18cddcfe8d5f2d3d230dd57987f49064f0f2322f1565507fb18132",
-        "optimized/ffbca9af2e83a17d1122ed2f7cf0ee3c95c8a356156e5017cbc53fffb0bca078.dds": "b11035ed92ed0baec938735755186dfb916eaaa65c41f9fa585b4af2f260ff5d",
-        "optimized-textures.json": "ee98382c799057658ca297d9c053ee0aa92f634eb97fa6f0a8c736855ef19cc2",
-        "thumbnail.png": "2773b101d8db937ca034505dc1e616bcb55900957489c5cdff722723696a06f9",
-        "vehicle.json": "bff7df117ec1d3440c49b05251715935aafd9bb12a25d685938bf1fc137cfdcd"
+        "optimized/ffbca9af2e83a17d1122ed2f7cf0ee3c95c8a356156e5017cbc53fffb0bca078.dds": "b11035ed92ed0baec938735755186dfb916eaaa65c41f9fa585b4af2f260ff5d"
       }
     },
     {
@@ -177,7 +182,10 @@
       "files": {
         "conversion-report.json": "70304dc38848387b9f9c049681c1fa617ebe90f024fb5f6c10d56b4600c34001",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "5050454922592fccccc13710bf2bde90d8a5be353a0302b4aa0bf6776e667a11",
+        "optimized-textures.json": "63b74c5bed469e340eaab027a40368d0731994a31ef299d8d03c7f6b766efeac",
+        "thumbnail.png": "5291623e3490cf00dc38edd4ce4715f43fa7f080a664086941f96352789c88fa",
+        "vehicle.json": "650a110e9ef3a007a7818fea4690fb24be7566c9e9d811a155826d43b608a3dd",
+        "vehicle.pck": "1f5574c5a76ad5cd8c313eb97508f1af493bb9feaf76d602edaafa794617a9d4",
         "optimized/06192f2925bb1dcfb535d4a491190647f640e63ca41da500da0022d30199bc77.dds": "93739670cb9734eaad83c62af9984b5c4af0523619e71dabc3f3ca8183ce32d8",
         "optimized/1e1026f26bee08d96a8004fd99631fe0f775d3aa5ae0fa3d49243cbbe8b78820.dds": "c12130afd77ed90fbf61838383150cbd170d7ba831d41c3ab484dfe7e5aa57e7",
         "optimized/22994e1cb87158edbec0e47ee599bb308d6faa00a8b2785468bfa19ce63354ce.dds": "8e0d0bff06e92488eddb41bd59e782142e1aa5007b067fb293dfaab71fa3c7f4",
@@ -193,10 +201,7 @@
         "optimized/c85f17b0de3f060910be799e0121a7642cf62b904bbea01a7cca7c69ba83a5a1.dds": "246e21cb61109c623a0f97e9cf127dd6f8dba51f4091a6564c1b339c21b24a9c",
         "optimized/cae591717bf5239b3f7c07a11b6c4c1fabe801a52443aced10fd0399e05ffae4.dds": "896582fec595874d7d06e2a1c1ac30290bfd38ed7ca37084076ed3c2b01b3260",
         "optimized/efa5e3b8f0ba21bbaeb8bdae859eacd8e48f9a72ac3a8f894f986618040bd0ce.dds": "272ea76dd5fbcffb866fb8c562df7b4da669dd96694bb3793dbd3da0c24a6119",
-        "optimized/f80fa28839307b5cc6b6a461d7bf01422e5a4e6b5005cd996654fffafe7106f8.dds": "5e4cea6ef9494db2384171cecd5588f703979238556d4c3cd817a7b2cd43d85e",
-        "optimized-textures.json": "63b74c5bed469e340eaab027a40368d0731994a31ef299d8d03c7f6b766efeac",
-        "thumbnail.png": "5291623e3490cf00dc38edd4ce4715f43fa7f080a664086941f96352789c88fa",
-        "vehicle.json": "7a1695edbe10a7123959d666f40d399164c06b1225a8924da95847d8e1e5a5f5"
+        "optimized/f80fa28839307b5cc6b6a461d7bf01422e5a4e6b5005cd996654fffafe7106f8.dds": "5e4cea6ef9494db2384171cecd5588f703979238556d4c3cd817a7b2cd43d85e"
       }
     },
     {
@@ -205,7 +210,10 @@
       "files": {
         "conversion-report.json": "4f8e0260df34f347c216d9d8e7279b004400d95611731f5f59dfd820416bb4a1",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "9e3e2bd85138cde1f7e9e0ec4bb0958854ab805d9a74a563ff5d7ac7b3dd89dc",
+        "optimized-textures.json": "6c65704baf892033f9ede8359c1abd3459ceda7171c06cb8ca37c542e4263afc",
+        "thumbnail.png": "9c03996717f291ac024b70675817411ee7af37462aa921c42af21e26c79ca925",
+        "vehicle.json": "74ee02a903d8ce5eb03761001aac113e5b7e5267c82b009baba3d595c35e1a08",
+        "vehicle.pck": "b0f9b8d83c26b88bdf648e15bea52b2824c95eccb4f65d9017cae363e9c3809e",
         "optimized/0284f90217920aaec22df741d0fd17f61f1a088d7f8be202d3a96db3d32c2712.dds": "8be11b88bbf660fd93e3a562272c5767db5671974ccd0ff50c6880ae01436509",
         "optimized/0f8fd8498ef3b9fe332279f009c875c707d6faf636af916305f73eed04129f77.dds": "57db7dca17005557fdbeb6c339e91cfd2e0f28ea2556746462e118a838bc7395",
         "optimized/11f475679559f4f83905900ba5221ad3b368f11b8c669b00ec7e53b29a200f6d.dds": "da2b8a6c23b41f9b6340d4777b6716eeec7fdf2357c74320a1790347a6356205",
@@ -240,10 +248,7 @@
         "optimized/c07fddac0e2d171c31ec71e4d8b2a0a3f68ab2046510606721b4c61039d04075.dds": "1931a9423ae1be1a5bcde10f40a27d8903cd0015583384f292fdd968e64ca84c",
         "optimized/f1a07f35876ad8cae126d51a1f5da080baa2fead98b83b824f0c7774b54679fb.dds": "4443c34010ddcafae2c5ff058b09d3d5b06c3ec2f0f81409462fa78b918e18c5",
         "optimized/f577fe721c8405d843495bdd60c62088ae1a4fe80a3d116693191053647e4c9d.dds": "b3b86e07ce9c7c0de7604272fd2ddce96f8c82aecc7994ad4d0d401bc50e4dce",
-        "optimized/f86379aca617a9ba5bf3e5689f321af7cc91f88514dadba3346e3c02cc5e94b7.dds": "6f7572ad0664de8bb47276b5d6a85cd8c360ce605bbe6ad563e1a22c6d70e8f7",
-        "optimized-textures.json": "6c65704baf892033f9ede8359c1abd3459ceda7171c06cb8ca37c542e4263afc",
-        "thumbnail.png": "9c03996717f291ac024b70675817411ee7af37462aa921c42af21e26c79ca925",
-        "vehicle.json": "007f447c8b11cd305149e32c0446e6581753e678807ce62630f59a935a0ce796"
+        "optimized/f86379aca617a9ba5bf3e5689f321af7cc91f88514dadba3346e3c02cc5e94b7.dds": "6f7572ad0664de8bb47276b5d6a85cd8c360ce605bbe6ad563e1a22c6d70e8f7"
       }
     },
     {
@@ -252,7 +257,10 @@
       "files": {
         "conversion-report.json": "7c528a560449aa3fce6df1857dfab70f9b1fef34ce680776861f1d4fa253dac8",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "3179e45727f0e1fb2df1d5c6572c60fc4c6276536f21d6974af962e078beef3c",
+        "optimized-textures.json": "67f30abab84d6bc786e08eb9947b69a1a98466828c41e6f71f08e374f73eefc2",
+        "thumbnail.png": "edf350440670763bcdae72671a6a205b7508b9d5e5032a0e752b9ff77bc90129",
+        "vehicle.json": "ffb790e5239f240b1d1c81ae47e504781b6bb42d796228b78909bbc53072148e",
+        "vehicle.pck": "58a2047838605fc18037be7171232586b7c370292b783e5c091f535c423b6d03",
         "optimized/00f0035c8ace347d3a9c262d39bbf471c25746abe4ebcd02d90aa571f57c7805.dds": "70e6ba4c813f5abe883354762a344ec3cf5b4a28d0a09b285e331d72bfa2d295",
         "optimized/0bb72b7109277db15aae7154d9068f0e9dffb4668e041b541df1caded1080da7.dds": "585254d31acfc108b3a591af7112bb13a17cf6f0a706de61345ba4d41d9fb843",
         "optimized/0cc6c20298e450b33ba49aee31028a22f88cff65379f9cd9c2a3a0c78218461d.dds": "2a35ae46591838ea27d7d2ebbed13d2ef3ba1f3f7838562ce9d42c7a57cf240b",
@@ -279,10 +287,7 @@
         "optimized/dd344cf39863a8d50f88427a3ae87dd3e81aa1c56d921c2f53478a3c37384005.dds": "9d0c4b09540f96390b000a8ec5db0fc1a2af218c084341bec5a273630b4a7b1c",
         "optimized/dd4970ff9274acf795194beb54a4a90ac97d2c60be6fa9c626625cd57f2937d3.dds": "99eab15c1df2517560e4e2b61eec5d5d3e623b4c5ddcfe4167d14ec058861836",
         "optimized/e1f249eb445ce50cec02609f005b148c9ee921257e92704e213a4bb2e0729c5a.dds": "24dc7feb17923aee242d2fa3e4a686304033a924f30009601b99770ed2dee865",
-        "optimized/fdc556b3c34f51e717d2d9bdd7cd4617fb93212589f322435dba33be10eb4f1c.dds": "ac982bc3141f98c1ec8f36c85c2ece21ebe909635e9d067505f0f5ddf33bf98d",
-        "optimized-textures.json": "67f30abab84d6bc786e08eb9947b69a1a98466828c41e6f71f08e374f73eefc2",
-        "thumbnail.png": "edf350440670763bcdae72671a6a205b7508b9d5e5032a0e752b9ff77bc90129",
-        "vehicle.json": "d10450fb7445df56508568a9173ad76e12c5915525a540c1a3dffdd2c1545654"
+        "optimized/fdc556b3c34f51e717d2d9bdd7cd4617fb93212589f322435dba33be10eb4f1c.dds": "ac982bc3141f98c1ec8f36c85c2ece21ebe909635e9d067505f0f5ddf33bf98d"
       }
     },
     {
@@ -291,7 +296,10 @@
       "files": {
         "conversion-report.json": "2d3978c98619d8628cc9c15a6b7c1c6fb3cec8d931072278a23529db7b8c8e77",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "48e9d52153ac7c756e553abbcd5f9b4246f03d5097ff6974597163f0de5531a0",
+        "optimized-textures.json": "f278077f7c865cf92d751fa118ba1f882fc0d64de4cb52fb4c3fef3ef9b33eea",
+        "thumbnail.png": "c490f3702e0445a0fb65e3e9cd4eb9e67aa1d6ec61c54b2ab786da155ee1eb5a",
+        "vehicle.json": "547e19a0916b1b4c9024fa29404e2abd63768cf1b0d31c7579626c9836a94cf0",
+        "vehicle.pck": "c22a412863a25e6504e29aa7f11eceda3c75e409e90b29838c747770faa6511e",
         "optimized/1264f00139e87c26c8961d06fc1d46dd02062f0c25fad12599ca3f19a8e33f28.dds": "d94bf06e5de988fd82657a3fbede4d47e302ae13ec9a79a30b220640e1711389",
         "optimized/12a8fddf539ce1ddb331d58306e3307b5d7a654c2d472d3c2df8e8d7890a9869.dds": "296145518517698b5204f1890143264aa7a7a88fd882fa28bedd22c4e6f0dd92",
         "optimized/1a93e3fe912dce5ce8b2c6d63c9b6124a648646b8a93ee0728ba7682160fa06f.dds": "a006f8c705b74d3a850c1b348cd57d9ca5ba442ba97d3121965508021809d79f",
@@ -325,10 +333,7 @@
         "optimized/e80b280e285f4d590326083eb580c03df56dcc09aaeb1154aeada8533066784b.dds": "dd153a774159c599d2e809d12e99ee3c753b966fe8bb7b136177f7600f50ee65",
         "optimized/e93f2d4364ca81db9558de9d3d290077ee77181b9889f043a7491094a381244b.dds": "b15466df3770e10ddaa891f389acfb5a7c565fb6801fb0a4fd47b7dda6fe91d3",
         "optimized/f18b5e916c9e20fd5b6ed9c036b31595f9d78c830230687f7e617af7e75bb0ce.dds": "efb7cf50fb65810f90cd9246c1deb13fba28c962ad6adff02c268608e5e8af97",
-        "optimized/fec5cc092afc4527bd80565dd3f39c234d7cbc8b99af629a0f4b81b64160ceff.dds": "52cc839e7dcedd590e2065fc85c8441d29323019305365adac0405e2df254b92",
-        "optimized-textures.json": "f278077f7c865cf92d751fa118ba1f882fc0d64de4cb52fb4c3fef3ef9b33eea",
-        "thumbnail.png": "c490f3702e0445a0fb65e3e9cd4eb9e67aa1d6ec61c54b2ab786da155ee1eb5a",
-        "vehicle.json": "80be55dbc91f5970b9312f4452cc5e8e410a31d219c4cee9205692347f9d598a"
+        "optimized/fec5cc092afc4527bd80565dd3f39c234d7cbc8b99af629a0f4b81b64160ceff.dds": "52cc839e7dcedd590e2065fc85c8441d29323019305365adac0405e2df254b92"
       }
     },
     {
@@ -337,7 +342,10 @@
       "files": {
         "conversion-report.json": "e5897f6d90b388bdd78427b9d55bf446094e9b2d120d4612bac242b4674e2550",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "1d905beb125578dee92b52b38c2e4f0dda179e89fd3e76b2383469f34ef200cd",
+        "optimized-textures.json": "264c9ffea3c5d47c15561b20b0d9b2ce0f90d86b8cbcb4191b12d3a3ea4be830",
+        "thumbnail.png": "5c2a8a0409b56ffaddbe0a15c0323caf42dd72ba5f12fed796765b0bb9727d72",
+        "vehicle.json": "dd37e128d6197533d52a9e5403ffa43681b4f4afa72b8c8cde9d095366df61a9",
+        "vehicle.pck": "b12ad3b0d3c3f22d378b71753aee031c5b2eb4083bee541c33b696cb1088592a",
         "optimized/07258b832f039b000e048fb7f03d0e12b01daf720cb90c4b39e32afa88659ea5.dds": "17334bc1e0c5e75030845b83a8c8260abb1b1507e1194fa66f04242694bc0258",
         "optimized/0995c331a7e09fb4a0f33fc040923d5f87f2c752e10052facdfd6b68be5d9756.dds": "b2d0c82a5261d0d2ab5e9076168a8b57e4978a9ee33f18f871dd809cad3f3689",
         "optimized/0a5ae3a0bf3f66dd3407eb9da9a2d3fc18356569125c88c372c1bc2b0285d9a8.dds": "9cef8930f86e7bfb8eb44a3b398c8a92e621b4f1864580bcd4f0074dc2d903e8",
@@ -378,10 +386,7 @@
         "optimized/f925d2d00b490d7750dbbdfa6625d8dfb60220f825af10c303cd5468ada6fe0a.dds": "9589541c3d4f99ed51587b5524bd60d970fd552f2ed2370b94e9026de507f58d",
         "optimized/f9d00da38db7f870b3cbfad50d5b508356520a2a93f4366154a4689c3ec460e6.dds": "f0207bbd81ceb94f7ec6fa22a5892b98e4f0893d7fdfd6f6d0252278197ae359",
         "optimized/fa1a4ceafbed62c8372cdf51f957846441465acc344097e32591c2a052d15ff9.dds": "369bf3ea34adda0c24984c981b7877d63e8dd8f6476457e71de46f9f50177249",
-        "optimized/fc994be46e81b53f635055c7798d448883b2280adf65054db026b73a9a9d8075.dds": "fa55ebc8cdfae137268dd57a37b3493d75122d8c50726ab3e673fe126226e5b9",
-        "optimized-textures.json": "264c9ffea3c5d47c15561b20b0d9b2ce0f90d86b8cbcb4191b12d3a3ea4be830",
-        "thumbnail.png": "5c2a8a0409b56ffaddbe0a15c0323caf42dd72ba5f12fed796765b0bb9727d72",
-        "vehicle.json": "203dec6dfa5dde779066bc501bb18508091b51196d860d12523bd4366a0c2620"
+        "optimized/fc994be46e81b53f635055c7798d448883b2280adf65054db026b73a9a9d8075.dds": "fa55ebc8cdfae137268dd57a37b3493d75122d8c50726ab3e673fe126226e5b9"
       }
     },
     {
@@ -390,7 +395,10 @@
       "files": {
         "conversion-report.json": "916c0997bd80f30c5efccf81b0df810540e58dcaf79768bdfc0d70c386071096",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "d7989c8ab53d5887d6b5678ebb8eb3a8e9c5f77a13d70c6e695efc3440b4b831",
+        "optimized-textures.json": "1a15c52953cade2c79d4c0b524e4c7b295ca27718ac380d5887d579d4f65cda8",
+        "thumbnail.png": "c68f23631e85f2cc66aba7e9cd5e92a25aa15fd8f842b681ecaa3b9c310b8662",
+        "vehicle.json": "6cd7ad8f44d0e095d01d54ea78f55aca78d30ed7d3c5d1e45c62e560c76dcc11",
+        "vehicle.pck": "8cffec7c01d609ea8d0d9af8536d79287430bde93793b29e89ac9bd0d13a789e",
         "optimized/19b139d74e0e4f21ca941ccefc2d3d67e4d2e4e8563fba2c98f4bdf7f7ad9c72.dds": "fb92914506f1904caa020cff83cb7a4b0d7df4b6cd720667a0c48bb086053ca2",
         "optimized/21b32e9db30471f6f08b46964d4c854aff7c4207fdfb60d94992425116e069d1.dds": "6818f57c9cf31d36a98a24852aa6a9847658ec92c43488f42ca02d0446f2e7d1",
         "optimized/300086cf45720e3a1c35a1378dc0e2cf1bfde66c5f9c614e5f3648b7984e5f47.dds": "e9d2509968d588570cc4fce8c3f52feedde8a0fa5825fbeb12087ec69528b5f0",
@@ -410,10 +418,7 @@
         "optimized/c2ff21ef63d10ac8f418fdb96bdaf0767eaf0e6711ffe4da032160241e386c98.dds": "bb9809440e09075faa52c244c2d42f77d2233c90d285825591b878660bad8626",
         "optimized/d2debe0ba2c888b9da8757abe8d9167e5b566f91cdd51ddb1229567cf0781ace.dds": "c117bd86495904206026592cf387d3d1a47150b6df5951bfa754bb2b86e23569",
         "optimized/ef15f661ee0a45a800f51b302aceebcaf52bf1d27507080329fe3bb18d446e07.dds": "f5a8c38c6bf8e96ab056950f6ccc4ae8928fd32652c2e8e0c16b2705beb74e9a",
-        "optimized/fa0a4658b7a2c2fddd4259c354d19088471a4d889cd00fa914dd841cc55666de.dds": "826343cc60011d2f70b204fb3ba5a7bdc36fb77bc75c63b3eaefe54aa4c0782a",
-        "optimized-textures.json": "1a15c52953cade2c79d4c0b524e4c7b295ca27718ac380d5887d579d4f65cda8",
-        "thumbnail.png": "c68f23631e85f2cc66aba7e9cd5e92a25aa15fd8f842b681ecaa3b9c310b8662",
-        "vehicle.json": "01c96d91e29a76dbc66ef4620237ee9426be12fff95cb19a7c95bb4838735496"
+        "optimized/fa0a4658b7a2c2fddd4259c354d19088471a4d889cd00fa914dd841cc55666de.dds": "826343cc60011d2f70b204fb3ba5a7bdc36fb77bc75c63b3eaefe54aa4c0782a"
       }
     },
     {
@@ -422,7 +427,10 @@
       "files": {
         "conversion-report.json": "f26d9e1f04c85c62e282bf68bef9053e61d59db0a5e361279e45f0f677a13e73",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "d227ed0b1bc82a41b555cba23464e17c200f88fd360d4875f94fbd9445f405aa",
+        "optimized-textures.json": "efc5243d9df27070339e286f605af015953c5d360c908f6003038b062d929cbc",
+        "thumbnail.png": "94168116953c4adca00baea2912afcaaa30a2220eec2ce74fd0d2099bf593536",
+        "vehicle.json": "b3dabf3e82130f350f1f917d37bcd4b2d12742d6c7c8117e4d40d492415c3041",
+        "vehicle.pck": "1ca73c84ec110876fd02af27a128e3a1c55816a04e6f036c5f4f4927f9c92134",
         "optimized/01139cbf72a846591e718638873f7e07031448763d786fbecea4f61d750c199d.dds": "8ea6084189271557751acc1c64ce5df7326c27fa937e002858cde1e563296a81",
         "optimized/063cda61c754d1f8cadd76a57d4f3f144c4befa948a0ddf15e94254af00f803b.dds": "34a9905474efd09ba4570c42adfd8b4ba9fb4e36dc3da790db217b788f9e7603",
         "optimized/11f475679559f4f83905900ba5221ad3b368f11b8c669b00ec7e53b29a200f6d.dds": "da2b8a6c23b41f9b6340d4777b6716eeec7fdf2357c74320a1790347a6356205",
@@ -466,10 +474,7 @@
         "optimized/f2fc35cf76ad254f7ae74e0d1e235773e44a506b38a4889fd94ace004e9b18d2.dds": "546e3f79cb2fabac6552cd3be03a3b810e1145c56e472b85dadadb19a0755b7c",
         "optimized/f4fc878a166879854588574d3a7c407f2a5b6f8687a95b2533eb472e1efb02ae.dds": "e7638a29a37845cf735a6c7fd2ee55474532d172c5cb1c046d6c56e63be78a10",
         "optimized/f60e5b63737203d73b124758babfafdf3da6cdcc57422ddd3558622a87e8952c.dds": "5fdec4b20a4b90ac7ca42ff27d40859bace94a15e5232855fd9cdcbc8e6b0fbf",
-        "optimized/f9d00da38db7f870b3cbfad50d5b508356520a2a93f4366154a4689c3ec460e6.dds": "f0207bbd81ceb94f7ec6fa22a5892b98e4f0893d7fdfd6f6d0252278197ae359",
-        "optimized-textures.json": "efc5243d9df27070339e286f605af015953c5d360c908f6003038b062d929cbc",
-        "thumbnail.png": "94168116953c4adca00baea2912afcaaa30a2220eec2ce74fd0d2099bf593536",
-        "vehicle.json": "6f3c671466947a3635f579327c80a2e6d7039f925327ca9641ded224c5a3ea51"
+        "optimized/f9d00da38db7f870b3cbfad50d5b508356520a2a93f4366154a4689c3ec460e6.dds": "f0207bbd81ceb94f7ec6fa22a5892b98e4f0893d7fdfd6f6d0252278197ae359"
       }
     },
     {
@@ -478,7 +483,10 @@
       "files": {
         "conversion-report.json": "31571dc619e96426e1348c1041674dff02a92645866b7ea687460099e9fee065",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "e95c413ab67d60ddd85722041af116c45a2c565a5569aca6ffa65e63fb8f4d56",
+        "optimized-textures.json": "6c8c4cc0b7041d0f5b04286f644184bd3516aca1fdd0dc150eb26c7f0a5de8df",
+        "thumbnail.png": "2b8f70e696754f6ea42f18f1f19d5607b88d0f52c7fd253f8899ea3400e0d218",
+        "vehicle.json": "cd47370d4cedaa2b7ed05c96ea42a808de245dedc5eacee70f0f9de196f7f7ad",
+        "vehicle.pck": "0db009c106e5423ad8f3eaa331b81a8b7881e5a9a9e1f0e0cb079666e1a396fd",
         "optimized/0ace6f807722503612e6c6a87526e3d163fead083ada60051927cd20ee551eb6.dds": "6d5fa1324ec80fc59d29a5711589093f62e331a643012e5e7066c33bd8cde0bd",
         "optimized/130046e8bb2bfb3bc47ac41cd183b54684d31540a06d6c4193a351a038f52aa8.dds": "6e96239b62b239563c2c3fd8688e806f9e8469e1a25ae734bd60242fde51f6c5",
         "optimized/2ef4516028101454d638cf2ea04bbadafecced0dc05f405c2c4c990987a792e9.dds": "9c786ae260f5526902411c7a8435f9d1b78f88359557c5ce484c9fea17bbcf11",
@@ -504,10 +512,7 @@
         "optimized/e90122782e52c444334fa64e80aeadef4c795dce09cb907376de85cf351950f4.dds": "7ef6c055d3897d72f3079f07f875e77a36487949da37444ca668e4f56083f410",
         "optimized/f2427ff35825207457c23910a9a48c331fea8d0e6d38dd27bd68a4f327bae9ef.dds": "e9e0dc08ca1348e8dc4de543ce2d6a1e5ddf88330797dbae1bdc11fb6e6ce39f",
         "optimized/f2c043fb2b0ded2f39b4b9a35b955212e8b7fd0584c3f580f4c2caa04ff9893d.dds": "f2a8bee1f7ddd2a80111a8c6f23724efc8fe51f5331c956b3e64e1cff6d00b08",
-        "optimized/faac34850d9e2aeabdfd4b99b41d4f236bc537ba06107522d0acb56b01b93464.dds": "bf946a6af0be085e18f67c611c2acf47947e776278f966a4335bbc634a9ffd9b",
-        "optimized-textures.json": "6c8c4cc0b7041d0f5b04286f644184bd3516aca1fdd0dc150eb26c7f0a5de8df",
-        "thumbnail.png": "2b8f70e696754f6ea42f18f1f19d5607b88d0f52c7fd253f8899ea3400e0d218",
-        "vehicle.json": "12d80e7d5ef9c1e322469470635550046d6513741954eaed7e47489962766dc0"
+        "optimized/faac34850d9e2aeabdfd4b99b41d4f236bc537ba06107522d0acb56b01b93464.dds": "bf946a6af0be085e18f67c611c2acf47947e776278f966a4335bbc634a9ffd9b"
       }
     },
     {
@@ -516,7 +521,10 @@
       "files": {
         "conversion-report.json": "3939dbf836fa73fb387131fe752bde38c5f44fd115d65a4ad57c2fff3b0ca1fe",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "ef2af21196f336c0c83d6fa573b0f4f60a71911e6a4f4964102061b4c1af5b40",
+        "optimized-textures.json": "f1f43d6c92969e97077ed9e41d0eddff26292eb4df85ad04e0f27d35fa6efb15",
+        "thumbnail.png": "1b86dbc37a4dda7ab6952d99957e3839a77fef27a11044e5fa221dda19261f31",
+        "vehicle.json": "520adab781860df14c70dd24cd5617ac429dfda9de598c6aa6277f46e2aefd6b",
+        "vehicle.pck": "e0962eccdaafa3821c84ac0bd035f8b622ecfe3ca8302320d90bed857f9e3f4d",
         "optimized/07d2985729d691eac40e17ed6f80c9ac52ca35d504927f2beb61d3cf3c6524b0.dds": "cab76c1e6be22d0c9e4d5731899e45194ad66731c3b8b1c425754eccd3c357d4",
         "optimized/152978925aaec68d904dda438283d6f6dd8de90c89e0d5bce0f409ec5e0b65c3.dds": "a3b9b25255472c36c68550d74739cf728137c3a7616860c69831ae53e5c4a859",
         "optimized/1c564b29108202d5bcb1d917fedfef51a875b89f5ea37464cb501b1266defc9e.dds": "26549812774d6f06cbf1c23ba0726b219fc1d02b88dc4df70b2536f7d25c324e",
@@ -545,10 +553,7 @@
         "optimized/d35804b04b85971645455d5bd858a381763648a726aa5f1aaa3f723735e5bd1f.dds": "4949c1ec9d5403387a0ed7165bf90311cc3bae843e6552ba6bff6c809d8358ba",
         "optimized/e5b6b2fe2116569e70a5a0e8276fbe7dfc68b011d72f660accfb0bf5f961bba1.dds": "cb77252bef7f93bba1f5770456f48f4cd108bab019af4eb12722e89ae2e91cee",
         "optimized/e855f6a6782f5ca5b70106e558ee62cf95206b06efca597197ea28b429de4d68.dds": "6d3e510e5f553bc393269347e66da7b7d26f0a5f1ff9af26acf719191a59ea39",
-        "optimized/ee78e46e62019e90e9d0171dd516c82c4759101517d99612dbffc68b1eb6e0f9.dds": "6d3e510e5f553bc393269347e66da7b7d26f0a5f1ff9af26acf719191a59ea39",
-        "optimized-textures.json": "f1f43d6c92969e97077ed9e41d0eddff26292eb4df85ad04e0f27d35fa6efb15",
-        "thumbnail.png": "1b86dbc37a4dda7ab6952d99957e3839a77fef27a11044e5fa221dda19261f31",
-        "vehicle.json": "203c63dad32c4c3ecd54912e8156f351b69f293811bda22bad0b593898c122c7"
+        "optimized/ee78e46e62019e90e9d0171dd516c82c4759101517d99612dbffc68b1eb6e0f9.dds": "6d3e510e5f553bc393269347e66da7b7d26f0a5f1ff9af26acf719191a59ea39"
       }
     },
     {
@@ -557,16 +562,16 @@
       "files": {
         "conversion-report.json": "e369a48fb6ccb5d717d049cc91365b4128bb76e6b691d4f91b23b6724a81545b",
         "LICENSE.txt": "1b306d7250102dbac55bab1daa160c31d8d3affd59d9099e4382bec16264a260",
-        "model.glb": "ce696d1a0c9a7cb2457c96b85aaab4730184f1d2e30a79ac103d57f3025b8bdd",
+        "optimized-textures.json": "537f4d703ee26ad9b037e43441299afcabb98721a3cceef8850bf1a00174d934",
+        "thumbnail.png": "8a20756c69c24ccf5836076fba2aa750a08419da5eaffebec24b66808fc8cad7",
+        "vehicle.json": "968f5f4e9dd74b5eb9d988520acafd2b2928faa3e816c163a30d6bda0aada026",
+        "vehicle.pck": "973b90592cfe42affbcd7ea8f517573785bb5b2a8b8fb0a282544b71bf36644c",
         "optimized/0b42e1c30d66db6ef57d077e41e35ac765ec5816f65ea54c60eb92a55dd6da56.dds": "ea55f162e4e5f171e6388b37da5d5a00a50ee3053afc552a043b3a89cd04c227",
         "optimized/13f732f3db48c365d12edfe9b650217382fb0e4be9c7c55940150fae770a5f10.dds": "a323cdd4041d0b9cad63ddbed8b48e567f6a29ee886da6577d2f859a033cb92d",
         "optimized/1d073e9cbd388598094fa2a8ecc0574624d33e6c7ccdc394ce8f845e8276fe72.dds": "5d6d5e5e30f1d39ecefee1b1148b46426b95ad0841be7ea8668194ad1cb6a814",
         "optimized/513b2893c19ada8d536fb64dbb8c387751260edee4d8034a614545f5c1e6460a.dds": "41fd1eef6569ad9e802dd1a9936dca7196e5c3c0314103b927bf14e8652c2c3a",
         "optimized/9fa6ffebab4bfd7667e1e8f266d3040a2f5d0190c3299153fc9438d7f0f092ad.dds": "d5ac0e43cb228f33ab086a16dd4ee06c18f9383616bf02593672126becc25dd1",
-        "optimized/d106426c48308d083f09017f51a09f4244603c3bf34570162f761fc078fa8d30.dds": "8ffb6937d0e98282f0d46a0a65b6a1b746ecf867c1e1d5b8175c28cb60d4ff55",
-        "optimized-textures.json": "537f4d703ee26ad9b037e43441299afcabb98721a3cceef8850bf1a00174d934",
-        "thumbnail.png": "8a20756c69c24ccf5836076fba2aa750a08419da5eaffebec24b66808fc8cad7",
-        "vehicle.json": "0ad4b7fdbe6e0b2e87a0473a41f3ae72efb661793682b1c488a39e4a6963046c"
+        "optimized/d106426c48308d083f09017f51a09f4244603c3bf34570162f761fc078fa8d30.dds": "8ffb6937d0e98282f0d46a0a65b6a1b746ecf867c1e1d5b8175c28cb60d4ff55"
       }
     },
     {
@@ -574,9 +579,21 @@
       "display_name": "McLaren MP4-25",
       "files": {
         "LICENSE.txt": "1de36c480fe29f271ded9990c36d3fdec87d6499e2494b0446b54684d30ffdef",
-        "model.glb": "7c453693ed68961e49333cc598218f8a9ea0d2e3ed3acdaaaf912d8dc425de16",
         "thumbnail.png": "14446a32d6216fa5cb075724160d7151e49d4c5e5a0d188e7f136e84bd2ec95f",
-        "vehicle.json": "51c7e71b3ff02693259561dac7bcd607b91572dcd74fa0ca35fa62bed91097e3"
+        "vehicle.json": "de62fbd28a2fd8e37f055eeac4cd7621bc44889fa6c978039986d01ff28b01c9",
+        "vehicle.pck": "2f3a61adb7381f3c6335f7cb30ccf2ff48e7aa5c9481d3b782b004ba54fcc59c"
+      }
+    },
+    {
+      "id": "duster_2024",
+      "display_name": "Dacia Duster 2024",
+      "files": {
+        "feature-authoring.json": "2a0ed232259e018a20bc50e1609d2fd9397e1ec5610c227ade9b2e83ca70b6fb",
+        "LICENSE.txt": "369190804e18a6512d93cfc0bf27d41516405e5de98c86928a1ec9d9a1032a6e",
+        "paint_presets.json": "f9c4858c5ddc984291686035380131bed2af9121fa69d7e4dd08b8af8d51438f",
+        "thumbnail.png": "18315413f13062f4d5aa4081b19f9603f0f6954d34ec5cac6da1ec0bb0329d9b",
+        "vehicle.json": "67c0eefb943407308aa140c8d51bca78a8c5b2330a7f6a87fb60551d5389f25a",
+        "vehicle.pck": "6a60e687073856a6bcde3d308f59a14ef7d6ac2037528552b93cea0f4aac4c97"
       }
     }
   ]

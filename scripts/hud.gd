@@ -77,6 +77,7 @@ func _ready() -> void:
 	frontend=LeoFrontend.new();frontend.game=game;frontend.hud=self;frontend.audio=game.ui_audio;add_child(frontend)
 
 func clear(root: Control) -> void:
+	if root==menu_root and is_instance_valid(garage_selector):garage_selector.hide()
 	for c in root.get_children():
 		root.remove_child(c)
 		c.queue_free()
@@ -165,6 +166,19 @@ func backdrop(parent: Node, alpha: float = .7) -> void:
 func show_menu() -> void:
 	frontend.show_home()
 
+func prepare_garage() -> void:
+	if is_instance_valid(garage_selector):return
+	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
+	garage_selector.warm_only=true
+	garage_selector.configure(game.catalog,game.local_players[0].driver_id,game.local_players[0].vehicle_id,game.reduced_motion)
+	add_child(garage_selector)
+	# Prepare the persistent UI and podium pipelines behind the loading screen.
+	for frame in 3:await get_tree().process_frame
+	preload("res://scripts/content/boot_trace.gd").mark("garage_shader_warmup_begin")
+	await garage_selector.prewarm_materials()
+	preload("res://scripts/content/boot_trace.gd").mark("garage_shader_warmup_complete")
+	garage_selector.hide();garage_selector.warm_only=false
+
 func show_garage(_focus_group: String = "driver") -> void:
 	var retaining:=_focus_group=="pause"
 	var from_lobby:=_focus_group in ["lobby","setup"]
@@ -179,12 +193,17 @@ func show_garage(_focus_group: String = "driver") -> void:
 		local.player_name=game.custom_player_name
 	game.enter_garage(retaining)
 	scene_mode="garage";hud_root.hide();clear(modal_root);clear(menu_root);menu_root.show()
-	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
+	if not is_instance_valid(garage_selector):
+		garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate();garage_selector.warm_only=true;add_child(garage_selector);garage_selector.warm_only=false
+	for event in ["selection_changed","name_changed","race_requested","continue_requested","back_requested"]:
+		for connection in garage_selector.get_signal_connection_list(event):garage_selector.disconnect(event,connection.callable)
+	if garage_selector.keyboard and garage_selector.keyboard.visible:garage_selector.close_keyboard(true)
 	garage_selector.configure(game.catalog,local.driver_id,local.vehicle_id,game.reduced_motion)
 	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining;garage_selector.player_slot=game.selected_player_slot if from_lobby or retaining else -1
 	garage_selector.input_device=-2
-	menu_root.add_child(garage_selector)
-	garage_selector.race_button.text="Use This Ride" if from_lobby else "Back" if from_home else garage_selector.race_button.text
+	garage_selector.name_field.text=local.player_name
+	garage_selector.show();garage_selector.set_selection(local.driver_id,local.vehicle_id)
+	garage_selector.race_button.text="Keep Racing" if retaining else "Use This Ride" if from_lobby else "Back" if from_home else "Use This Ride"
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
 		game.preview=garage_selector.assembly
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)

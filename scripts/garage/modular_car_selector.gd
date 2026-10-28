@@ -30,6 +30,10 @@ var vehicle_id: StringName = &"blue"
 var reduced_motion := false
 var assembly: Node3D
 var selection_generation := 0
+var loading_preview: TextureRect
+var loading_caption: Label
+var warm_only := false
+var driver_caption: Label
 signal preview_ready
 var driver_buttons: Array[Button] = []
 var ui: Control
@@ -72,7 +76,7 @@ func _ready() -> void:
 	move_child(background,1)
 	build_showroom()
 	build_interface()
-	set_selection(driver_id,vehicle_id)
+	if not warm_only:set_selection(driver_id,vehicle_id)
 	visibility_changed.connect(sync_visibility)
 	sync_visibility()
 
@@ -118,7 +122,7 @@ func build_interface() -> void:
 	name_field=LineEdit.new();name_field.position=Vector2(40,141);name_field.size=Vector2(432,48);name_field.max_length=32;name_field.text=custom_name;name_field.add_theme_font_size_override("font_size",26);ui.add_child(name_field)
 	name_field.text_changed.connect(func(value: String):custom_name=value;refresh_labels();name_changed.emit(value))
 	var keys:=button(ui,"Change Name",open_keyboard);keys.position=Vector2(224,201);keys.size=Vector2(248,44)
-	positioned_label(("PLAYER %d · " % (player_slot+1) if player_slot>=0 else "")+"CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
+	driver_caption=positioned_label(("PLAYER %d · " % (player_slot+1) if player_slot>=0 else "")+"CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
 	carousel=LeoDriverCarousel.new();carousel.catalog=catalog;carousel.reduced_motion=reduced_motion;carousel.position=Vector2(40,300);carousel.size=Vector2(432,224);ui.add_child(carousel);carousel.driver_selected.connect(choose_driver);driver_buttons=carousel.cards
 	caption=positioned_label("",Vector2(40,526),22,Color("b9c7d6"));caption.size=Vector2(432,56);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	for i in 4:
@@ -152,6 +156,7 @@ func build_interface() -> void:
 	build_keyboard()
 
 func refresh_labels() -> void:
+	if driver_caption:driver_caption.text=("PLAYER %d · " % (player_slot+1) if player_slot>=0 else "")+"CHOOSE YOUR DRIVER"
 	if not ui:return
 	var d:=catalog.driver(driver_id);var v:=catalog.vehicle(vehicle_id)
 	title.text=(d.display_name if custom_name.strip_edges().is_empty() else custom_name.strip_edges()).to_upper()
@@ -252,6 +257,18 @@ func add_card_content(b: Button, name_text: String, texture: Texture2D, image_si
 	var pic := TextureRect.new();pic.texture=texture;pic.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;pic.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;pic.custom_minimum_size=image_size;pic.size_flags_vertical=SIZE_EXPAND_FILL;pic.mouse_filter=MOUSE_FILTER_IGNORE;box.add_child(pic)
 	var text := label(box,name_text.to_upper(),fs);text.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;text.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;text.clip_text=true;text.custom_minimum_size.x=0
 
+func valid_selection(generation: int) -> bool:
+	return is_inside_tree() and generation==selection_generation and is_visible_in_tree()
+
+func prefetch_neighbors(generation: int) -> void:
+	var index:=catalog.vehicle_index(vehicle_id)
+	for offset in [-1,1]:
+		if not valid_selection(generation):return
+		var next: VehicleDefinition=catalog.vehicles[posmod(index+offset,catalog.vehicles.size())]
+		await LeoPreviewStream.request(next,get_tree(),func():return valid_selection(generation),false)
+
+func _exit_tree() -> void:selection_generation+=1
+
 func set_selection(d: StringName,v: StringName) -> void:
 	var changed:=vehicle_id!=v
 	driver_id=d;vehicle_id=v
@@ -260,24 +277,55 @@ func set_selection(d: StringName,v: StringName) -> void:
 	var generation:=selection_generation
 	var car:=catalog.vehicle(v)
 	var racer:=catalog.driver(d)
+	if not car or not racer:
+		machine.text="PREVIEW UNAVAILABLE"
+		policy.text="This selection is unavailable. Choose another ride or driver."
+		race_button.disabled=true
+		if is_instance_valid(assembly):assembly.hide()
+		if loading_preview:loading_preview.hide()
+		if loading_caption:loading_caption.hide()
+		return
 	refresh_labels()
-	if not car.model_path.is_empty() and not await LeoAssets.scene_async(car.model_path,get_tree()):
-		if generation==selection_generation:machine.text="PREVIEW UNAVAILABLE / CHECK GAME ASSETS"
+	var start_time:=Time.get_ticks_usec()
+	if not loading_preview:
+		loading_preview=TextureRect.new();loading_preview.position=Vector2(620,230);loading_preview.size=Vector2(800,480);loading_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;loading_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;loading_preview.mouse_filter=MOUSE_FILTER_IGNORE;ui.add_child(loading_preview)
+		loading_caption=positioned_label("",Vector2(650,700),22,cyan)
+	loading_preview.texture=car.thumbnail;loading_preview.show();loading_caption.text="Loading your ride…";loading_caption.show();race_button.disabled=true
+	if is_instance_valid(assembly):assembly.hide()
+	var current:=func():return valid_selection(generation)
+	var preview_scene:=await LeoPreviewStream.request(car,get_tree(),current)
+	if not preview_scene:
+		if generation==selection_generation:machine.text="PREVIEW UNAVAILABLE / CHECK GAME ASSETS";loading_caption.text="Preview unavailable"
 		return
 	var driver_path:=racer.cabin_model_path if car.driver_policy==VehicleDefinition.DriverPolicy.CABIN else racer.seated_model_path
+	if not current.call():return
+	loading_caption.text="Preparing driver…"
 	if not driver_path.is_empty() and not await LeoAssets.scene_async(driver_path,get_tree()):
 		if generation==selection_generation:machine.text="DRIVER PREVIEW UNAVAILABLE / CHECK GAME ASSETS"
 		return
 	if generation!=selection_generation or not is_inside_tree():return
 	if is_instance_valid(assembly):showroom.remove_child(assembly);assembly.queue_free()
-	assembly=VehicleAssembler.assemble(catalog.vehicle(v),catalog.driver(d));showroom.add_child(assembly)
+	loading_caption.text="Preparing materials…"
+	var prepared:=await VehicleAssembler.assemble_async(car,racer,get_tree(),current,preview_scene)
+	if not prepared:return
+	if not current.is_valid() or not current.call():prepared.free();return
+	assembly=prepared
+	if not assembly:return
+	showroom.add_child(assembly)
 	var presented:=LeoVehiclePresentation.resolve(catalog.vehicle(v))
 	base_distance=presented.preview_distance;target=presented.preview_target
 	if changed:reset_view()
 	else:update_camera()
+	var gpu_start:=Time.get_ticks_usec()
+	await get_tree().process_frame
+	if not current.is_valid() or not current.call():return
+	LeoPreviewStream.timings.append({"vehicle":String(v),"stage":"gpu_warm_up","ms":(Time.get_ticks_usec()-gpu_start)/1000.})
+	loading_preview.hide();loading_caption.hide();race_button.disabled=false
+	LeoPreviewStream.timings.append({"vehicle":String(v),"stage":"first_visible","ms":(Time.get_ticks_usec()-start_time)/1000.})
 	refresh_labels()
 	pulse_rings()
 	preview_ready.emit()
+	prefetch_neighbors(generation)
 
 func choose_driver(id: StringName) -> void:
 	set_selection(id,vehicle_id);selection_changed.emit(driver_id,vehicle_id)
@@ -294,6 +342,7 @@ func update_camera() -> void:
 	camera.look_at(target)
 
 func sync_visibility() -> void:
+	if not is_visible_in_tree():selection_generation+=1
 	viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS if is_visible_in_tree() else SubViewport.UPDATE_DISABLED
 	set_process(is_visible_in_tree());set_process_input(is_visible_in_tree())
 
@@ -310,7 +359,54 @@ func _process(dt: float) -> void:
 	idle+=dt
 	if not reduced_motion and not dragging and idle>4.:yaw+=dt*.12;update_camera()
 
+func prewarm_materials() -> void:
+	# OpenGL has no background pipeline compilation. Compile tiny material
+	# representatives behind the boot screen, retaining only lightweight resources.
+	if RenderingServer.get_current_rendering_method()!="gl_compatibility":return
+	var seen: Dictionary={}
+	for vehicle in catalog.vehicles:
+		var path:=String(vehicle.content_data.get("shader_warmup_scene",""))
+		if path.is_empty():continue
+		if ResourceLoader.load_threaded_request(path,"PackedScene")!=OK:continue
+		while ResourceLoader.load_threaded_get_status(path)==ResourceLoader.THREAD_LOAD_IN_PROGRESS:await get_tree().process_frame
+		if ResourceLoader.load_threaded_get_status(path)!=ResourceLoader.THREAD_LOAD_LOADED:continue
+		var scene:=ResourceLoader.load_threaded_get(path) as PackedScene
+		LeoPreviewStream.shader_warmups.append(scene)
+		var proxies:=scene.instantiate();showroom.add_child(proxies)
+		for proxy in proxies.get_children():
+			var material: Material=proxy.mesh.surface_get_material(0)
+			var features: PackedStringArray=[]
+			for property in material.get_property_list():
+				if not int(property.usage)&PROPERTY_USAGE_STORAGE:continue
+				var value: Variant=material.get(property.name)
+				if value is Texture2D:features.append(String(property.name)+"=texture")
+				elif value is bool or (value is int and int(property.hint)==PROPERTY_HINT_ENUM):features.append(String(property.name)+"="+str(value))
+			var shader: String=";".join(features)
+			if seen.has(shader):continue
+			seen[shader]=true;proxy.show()
+			await get_tree().process_frame
+			await RenderingServer.frame_post_draw
+			proxy.hide()
+		proxies.free()
+	# Driver albedo/vertex-color combinations are independent of car paint.
+	# Keep their small compiled resources in the existing driver cache.
+	for racer in catalog.drivers:
+		for path in [racer.seated_model_path,racer.cabin_model_path]:
+			if path.is_empty():continue
+			var scene: PackedScene=await LeoAssets.scene_async(path,get_tree())
+			if not scene:continue
+			var model:=scene.instantiate() as Node3D
+			model.position=Vector3(0,.8,0);model.scale=Vector3.ONE*.5
+			if racer.material_albedo:VehicleAssembler.bind_albedo(model,racer.material_name,racer.material_albedo)
+			for key in racer.material_bindings:
+				if racer.material_bindings[key] is Texture2D:VehicleAssembler.bind_albedo(model,String(key),racer.material_bindings[key])
+			showroom.add_child(model)
+			await get_tree().process_frame
+			await RenderingServer.frame_post_draw
+			model.free()
 func build_showroom() -> void:
+	# Match the active viewport so Godot can precompile the same pipeline variants.
+	viewport.msaa_3d=get_tree().root.msaa_3d
 	camera=Camera3D.new();camera.fov=43;camera.current=true;showroom.add_child(camera)
 	var env := WorldEnvironment.new();env.environment=Environment.new();env.environment.background_mode=Environment.BG_COLOR;env.environment.background_color=Color(0,0,0,0);env.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;env.environment.ambient_light_color=Color("c9b69e");env.environment.ambient_light_energy=.7;env.environment.tonemap_mode=Environment.TONE_MAPPER_ACES;showroom.add_child(env)
 	var sky := Sky.new()
@@ -331,6 +427,8 @@ func build_showroom() -> void:
 		var glow:=ShaderMaterial.new();glow.shader=preload("res://shaders/garage_ring_halo.gdshader");glow.set_shader_parameter("tint",metal.emission);halo.material_override=glow;showroom.add_child(halo)
 	for i in 16:
 		var bolt:=MeshInstance3D.new();var mesh:=CylinderMesh.new();mesh.top_radius=.05;mesh.bottom_radius=.05;mesh.height=.04;mesh.radial_segments=6;bolt.mesh=mesh;bolt.material_override=mat;bolt.position=Vector3(sin(i*TAU/16)*3.52,.015,cos(i*TAU/16)*3.52);showroom.add_child(bolt)
+
+	reset_view()
 
 func pulse_rings() -> void:
 	if ring_tween:ring_tween.kill()

@@ -1,0 +1,64 @@
+{
+  "version": "2.6.0-preview",
+  "branch": "release/2.6.0",
+  "base_commit": "3d37854025589d7e16d94fb6a422020954fe3f6f",
+  "public_release": false,
+  "default_vehicles": [
+    "bigster",
+    "byd_yangwang_u8",
+    "colombo_tuk",
+    "cyberpunk",
+    "duster",
+    "formula_blue",
+    "hover",
+    "import_1968_volkswagen_beetle",
+    "import_1985_delorean_dmc_12_time_machine_bttf",
+    "import_2013_equipped_jeep_wrangler_unlimited_rubicon",
+    "import_2019_ford_mustang_rtr_spec5_10th_anniversary",
+    "import_2020_ferrari_roma",
+    "import_2020_jeep_gladiator",
+    "import_2020_lbworks_toyota_supra_a90_ver_2",
+    "import_2021_pininfarina_teorema_concept",
+    "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit",
+    "import_2022_mclaren_765lt",
+    "import_2024_byd_atto_2",
+    "import_future_car",
+    "mclaren",
+    "duster_2024"
+  ],
+  "fallback": "bigster",
+  "tracks": [
+    "astra_coast",
+    "colombo_city",
+    "kandy_lake"
+  ],
+  "vehicle_api": 2,
+  "legacy_vehicle_api": 1,
+  "source_assets": {
+    "duster": {
+      "package": "Duster_My_2014/package/GameAssets/vehicles/duster",
+      "master": "Duster_My_2014/Duster_My_2014.blend",
+      "conversion_credit": "Amila Prasad Perera"
+    },
+    "duster_2024": {
+      "package": "Duster_2024/package/GameAssets/vehicles/duster_2024",
+      "master": "Duster_2024/Duster_2024_runtime.blend"
+    }
+  },
+  "source_policy": "Source-mod attribution and applicable terms remain in each package. Conversion credit does not replace source ownership. Original masters and downloaded mod remain unchanged.",
+  "driver_fit_scales": {
+    "duster_2024": {
+      "hedgehog": 0.951913644545076,
+      "lion": 0.886697051055878,
+      "parrot": 0.97588088053126,
+      "mario": 0.907492326426473
+    }
+  },
+  "driver_seat_offsets": {
+    "duster_2024": [
+      0.0,
+      -0.08,
+      0.0
+    ]
+  }
+}

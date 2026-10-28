@@ -1,0 +1,174 @@
+{
+  "astra_coast": {
+    "dusk_top": "586990",
+    "dusk_horizon": "e9a77b",
+    "night_top": "0b122b",
+    "night_horizon": "293e63",
+    "sun_yaw": -145,
+    "night_lights": [
+      {
+        "fraction": 0.06,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.12,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.31,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.48,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.67,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.85,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      }
+    ]
+  },
+  "colombo_city": {
+    "dusk_top": "686e96",
+    "dusk_horizon": "e5a387",
+    "night_top": "101b34",
+    "night_horizon": "37486b",
+    "sun_yaw": -112,
+    "night_lights": [
+      {
+        "fraction": 0.04,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.18,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.33,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.52,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.71,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.9,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      }
+    ]
+  },
+  "kandy_lake": {
+    "dusk_top": "63738c",
+    "dusk_horizon": "d7ad91",
+    "night_top": "101b32",
+    "night_horizon": "30475d",
+    "sun_yaw": -155,
+    "neutral_manifest": "res://leo_environments/kandy_lake/manifest.json",
+    "night_lights": [
+      {
+        "fraction": 0.025,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.12,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.29,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.47,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.63,
+        "offset": 8.0,
+        "height": 5.0,
+        "color": "ffd5a5",
+        "energy": 2.1,
+        "range": 22.0
+      },
+      {
+        "fraction": 0.83,
+        "offset": -8.0,
+        "height": 5.0,
+        "color": "b8d7f7",
+        "energy": 2.1,
+        "range": 22.0
+      }
+    ]
+  }
+}

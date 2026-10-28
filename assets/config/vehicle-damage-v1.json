@@ -14,8 +14,7 @@
     "Body_gameasset_Mat_1"
   ],
   "duster": [
-    "varnish",
-    "Graphite paint"
+    "CarPaint_Duster_My_2014_Bianco_Ghiaccio"
   ],
   "formula_blue": [
     "blue"
@@ -63,5 +62,8 @@
   "mclaren": [
     "Body21Mtl.004",
     "Chassis1Mtl.004"
+  ],
+  "duster_2024": [
+    "CarPaint_Body_Terracotta"
   ]
 }

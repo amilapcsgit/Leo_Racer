@@ -1,7 +1,7 @@
 class_name LeoVehicleCodec
 extends RefCounted
 ## JSON adapter; never evaluates expressions or accepts user scripts.
-const FIELDS := ["display_name","collision_size","collision_position","max_speed","boosted_speed","electric_boost","braking_regeneration","ai_lateral_acceleration","acceleration","handling","camera_height","preview_target","preview_distance","exhausts","driver_policy","seat","normalization","driver_fits","hovering","preserve_materials","visual_profile","lighting","actions","fixed_driver_id","setup_complete","attribution"]
+const FIELDS := ["preview_scene","compiled_bounds","estimated_bytes","display_name","collision_size","collision_position","max_speed","boosted_speed","electric_boost","braking_regeneration","ai_lateral_acceleration","acceleration","handling","camera_height","preview_target","preview_distance","exhausts","driver_policy","seat","normalization","driver_fits","hovering","preserve_materials","visual_profile","lighting","actions","fixed_driver_id","setup_complete","attribution"]
 
 static func encode(value: Variant) -> Variant:
 	if value is Vector3:return [value.x,value.y,value.z]
@@ -27,6 +27,12 @@ static func serialize(vehicle: VehicleDefinition) -> Dictionary:
 	for key in FIELDS:data[key]=encode(vehicle.get(key))
 	for wheel in vehicle.wheels:
 		data.wheels.append({"rotating":Array(wheel.rotating_groups).map(func(p):return String(p)),"stationary":Array(wheel.stationary_groups).map(func(p):return String(p)),"steering":wheel.steering,"axle":encode(wheel.axle),"pivot":encode(wheel.pivot),"radius":wheel.radius})
+	if int(vehicle.content_data.get("vehicle_api",1))==2:
+		data.vehicle_api=2
+		data.core={"min":"2.6.0","max_major":2}
+		data.version=vehicle.content_data.get("version","1.0.0")
+		for key in ["pack","pack_sha256","model_scene","preview_scene","compiled_bounds","estimated_bytes","source_model_sha256","warmup_resources","shader_warmup_scene"]:
+			if vehicle.content_data.has(key):data[key]=vehicle.content_data[key]
 	return data
 
 static func deserialize(data: Dictionary, folder: String) -> VehicleDefinition:
@@ -44,7 +50,7 @@ static func deserialize(data: Dictionary, folder: String) -> VehicleDefinition:
 			value=PackedVector3Array()
 			for point in data[key]:value.append(vector(point))
 		vehicle.set(key,value)
-	vehicle.model_path=folder.path_join(String(data.get("model","model.glb")))
+	vehicle.model_path=String(data.model_scene) if int(data.get("vehicle_api",1))==2 else folder.path_join(String(data.get("model","model.glb")))
 	for item in data.get("wheels",[]):
 		var wheel:=WheelBinding.new()
 		for path in item.get("rotating",[]):wheel.rotating_groups.append(NodePath(path))

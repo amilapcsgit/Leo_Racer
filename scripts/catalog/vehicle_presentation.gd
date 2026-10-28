@@ -19,10 +19,14 @@ static func resolve(source: VehicleDefinition) -> VehicleDefinition:
 	var key:=source.get_instance_id()
 	if cache.has(key):return cache[key]
 	if profiles.is_empty():profiles=JSON.parse_string(FileAccess.get_file_as_string("res://assets/config/vehicle-presentation-v1.json"))
-	var model:=source.model.instantiate() as Node3D
-	model.transform=source.normalization*model.transform
-	var measured:=bounds(model)
-	model.queue_free()
+	var measured:=AABB()
+	if not source.compiled_bounds.is_empty():
+		measured=source.normalization*AABB(LeoVehicleCodec.vector(source.compiled_bounds.position),LeoVehicleCodec.vector(source.compiled_bounds.size))
+	else:
+		var model:=source.model.instantiate() as Node3D
+		model.transform=source.normalization*model.transform
+		measured=bounds(model)
+		model.free()
 	var entry: Dictionary=profiles.get(String(source.id),{})
 	var factor:=1.
 	if source.id==&"bigster":factor=1./1.3

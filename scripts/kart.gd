@@ -49,6 +49,15 @@ var wheels: Array[Node3D] = []
 var wheel_steering_pivots: Array[Node3D] = []
 var wheel_spin_pivots: Array[Node3D] = []
 var wheel_roll := 0.0
+var suspension_velocity := Vector3.ZERO
+var suspension_yaw := 0.0
+var suspension_roll := 0.0
+var suspension_pitch := 0.0
+var suspension_ready := false
+var drafting := false
+var boost_kind := "nitro"
+var boost_tier := 0
+var boost_duration := 0.0
 var wheel_motion_speed := 0.0
 var wheel_visual_speed := 0.0
 var flames: Array[MeshInstance3D] = []
@@ -291,6 +300,7 @@ func make_particles(p: Vector3, exhaust := false) -> GPUParticles3D:
 	return fx
 
 func place(distance: float, lane: float) -> void:
+	reset_suspension()
 	road_offset=lane
 	position = circuit.sample(distance, lane) + Vector3.UP * .12
 	var t := circuit.direction(distance)
@@ -333,6 +343,7 @@ func advance_checkpoints(projection: Dictionary, motion: Vector3) -> void:
 	progress=clampf(expected+relative,expected-segment,expected-.001)
 
 func recover() -> void:
+	reset_suspension()
 	var completed := maxi(0,next_gate-1)
 	var safe := float(completed) * circuit.length / LeoCircuit.GATES + 2.0
 	var recoveries: Array=circuit.features.get("recoveries",[])
@@ -378,7 +389,25 @@ func recover() -> void:
 	road_offset=circuit.project(position,nearest_index).offset
 	recovered.emit(self)
 
-func boost(duration: float, source: String) -> void:
+func reset_suspension() -> void:
+	suspension_ready=false;suspension_roll=0.;suspension_pitch=0.;drafting=false
+
+func update_suspension(dt: float, reduced: bool, motion_velocity: Vector3=Vector3.INF) -> void:
+	var measured:=Vector3(velocity.x,0,velocity.z) if not motion_velocity.is_finite() else Vector3(motion_velocity.x,0,motion_velocity.z)
+	if not suspension_ready or reduced or not active:
+		suspension_velocity=measured;suspension_yaw=rotation.y;suspension_ready=true
+		suspension_roll=0.;suspension_pitch=0.;return
+	var acceleration_world:=(measured-suspension_velocity)/maxf(dt,.001)
+	var lateral:=acceleration_world.dot(global_basis.x)
+	var longitudinal:=acceleration_world.dot(-global_basis.z)
+	var yaw_rate:=angle_difference(suspension_yaw,rotation.y)/maxf(dt,.001)
+	var blend:=1.-exp(-dt*8.)
+	suspension_roll=lerpf(suspension_roll,clampf(-lateral*.0018+yaw_rate*.012,-deg_to_rad(4.),deg_to_rad(4.)),blend)
+	suspension_pitch=lerpf(suspension_pitch,clampf(longitudinal*.0012,-deg_to_rad(1.5),deg_to_rad(1.5)),blend)
+	suspension_velocity=measured;suspension_yaw=rotation.y
+
+func boost(duration: float, source: String, kind: String="nitro", tier: int=0) -> void:
+	boost_kind=kind;boost_tier=tier;boost_duration=duration
 	boost_time = maxf(boost_time, duration)
 	boosted.emit(self, source)
 	if is_player and boost_sound: boost_sound.play()
@@ -421,7 +450,7 @@ func _physics_process(dt: float) -> void:
 		air_hop = .18
 	if drifting and not want_drift:
 		if drift_charge >= .65 and throttle >= -.1:
-			boost(1.0+minf(drift_charge,2.5)*.35,"SUPER DRIFT" if drift_charge>=1.65 else "DRIFT BOOST")
+			boost(1.0+minf(drift_charge,2.5)*.35,"SUPER DRIFT" if drift_charge>=1.65 else "DRIFT BOOST","drift",2 if drift_charge>=1.65 else 1)
 		drift_charge = 0
 	if drifting != want_drift: drift_changed.emit(self,want_drift)
 	drifting = want_drift
@@ -479,16 +508,19 @@ func _physics_process(dt: float) -> void:
 	if active and boost_cooldown <= 0:
 		for fraction in circuit.boosts:
 			if absf(circuit.delta_distance(projection.distance, float(fraction) * circuit.length)) < 2.5 and absf(offset) < 6.5:
-				boost(1.5, "BOOST PAD")
+				boost(1.5, "BOOST PAD","pad")
 				boost_cooldown = 2.0
 	# Keep the RC's body response; Reduced Motion suppresses presentation offsets.
 	var reduced:=bool(get_parent().get("reduced_motion")) if get_parent().get("reduced_motion")!=null else false
 	air_hop = move_toward(air_hop, 0, dt * .8)
 	visual.position.y = (.20 if definition.hovering else 0.) if reduced else ((.20 + sin(Time.get_ticks_msec()*.0018)*.055 if definition.hovering else 0.0) + air_hop + sin(Time.get_ticks_msec() * .018) * .012 * absf(speed) / 33)
-	visual.rotation.z = 0. if reduced else lerp_angle(visual.rotation.z, -steer * .075 * grip, dt * 7)
+	var photo:=false
+	if is_player and get_parent().get("local_players")!=null:photo=get_parent().local_players[local_slot].photo
+	update_suspension(dt,reduced or photo,(global_position-motion_origin)/maxf(dt,.001))
+	visual.rotation.z = suspension_roll
 	visual.rotation.y = 0. if reduced else lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
 	contact_recoil=Vector3.ZERO if reduced else contact_recoil.move_toward(Vector3.ZERO,dt*1.8)
-	visual.rotation.z+=contact_recoil.z;visual.rotation.x=contact_recoil.x
+	visual.rotation.z+=contact_recoil.z;visual.rotation.x=suspension_pitch+contact_recoil.x
 	if is_player and engine:
 		if motor_audio:motor_audio.throttle=throttle;motor_audio.update(dt)
 		skid.volume_db = lerpf(skid.volume_db, -13.0 if drifting else -65.0, dt * 8)

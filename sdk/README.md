@@ -14,7 +14,7 @@ Keep IDs stable and unique. Increment `version` for updates. `vehicle.json` foll
 
 For textured models, optionally run the editor-only `vehicle-tools/optimize_vehicle.gd` script with `--vehicle-folder=<absolute-folder>` and `--max-texture=2048`. The packaged SDK includes a standalone vehicle-tools project: run `godot --headless --path vehicle-tools --script res://optimize_vehicle.gd -- --vehicle-folder=<folder>`. In the source repository the same script lives under tools/. It writes optional `optimized-textures.json` and GPU-compressed DDS sidecars, preserving the original GLB and UVs. Include the sidecars when sharing. Runtime never needs the compressor. Re-run optimization after changing the GLB.
 
-The installed game's `LeoRacer.console.exe --headless -- --validate-vehicles` checks discovery, wheel bindings, fingerprints and imports. It reports cache use and compressed material counts. Authoritative files remain loose; disposable caches live in the existing Godot user-data directory. Deleting caches is safe.
+The installed game's `LeoRacer.console.exe --headless -- --validate-vehicles` checks discovery, wheel bindings, fingerprints and imports. It reports cache use and compressed material counts. Vehicle API 1 sources remain loose; Vehicle API 2 assets live in namespaced PCKs. Disposable import caches live in the existing Godot user-data directory. Deleting caches is safe.
 
 ## Track kit
 
@@ -28,3 +28,15 @@ Open `track-kit/project.godot` and `example.tscn`. Select the root node. Its ini
 - Change the stable ID for a different course; increment `course_revision` for route/collision changes and `content_version` for updates. Supply a license for all added assets. Custom tracks are modded/unranked.
 
 The original API 1 Astra/Colombo folders remain compatible. Original published records are preserved. There is no online workshop, executable mod scripting, vehicle part swapping or force-feedback extension in this SDK.
+
+## Vehicle API 2 (core 2.6)
+
+Use `vehicle-tools/Compile Vehicle.ps1 -VehicleFolder <validated-api1-folder> -Output <new-output-folder> -Godot <godot-console.exe>`. The source is preserved. The output contains `vehicle.pck`, API 2 `vehicle.json`, and copied thumbnails, presets and credits. Distribute under `GameAssets/vehicles/<id>/`. Loose Vehicle API 1 remains supported.
+
+The compiler prepares materials, generates mesh LODs, compresses desktop textures with mipmaps, and records model-local presentation bounds. Model and preview scenes live under `res://leo_vehicles/<id>/`; all dependencies must stay there. Runtime mounts without replacing existing resources. Packs with conflicting paths, invalid hashes, executable file entries or external dependencies are rejected. Restart the game after replacing a mounted pack. Custom packs remain unranked.
+
+`preview_scene` may name a separate compiled preview within that namespace. `compiled_bounds` contains three-element `position` and `size` arrays before the manifest normalization transform. `estimated_bytes` is a conservative cache estimate, not a measured VRAM figure. Original Blender masters belong outside the installed discovery folder. Color presets are documentation for future garage customization.
+
+The optional `shader_warmup_scene` is a small compiler-generated scene with representative materials and 1-pixel textures. Compatibility draws these behind the initial loading screen to avoid first-use shader compilation in the garage; it does not load full vehicles or consume a preview-cache slot. Keep it in the same vehicle namespace.
+
+Custom compiled packs must use uncompressed binary scene/resource containers as emitted by this compiler (their texture payloads remain compressed). Embedded CPU scripts, native extensions, scene signal wiring and method/audio animation tracks are rejected. Model scenes use basic spatial, mesh, skeleton, animation-player and particle nodes.

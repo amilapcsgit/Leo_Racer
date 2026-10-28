@@ -145,5 +145,9 @@
     "length": 4.365,
     "source": "Authored MP4-25 derivative: fleet-audit.json measured model bounds",
     "note": "Retain documented authored competition size; no invented homologation dimensions."
+  },
+  "duster_2024": {
+    "length": 4.343,
+    "source": "Duster 2024 approved source derivative"
   }
 }

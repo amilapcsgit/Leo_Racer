@@ -5,6 +5,9 @@ enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var id: StringName
 @export var display_name := "New vehicle"
 @export var model_path := ""
+@export var preview_scene := ""
+@export var compiled_bounds: Dictionary = {}
+@export var estimated_bytes := 0
 @export var fixed_driver_model_path := ""
 @export var model: PackedScene:
 	get:

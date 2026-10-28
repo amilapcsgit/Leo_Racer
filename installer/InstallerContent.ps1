@@ -35,6 +35,25 @@ try {
   New-Item -ItemType Directory -Force -Path $root | Out-Null
   $backup=Join-Path $root ('ContentBackups\'+[guid]::NewGuid().ToString('N'))
   $backupIndex=@{}
+  # Superseded managed vehicle files must leave discovery before installing API 2.
+  # Unknown files and custom packages have no ownership entry and are preserved.
+  $incoming=[Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+  foreach($file in Get-ChildItem -LiteralPath $stage -Recurse -File){$null=$incoming.Add($file.FullName.Substring($stage.Length+1))}
+  foreach($relative in @($owned.Keys)){
+   if($relative.Replace('/','\').StartsWith('GameAssets\vehicles\',[StringComparison]::OrdinalIgnoreCase) -and -not $incoming.Contains($relative)){
+    $target=Resolve-Owned $relative
+    if(Test-Path -LiteralPath $target){
+     $archiveRoot=[IO.Path]::GetFullPath((Join-Path $backup 'Superseded'))
+     $archived=[IO.Path]::GetFullPath((Join-Path $archiveRoot $relative))
+     if(-not $archived.StartsWith($archiveRoot+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Archive path escapes backup'}
+     New-Item -ItemType Directory -Force -Path (Split-Path $archived -Parent) | Out-Null
+     Move-Item -LiteralPath $target -Destination $archived
+     $backupIndex[$relative]=@{file=$archived.Substring($backup.Length+1);modified=((Get-OwnedHash $archived) -ne $owned[$relative])}
+    }
+    $owned.Remove($relative)
+   }
+  }
+  if($backupIndex.Count){[IO.File]::WriteAllText((Join-Path $backup 'index.json'),($backupIndex | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))}
   foreach($file in Get-ChildItem -LiteralPath $stage -Recurse -File){
    $relative=$file.FullName.Substring($stage.Length+1);$target=Resolve-Owned $relative
    if($target.Length -ge 260){throw 'Choose a shorter installation folder: Windows path length limit reached'}
@@ -46,7 +65,7 @@ try {
      $saved=Join-Path $backup ($existing.Substring(0,16)+'-'+$file.Name);New-Item -ItemType Directory -Force -Path $backup | Out-Null
      Copy-Item -LiteralPath $target -Destination $saved -Force
      $backupIndex[$relative]=[IO.Path]::GetFileName($saved)
-     [IO.File]::WriteAllText((Join-Path $backup 'index.json'),($backupIndex | ConvertTo-Json),[Text.UTF8Encoding]::new($false))
+     [IO.File]::WriteAllText((Join-Path $backup 'index.json'),($backupIndex | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
     }
    }
    New-Item -ItemType Directory -Force -Path (Split-Path $target -Parent) | Out-Null

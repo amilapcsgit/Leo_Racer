@@ -6,5 +6,5 @@ static func mark(stage: String) -> void:
 	marks.append(entry)
 	if marks.size()>32:marks.pop_front()
 	var file:=FileAccess.open("user://startup-last.json",FileAccess.WRITE)
-	if file:file.store_string(JSON.stringify({"version":"2.5.0","stages":marks},"  "))
+	if file:file.store_string(JSON.stringify({"version":"2.6.0","stages":marks},"  "))
 	print("BOOT_STAGE ",JSON.stringify(entry))

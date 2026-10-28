@@ -21,9 +21,10 @@ static func apply(world: Node3D, environment: Environment, quality: int, split: 
 		light.shadow_enabled=true
 		light.directional_shadow_max_distance=[65.,100.,140.][tier]
 		light.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-		if not forward and split:
-			light.directional_shadow_max_distance=minf(light.directional_shadow_max_distance,80.)
-			light.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+		if not forward and tier<=1:
+			# A nearer single cascade keeps Medium within the GLES draw budget; High retains four.
+			light.directional_shadow_max_distance=minf(light.directional_shadow_max_distance,65. if split else 80.)
+			light.directional_shadow_mode=DirectionalLight3D.SHADOW_ORTHOGONAL
 	for probe in world.get_children():
 		if probe is ReflectionProbe and String(probe.name).begins_with("RaceReflection"):
 			probe.visible=tier>0

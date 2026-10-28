@@ -20,6 +20,8 @@ var ROSTER: Array = []
 var KARTS: Array = []
 var tracks: Array[LeoTrackDefinition] = []
 var track_definition: LeoTrackDefinition
+var race_variant := "static"
+var race_environment := LeoRaceEnvironment.new()
 var chosen_track_id := "colombo_city"
 var circuit: LeoCircuit
 var world: Node3D
@@ -209,6 +211,7 @@ func _ready() -> void:
 	local_players[1].feedback=second_feedback
 	feedback.process_mode=Node.PROCESS_MODE_PAUSABLE
 	return_menu()
+	await hud.prepare_garage()
 	initialized=true;loading.hide();initialization_finished.emit()
 	if test_mode or "--show-race" in args:
 		await start_race()
@@ -491,6 +494,7 @@ func apply_graphics() -> void:
 	if world.find_children("RaceReflection*","ReflectionProbe",false,false).is_empty() and (human_count==1 or RenderingServer.get_current_rendering_method()=="forward_plus"):
 		LeoGraphics.install_reflections(world,circuit)
 	LeoGraphics.apply(world,environment,graphics_quality,human_count==2,state=="garage")
+	race_environment.enforce_graphics()
 
 func set_graphics_quality(value: int) -> void:
 	graphics_quality=clampi(value,0,2);apply_graphics();save_settings()
@@ -538,6 +542,14 @@ func default_ai_vehicle(index: int) -> VehicleDefinition:
 	if pool.is_empty():return catalog.vehicle(LeoDefaultRoster.fallback(catalog))
 	return pool[(selected_kart+index*3)%pool.size()]
 
+func current_ruleset(course: LeoTrackDefinition=null) -> String:
+	if not course:course=track_definition
+	return ("distinct_v5_dusk_night" if race_variant=="dusk_night" else "distinct_v5_static")+("+arcade_elevation_v1" if course.elevated() else "")
+
+func set_race_variant(value: String) -> void:
+	race_variant=value if value in ["static","dusk_night"] else "static"
+	save_settings()
+
 func start_race() -> void:
 	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
@@ -565,6 +577,9 @@ func start_race() -> void:
 	rankings_written=false;ranking_message=""
 	showroom_lighting(false)
 	apply_graphics()
+	if not await race_environment.prepare(get_tree(),chosen_track_id,race_variant=="dusk_night"):
+		loading.show_failure("The Dusk to Night lighting pack is missing or damaged.",start_race,func():loading.hide();return_menu());return
+	race_environment.configure(world,environment,chosen_track_id,race_variant=="dusk_night")
 	get_tree().paused=false;paused=false
 	remove_racers()
 	stage.hide();world.show()
@@ -601,7 +616,7 @@ func start_race() -> void:
 	player=karts[0]
 	if ranking_store and not diagnostic_run():
 		best_time=0.
-		for row in ranking_store.best_times_for_track(human_count,LeoRaceRules.resolve(player.definition).class_id,"",false,track_definition.id,track_definition.revision,track_definition.ruleset_id()):
+		for row in await LeoRankingRequests.query(ranking_store,get_tree(),human_count,LeoRaceRules.resolve(player.definition).class_id,"",false,track_definition.id,track_definition.revision,current_ruleset()):
 			if row.profile_id==local_players[0].profile_id:best_time=float(row.race_ms)/1000.;break
 	local_players[0].camera=camera;local_players[0].feedback=feedback
 	if test_mode:player.auto_drive=true
@@ -609,6 +624,8 @@ func start_race() -> void:
 	camera.position=player.position+Vector3(sin(cam_heading),0,cos(cam_heading))*9+Vector3.UP*5
 	camera.look_at(player.position+Vector3.UP*1.2)
 	if split_view:split_view.activate(human_count==2)
+	for local in local_players:
+		if is_instance_valid(local.camera):local.camera.cull_mask=(local.camera.cull_mask & ~((1<<18)|(1<<19))) | (1<<(18+local.slot))
 	loading.stage("Warming up the race view…",95)
 	for frame in 4:await get_tree().process_frame
 	state="countdown";countdown=3.6
@@ -639,7 +656,7 @@ func on_boost(kart: LeoKart, source: String) -> void:
 	var local:=state_for(kart)
 	if local:
 		local.boost_count+=1
-		if local.feedback:local.feedback.play_boost(source,kart.boost_time)
+		if local.feedback:local.feedback.play_boost_explicit(kart.boost_kind,kart.boost_tier,kart.boost_duration)
 		if local.slot==0:boost_count=local.boost_count
 		announce_player(local.slot,source,1.1)
 
@@ -662,6 +679,7 @@ func set_reduced_motion(value: bool) -> void:
 	for button in get_tree().get_nodes_in_group("ui_buttons"):button.set_reduced_motion(value)
 	if hud and hud.ui_effects:hud.ui_effects.set_reduced_motion(value)
 	if hud and is_instance_valid(hud.garage_selector):hud.garage_selector.set_reduced_motion(value)
+	if value:reset_motion_feedback()
 	reduced_motion = value
 	if feedback: feedback.set_reduced_motion(value)
 	if local_players[1].feedback:local_players[1].feedback.set_reduced_motion(value)
@@ -786,7 +804,15 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
 	return true
 
+func reset_motion_feedback() -> void:
+	for local in local_players:
+		if local.feedback:local.feedback.reset_feedback()
+		if is_instance_valid(local.kart):
+			local.kart.reset_suspension()
+			if local.kart.effects and local.kart.effects.wind:local.kart.effects.wind.reset()
+
 func toggle_pause() -> void:
+	reset_motion_feedback()
 	if state not in ["race","countdown","finishing"]:return
 	if paused and not diagnostics_mode:
 		for slot in human_count:
@@ -828,6 +854,9 @@ func _process(dt: float) -> void:
 				if local_players[slot].launch_charged:local_players[slot].kart.boost(.9,"PERFECT LAUNCH")
 	elif state in ["race","finishing"]:
 		race_time+=dt
+		var photo_active:=false
+		for local in local_players:photo_active=photo_active or local.photo
+		race_environment.advance(karts,dt,photo_active)
 		update_slipstream(dt)
 		for slot in human_count:
 			var local:=local_players[slot]
@@ -865,6 +894,7 @@ func update_slipstream(dt: float) -> void:
 				if other==kart or not other.active:continue
 				var gap: Vector3=other.position-kart.position
 				if gap.dot(forward)>5 and gap.dot(forward)<19 and absf(gap.dot(kart.global_basis.x))<2.4 and forward.dot(-other.global_basis.z)>.85:drafting=true;break
+		kart.drafting=drafting
 		if drafting:
 			local.slipstream_time+=dt;kart.boost_fuel=minf(1.,kart.boost_fuel+dt*.13)
 			if local.slipstream_time>.8 and local.slipstream_cooldown<=0:announce_player(slot,"SLIPSTREAM / NITRO CHARGING",1.4);local.slipstream_cooldown=5.
@@ -901,6 +931,7 @@ func save_settings() -> void:
 	var cfg := ConfigFile.new()
 	cfg.load("user://leo_racer.cfg")
 	cfg.set_value("game","track_id",chosen_track_id)
+	cfg.set_value("game","race_variant",race_variant)
 	cfg.set_value("game","human_count",human_count)
 	cfg.set_value("audio", "volume", master_volume)
 	cfg.set_value("audio", "music", music_enabled)
@@ -930,6 +961,7 @@ func load_settings() -> void:
 		selected_kart = selection.y
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
 		chosen_track_id=cfg.get_value("game","track_id","colombo_city")
+		race_variant=cfg.get_value("game","race_variant","static")
 		human_count=clampi(int(cfg.get_value("game","human_count",1)),1,2)
 		legacy_best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		for local in local_players:
@@ -1148,6 +1180,7 @@ func _on_local_command(slot: int, action: String) -> void:
 	if action=="horn" and local.horn_cooldown<=0:
 		local.horn_cooldown=.8;hud.play_arcade_cue("bus_horn" if kart.vehicle_key=="race_bus" else "tuk_horn")
 	if action=="photo":
+		reset_motion_feedback()
 		local.photo=not local.photo
 		if slot==0 and human_count==1:hud.photo_mode=local.photo;hud.hud_root.visible=not local.photo
 func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
@@ -1209,7 +1242,13 @@ func save_ranking_results() -> void:
 	if not ranking_store:
 		ranking_message="RANKINGS SAVE FAILED / Racing is still available.";return
 	var rows:=ranking_rows()
-	var count: int=ranking_store.save_session_for_track(session_id,human_count,rows,false,false,track_definition.id,track_definition.revision,track_definition.ruleset_id())
+	var saved_session:=session_id
+	var request: int=ranking_store.write_async(session_id,human_count,rows,false,false,track_definition.id,track_definition.revision,current_ruleset())
+	if request<0:ranking_message="RANKINGS SAVE FAILED";return
+	ranking_message="Saving results…"
+	while not ranking_store.request_ready(request):await get_tree().process_frame
+	var count: int=ranking_store.take_write(request)
+	if session_id!=saved_session:return
 	ranking_message="RANKINGS SAVE FAILED / Racing is still available. Existing data retained." if count<0 else "OFFLINE RANKINGS / %d RESULTS SAVED" % count
 	if count>0 and player.finished:
 		best_time=player.finish_time if best_time<=0 else minf(best_time,player.finish_time)

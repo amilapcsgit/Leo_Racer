@@ -95,6 +95,7 @@ func show_setup(count: int=-1) -> void:
   var number: int=n
   action(top,("✓ " if game.human_count==n else "")+("1 Player" if n==1 else "2 Players"),func():show_setup(number)).custom_minimum_size.x=210
  var track_button:=action(top,game.track_definition.display_name+"  ·  Change Track",show_tracks);track_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ var lighting:=OptionButton.new();lighting.add_item("Static lighting");lighting.add_item("Dusk to Night");lighting.select(1 if game.race_variant=="dusk_night" else 0);lighting.item_selected.connect(func(i):game.set_race_variant("dusk_night" if i==1 else "static"));top.add_child(lighting)
  var row:=HBoxContainer.new();row.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(row)
  for slot in game.human_count:
   var index: int=slot;var local: LeoLocalPlayer=game.local_players[slot]

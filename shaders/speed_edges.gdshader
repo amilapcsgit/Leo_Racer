@@ -16,5 +16,6 @@ void fragment() {
 	vec2 warp=vec2(sin(floor(UV.y*38.0)+animation_time*150.0)*.025*glitch,0.0);
 	vec3 reset=texture(screen_tex,SCREEN_UV+warp).rgb;
 	reset.r=texture(screen_tex,SCREEN_UV+warp+vec2(.008*glitch,0)).r;
-	COLOR = vec4(mix(vec3(.03,.82,1.0),reset,step(.001,glitch)),max(light,glitch*.85)+reset_band);
+	float vignette=edge*strength*.075;
+	COLOR = vec4(mix(vec3(.03,.82,1.0),reset,step(.001,glitch))*(1.0-vignette),max(light+vignette,glitch*.85)+reset_band);
 }

@@ -1,7 +1,7 @@
 class_name LeoVehicleLibrary
 extends RefCounted
 ## Metadata-only discovery. A bad optional car never prevents boot.
-const CORE_VERSION := Vector3i(2,5,0)
+const CORE_VERSION := Vector3i(2,6,0)
 static var generation := 0
 static var entries: Array[VehicleDefinition]=[]
 static var unavailable: Array[Dictionary]=[]
@@ -63,7 +63,7 @@ static func glb_problem(path: String) -> String:
 static func problems(data: Variant, folder: String, files: bool=true) -> PackedStringArray:
 	var errors:=PackedStringArray()
 	if not data is Dictionary:return ["vehicle.json must contain an object"]
-	if data.get("format")!=1 or data.get("vehicle_api")!=1:errors.append("Unsupported Vehicle API; expected 1")
+	if data.get("format")!=1 or int(data.get("vehicle_api",0)) not in [1,2]:errors.append("Unsupported Vehicle API; expected 1 or 2")
 	for field in ["display_name","version","fixed_driver_id","attribution","visual_profile"]:
 		if data.has(field) and not data[field] is String:errors.append("Invalid "+field)
 	for field in ["electric_boost","hovering","preserve_materials","setup_complete"]:
@@ -81,7 +81,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 		else:
 			var number:=int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])
 			if number>CORE_VERSION.x*1000000+CORE_VERSION.y*1000+CORE_VERSION.z:errors.append("Requires a newer Leo Racer core")
-	for key in ["model","thumbnail"]:
+	for key in (["model","thumbnail"] if int(data.get("vehicle_api",1))==1 else ["thumbnail"]):
 		var relative: Variant=data.get(key,"model.glb" if key=="model" else "thumbnail.png")
 		if not relative is String or not safe_relative(relative):errors.append("Unsafe "+key+" path")
 		elif files and key=="model":
@@ -89,7 +89,15 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 			else:
 				var problem:=glb_problem(folder.path_join(relative))
 				if not problem.is_empty():errors.append(problem)
-	if String(data.get("model","")).get_extension().to_lower()!="glb":errors.append("Model must be GLB")
+	if int(data.get("vehicle_api",1))==2:
+		var estimate: Variant=data.get("estimated_bytes",0)
+		if (not estimate is int and not estimate is float) or not is_finite(float(estimate)) or float(estimate)<0. or float(estimate)>17179869184. or fmod(float(estimate),1.)!=0.:errors.append("Invalid compiled memory estimate")
+		var pack_problem:=LeoVehiclePack.problem(data,folder) if files else ""
+		if not pack_problem.is_empty():errors.append(pack_problem)
+		var box: Variant=data.get("compiled_bounds",{})
+		if not box is Dictionary or not finite_vector(box.get("position")) or not finite_vector(box.get("size")):errors.append("Invalid compiled presentation bounds")
+		elif box.size.any(func(value):return float(value)<=0. or float(value)>1000.):errors.append("Invalid compiled presentation dimensions")
+	elif String(data.get("model","")).get_extension().to_lower()!="glb":errors.append("Model must be GLB")
 	for key in ["collision_size","collision_position","preview_target"]:
 		if data.has(key) and not finite_vector(data[key]):errors.append("Invalid "+key)
 	if finite_vector(data.get("collision_size")):
@@ -114,7 +122,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 		if not finite_vector(wheel.get("pivot")) or not finite_vector(wheel.get("axle")):errors.append("Invalid wheel pivot/axle")
 		elif not is_equal_approx(LeoVehicleCodec.vector(wheel.axle).length(),1.):errors.append("Wheel axle must be normalized")
 		if not wheel.get("radius") is float and not wheel.get("radius") is int:errors.append("Invalid wheel radius")
-		elif float(wheel.radius)<=.01 or float(wheel.radius)>3.:errors.append("Wheel radius outside 0.01–3 m")
+		elif float(wheel.radius)<=.01 or float(wheel.radius)>3.:errors.append("Wheel radius outside 0.01ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ3 m")
 		for key in ["rotating","stationary"]:
 			var paths: Variant=wheel.get(key,[])
 			if not paths is Array:errors.append("Invalid wheel groups");continue
@@ -138,12 +146,20 @@ static func discover(directory: String="") -> void:
 	entries.clear();unavailable.clear();pending.clear();fingerprint_details.clear();generation+=1
 	if not DirAccess.dir_exists_absolute(root):return
 	var candidates: Array[Dictionary]=[];var counts: Dictionary={}
+	var documents: Array[Dictionary]=[]
 	for child in DirAccess.get_directories_at(root):
 		var folder:=root.path_join(child);var file:=folder.path_join("vehicle.json")
 		if not FileAccess.file_exists(file):continue
-		var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(file));var errors:=problems(data,folder)
+		var data: Variant=JSON.parse_string(FileAccess.get_file_as_string(file))
+		documents.append({"data":data,"folder":folder,"child":child})
+		if data is Dictionary and data.get("id") is String:counts[data.id]=int(counts.get(data.id,0))+1
+	for document in documents:
+		var data: Variant=document.data;var folder: String=document.folder;var child: String=document.child
+		if data is Dictionary and data.get("id") is String and counts.get(data.id,0)>1:
+			unavailable.append({"folder":child,"reason":"Duplicate ID: "+data.id});continue
+		var errors:=problems(data,folder)
 		if not errors.is_empty():unavailable.append({"folder":child,"reason":"; ".join(errors)});continue
-		counts[data.id]=int(counts.get(data.id,0))+1;candidates.append({"data":data,"folder":folder})
+		candidates.append({"data":data,"folder":folder})
 	for candidate in candidates:
 		var data: Dictionary=candidate.data
 		if counts[data.id]>1:unavailable.append({"folder":candidate.folder.get_file(),"reason":"Duplicate ID: "+data.id});continue
@@ -154,7 +170,12 @@ static func discover(directory: String="") -> void:
 		entries.append(vehicle)
 	for file in DirAccess.get_files_at(root):
 		if file.get_extension().to_lower()=="glb":pending.append(root.path_join(file))
-	entries.sort_custom(func(a,b):return String(a.id)<String(b.id))
+	var order:=LeoDefaultRoster.ids()
+	entries.sort_custom(func(a,b):
+		var ai:=order.find(String(a.id));var bi:=order.find(String(b.id))
+		if ai<0:ai=order.size()
+		if bi<0:bi=order.size()
+		return ai<bi if ai!=bi else String(a.id)<String(b.id))
 
 static func official(data: Dictionary, folder: String) -> bool:
 	var path:="res://assets/config/official-vehicles.json"
@@ -162,6 +183,6 @@ static func official(data: Dictionary, folder: String) -> bool:
 	var registry: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(path))
 	var expected: Dictionary=registry.get(String(data.id),{})
 	var definition_hash:=FileAccess.get_file_as_string(folder.path_join("vehicle.json")).replace("\r\n","\n").sha256_text()
-	var model_hash:=FileAccess.get_sha256(folder.path_join(String(data.model)))
+	var model_hash:=FileAccess.get_sha256(folder.path_join(String(data.pack if int(data.get("vehicle_api",1))==2 else data.model)))
 	fingerprint_details[String(data.id)]={"registry_found":true,"trusted_id":not expected.is_empty(),"definition_match":expected.get("definition")==definition_hash,"model_match":expected.get("model")==model_hash,"definition_sha256":definition_hash,"model_sha256":model_hash}
 	return not expected.is_empty() and expected.get("definition")==definition_hash and expected.get("model")==model_hash

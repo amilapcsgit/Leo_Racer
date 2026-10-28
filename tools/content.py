@@ -4,6 +4,8 @@ import argparse, hashlib, json, shutil, struct, zipfile, subprocess, re
 
 ROOT = Path(__file__).resolve().parents[1]
 DEV = ('bigster', 'duster')
+RUNTIME = ROOT/'build/runtime260/GameAssets/vehicles'
+def roster_ids():return [row['id'] for row in read(ROOT/'assets/config/default-roster-v1.json')['vehicles']]
 
 def read(path):
     return json.loads(Path(path).read_text(encoding='utf-8-sig'))
@@ -33,15 +35,29 @@ def relative_file(folder, name):
 
 def vehicle(key, destination, source_folder=None):
     assert re.fullmatch(r'[a-z0-9][a-z0-9_.-]{0,63}',key)
+    if source_folder is None and key in roster_ids():
+        assert (RUNTIME/key/'vehicle.json').is_file(),'Compile the 2.6 default roster first: tools/compile_roster260.py'
+        source_folder=RUNTIME/key
     if source_folder:
         source_folder=Path(source_folder).resolve();data=read(source_folder/'vehicle.json')
-        assert data.get('id')==key and data.get('format')==1 and data.get('vehicle_api')==1
-        model_document(relative_file(source_folder,data.get('model','model.glb')))
+        assert data.get('id')==key and data.get('format')==1 and data.get('vehicle_api') in [1,2]
+        if data['vehicle_api']==2:
+            pack=relative_file(source_folder,data.get('pack',''))
+            assert pack.suffix=='.pck' and pack.is_file() and sha(pack)==data.get('pack_sha256'),'Invalid compiled pack checksum'
+            import city_packs
+            _, entries=city_packs.read_pack(pack)
+            prefix='leo_vehicles/'+key+'/'
+            assert entries and all(name.removeprefix('res://').startswith(prefix) and '..' not in name.split('/') for name in entries),'Compiled pack namespace conflict'
+            assert data.get('model_scene','').removeprefix('res://') in {name.removeprefix('res://') for name in entries},'Missing compiled scene'
+            names=['vehicle.json',data['pack']]
+        else:
+            model_document(relative_file(source_folder,data.get('model','model.glb')))
+            names=['vehicle.json',data.get('model','model.glb')]
+        # Preserve paint masks, presets and attribution, while leaving authoring
+        # masters and compiler intermediates outside the runtime content ZIP.
+        names += [p.relative_to(source_folder).as_posix() for p in source_folder.rglob('*') if p.is_file() and p.suffix.lower() in ['.png','.jpg','.webp','.svg','.json','.txt','.md'] and p.name!='vehicle.json' and '.godot' not in p.parts]
+        names=list(dict.fromkeys(names))
         folder=Path(destination)/key;folder.mkdir(parents=True,exist_ok=True)
-        names=['vehicle.json',data.get('model','model.glb')]
-        names += [n for n in [data.get('thumbnail','thumbnail.png'),'LICENSE.txt','conversion-report.json','feature-authoring.json','optimized-textures.json'] if (source_folder/n).is_file()]
-        if 'optimized-textures.json' in names:
-            names += [entry['file'] for entry in read(source_folder/'optimized-textures.json').get('textures',[])]
         for name in names:
             original=relative_file(source_folder,name);target=relative_file(folder,name);target.parent.mkdir(parents=True,exist_ok=True)
             if original.resolve()!=target.resolve():shutil.copy2(original,target)
@@ -64,7 +80,12 @@ def vehicle(key, destination, source_folder=None):
 
 def registry():
     result = {}
+    for key in roster_ids():
+        folder=RUNTIME/key;data=read(folder/'vehicle.json')
+        assert data['vehicle_api']==2 and sha(folder/data['pack'])==data['pack_sha256']
+        result[key]={'definition':hashlib.sha256((folder/'vehicle.json').read_text(encoding='utf-8').replace('\r\n','\n').encode()).hexdigest(),'model':data['pack_sha256']}
     for key, source in read(ROOT/'content/vehicle-sources.json').items():
+        if key in result:continue
         text=(ROOT/'content/vehicles'/key/'vehicle.json').read_text(encoding='utf-8')
         result[key] = {'definition': hashlib.sha256(text.encode()).hexdigest(),
                        'model': sha(ROOT/source['model'].removeprefix('res://'))}
@@ -106,7 +127,7 @@ def distribution(core_folder, profile, output, version):
     assert (core_folder/'GameAssets/catalog.json').exists(),'Build the core cache once first'
     desired=file_map(core_folder)
     desired.pop('asset-sizes.json',None)
-    keys=DEV if profile=='dev' else read(ROOT/'content/vehicle-sources.json').keys()
+    keys=DEV if profile=='dev' else roster_ids()
     for key in keys:
         folder=vehicle(key,ROOT/'build/content-vehicles')
         for name,p in file_map(folder).items():desired['GameAssets/vehicles/'+key+'/'+name]=p
@@ -128,7 +149,7 @@ def distribution(core_folder, profile, output, version):
       'Content > Vehicles discovers folders and standalone GLBs in GameAssets/vehicles.\n'
       'Import GLB opens the offline Vehicle Workshop in a separate window. Confirm orientation and four wheels, preview/test, then Install.\n'
       'Vehicle Workshop.cmd also launches the companion directly. No extra engine/editor installation is needed.\n'
-      'Mesh/texture caches are disposable files in Godot user data; authoritative GLBs stay loose.\n'
+      'Official vehicles use namespaced Vehicle API 2 PCKs; Vehicle API 1 loose add-ons remain supported.\n'
       'Install compatible track folders in GameAssets/tracks while the game is closed.\n'
       'Existing controls/settings/rankings are preserved. Custom content cannot set official records.\n'
       +('Development build. ' if development else 'Release build. ')+'Vehicles: '+', '.join(keys)+'.\n'
@@ -158,6 +179,9 @@ def sdk():
            if p.is_file() and not any(part in ['.godot','exported','.gdignore'] for part in p.relative_to(ROOT/'sdk').parts)}
     for p in (ROOT/'content/schemas').glob('*.json'):files['schemas/'+p.name]=p
     files['vehicle-tools/optimize_vehicle.gd']=ROOT/'tools/optimize_vehicle.gd'
+    files['vehicle-tools/compile_vehicle260.gd']=ROOT/'tools/compile_vehicle260.gd'
+    for name in ['scripts/content/vehicle_importer.gd','scripts/catalog/vehicle_finish.gd','scripts/catalog/vehicle_surface_profile.gd','assets/materials/automotive_paint.tres','assets/materials/automotive_glass.tres','assets/config/vehicle-material-repairs-v1.json']:
+        files['vehicle-tools/'+name]=ROOT/name
     files['LICENSE']=ROOT/'LICENSE'
     result=zip_files(files,ROOT/'dist/LeoRacer-Contributor-SDK.zip',prefix='LeoRacer-SDK/')
     print('CONTRIBUTOR_SDK_BUILT',result.name)
@@ -176,7 +200,7 @@ def main():
     args=parser.parse_args()
     if args.target=='registry':print('OFFICIAL_VEHICLES',len(registry()));return
     if args.target=='stage':
-        keys=DEV if args.profile=='dev' else read(ROOT/'content/vehicle-sources.json').keys()
+        keys=DEV if args.profile=='dev' else roster_ids()
         for key in keys:vehicle(key,args.output/'vehicles')
         print(json.dumps({'status':'PASS','profile':args.profile,'vehicles':list(keys),'core_export_invoked':False}))
     elif args.target=='vehicle':

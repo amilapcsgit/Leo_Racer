@@ -25,7 +25,7 @@ static func apply_node(node: GeometryInstance3D, world: Node3D) -> void:
 	# Streamed cells retire independently, so long sessions do not accumulate
 	# materials for cells which have already left the world.
 	var retained: Array=[]
-	var tree:=node.get_tree()
+	var tree:=world.get_tree()
 	node.tree_exiting.connect(func():retire_materials(retained,tree))
 	var plant_assets: Array=["res://assets/models/colombo/shade_tree_0.res","res://assets/models/colombo/shade_tree_1.res","res://assets/models/colombo/shade_tree_2.res","res://assets/models/colombo/bush_common.glb","res://shared/landmarks/forest.glb"]
 	var plant:=String(node.get_meta("shared_asset","")) in plant_assets

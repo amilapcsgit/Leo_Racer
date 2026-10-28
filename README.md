@@ -1,3 +1,5 @@
+> **2.6 preview branch:** This branch adds the 21-car compiled roster, streamed garage, the 2014 and 2024 Dusters, dynamic race lighting and presentation polish. The public 2.5 downloads below remain the stable release. Local preview artifacts are prepared separately; no public 2.6 release is published. See [2.6 notes](docs/RELEASE_NOTES_260.md), [validation](docs/QUALITY260.md), and [Vehicle API 2 SDK](sdk/README.md).
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/astra/leo_road_crest.png" alt="Leo Racer lion and lotus racing crest" width="96">
 </p>
