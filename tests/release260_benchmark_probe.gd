@@ -32,6 +32,15 @@ func run() -> void:
 			game.human_count=humans;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"duster"
 			var start:=Time.get_ticks_msec();await game.start_race();var load_ms:=Time.get_ticks_msec()-start
 			game.state="race"
+			# Diagnostic switches isolate presentation costs without changing handling.
+			if "--qa-hide-hud" in OS.get_cmdline_user_args():
+				for instrument in game.hud.find_children("*","LeoRaceInstruments",true,false):instrument.hide();instrument.set_process(false)
+				if game.split_view:
+					for instrument in game.split_view.overlays:instrument.hide();instrument.set_process(false)
+			if "--qa-hide-streets" in OS.get_cmdline_user_args():
+				for light in game.race_environment.illumination.pool:light.hide()
+			if "--qa-static-hud" in OS.get_cmdline_user_args():
+				for instrument in game.split_view.overlays:instrument.set_process(false)
 			if humans==1:
 				for car in game.karts:car.set_physics_process(false)
 				var local: LeoLocalPlayer=game.local_players[0]
@@ -47,18 +56,29 @@ func run() -> void:
 			for kart in game.karts:kart.active=true;kart.auto_drive=true
 			if humans==2:game.karts[1].place(game.circuit.length*.5,3.)
 			await get_tree().create_timer(6.,true,false,true).timeout
+			var measured: Array[RID]=[root.get_viewport_rid()]
+			if humans==2:
+				for viewport in game.split_view.views:measured.append(viewport.get_viewport_rid())
+			if "--qa-gpu" in OS.get_cmdline_user_args():
+				for rid in measured:RenderingServer.viewport_set_measure_render_time(rid,true)
+			var viewport_gpu:=0.;var viewport_cpu:=0.
 			var cpu_process:=0.;var cpu_physics:=0.;var draws:=0.;var primitives:=0.
 			var frames: Array[float]=[];var last:=Time.get_ticks_usec();var began:=last
-			while Time.get_ticks_usec()-began<30000000:
+			while Time.get_ticks_usec()-began<(10000000 if "--qa-short" in OS.get_cmdline_user_args() else 30000000):
 				await get_tree().process_frame
 				var now:=Time.get_ticks_usec();frames.append((now-last)/1000.);last=now
 				cpu_process+=Performance.get_monitor(Performance.TIME_PROCESS)*1000.;cpu_physics+=Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS)*1000.
+				if "--qa-gpu" in OS.get_cmdline_user_args():
+					for rid in measured:
+						viewport_gpu+=RenderingServer.viewport_get_measured_render_time_gpu(rid);viewport_cpu+=RenderingServer.viewport_get_measured_render_time_cpu(rid)
 				draws+=Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME);primitives+=Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)
 			FileAccess.open(output.path_join("frame-times-"+track+"-"+str(humans)+".json"),FileAccess.WRITE).store_string(JSON.stringify(frames))
 			frames.sort()
 			var result:={"track":track,"humans":humans,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"resolution":[1920,1080],"warmup_seconds":6,"sample_seconds":30,"p50_ms":frames[int(frames.size()*.5)],"p95_ms":frames[int(frames.size()*.95)],"p99_ms":frames[int(frames.size()*.99)],"max_frame_ms":frames[-1],"load_ms":load_ms,"static_memory_bytes":OS.get_static_memory_usage(),"peak_static_memory_bytes":OS.get_static_memory_peak_usage(),"video_memory_bytes":Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)}
 			result.cpu_process_mean_ms=cpu_process/frames.size();result.cpu_physics_mean_ms=cpu_physics/frames.size();result.draw_calls_mean=draws/frames.size();result.primitives_mean=primitives/frames.size()
+			result.viewport_gpu_ms=viewport_gpu/frames.size();result.viewport_cpu_ms=viewport_cpu/frames.size()
 			result.vehicles=game.karts.map(func(car):return car.vehicle_key)
+			result.hud_profile=game.split_view.overlays.map(func(item):return {"mean_usec":float(item.profile_usec)/maxi(1,item.profile_frames),"cache_updates":item.background_updates}) if humans==2 else []
 			rows.append(result);print("QUALITY26_PERFORMANCE ",JSON.stringify(result))
 			FileAccess.open(output.path_join("performance.json"),FileAccess.WRITE).store_string(JSON.stringify(rows,"  "))
 			game.return_menu()

@@ -8,7 +8,8 @@
     "reflection_stations": [
       0.04,
       0.46
-    ]
+    ],
+    "road_albedo_gain": 0.54
   },
   "colombo_city": {
     "exposure": 0.83,
@@ -19,7 +20,8 @@
     "reflection_stations": [
       0.08,
       0.61
-    ]
+    ],
+    "road_albedo_gain": 0.54
   },
   "astra_coast": {
     "exposure": 0.82,
@@ -30,6 +32,7 @@
     "reflection_stations": [
       0.05,
       0.58
-    ]
+    ],
+    "road_albedo_gain": 0.43
   }
 }

@@ -41,19 +41,25 @@ static func finish_body(root: Node3D,vehicle: VehicleDefinition) -> void:
 static func assemble_async(vehicle: VehicleDefinition,racer: DriverDefinition,tree: SceneTree,current: Callable,preview_scene: PackedScene=null) -> Node3D:
 	if not current.is_valid() or not current.call():return null
 	vehicle=LeoVehiclePresentation.resolve(vehicle)
+	await LeoPreparationBudget.checkpoint(tree)
 	var started:=Time.get_ticks_usec()
 	var root:=Node3D.new();root.name="VehicleAssembly"
 	root.set_meta("vehicle_id",vehicle.id);root.set_meta("driver_id",racer.id)
 	var body: Node3D=(preview_scene if preview_scene else vehicle.model).instantiate();body.name="Chassis"
 	body.transform=vehicle.normalization*body.transform;root.add_child(body)
+	LeoPreparationBudget.record(started)
 	LeoPreviewStream.timings.append({"vehicle":String(vehicle.id),"stage":"instantiate","ms":(Time.get_ticks_usec()-started)/1000.})
 	await tree.process_frame
 	if not current.is_valid() or not current.call():root.free();return null
+	await LeoPreparationBudget.checkpoint(tree)
 	started=Time.get_ticks_usec();attach_driver(root,vehicle,racer)
+	LeoPreparationBudget.record(started)
 	LeoPreviewStream.timings.append({"vehicle":String(vehicle.id),"stage":"driver","ms":(Time.get_ticks_usec()-started)/1000.})
 	await tree.process_frame
 	if not current.is_valid() or not current.call():root.free();return null
+	await LeoPreparationBudget.checkpoint(tree)
 	started=Time.get_ticks_usec();finish_body(root,vehicle)
+	LeoPreparationBudget.record(started)
 	LeoPreviewStream.timings.append({"vehicle":String(vehicle.id),"stage":"materials","ms":(Time.get_ticks_usec()-started)/1000.})
 	return root
 

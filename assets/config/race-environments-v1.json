@@ -5,56 +5,100 @@
     "night_top": "0b122b",
     "night_horizon": "293e63",
     "sun_yaw": -145,
-    "night_lights": [
-      {
-        "fraction": 0.06,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.12,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.31,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.48,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.67,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.85,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      }
-    ]
+    "transition_seconds": 1.5,
+    "night_sun_energy": 0.055,
+    "night_ambient_energy": 0.25,
+    "fixture_data": "",
+    "street_lights": {
+      "compatibility": [
+        8,
+        16,
+        16
+      ],
+      "forward_plus": [
+        12,
+        24,
+        32
+      ],
+      "range": 20,
+      "angle": 30,
+      "fade_begin": 65,
+      "fade_end": 95,
+      "shadow_enabled": false,
+      "color": "ffdeb0",
+      "energy": 3.4
+    },
+    "landmark_led": {
+      "period_seconds": 12,
+      "stem": "53d9d5",
+      "petals": "ff19b6",
+      "antenna": "ffce65",
+      "reduced_motion": "static",
+      "materials": [
+        {
+          "name": "Petals",
+          "color": "ff19b6",
+          "pattern": 1
+        },
+        {
+          "name": "Petal_interior",
+          "color": "ff19b6",
+          "pattern": 1
+        },
+        {
+          "name": "Stem1",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Stem2",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Top_light_blue",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Material.004",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Material.001",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Antenna",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Spire",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Yellow",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Gold",
+          "color": "ffce65",
+          "pattern": 0
+        }
+      ]
+    },
+    "night_ambient_color": "526785",
+    "night_sun_pitch": 8,
+    "emission": {
+      "lamp_color": "fff0c9",
+      "lamp_energy": 1.8,
+      "billboard_energy": 1.2
+    }
   },
   "colombo_city": {
     "dusk_top": "686e96",
@@ -62,56 +106,43 @@
     "night_top": "101b34",
     "night_horizon": "37486b",
     "sun_yaw": -112,
-    "night_lights": [
-      {
-        "fraction": 0.04,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.18,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.33,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.52,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.71,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.9,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      }
-    ]
+    "transition_seconds": 1.5,
+    "night_sun_energy": 0.22,
+    "night_ambient_energy": 0.34,
+    "fixture_data": "illumination.json",
+    "street_lights": {
+      "compatibility": [
+        8,
+        16,
+        16
+      ],
+      "forward_plus": [
+        12,
+        24,
+        32
+      ],
+      "range": 20,
+      "angle": 30,
+      "fade_begin": 65,
+      "fade_end": 95,
+      "shadow_enabled": false,
+      "color": "ffdeb0",
+      "energy": 3.4
+    },
+    "landmark_led": {
+      "period_seconds": 12,
+      "stem": "53d9d5",
+      "petals": "ff19b6",
+      "antenna": "ffce65",
+      "reduced_motion": "static"
+    },
+    "night_ambient_color": "98a9be",
+    "night_sun_pitch": -38,
+    "emission": {
+      "lamp_color": "fff0c9",
+      "lamp_energy": 1.8,
+      "billboard_energy": 1.2
+    }
   },
   "kandy_lake": {
     "dusk_top": "63738c",
@@ -120,55 +151,42 @@
     "night_horizon": "30475d",
     "sun_yaw": -155,
     "neutral_manifest": "res://leo_environments/kandy_lake/manifest.json",
-    "night_lights": [
-      {
-        "fraction": 0.025,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.12,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.29,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.47,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.63,
-        "offset": 8.0,
-        "height": 5.0,
-        "color": "ffd5a5",
-        "energy": 2.1,
-        "range": 22.0
-      },
-      {
-        "fraction": 0.83,
-        "offset": -8.0,
-        "height": 5.0,
-        "color": "b8d7f7",
-        "energy": 2.1,
-        "range": 22.0
-      }
-    ]
+    "transition_seconds": 1.5,
+    "night_sun_energy": 0.22,
+    "night_ambient_energy": 0.34,
+    "fixture_data": "illumination.json",
+    "street_lights": {
+      "compatibility": [
+        8,
+        16,
+        16
+      ],
+      "forward_plus": [
+        12,
+        24,
+        32
+      ],
+      "range": 20,
+      "angle": 30,
+      "fade_begin": 65,
+      "fade_end": 95,
+      "shadow_enabled": false,
+      "color": "ffdeb0",
+      "energy": 3.4
+    },
+    "landmark_led": {
+      "period_seconds": 12,
+      "stem": "53d9d5",
+      "petals": "ff19b6",
+      "antenna": "ffce65",
+      "reduced_motion": "static"
+    },
+    "night_ambient_color": "98a9be",
+    "night_sun_pitch": -38,
+    "emission": {
+      "lamp_color": "fff0c9",
+      "lamp_energy": 1.8,
+      "billboard_energy": 1.2
+    }
   }
 }

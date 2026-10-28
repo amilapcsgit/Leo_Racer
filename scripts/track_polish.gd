@@ -47,6 +47,9 @@ static func apply_node(node: GeometryInstance3D, world: Node3D) -> void:
 			material=old.duplicate() as ShaderMaterial
 			material.shader=preload("res://shaders/road_premium.gdshader")
 			material.set_shader_parameter("base_roughness",float(profile.get("road_roughness",.7)))
+			material.set_shader_parameter("base_albedo_gain",float(profile.get("road_albedo_gain",.43)))
+		elif old.shader.code.contains("uv=world.xz/1.5") and old.shader.code.contains("color_map"):
+			material=old.duplicate() as ShaderMaterial;material.shader=preload("res://shaders/city_road.gdshader")
 		elif String(node.get_meta("surface_role","")) in ["terrain_verge","terrain_detail","terrain_backdrop"]:
 			material=old.duplicate() as ShaderMaterial;material.shader=preload("res://shaders/ground_premium.gdshader")
 		elif String(node.get_meta("surface_role",""))=="water" or node.name=="KandyLakeColomboWater":

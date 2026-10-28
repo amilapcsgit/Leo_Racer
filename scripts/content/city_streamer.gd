@@ -33,6 +33,15 @@ func anchors() -> Array[Vector3]:
 			var camera: Camera3D=game.local_players[slot].camera
 			if is_instance_valid(camera):result.append(camera.global_position)
 	return result
+func priority(center: Vector3) -> float:
+	var score:=INF
+	for slot in game.human_count:
+		var local: LeoLocalPlayer=game.local_players[slot]
+		if not is_instance_valid(local.kart):continue
+		var kart: LeoKart=local.kart
+		var future:=kart.global_position+kart.velocity*4.
+		score=minf(score,minf(center.distance_to(kart.global_position),center.distance_to(future)*.8))
+	return score
 
 func wanted(center: Vector3, distance: float, positions: Array[Vector3]) -> bool:
 	for position in positions:
@@ -48,7 +57,9 @@ func refresh(initial: bool = false) -> void:
 	if busy or halted:return
 	busy=true
 	var positions:=anchors()
-	for cell in cells:
+	var ordered:=cells.duplicate()
+	ordered.sort_custom(func(a,b):return priority(Vector3(a.center[0],0,a.center[1]))<priority(Vector3(b.center[0],0,b.center[1])))
+	for cell in ordered:
 		if halted:break
 		var id:=String(cell.id);var center:=Vector3(float(cell.center[0]),0,float(cell.center[1]))
 		if loaded.has(id):
@@ -62,7 +73,17 @@ func refresh(initial: bool = false) -> void:
 			if not is_inside_tree():return
 			# Cameras can move while a resource is loading.
 			if scene and not halted and (initial or wanted(center,load_radius,anchors())):
-				var node:=scene.instantiate();load("res://scripts/content/scene_instances.gd").restore(node);LeoAssets.apply_overrides(node);add_child(node);loaded[id]=node;stats.loads+=1
+				await LeoPreparationBudget.checkpoint(get_tree())
+				var began:=Time.get_ticks_usec();var node:=scene.instantiate();LeoPreparationBudget.record(began)
+				await LeoPreparationBudget.checkpoint(get_tree())
+				var pending: Array[Node]=[node]
+				while not pending.is_empty() and not halted:
+					await LeoPreparationBudget.checkpoint(get_tree())
+					var item: Node=pending.pop_back();pending.append_array(item.get_children())
+					began=Time.get_ticks_usec();LeoSceneInstances.restore_one(item);LeoAssets.apply_overrides(item,false);LeoPreparationBudget.record(began)
+				if halted:node.free();break
+				await LeoPreparationBudget.checkpoint(get_tree())
+				began=Time.get_ticks_usec();add_child(node);LeoPreparationBudget.record(began);loaded[id]=node;stats.loads+=1
 				stats.peak_cells=maxi(stats.peak_cells,loaded.size())
 				await get_tree().process_frame
 	busy=false

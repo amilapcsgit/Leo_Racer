@@ -5,16 +5,25 @@ import city_packs
 R=Path(__file__).resolve().parents[1];Q=R/'build/qa260';Q.mkdir(exist_ok=True)
 ENGINE=R.parent.parent/'tools/godot-net/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe'
 def dump(p,v):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(v,indent=2)+'\n',encoding='utf-8')
-def run(label,script,compat=False,extra=(),exe=None,vehicles=None):
+def run(label,script,compat=False,extra=(),exe=None,vehicles=None,tracks=None):
  out=Q/label;out.mkdir(exist_ok=True);profile=out/'profile';profile.mkdir(exist_ok=True)
  env=dict(os.environ,APPDATA=str(profile),LOCALAPPDATA=str(profile),DOTNET_ROOT=str(R.parent.parent/'tools/dotnet'))
  env['PATH']=env['DOTNET_ROOT']+os.pathsep+env['PATH']
  command=[str(exe or ENGINE)]
  if not exe:command+=['--path',str(R),'--script',script]
  if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
- command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(vehicles or R/'build/runtime260/GameAssets/vehicles'),'--tracks='+str(R/'build/preview260/GameAssets/tracks'),'--qa-output='+str(out),*extra]
+ command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(vehicles or R/'build/runtime260/GameAssets/vehicles'),'--tracks='+str(tracks or R/'build/preview260/GameAssets/tracks'),'--qa-output='+str(out),*extra]
+ controlled=os.name=='nt' and env.get('LEO_CONTROLLED_PERF')=='1'
+ context={'normal_priority_requested':controlled,'execution_speed_throttling_disabled':False}
  with (out/'process.log').open('w',encoding='utf-8') as log:
-  process=subprocess.Popen(command,cwd=exe.parent if exe else R,env=env,stdout=log,stderr=subprocess.STDOUT)
+  process=subprocess.Popen(command,cwd=exe.parent if exe else R,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.NORMAL_PRIORITY_CLASS if controlled else 0)
+  if controlled:
+   import ctypes
+   from ctypes import wintypes
+   class PowerState(ctypes.Structure):_fields_=[('Version',wintypes.ULONG),('ControlMask',wintypes.ULONG),('StateMask',wintypes.ULONG)]
+   state=PowerState(1,1,0);kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+   kernel.SetProcessInformation.argtypes=[wintypes.HANDLE,ctypes.c_int,ctypes.c_void_p,wintypes.DWORD]
+   context['execution_speed_throttling_disabled']=bool(kernel.SetProcessInformation(int(process._handle),4,ctypes.byref(state),ctypes.sizeof(state)))
   began=time.monotonic()
   while process.poll() is None:
    time.sleep(.5)
@@ -28,7 +37,7 @@ def run(label,script,compat=False,extra=(),exe=None,vehicles=None):
  text=(out/'process.log').read_text(encoding='utf-8',errors='replace')
  errors=[line for line in text.splitlines() if any(term in line for term in ['SCRIPT ERROR','Parse Error','Shader compilation failed','Parameter "tex" is null'])]
  warnings=[line for line in text.splitlines() if any(term in line for term in ['leaked','resources still in use','Pages in use'])]
- dump(out/'process.json',{'exit':result.returncode,'errors':errors,'shutdown_warnings':warnings})
+ dump(out/'process.json',{'exit':result.returncode,'errors':errors,'shutdown_warnings':warnings,'execution_context':context})
  assert result.returncode==0 and not errors,(label,result.returncode,errors[:3])
  print('QA260_COMPLETE',label,flush=True)
  return out

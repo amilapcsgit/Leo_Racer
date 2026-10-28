@@ -29,7 +29,7 @@ var local_lobby: LeoLocalLobby
 var garage_selector: ModularCarSelector
 var frontend: LeoFrontend
 var ui_effects: LeoUIEffects
-var unified_hud: LeoPlayerHUD
+var unified_hud: LeoRaceInstruments
 var binding_hints: Array[Label]=[]
 const HINT_ACTIONS=["drift","boost","recover","horn","pause_race"]
 var last_ready := true
@@ -174,9 +174,7 @@ func prepare_garage() -> void:
 	add_child(garage_selector)
 	# Prepare the persistent UI and podium pipelines behind the loading screen.
 	for frame in 3:await get_tree().process_frame
-	preload("res://scripts/content/boot_trace.gd").mark("garage_shader_warmup_begin")
-	await garage_selector.prewarm_materials()
-	preload("res://scripts/content/boot_trace.gd").mark("garage_shader_warmup_complete")
+
 	garage_selector.hide();garage_selector.warm_only=false
 
 func show_garage(_focus_group: String = "driver") -> void:
@@ -202,8 +200,8 @@ func show_garage(_focus_group: String = "driver") -> void:
 	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining;garage_selector.player_slot=game.selected_player_slot if from_lobby or retaining else -1
 	garage_selector.input_device=-2
 	garage_selector.name_field.text=local.player_name
-	garage_selector.show();garage_selector.set_selection(local.driver_id,local.vehicle_id)
-	garage_selector.race_button.text="Keep Racing" if retaining else "Use This Ride" if from_lobby else "Back" if from_home else "Use This Ride"
+	garage_selector.home_preview=false;garage_selector.show();garage_selector.set_selection(local.driver_id,local.vehicle_id)
+	garage_selector.race_button.text="Keep Racing" if retaining else "Use This Ride"
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
 		game.preview=garage_selector.assembly
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
@@ -241,68 +239,13 @@ func close_settings() -> void:
 	frontend.close_modal()
 
 func show_race() -> void:
-	frontend.close_modal(false)
-	binding_hints.clear()
-	scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
+	unified_hud=null
+	frontend.close_modal(false);scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
 	game.input_router.gameplay_enabled=true;game.input_router.assignment_locked=true;game.input_router.clear_all()
-	if game.human_count==2:hud_root.hide();return
-	hud_root.show()
-	display_speed=0.;display_nitro=1.;announcement="";announcement_time=0.;ready_flash=0.;last_ready=true;last_drift_charged=false
-	labels.position = text_at(hud_root, Vector2(65, 46), Vector2(170, 80), "1", 76, accent, true)
-	labels.position.add_theme_constant_override("outline_size",1)
-	labels.position.add_theme_color_override("font_outline_color",Color("d4af37"))
-	text_at(hud_root, Vector2(142, 88), Vector2(140, 35), "/ 6", 27, Color.WHITE, true)
-	text_at(hud_root, Vector2(68, 133), Vector2(180, 25), "POSITION", 16, muted, true)
-	labels.lap = text_at(hud_root,Vector2(325,48),Vector2(200,52),"1 / 3",42,accent,true)
-	labels.timer = text_at(hud_root,Vector2(325,106),Vector2(215,30),"00:00.000",21,Color.WHITE)
-	text_at(hud_root,Vector2(326,140),Vector2(180,25),"LAP // RACE TIME",14,muted,true)
-	text_at(hud_root,Vector2(590,36),Vector2(575,35),game.track_definition.display_name.to_upper(),21,Color("bce7e7"),true)
-	labels.sector = text_at(hud_root,Vector2(755,77),Vector2(400,28),"COASTAL PROMENADE",16,gold,true)
-	labels.progress = text_at(hud_root,Vector2(595,106),Vector2(270,25),"LAP PROGRESS  0%",14,muted,true)
-	labels.corner = text_at(hud_root,Vector2(858,106),Vector2(300,25),"",14,accent,true)
-	labels.corner.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	text_at(hud_root,Vector2(1282,51),Vector2(280,55),"LEO RACER",37,Color("e7f5f7"),true)
-	var lion := TextureRect.new()
-	lion.texture = load("res://assets/art/neon_lion.svg")
-	lion.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	lion.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	lion.position = Vector2(1207,44)
-	lion.size = Vector2(64,64)
-	lion.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	hud_root.add_child(lion)
-	labels.speed = text_at(hud_root,Vector2(1293,663),Vector2(220,110),"000",91,Color("c3fcff"),true)
-	labels.speed.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	labels.speed.add_theme_constant_override("shadow_outline_size",4)
-	labels.speed.add_theme_color_override("font_shadow_color",Color(0,.8,.9,.24))
-	text_at(hud_root,Vector2(1370,773),Vector2(110,27),"KM/H",18,muted,true)
-	labels.nitro = text_at(hud_root,Vector2(1198,854),Vector2(160,25),"NITRO READY",17,Color("69e9b2"),true)
-	labels.drift = text_at(hud_root, Vector2(575, 758), Vector2(500, 35), "", 23, accent, true)
-	labels.drift.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var carbon:=ColorRect.new()
-	carbon.position=Vector2(47,840)
-	carbon.size=Vector2(836,36)
-	carbon.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	var carbon_material:=ShaderMaterial.new()
-	carbon_material.shader=load("res://shaders/control_carbon.gdshader")
-	carbon.material=carbon_material
-	hud_root.add_child(carbon)
-	for i in HINT_ACTIONS.size():
-		binding_hints.append(text_at(hud_root,Vector2(59+i*165,842),Vector2(72,28),"",15,accent,true))
-		text_at(hud_root,Vector2(129+i*165,842),Vector2(95,28),["DRIFT","NITRO","RECOVER","HORN","PAUSE"][i],15,Color("dfebf2"),true)
-	nitro_liquid=ColorRect.new()
-	nitro_liquid.position=Vector2(1200,520)
-	nitro_liquid.size=Vector2(400,400)
-	nitro_liquid.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	var liquid:=ShaderMaterial.new()
-	liquid.shader=load("res://shaders/nitro_liquid.gdshader")
-	nitro_liquid.material=liquid
-	hud_root.add_child(nitro_liquid)
-	labels.countdown = text_at(hud_root, Vector2(250, 310), Vector2(1100, 180), "3", 126, gold, true)
-	labels.countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	labels.callout = text_at(hud_root, Vector2(400, 225), Vector2(800, 65), "", 37, gold, true)
-	labels.callout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	labels.launch = text_at(hud_root,Vector2(380,517),Vector2(840,35),"TAP ACCELERATE ON THE FINAL BEAT FOR A LAUNCH BOOST",20,accent,true)
-	labels.launch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hud_root.visible=game.human_count==1
+	if game.human_count==1:
+		var instruments:=LeoRaceInstruments.new();instruments.game=game;instruments.slot=0;hud_root.add_child(instruments)
+		unified_hud=instruments;labels=instruments.labels;binding_hints=instruments.binding_hints;nitro_liquid=instruments.nitro_liquid
 	queue_redraw()
 
 func announce(words: String, duration: float = 1.8) -> void:
@@ -318,6 +261,8 @@ func show_results() -> void:
 	frontend.show_results()
 
 func _process(dt: float) -> void:
+	if scene_mode=="race":
+		hud_root.visible=game.human_count==1 and not photo_mode;speed_overlay.hide();return
 	if scene_mode=="race" and game.human_count==2:
 		hud_root.hide();speed_overlay.hide();return
 	var visual_dt := 0.0 if game and game.paused else dt
@@ -403,7 +348,7 @@ static func speed_line_strength(speed_mps: float,boosting: bool,active: bool,red
 	return maxf(1.0 if boosting and speed_mps>8 else 0.0,smoothstep(150.0,180.0,absf(speed_mps)*3.6)*.65)
 
 func _draw() -> void:
-	if scene_mode=="race" and game.human_count==1 and not photo_mode and not labels.is_empty():LeoTelemetry.draw(self)
+	pass
 
 func show_controls(slot: int = 0) -> void:
 	frontend.show_controls(slot)

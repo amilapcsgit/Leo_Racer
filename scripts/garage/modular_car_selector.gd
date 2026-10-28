@@ -33,6 +33,10 @@ var selection_generation := 0
 var loading_preview: TextureRect
 var loading_caption: Label
 var warm_only := false
+var home_preview:=false
+var scheduler: LeoPreviewScheduler
+var vehicle_cards: Dictionary={}
+var vehicle_strip: ScrollContainer
 var driver_caption: Label
 signal preview_ready
 var driver_buttons: Array[Button] = []
@@ -67,13 +71,16 @@ func _ready() -> void:
 	surround.position=Vector2(-2000,0);surround.size=Vector2(5600,900)
 	surround.color=Color("17140f");surround.mouse_filter=MOUSE_FILTER_IGNORE;add_child(surround);move_child(surround,0)
 	var background := TextureRect.new()
-	background.texture=preload("res://assets/ui/art/garage.png")
+	background.texture=preload("res://assets/ui/art/lighting-skyline.png")
 	background.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	background.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.mouse_filter=MOUSE_FILTER_IGNORE
 	add_child(background)
 	move_child(background,1)
+	var dim:=ColorRect.new();dim.color=Color(.015,.025,.04,.48);dim.set_anchors_and_offsets_preset(PRESET_FULL_RECT);dim.mouse_filter=MOUSE_FILTER_IGNORE;add_child(dim);move_child(dim,2)
+	var atmosphere:=LeoBackdropFX.new();atmosphere.art=background;atmosphere.reduced_motion=reduced_motion;add_child(atmosphere)
+	scheduler=LeoPreviewScheduler.new();scheduler.catalog=catalog;add_child(scheduler)
 	build_showroom()
 	build_interface()
 	if not warm_only:set_selection(driver_id,vehicle_id)
@@ -116,43 +123,47 @@ func build_interface() -> void:
 	if ui:return
 	process_mode=Node.PROCESS_MODE_ALWAYS
 	ui=Control.new();ui.set_anchors_and_offsets_preset(PRESET_FULL_RECT);ui.mouse_filter=MOUSE_FILTER_IGNORE;add_child(ui)
-	panel(ui,Rect2(16,20,480,860))
-	positioned_label("COLOMBO MOTOR CLUB",Vector2(40,36),20,cyan)
-	positioned_label("THE PIT SHOP",Vector2(38,72),48)
-	name_field=LineEdit.new();name_field.position=Vector2(40,141);name_field.size=Vector2(432,48);name_field.max_length=32;name_field.text=custom_name;name_field.add_theme_font_size_override("font_size",26);ui.add_child(name_field)
+	positioned_label("COLOMBO MOTOR CLUB / GARAGE",Vector2(32,28),24,cyan)
+	panel(ui,Rect2(24,116,308,524))
+	name_field=LineEdit.new();name_field.position=Vector2(44,136);name_field.size=Vector2(268,44);name_field.max_length=32;name_field.text=custom_name;name_field.add_theme_font_size_override("font_size",22);ui.add_child(name_field)
 	name_field.text_changed.connect(func(value: String):custom_name=value;refresh_labels();name_changed.emit(value))
-	var keys:=button(ui,"Change Name",open_keyboard);keys.position=Vector2(224,201);keys.size=Vector2(248,44)
-	driver_caption=positioned_label(("PLAYER %d · " % (player_slot+1) if player_slot>=0 else "")+"CHOOSE YOUR DRIVER",Vector2(40,260),22,cyan)
-	carousel=LeoDriverCarousel.new();carousel.catalog=catalog;carousel.reduced_motion=reduced_motion;carousel.position=Vector2(40,300);carousel.size=Vector2(432,224);ui.add_child(carousel);carousel.driver_selected.connect(choose_driver);driver_buttons=carousel.cards
-	caption=positioned_label("",Vector2(40,526),22,Color("b9c7d6"));caption.size=Vector2(432,56);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var keys:=button(ui,"Change Name",open_keyboard);keys.position=Vector2(44,188);keys.size=Vector2(268,44)
+	driver_caption=positioned_label("YOUR DRIVER",Vector2(44,250),18,cyan)
+	carousel=LeoDriverCarousel.new();carousel.catalog=catalog;carousel.reduced_motion=reduced_motion;carousel.position=Vector2(36,278);carousel.scale=Vector2.ONE*.66;ui.add_child(carousel);carousel.driver_selected.connect(choose_driver);driver_buttons=carousel.cards
+	caption=positioned_label("",Vector2(44,438),18,Color("b9c7d6"));caption.size=Vector2(268,46);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	for i in 4:
-		var caption_label:=positioned_label("",Vector2(40,604+i*44),21,cream);stat_labels.append(caption_label)
-		var bar: LeoStatBar=load("res://scenes/ui/StatBar.tscn").instantiate();bar.position=Vector2(268,608+i*44);bar.size=Vector2(200,18);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
-	positioned_label("Your combo. Your coast.",Vector2(40,770),22,cyan)
+		var stat:=positioned_label("",Vector2(44,500+i*29),16,cream);stat_labels.append(stat)
+		var bar:=LeoStatBar.new();bar.position=Vector2(203,505+i*29);bar.custom_minimum_size=Vector2(108,10);bar.size=Vector2(108,10);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
+	title=positioned_label("",Vector2(384,27),22,Color("b9c7d6"));title.size=Vector2(990,30)
+	machine=positioned_label("",Vector2(382,59),40,cream);machine.size=Vector2(1000,52);machine.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;machine.clip_text=true
+	counter=positioned_label("",Vector2(1450,66),22,cyan)
+	identity=positioned_label("YOUR RIDE / YOUR COAST",Vector2(384,599),18,cyan)
+	policy=positioned_label("",Vector2(384,126),18);policy.hide()
+	previous_button=button(ui,"‹",func():cycle_vehicle(-1));previous_button.position=Vector2(350,328);previous_button.size=Vector2(48,72)
+	next_button=button(ui,"›",func():cycle_vehicle(1));next_button.position=Vector2(1516,328);next_button.size=Vector2(48,72)
+	stats=positioned_label("",Vector2.ZERO,20);stats.hide()
+	positioned_label("Drag to orbit  ·  Scroll to zoom  ·  LB / RB change ride",Vector2(384,626),17,Color("b9c7d6"))
+	vehicle_strip=ScrollContainer.new();vehicle_strip.position=Vector2(32,674);vehicle_strip.size=Vector2(1536,138);vehicle_strip.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;vehicle_strip.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER;ui.add_child(vehicle_strip)
+	var row:=HBoxContainer.new();row.add_theme_constant_override("separation",12);vehicle_strip.add_child(row)
+	for vehicle in catalog.vehicles:
+		var id: StringName=vehicle.id
+		var card:=Button.new();card.custom_minimum_size=Vector2(209,134);card.toggle_mode=true;card.tooltip_text=vehicle.display_name;row.add_child(card);vehicle_cards[id]=card
+		var normal:=StyleBoxFlat.new();normal.bg_color=Color(.025,.045,.065,.75);normal.border_color=Color(.25,.36,.4,.6);normal.set_border_width_all(1);normal.set_corner_radius_all(5);card.add_theme_stylebox_override("normal",normal)
+		var selected:=normal.duplicate() as StyleBoxFlat;selected.bg_color=Color(.04,.16,.20,.86);selected.border_color=cyan;selected.set_border_width_all(2)
+		for state in ["pressed","hover","focus"]:card.add_theme_stylebox_override(state,selected)
+		add_card_content(card,vehicle.display_name,vehicle.thumbnail,Vector2(196,96),17)
+		card.pressed.connect(func():choose_vehicle(id));card.focus_entered.connect(func():scheduler.hint(id));card.mouse_entered.connect(func():scheduler.hint(id))
+	back_button=button(ui,"Back",func():back_requested.emit());back_button.position=Vector2(32,838);back_button.size=Vector2(176,44)
+	var reset:=button(ui,"Reset View",reset_view);reset.position=Vector2(1090,838);reset.size=Vector2(176,44)
 	race_button=button(ui,"Keep Racing" if race_context else "Use This Ride",func():
 		if race_context:continue_requested.emit(driver_id,vehicle_id)
 		else:race_requested.emit(driver_id,vehicle_id),true)
-	race_button.position=Vector2(40,812);race_button.size=Vector2(432,48)
-	back_button=button(ui,"Back",func():back_requested.emit());back_button.position=Vector2(1328,812);back_button.size=Vector2(224,48)
-	panel(ui,Rect2(536,20,1016,108))
-	title=positioned_label("",Vector2(560,30),38);title.size=Vector2(910,44);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.clip_text=true
-	machine=positioned_label("",Vector2(560,78),28,cyan);machine.size=Vector2(810,40);machine.clip_text=true
-	counter=positioned_label("",Vector2(1450,80),22,cyan)
-	identity=positioned_label("Your ride. Your rules.",Vector2(558,138),20,cream)
-	policy=positioned_label("",Vector2(558,164),20);policy.hide()
-	previous_button=button(ui,"‹",func():cycle_vehicle(-1));previous_button.position=Vector2(540,382);previous_button.size=Vector2(64,112);previous_button.tooltip_text="Previous ride · LB"
-	next_button=button(ui,"›",func():cycle_vehicle(1));next_button.position=Vector2(1488,382);next_button.size=Vector2(64,112);next_button.tooltip_text="Next ride · RB"
-	stats=positioned_label("",Vector2.ZERO,20);stats.hide()
-	positioned_label("Drag to orbit · Scroll to zoom · LB / RB change ride",Vector2(560,772),20,cream)
-	var reset:=button(ui,"Reset View",reset_view);reset.position=Vector2(560,812);reset.size=Vector2(224,48)
-	var all: Array[Control]=[name_field,keys,carousel,carousel.left,carousel.right,previous_button,next_button,reset,race_button,back_button]
-	for i in all.size():
-		all[i].focus_next=all[i].get_path_to(all[(i+1)%all.size()]);all[i].focus_previous=all[i].get_path_to(all[posmod(i-1,all.size())])
-	carousel.focus_neighbor_top=carousel.get_path_to(name_field);carousel.focus_neighbor_bottom=carousel.get_path_to(race_button)
-	carousel.left.focus_neighbor_right=carousel.left.get_path_to(carousel);carousel.right.focus_neighbor_left=carousel.right.get_path_to(carousel)
-	for control in [carousel.left,carousel.right]:control.focus_neighbor_top=control.get_path_to(name_field);control.focus_neighbor_bottom=control.get_path_to(race_button)
-	name_field.focus_neighbor_bottom=name_field.get_path_to(carousel)
-	race_button.focus_neighbor_top=race_button.get_path_to(carousel);race_button.focus_neighbor_right=race_button.get_path_to(back_button)
+	race_button.position=Vector2(1282,838);race_button.size=Vector2(280,44)
+	var controls: Array[Control]=[name_field,keys,carousel,previous_button,next_button,reset,race_button,back_button]
+	for card in vehicle_cards.values():controls.append(card)
+	for i in controls.size():
+		controls[i].focus_next=controls[i].get_path_to(controls[(i+1)%controls.size()]);controls[i].focus_previous=controls[i].get_path_to(controls[posmod(i-1,controls.size())])
+	carousel.focus_neighbor_bottom=carousel.get_path_to(vehicle_cards[vehicle_id]);race_button.focus_neighbor_left=race_button.get_path_to(back_button)
 	build_keyboard()
 
 func refresh_labels() -> void:
@@ -161,9 +172,11 @@ func refresh_labels() -> void:
 	var d:=catalog.driver(driver_id);var v:=catalog.vehicle(vehicle_id)
 	title.text=(d.display_name if custom_name.strip_edges().is_empty() else custom_name.strip_edges()).to_upper()
 	machine.text=v.display_name.to_upper();counter.text="%02d / %02d"%[catalog.vehicle_index(vehicle_id)+1,catalog.vehicles.size()]
-	name_field.placeholder_text="ENTER DRIVER NAME  /  "+d.display_name.to_upper()
+	name_field.placeholder_text=d.display_name
 	identity.text="%d RACERS × %d MACHINES // YOUR COMBO. YOUR COAST."%[catalog.drivers.size(),catalog.vehicles.size()]
 	caption.text=d.tagline
+	for id in vehicle_cards:vehicle_cards[id].set_pressed_no_signal(id==vehicle_id)
+	vehicle_strip.ensure_control_visible(vehicle_cards[vehicle_id])
 	stats.text="TOP SPEED     %03d KM/H\nBOOST SPEED   %03d KM/H\nCORNER GRIP   %.2f\nLAUNCH POWER  %.1f M/S²"%[roundi(float(LeoRaceRules.resolve(v).max_speed)*3.6),roundi(float(LeoRaceRules.resolve(v).boosted_speed)*3.6),float(LeoRaceRules.resolve(v).handling),float(LeoRaceRules.resolve(v).acceleration)]
 	var rules:=LeoRaceRules.resolve(v)
 	var values: Array[float]=[float(rules.max_speed)*3.6,float(rules.boosted_speed)*3.6,float(rules.handling),float(rules.acceleration)]
@@ -179,6 +192,7 @@ func refresh_labels() -> void:
 	carousel.select_id(driver_id)
 
 func cycle_vehicle(direction: int) -> void:
+	scheduler.direction=signi(direction)
 	choose_vehicle(catalog.vehicles[posmod(catalog.vehicle_index(vehicle_id)+direction,catalog.vehicles.size())].id)
 
 func cycle_driver(direction: int) -> void:
@@ -258,18 +272,15 @@ func add_card_content(b: Button, name_text: String, texture: Texture2D, image_si
 	var text := label(box,name_text.to_upper(),fs);text.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;text.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;text.clip_text=true;text.custom_minimum_size.x=0
 
 func valid_selection(generation: int) -> bool:
-	return is_inside_tree() and generation==selection_generation and is_visible_in_tree()
+	return is_inside_tree() and generation==selection_generation and (is_visible_in_tree() or home_preview)
 
-func prefetch_neighbors(generation: int) -> void:
-	var index:=catalog.vehicle_index(vehicle_id)
-	for offset in [-1,1]:
-		if not valid_selection(generation):return
-		var next: VehicleDefinition=catalog.vehicles[posmod(index+offset,catalog.vehicles.size())]
-		await LeoPreviewStream.request(next,get_tree(),func():return valid_selection(generation),false)
+func prefetch_neighbors(_generation: int) -> void:
+	scheduler.anticipate(driver_id,vehicle_id)
 
 func _exit_tree() -> void:selection_generation+=1
 
 func set_selection(d: StringName,v: StringName) -> void:
+	if is_node_ready():viewport.msaa_3d=get_tree().root.msaa_3d
 	var changed:=vehicle_id!=v
 	driver_id=d;vehicle_id=v
 	if not is_node_ready():return
@@ -288,38 +299,28 @@ func set_selection(d: StringName,v: StringName) -> void:
 	refresh_labels()
 	var start_time:=Time.get_ticks_usec()
 	if not loading_preview:
-		loading_preview=TextureRect.new();loading_preview.position=Vector2(620,230);loading_preview.size=Vector2(800,480);loading_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;loading_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;loading_preview.mouse_filter=MOUSE_FILTER_IGNORE;ui.add_child(loading_preview)
-		loading_caption=positioned_label("",Vector2(650,700),22,cyan)
+		loading_preview=TextureRect.new();loading_preview.position=Vector2(480,160);loading_preview.size=Vector2(850,400);loading_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;loading_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;loading_preview.mouse_filter=MOUSE_FILTER_IGNORE;ui.add_child(loading_preview)
+		loading_caption=positioned_label("",Vector2(700,570),22,cyan)
 	loading_preview.texture=car.thumbnail;loading_preview.show();loading_caption.text="Loading your ride…";loading_caption.show();race_button.disabled=true
 	if is_instance_valid(assembly):assembly.hide()
 	var current:=func():return valid_selection(generation)
-	var preview_scene:=await LeoPreviewStream.request(car,get_tree(),current)
-	if not preview_scene:
-		if generation==selection_generation:machine.text="PREVIEW UNAVAILABLE / CHECK GAME ASSETS";loading_caption.text="Preview unavailable"
+	scheduler.suspended=false
+	var prepared:=await scheduler.acquire(d,v,current)
+	if not prepared:
+		if current.call():loading_caption.text="Preview unavailable / check content"
 		return
-	var driver_path:=racer.cabin_model_path if car.driver_policy==VehicleDefinition.DriverPolicy.CABIN else racer.seated_model_path
 	if not current.call():return
-	loading_caption.text="Preparing driver…"
-	if not driver_path.is_empty() and not await LeoAssets.scene_async(driver_path,get_tree()):
-		if generation==selection_generation:machine.text="DRIVER PREVIEW UNAVAILABLE / CHECK GAME ASSETS"
-		return
-	if generation!=selection_generation or not is_inside_tree():return
-	if is_instance_valid(assembly):showroom.remove_child(assembly);assembly.queue_free()
-	loading_caption.text="Preparing materials…"
-	var prepared:=await VehicleAssembler.assemble_async(car,racer,get_tree(),current,preview_scene)
-	if not prepared:return
-	if not current.is_valid() or not current.call():prepared.free();return
+	if is_instance_valid(assembly) and assembly!=prepared:scheduler.park(assembly)
 	assembly=prepared
-	if not assembly:return
-	showroom.add_child(assembly)
-	var presented:=LeoVehiclePresentation.resolve(catalog.vehicle(v))
-	base_distance=presented.preview_distance;target=presented.preview_target
+	if assembly.get_parent()!=showroom:assembly.reparent(showroom)
+	assembly.show()
+	var presented:=LeoVehiclePresentation.resolve(car)
+	base_distance=presented.preview_distance*.65;target=presented.preview_target
 	if changed:reset_view()
 	else:update_camera()
-	var gpu_start:=Time.get_ticks_usec()
 	await get_tree().process_frame
-	if not current.is_valid() or not current.call():return
-	LeoPreviewStream.timings.append({"vehicle":String(v),"stage":"gpu_warm_up","ms":(Time.get_ticks_usec()-gpu_start)/1000.})
+	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
+	if not current.call():return
 	loading_preview.hide();loading_caption.hide();race_button.disabled=false
 	LeoPreviewStream.timings.append({"vehicle":String(v),"stage":"first_visible","ms":(Time.get_ticks_usec()-start_time)/1000.})
 	refresh_labels()
@@ -342,9 +343,9 @@ func update_camera() -> void:
 	camera.look_at(target)
 
 func sync_visibility() -> void:
-	if not is_visible_in_tree():selection_generation+=1
-	viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS if is_visible_in_tree() else SubViewport.UPDATE_DISABLED
-	set_process(is_visible_in_tree());set_process_input(is_visible_in_tree())
+	if not is_visible_in_tree() and not home_preview:selection_generation+=1
+	viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS if is_visible_in_tree() or home_preview else SubViewport.UPDATE_DISABLED
+	set_process(is_visible_in_tree() or home_preview);set_process_input(is_visible_in_tree())
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.position.x>650:
@@ -407,8 +408,10 @@ func prewarm_materials() -> void:
 func build_showroom() -> void:
 	# Match the active viewport so Godot can precompile the same pipeline variants.
 	viewport.msaa_3d=get_tree().root.msaa_3d
-	camera=Camera3D.new();camera.fov=43;camera.current=true;showroom.add_child(camera)
-	var env := WorldEnvironment.new();env.environment=Environment.new();env.environment.background_mode=Environment.BG_COLOR;env.environment.background_color=Color(0,0,0,0);env.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;env.environment.ambient_light_color=Color("c9b69e");env.environment.ambient_light_energy=.7;env.environment.tonemap_mode=Environment.TONE_MAPPER_ACES;showroom.add_child(env)
+	viewport.transparent_bg=false
+	var composite:=ShaderMaterial.new();composite.shader=preload("res://shaders/showroom_composite.gdshader");$SubViewportContainer.material=composite
+	camera=Camera3D.new();camera.fov=36;camera.current=true;showroom.add_child(camera)
+	var env := WorldEnvironment.new();env.environment=Environment.new();env.environment.background_mode=Environment.BG_COLOR;env.environment.background_color=Color("0d1621");env.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;env.environment.ambient_light_color=Color("c5d2de");env.environment.ambient_light_energy=.75;env.environment.tonemap_mode=Environment.TONE_MAPPER_ACES;showroom.add_child(env)
 	var sky := Sky.new()
 	var sky_mat := ProceduralSkyMaterial.new()
 	sky_mat.sky_top_color=Color("718c9b");sky_mat.sky_horizon_color=Color("e8c492")
@@ -416,25 +419,29 @@ func build_showroom() -> void:
 	sky.sky_material=sky_mat
 	env.environment.sky=sky
 	env.environment.reflected_light_source=Environment.REFLECTION_SOURCE_SKY
-	for entry in [[Vector3(-4,6,-4),Color("ffe3b9"),3.2],[Vector3(4,4,1),Color("8ebdcc"),2.1],[Vector3(0,5,4),Color("ffbe76"),2.5]]:
+	for entry in [[Vector3(-4,6,-4),Color("ffe9cc"),4.8],[Vector3(4,4,1),Color("b4d0da"),3.2],[Vector3(0,5,4),Color("ffbe76"),2.5]]:
 		var light := OmniLight3D.new();light.position=entry[0];light.light_color=entry[1];light.light_energy=entry[2];light.omni_range=20;showroom.add_child(light)
-	var podium := MeshInstance3D.new();var cylinder:=CylinderMesh.new();cylinder.top_radius=3.6;cylinder.bottom_radius=3.7;cylinder.height=.32;cylinder.radial_segments=80;podium.mesh=cylinder;podium.position.y=-.19
-	var mat := StandardMaterial3D.new();mat.albedo_color=Color("272625");mat.metallic=.65;mat.roughness=.34;podium.material_override=mat;showroom.add_child(podium)
-	for radius in [3.42,3.62]:
-		var rim:=MeshInstance3D.new();var ring:=TorusMesh.new();ring.inner_radius=radius;ring.outer_radius=radius+.035;rim.mesh=ring;rim.position.y=-.015
-		var metal:=StandardMaterial3D.new();metal.albedo_color=cyan if radius<3.5 else Color("ffc857");metal.metallic=.7;metal.roughness=.28;metal.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;metal.emission_enabled=true;metal.emission=cyan if radius<3.5 else Color("ffc857");metal.emission_energy_multiplier=1.1;ring_materials.append(metal);rim.material_override=metal;showroom.add_child(rim)
-		var halo:=MeshInstance3D.new();var glow_ring:=TorusMesh.new();glow_ring.inner_radius=radius-.06;glow_ring.outer_radius=radius+.10;halo.mesh=glow_ring;halo.position.y=-.035;halo.scale.y=.05
-		var glow:=ShaderMaterial.new();glow.shader=preload("res://shaders/garage_ring_halo.gdshader");glow.set_shader_parameter("tint",metal.emission);halo.material_override=glow;showroom.add_child(halo)
-	for i in 16:
-		var bolt:=MeshInstance3D.new();var mesh:=CylinderMesh.new();mesh.top_radius=.05;mesh.bottom_radius=.05;mesh.height=.04;mesh.radial_segments=6;bolt.mesh=mesh;bolt.material_override=mat;bolt.position=Vector3(sin(i*TAU/16)*3.52,.015,cos(i*TAU/16)*3.52);showroom.add_child(bolt)
+	var floor:=MeshInstance3D.new();var plane:=PlaneMesh.new();plane.size=Vector2(26,26);floor.mesh=plane;floor.position.y=-.025
+	var floor_material:=ShaderMaterial.new();floor_material.shader=preload("res://shaders/showroom_floor.gdshader");floor.material_override=floor_material;showroom.add_child(floor)
+	var mat:=StandardMaterial3D.new();mat.albedo_color=Color("17212b");mat.metallic=.28;mat.roughness=.43
+	var wall:=StandardMaterial3D.new();wall.albedo_color=Color("15232e");wall.roughness=.88
+	var backdrop:=LeoRaceVisuals.mesh_box(showroom,Vector3(40,12,.2),Vector3(0,4.,9),wall);backdrop.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var sign:=Label3D.new();sign.text="COLOMBO MOTOR CLUB";sign.font=font;sign.font_size=64;sign.pixel_size=.004;sign.modulate=Color("98b8ba");sign.position=Vector3(0,3.8,8.85);sign.rotation.y=PI;showroom.add_child(sign)
+	for x in [-4.6,4.6]:
+		LeoRaceVisuals.mesh_box(showroom,Vector3(.18,5.8,.25),Vector3(x,2.9,3.8),mat)
+		var emissive:=StandardMaterial3D.new();emissive.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;emissive.albedo_color=Color("b2e5e7");emissive.emission_enabled=true;emissive.emission=Color("8bcfd9");emissive.emission_energy_multiplier=.8
+		LeoRaceVisuals.mesh_box(showroom,Vector3(.025,4.5,.04),Vector3(x-.10,2.8,3.65),emissive)
+	var line_mat:=StandardMaterial3D.new();line_mat.albedo_color=Color("9aa5a6");line_mat.roughness=.55
+	for x in [-3.1,3.1]:LeoRaceVisuals.mesh_box(showroom,Vector3(.025,.006,7),Vector3(x,-.018,0),line_mat)
+	var sun:=DirectionalLight3D.new();sun.rotation_degrees=Vector3(-55,-30,0);sun.light_energy=.35;sun.shadow_enabled=true;sun.directional_shadow_max_distance=20.;showroom.add_child(sun)
 
 	reset_view()
 
 func pulse_rings() -> void:
 	if ring_tween:ring_tween.kill()
 	var audio:=get_tree().get_first_node_in_group("ui_audio")
-	if audio and is_visible_in_tree():audio.cue("preview")
-	if reduced_motion:return
+	if audio and (is_visible_in_tree() or home_preview):audio.cue("preview")
+	if reduced_motion or ring_materials.is_empty():return
 	ring_tween=create_tween().set_parallel(true)
 	for material in ring_materials:
 		material.emission_energy_multiplier=1.7

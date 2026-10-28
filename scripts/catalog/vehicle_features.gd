@@ -100,6 +100,10 @@ func configure(body: Node3D, lamps: Array, authored_actions: Array) -> void:
 	update_state(false)
 	for message in diagnostics:push_warning(message)
 
+var projected_headlights_allowed:=true
+func set_headlight_projection(allowed: bool) -> void:
+	if projected_headlights_allowed==allowed:return
+	projected_headlights_allowed=allowed;update_state(braking,reversing)
 func update_state(is_braking: bool, is_reversing: bool = false) -> void:
 	braking = is_braking;reversing = is_reversing
 	for group in groups:
@@ -115,7 +119,7 @@ func update_state(is_braking: bool, is_reversing: bool = false) -> void:
 			material.albedo_color = Color(.8,.86,.92) if group.role=="reverse" else material.albedo_color
 		if group.light:
 			group.light.light_energy = group.energy * strength / (3. if group.role=="head" else 3.5)
-			group.light.visible = strength > 0.
+			group.light.visible = strength > 0. and (group.role!="head" or projected_headlights_allowed)
 
 func toggle_headlights() -> void:
 	headlights_on = not headlights_on;update_state(braking,reversing)

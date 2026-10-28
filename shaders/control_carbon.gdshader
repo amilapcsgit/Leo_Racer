@@ -6,5 +6,5 @@ void fragment(){
  float fiber=sin((p.x+p.y)*2.5)*.012;
  float glow=(1.0-smoothstep(0.0,5.0,p.y))*.14;
  vec3 c=mix(vec3(.016,.021,.027),vec3(.033,.043,.052),weave)+fiber;
- COLOR=vec4(c+vec3(0.0,.7,.8)*glow,.94);
+ COLOR=vec4(c+vec3(0.0,.7,.8)*glow,.28);
 }

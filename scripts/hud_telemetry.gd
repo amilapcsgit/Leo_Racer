@@ -6,7 +6,7 @@ static func glass(h: Control, r: Rect2, cyan: Color) -> void:
 	var e := r.end
 	var cut := minf(12.0,minf(r.size.x,r.size.y)*.25)
 	var pts := PackedVector2Array([p+Vector2(cut,0),Vector2(e.x,p.y),e-Vector2(0,cut),e-Vector2(cut,0),Vector2(p.x,e.y),p+Vector2(0,cut)])
-	h.draw_colored_polygon(pts,Color(.018,.031,.043,.86))
+	h.draw_colored_polygon(pts,Color(.018,.031,.043,.28))
 	pts.append(pts[0])
 	h.draw_polyline(pts,Color(.24,.45,.49,.6),1.2,true)
 	h.draw_line(p+Vector2(17,3),Vector2(e.x-5,p.y+3),Color(cyan,.32),2,true)
@@ -14,85 +14,98 @@ static func glass(h: Control, r: Rect2, cyan: Color) -> void:
 		var y := p.y+6+i*7
 		h.draw_line(Vector2(p.x+8,y),Vector2(e.x-8,y),Color(.6,.8,.8,.018),1)
 
-static func draw(h: LeoHUD) -> void:
-	if not is_instance_valid(h.game.player) or not h.game.circuit:return
+static func draw(h: Control, background: bool=false) -> void:
+	var kart: LeoKart=h.instrument_kart()
+	if not is_instance_valid(kart) or not h.game.circuit:return
+	var extra: float=h.size.y-900.
 	var cyan := Color("00f2fe")
 	var amber := Color("ff9000")
-	glass(h,Rect2(42,36,230,142),cyan)
-	glass(h,Rect2(306,36,244,139),cyan)
-	# Sunset sky can be nearly white; telemetry retains the same contrast as gauges.
-	glass(h,Rect2(574,28,600,120),cyan)
-	glass(h,Rect2(1193,30,365,96),cyan)
-	h.draw_polyline(PackedVector2Array([Vector2(574,36),Vector2(585,75),Vector2(1145,75),Vector2(1174,36)]),Color(cyan,.5),1.2,true)
-	h.draw_line(Vector2(638,81),Vector2(735,81),Color(amber,.8),2,true)
-	glass(h,Rect2(42,836,847,45),cyan)
-	var lap_fraction := fposmod(maxf(0.,h.game.player.progress)/h.game.circuit.length,1.0)
-	h.draw_line(Vector2(595,136),Vector2(1156,136),Color(cyan,.15),3,true)
-	h.draw_line(Vector2(595,136),Vector2(595+561*lap_fraction,136),Color(cyan,.8),3,true)
-	# Position badge metallic edge.
-	h.draw_line(Vector2(46,52),Vector2(46,151),Color(amber,.8),3,true)
-	h.draw_line(Vector2(50,55),Vector2(50,146),Color("ffd796"),1,true)
-	var c := Vector2(1400,720)
-	h.draw_circle(c,155,Color(.008,.02,.033,.86),true,-1,true)
-	for i in range(5):
-		h.draw_arc(c,146+i*2,deg_to_rad(135),deg_to_rad(405),100,Color(0,.8,.95,.09-float(i)*.014),3,true)
-	h.draw_arc(c,149,deg_to_rad(135),deg_to_rad(405),100,Color(.16,.35,.4,.85),2,true)
-	h.draw_arc(c,138,deg_to_rad(135),deg_to_rad(405),100,Color(.08,.21,.28),8,true)
+	if background:
+		glass(h,Rect2(42,36,230,142),cyan)
+		glass(h,Rect2(306,36,244,139),cyan)
+		# Sunset sky can be nearly white; telemetry retains the same contrast as gauges.
+		glass(h,Rect2(574,28,600,120),cyan)
+		glass(h,Rect2(1193,30,365,96),cyan)
+		h.draw_polyline(PackedVector2Array([Vector2(574,36),Vector2(585,75),Vector2(1145,75),Vector2(1174,36)]),Color(cyan,.5),1.2,true)
+		h.draw_line(Vector2(638,81),Vector2(735,81),Color(amber,.8),2,true)
+		if h.game.human_count==1:glass(h,Rect2(42,836+extra,847,45),cyan)
+		# Position badge metallic edge.
+		h.draw_line(Vector2(46,52),Vector2(46,151),Color(amber,.8),3,true)
+		h.draw_line(Vector2(50,55),Vector2(50,146),Color("ffd796"),1,true)
+	var c := Vector2(1400,720+extra)
+	if background:
+		h.draw_circle(c,155,Color(.008,.02,.033,.28),true,-1,true)
+		for i in range(5):
+			h.draw_arc(c,146+i*2,deg_to_rad(135),deg_to_rad(405),100,Color(0,.8,.95,.09-float(i)*.014),3,true)
+		h.draw_arc(c,149,deg_to_rad(135),deg_to_rad(405),100,Color(.16,.35,.4,.85),2,true)
+		h.draw_arc(c,138,deg_to_rad(135),deg_to_rad(405),100,Color(.08,.21,.28),8,true)
 	var value := clampf(h.display_speed/240.0,0,1)
+	var segments:=PackedVector2Array();var colors:=PackedColorArray()
 	for i in range(64):
-		var t := float(i)/64
-		var a := deg_to_rad(135+t*270)
-		var b := deg_to_rad(135+(t+1.0/64)*270)
-		var col := cyan.lerp(amber,smoothstep(.55,.9,t))
-		h.draw_arc(c,138,a,b,3,Color(col,.9 if t<=value else .18),4,true)
-	for i in range(49):
-		var a := deg_to_rad(135+float(i)/48*270)
-		var v := Vector2(cos(a),sin(a))
-		var large := i%6==0
-		h.draw_line(c+v*127,c+v*(116 if large else 122),Color(cyan,.85 if large else .4),2 if large else 1,true)
-		if large:
-			var label_pos := c+v*103-Vector2(9,-5)
-			h.draw_string(h.heading_font,label_pos,str(i*5),HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("d6e8ea"))
-	var angle := deg_to_rad(135+value*270)
-	var needle := Vector2(cos(angle),sin(angle))
-	h.draw_line(c+needle*77,c+needle*130,Color(amber,.18),9,true)
-	h.draw_line(c+needle*77,c+needle*130,amber,3,true)
-	h.draw_circle(c+needle*77,3,Color("fff6df"),true,-1,true)
-	h.draw_arc(c,82,0,TAU,64,Color(cyan,.18),1,true)
+		var t:=float(i)/64.
+		if not background and t>value:continue
+		var a:=deg_to_rad(135+t*270);var b:=deg_to_rad(135+(t+1./64)*270)
+		var col:=Color(cyan.lerp(amber,smoothstep(.55,.9,t)),.18 if background else .9)
+		segments.append(c+Vector2(cos(a),sin(a))*138);segments.append(c+Vector2(cos(b),sin(b))*138);colors.append(col)
+	if not segments.is_empty():h.draw_multiline_colors(segments,colors,4.,true)
+	if background:
+		for i in range(49):
+			var a := deg_to_rad(135+float(i)/48*270)
+			var v := Vector2(cos(a),sin(a))
+			var large := i%6==0
+			h.draw_line(c+v*127,c+v*(116 if large else 122),Color(cyan,.85 if large else .4),2 if large else 1,true)
+			if large:
+				var label_pos := c+v*103-Vector2(9,-5)
+				h.draw_string(h.heading_font,label_pos,str(i*5),HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("d6e8ea"))
+	if not background:
+		var angle := deg_to_rad(135+value*270)
+		var needle := Vector2(cos(angle),sin(angle))
+		h.draw_line(c+needle*77,c+needle*130,Color(amber,.18),9,true)
+		h.draw_line(c+needle*77,c+needle*130,amber,3,true)
+		h.draw_circle(c+needle*77,3,Color("fff6df"),true,-1,true)
+		h.draw_arc(c,82,0,TAU,64,Color(cyan,.18),1,true)
 	# Curved nitro tube; energy follows the real fuel value.
-	h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.27,.45,.48),23,true)
-	h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.018,.05,.06),18,true)
-	if h.ready_flash>0 and not h.game.reduced_motion:
+	if background:
+		h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.27,.45,.48),23,true)
+		h.draw_arc(c,164,deg_to_rad(42),deg_to_rad(138),64,Color(.018,.05,.06),18,true)
+	if not background and h.ready_flash>0 and not h.game.reduced_motion:
 		h.draw_arc(c,168,deg_to_rad(42),deg_to_rad(138),64,Color(.4,1.0,.75,h.ready_flash*.25),10,true)
 	# The shader-backed child draws liquid energy inside this fixed tube.
-	# Holographic map.
-	glass(h,Rect2(42,498,242,311),cyan)
-	for i in range(8):
-		h.draw_line(Vector2(49+i*32,507),Vector2(49+i*32,800),Color(cyan,.045),1)
-	for i in range(10):
-		h.draw_line(Vector2(48,508+i*32),Vector2(278,508+i*32),Color(cyan,.045),1)
-	# Fit actual circuit bounds, keeping the full extended harbour route on screen.
-	var projection := map_transform(h.game.circuit.points,Rect2(62,521,203,269))
-	var line := PackedVector2Array()
-	for i in range(0,h.game.circuit.points.size(),3):
-		var p: Vector3 = h.game.circuit.points[i]
-		line.append(projection*Vector2(p.x,p.z))
-	if line.size()>1:
-		line.append(line[0])
-		h.draw_polyline(line,Color(0,.65,.8,.10),12,true)
-		h.draw_polyline(line,Color(.12,.32,.37),6,true)
-		h.draw_polyline(line,Color("65dae0"),2,true)
-	for kart in h.game.karts:
-		var dot := projection*Vector2(kart.position.x,kart.position.z)
-		if kart.is_player:
-			var pulse := 0.0 if h.game.reduced_motion else sin(h.time*4)*2
-			h.draw_circle(dot,13+pulse,Color(cyan,.08),true,-1,true)
-			lotus(h,dot,cyan)
-		else:
-			h.draw_circle(dot,4,amber,true,-1,true)
-	if h.game.player.drifting:
-		glass(h,Rect2(600,805,400,10),cyan)
-		h.draw_rect(Rect2(602,807,396*minf(1,h.game.player.drift_charge/2.5),6),amber)
+	var projection: Transform2D=h.map_projection
+	if background:
+		# Holographic map.
+		glass(h,Rect2(42,498+extra,242,311),cyan)
+		for i in range(8):
+			h.draw_line(Vector2(49+i*32,507+extra),Vector2(49+i*32,800+extra),Color(cyan,.045),1)
+		for i in range(10):
+			h.draw_line(Vector2(48,508+i*32+extra),Vector2(278,508+i*32+extra),Color(cyan,.045),1)
+		# Fit actual circuit bounds, keeping the full extended harbour route on screen.
+		var line := PackedVector2Array()
+		for i in range(0,h.game.circuit.points.size(),3):
+			var p: Vector3 = h.game.circuit.points[i]
+			line.append(projection*Vector2(p.x,p.z))
+		if line.size()>1:
+			line.append(line[0])
+			h.draw_polyline(line,Color(0,.65,.8,.10),12,true)
+			h.draw_polyline(line,Color(.12,.32,.37),6,true)
+			h.draw_polyline(line,Color("65dae0"),2,true)
+	if not background:
+		for rival in h.game.karts:
+			var dot := projection*Vector2(rival.position.x,rival.position.z)
+			if rival.is_player:
+				var pulse := 0.0 if h.game.reduced_motion else sin(h.time*4)*2
+				h.draw_circle(dot,13+pulse,Color(cyan,.08),true,-1,true)
+				lotus(h,dot,cyan)
+			else:
+				h.draw_circle(dot,4,amber,true,-1,true)
+	if not background and kart.drifting:
+		glass(h,Rect2(600,805+extra,400,10),cyan)
+		h.draw_rect(Rect2(602,807+extra,396*minf(1,kart.drift_charge/2.5),6),amber)
+
+	if not background:
+		var lap_fraction := fposmod(maxf(0.,kart.progress)/h.game.circuit.length,1.0)
+		h.draw_line(Vector2(595,136),Vector2(1156,136),Color(cyan,.15),3,true)
+		h.draw_line(Vector2(595,136),Vector2(595+561*lap_fraction,136),Color(cyan,.8),3,true)
 
 ## The same projection is used for the road and all racer markers.
 static func map_transform(points: PackedVector3Array, area: Rect2) -> Transform2D:

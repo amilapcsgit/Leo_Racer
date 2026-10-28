@@ -155,7 +155,7 @@ static func _patch_material(original: Material) -> Material:
 				result.set_shader_parameter(uniform.name,texture(value.resource_path))
 	return result
 
-static func apply_overrides(node: Node) -> void:
+static func apply_overrides(node: Node, recursive: bool=true) -> void:
 	if manifest.get("overrides",[]).is_empty() or node.get_meta("_content_override",false):return
 	node.set_meta("_content_override",true)
 	if node is MultiMeshInstance3D and node.multimesh:
@@ -182,4 +182,5 @@ static func apply_overrides(node: Node) -> void:
 		if node.material_override:node.material_override=_patch_material(node.material_override)
 		else:
 			for i in node.mesh.get_surface_count():node.set_surface_override_material(i,_patch_material(node.get_active_material(i)))
-	for child in node.get_children():apply_overrides(child)
+	if recursive:
+		for child in node.get_children():apply_overrides(child)

@@ -4,7 +4,10 @@ extends RefCounted
 var progress := 0.0
 var displayed := 0.0
 var profile: Dictionary
-var sky: ProceduralSkyMaterial
+var sky: ShaderMaterial
+var visual_sky: ShaderMaterial
+var sky_meshes: Array[MeshInstance3D]=[]
+var illumination: LeoTrackIllumination
 var environment: Environment
 var sun: DirectionalLight3D
 var night_lights: Array[Light3D]=[]
@@ -44,8 +47,10 @@ func configure(target: Node3D, env: Environment, track_id: String, dynamic: bool
 	if is_instance_valid(world) and not original.is_empty():restore()
 	elif not original.is_empty():original.clear();indirect.clear();probes.clear();extra_suns.clear();previous_world_environment=null
 	world=target;environment=env;sun=world.get_node_or_null("RaceSun");enabled=dynamic
+	if is_instance_valid(illumination):illumination.free()
+	illumination=LeoTrackIllumination.new();world.add_child(illumination);illumination.setup(world.get_parent())
 	progress=0.;displayed=0.;last_applied=-1.;update_clock=0.;sky_update_clock=0.;last_sky_applied=-1.;night_lights.clear();light_energy.clear()
-	if not enabled:return
+	if not enabled:illumination.set_gain(.18);return
 	original={}
 	for field in ["sky","sky_rotation","ambient_light_source","ambient_light_color","ambient_light_energy","fog_light_color","fog_density"]:original[field]=environment.get(field)
 	if sun:original.sun={"rotation_degrees":sun.rotation_degrees,"light_color":sun.light_color,"light_energy":sun.light_energy,"directional_shadow_mode":sun.directional_shadow_mode,"directional_shadow_max_distance":sun.directional_shadow_max_distance}
@@ -53,7 +58,8 @@ func configure(target: Node3D, env: Environment, track_id: String, dynamic: bool
 	previous_world_environment=world.get_world_3d().environment
 	world.get_world_3d().environment=environment
 	profile=profiles.get(track_id,profiles.astra_coast)
-	sky=ProceduralSkyMaterial.new();var resource:=Sky.new();resource.sky_material=sky
+	sky=ShaderMaterial.new();sky.shader=preload("res://shaders/race_radiance.gdshader");var resource:=Sky.new();resource.sky_material=sky
+	visual_sky=ShaderMaterial.new();visual_sky.shader=preload("res://shaders/race_visual_sky.gdshader")
 	resource.process_mode=Sky.PROCESS_MODE_INCREMENTAL
 	var game:=world.get_parent()
 	var tier:=mini(int(game.get("graphics_quality")),1) if int(game.get("human_count"))==2 else int(game.get("graphics_quality"))
@@ -63,16 +69,11 @@ func configure(target: Node3D, env: Environment, track_id: String, dynamic: bool
 	if not world.get_tree().node_added.is_connected(on_node_added):world.get_tree().node_added.connect(on_node_added)
 	collect(world)
 	authored_night_root=Node3D.new();authored_night_root.name="DuskNightLights";world.add_child(authored_night_root)
-	var circuit: LeoCircuit=world.get_parent().get("circuit")
-	if circuit:
-		for entry in profile.get("night_lights",[]):
-			var light:=OmniLight3D.new();light.position=circuit.sample(circuit.length*float(entry.fraction),float(entry.offset))+Vector3.UP*float(entry.height)
-			light.light_color=Color(entry.color);light.light_energy=float(entry.energy);light.omni_range=float(entry.range);light.shadow_enabled=false
-			light.distance_fade_enabled=true;light.distance_fade_begin=85.;light.distance_fade_length=35.
-			authored_night_root.add_child(light)
+	ensure_visual_skies()
 	apply()
 	enforce_graphics()
 func collect(node: Node) -> void:
+	if node==illumination:return
 	if node is ReflectionProbe and String(node.name).begins_with("RaceReflection"):
 		probes[node]=node.visible;node.visible=false
 	if node is DirectionalLight3D and node!=sun:
@@ -86,6 +87,7 @@ func collect(node: Node) -> void:
 	for child in node.get_children():collect(child)
 func on_node_added(node: Node) -> void:
 	if not enabled or not is_instance_valid(world) or not world.is_ancestor_of(node):return
+	if node==illumination or illumination.is_ancestor_of(node):return
 	if node is LightmapGI:
 		var key:=String(node.get_parent().name)
 		if neutral.has(key):indirect[node]=node.light_data;node.light_data=neutral[key]
@@ -105,6 +107,10 @@ func enforce_graphics() -> void:
 	for probe in probes:
 		if is_instance_valid(probe):probe.visible=false
 func restore() -> void:
+	for mesh in sky_meshes:
+		if is_instance_valid(mesh):mesh.queue_free()
+	sky_meshes.clear()
+	if is_instance_valid(illumination):illumination.queue_free()
 	for field in original:
 		if field!="sun":environment.set(field,original[field])
 	if is_instance_valid(sun) and original.has("sun"):
@@ -121,15 +127,18 @@ func restore() -> void:
 	if is_instance_valid(world):world.get_world_3d().environment=previous_world_environment
 	if is_instance_valid(authored_night_root):authored_night_root.free()
 	original.clear();indirect.clear();probes.clear()
+	enabled=false
 func reset() -> void:
 	progress=0.;displayed=0.;last_applied=-1.;last_sky_applied=-1.;sky_update_clock=0.
 	if enabled:apply()
 func advance(karts: Array, dt: float, frozen: bool) -> void:
+	if is_instance_valid(illumination):illumination.update(dt,frozen)
 	if not enabled or frozen:return
 	for kart in karts:
-		if not is_instance_valid(kart) or kart.retired:continue
-		progress=maxf(progress,clampf(float(kart.next_gate-1)/(LeoCircuit.GATES*3.),0.,1.))
-	displayed=move_toward(displayed,progress,dt*.12)
+		if not is_instance_valid(kart) or kart.retired or kart.checkpoint_missed:continue
+		progress=maxf(progress,1. if kart.finished else clampf(float(kart.progress)/(kart.circuit.length*3.),0.,1.))
+	displayed=lerpf(displayed,progress,1.-exp(-dt/float(profile.get("transition_seconds",1.5))))
+	ensure_visual_skies()
 	sky_update_clock+=dt
 	update_clock+=dt
 	if update_clock>=.1:
@@ -138,7 +147,17 @@ func advance(karts: Array, dt: float, frozen: bool) -> void:
 			if not is_instance_valid(night_lights[i]):night_lights.remove_at(i);light_energy.remove_at(i)
 		for lightmap in indirect.keys():
 			if not is_instance_valid(lightmap):indirect.erase(lightmap)
-		apply()
+	apply()
+	for mesh in sky_meshes:
+		if is_instance_valid(mesh):mesh.visible=mesh.get_parent().current
+func ensure_visual_skies() -> void:
+	var game:=world.get_parent()
+	for local in game.local_players:
+		var camera: Camera3D=local.camera
+		if not is_instance_valid(camera) or camera.has_node("ContinuousVisualSky"):continue
+		var mesh:=MeshInstance3D.new();mesh.name="ContinuousVisualSky";var quad:=QuadMesh.new();quad.size=Vector2(2,2);mesh.mesh=quad;mesh.material_override=visual_sky
+		mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mesh.extra_cull_margin=16384.;mesh.layers=1<<(18+local.slot)
+		camera.add_child(mesh);sky_meshes.append(mesh)
 func apply(force_sky: bool=false) -> void:
 	if not force_sky and is_equal_approx(last_applied,displayed) and is_equal_approx(last_sky_applied,displayed):return
 	last_applied=displayed
@@ -147,16 +166,18 @@ func apply(force_sky: bool=false) -> void:
 	# sky/sun at 2 Hz; ambient, fog and authored night groups retain 10 Hz blending.
 	if force_sky or last_sky_applied<0. or sky_update_clock>=.5:
 		sky_update_clock=0.;last_sky_applied=displayed
-		sky.sky_top_color=Color(profile.dusk_top).lerp(Color(profile.night_top),t)
-		sky.sky_horizon_color=Color(profile.dusk_horizon).lerp(Color(profile.night_horizon),t)
-		sky.ground_bottom_color=Color("11151f");sky.ground_horizon_color=sky.sky_horizon_color
-		environment.sky_rotation=Vector3(0,displayed*.18,0)
-		if sun:
-			sun.rotation_degrees=Vector3(lerpf(-12.,8.,t),float(profile.sun_yaw),0)
-			sun.light_color=Color("ffd2a2").lerp(Color("91b7ef"),t)
-			sun.light_energy=lerpf(.8,.055,t)
-	environment.ambient_light_color=Color("a99ba2").lerp(Color("526785"),t)
-	environment.ambient_light_energy=lerpf(.48,.25,t)
+		sky.set_shader_parameter("top_color",Color(profile.dusk_top).lerp(Color(profile.night_top),t))
+		sky.set_shader_parameter("horizon_color",Color(profile.dusk_horizon).lerp(Color(profile.night_horizon),t))
+	visual_sky.set_shader_parameter("top_color",Color(profile.dusk_top).lerp(Color(profile.night_top),t))
+	visual_sky.set_shader_parameter("horizon_color",Color(profile.dusk_horizon).lerp(Color(profile.night_horizon),t))
+	if sun:
+		# One direct-light pass also supplies the night moon fill on the older tracks.
+		sun.rotation_degrees=Vector3(lerpf(-12.,float(profile.get("night_sun_pitch",8.)),t),float(profile.sun_yaw),0)
+		sun.light_color=Color("ffd2a2").lerp(Color("91b7ef"),t)
+		sun.light_energy=lerpf(.8,float(profile.get("night_sun_energy",.10)),t)
+	environment.ambient_light_color=Color("a99ba2").lerp(Color(profile.get("night_ambient_color","526785")),t)
+	environment.ambient_light_energy=lerpf(.48,float(profile.get("night_ambient_energy",.34)),t)
+	if is_instance_valid(illumination):illumination.set_gain(smoothstep(.03,.65,t))
 	environment.fog_light_color=Color(profile.dusk_horizon).lerp(Color(profile.night_horizon),t);environment.fog_density=lerpf(.00065,.0013,t)
 	for i in night_lights.size():
 		if is_instance_valid(night_lights[i]):night_lights[i].light_energy=light_energy[i]*lerpf(.3,1.,smoothstep(.05,.65,t))

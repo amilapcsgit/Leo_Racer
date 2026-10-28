@@ -212,6 +212,7 @@ func _ready() -> void:
 	feedback.process_mode=Node.PROCESS_MODE_PAUSABLE
 	return_menu()
 	await hud.prepare_garage()
+	hud.show_menu()
 	initialized=true;loading.hide();initialization_finished.emit()
 	if test_mode or "--show-race" in args:
 		await start_race()
@@ -373,7 +374,7 @@ func build_world() -> void:
 			environment.adjustment_saturation=1.0;environment.adjustment_contrast=1.03
 	LeoRaceVisuals.build_boosts(world,circuit)
 	if not track_definition.metadata.get("authored_signage",false):LeoRaceVisuals.build_signs(world,circuit)
-	if track_definition.world_kind()=="astra":LeoAstraDecals.build(world,circuit)
+	if track_definition.world_kind()=="astra" or chosen_track_id=="kandy_lake":LeoAstraDecals.build(world,circuit)
 	if track_definition.world_kind()=="astra" and ResourceLoader.exists("res://assets/models/kenney/decoration-tents.glb"):
 		for i in range(3):
 			var tent: Node3D = load("res://assets/models/kenney/decoration-tents.glb").instantiate()
@@ -465,7 +466,7 @@ func build_stage() -> void:
 
 func update_preview() -> void:
 	if hud and is_instance_valid(hud.garage_selector):
-		hud.garage_selector.set_selection(ROSTER[selected_driver].animal,KARTS[selected_kart].color)
+		await hud.garage_selector.set_selection(ROSTER[selected_driver].animal,KARTS[selected_kart].color)
 		preview = hud.garage_selector.assembly
 
 func enter_garage(retain_race: bool=false) -> void:
@@ -523,6 +524,7 @@ func remove_racers() -> void:
 	player = null
 
 func return_menu() -> void:
+	race_environment.restore()
 	input_router.gameplay_enabled=false;input_router.assignment_locked=false
 	garage_from_pause=false
 	showroom_lighting(false)
@@ -552,6 +554,8 @@ func set_race_variant(value: String) -> void:
 
 func start_race() -> void:
 	if catalog.vehicles.is_empty():show_content_manager();return
+	if is_instance_valid(hud.garage_selector):
+		hud.garage_selector.home_preview=false;hud.garage_selector.scheduler.pause_for_race();hud.garage_selector.assembly=null;hud.garage_selector.sync_visibility()
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
 	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"))
@@ -627,10 +631,11 @@ func start_race() -> void:
 	for local in local_players:
 		if is_instance_valid(local.camera):local.camera.cull_mask=(local.camera.cull_mask & ~((1<<18)|(1<<19))) | (1<<(18+local.slot))
 	loading.stage("Warming up the race view…",95)
-	for frame in 4:await get_tree().process_frame
+	hud.show_race();input_router.gameplay_enabled=false
+	await LeoRaceWarmup.prepare(self)
 	state="countdown";countdown=3.6
 	loading.hide()
-	hud.show_race()
+	input_router.gameplay_enabled=true;input_router.clear_all()
 
 func on_gate(kart: LeoKart, gate: int) -> void:
 	if kart.finished or kart.retired or gate<=kart.last_reported_gate:return
@@ -1098,12 +1103,14 @@ func run_smoke_checks() -> void:
 	check(player.next_gate == 0 and player.lap == 1 and boost_count == 0, "Restart clears checkpoint lap and boost state")
 	hud.show_garage()
 	check(state == "garage" and is_instance_valid(hud.garage_selector), "Garage shows modular preview")
+	var all_previews_loaded := true
 	for i in ROSTER.size():
 		selected_driver = i
 		for j in KARTS.size():
 			selected_kart = j
-			update_preview()
-	check(is_instance_valid(preview), "Every driver and kart combination loads independently")
+			await update_preview()
+			all_previews_loaded = all_previews_loaded and is_instance_valid(preview) and not hud.garage_selector.race_button.disabled
+	check(all_previews_loaded, "Every driver and kart combination loads independently")
 	selected_driver = 0
 	selected_kart = 0
 	return_menu()
@@ -1275,6 +1282,7 @@ func select_track(id: String) -> bool:
 	state="loading";remove_racers()
 	var old_streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
 	if old_streamer:await old_streamer.stop()
+	race_environment.restore()
 	world.free()
 	track_definition=target;chosen_track_id=id;circuit=LeoCircuit.new(target);art_profile=target.profile();best_time=0.
 	await build_world()

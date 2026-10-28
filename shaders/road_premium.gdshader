@@ -4,6 +4,7 @@ uniform sampler2D normal_map : hint_normal, filter_linear_mipmap_anisotropic, re
 uniform sampler2D rough_map : filter_linear_mipmap, repeat_enable;
 varying vec3 wp;
 uniform float base_roughness = .35;
+uniform float base_albedo_gain = .43;
 // Keep corner hashes bounded and independent of sine precision/constant folding.
 // Explicit corner interpolation keeps the world-space puddle field continuous.
 float road_hash(vec2 cell){
@@ -29,7 +30,7 @@ void fragment(){
 	vec2 uv=wp.xz/1.25;
 	vec3 base=texture(color_map,uv).rgb;
 	float patch=noise(wp.xz*.12);
-	ALBEDO = base*vec3(.43)*mix(.97,1.03,patch)*(.95+grain*.10);
+	ALBEDO = base*vec3(base_albedo_gain)*mix(.97,1.03,patch)*(.95+grain*.10);
 	ROUGHNESS = clamp(base_roughness+(patch-.5)*.08+(texture(rough_map,uv).r-.5)*.10,.50,.88);
 	NORMAL_MAP=texture(normal_map,uv).rgb;
 	NORMAL_MAP_DEPTH=.22;

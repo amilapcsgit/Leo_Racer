@@ -6,8 +6,14 @@ func check(ok: bool, message: String) -> void:
 	if not ok:errors.append(message);push_error(message)
 func _initialize() -> void:run.call_deferred()
 func run() -> void:
-	LeoAssets.configure(ProjectSettings.globalize_path("res://build/preview260/GameAssets"));LeoAssets.mount_packs()
-	LeoVehicleLibrary.discover(ProjectSettings.globalize_path("res://build/runtime260/GameAssets/vehicles"))
+	var output:=ProjectSettings.globalize_path("res://build/qa-lighting/content")
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+	DirAccess.make_dir_recursive_absolute(output)
+	var assets:=OS.get_environment("LEO_ASSET_ROOT")
+	if assets.is_empty():assets=ProjectSettings.globalize_path("res://build/preview260/GameAssets")
+	LeoAssets.configure(assets);LeoAssets.mount_packs()
+	LeoVehicleLibrary.discover(assets.path_join("vehicles"))
 	check(LeoVehicleLibrary.unavailable.is_empty(),"No unavailable official packs: "+str(LeoVehicleLibrary.unavailable))
 	var catalog:=GarageCatalog.shared()
 	check(catalog.vehicles.size()==21,"Exactly 21 default cars")
@@ -69,12 +75,12 @@ func run() -> void:
 	fake.pack_sha256=catalog.vehicle(&"duster").content_data.pack_sha256
 	fake.model_scene="res://scripts/main.gd"
 	check(not LeoVehiclePack.problem(fake,catalog.vehicle(&"duster").content_folder).is_empty(),"Core resource path rejected")
-	var duplicate_root:=ProjectSettings.globalize_path("res://build/duplicate260")
+	var duplicate_root:=output.path_join("duplicate-fixtures")
 	for folder in ["one","two"]:
 		DirAccess.make_dir_recursive_absolute(duplicate_root.path_join(folder))
 		FileAccess.open(duplicate_root.path_join(folder).path_join("vehicle.json"),FileAccess.WRITE).store_string(JSON.stringify(catalog.vehicle(&"duster").content_data))
 	LeoVehicleLibrary.discover(duplicate_root)
 	check(LeoVehicleLibrary.entries.is_empty() and LeoVehicleLibrary.unavailable.size()==2,"Duplicate compiled IDs rejected before mounting")
 	var report:={"checks":checks,"errors":errors,"status":"PASS" if errors.is_empty() else "FAIL"}
-	FileAccess.open("res://build/content260-result.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+	FileAccess.open(output.path_join("content.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 	print("CONTENT260 ",JSON.stringify(report));LeoPreviewStream.clear();LeoAssets.cache.clear();quit(0 if errors.is_empty() else 1)

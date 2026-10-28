@@ -31,7 +31,9 @@ func run() -> void:
 		if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
 	DirAccess.make_dir_recursive_absolute(output)
 	root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size);Engine.max_fps=120
-	check(LeoAssets.configure(ProjectSettings.globalize_path("res://build/preview260/GameAssets"))==OK and LeoAssets.mount_packs()==OK,"Shared assets mount")
+	var assets:=OS.get_environment("LEO_ASSET_ROOT")
+	if assets.is_empty():assets=ProjectSettings.globalize_path("res://build/preview260/GameAssets")
+	check(LeoAssets.configure(assets)==OK and LeoAssets.mount_packs()==OK,"Shared assets mount")
 	LeoVehicleLibrary.discover()
 	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished
 	if not game.hud:check(false,"Runtime catalog and HUD initialize");quit(2);return
@@ -85,9 +87,9 @@ func run() -> void:
 	player.velocity=Vector3(100,0,-100);player.rotation.y+=1.;player.update_suspension(.016,false)
 	check(absf(player.suspension_roll)<=deg_to_rad(4.) and absf(player.suspension_pitch)<=deg_to_rad(1.5),"Cosmetic motion limits")
 	player.reset_suspension();check(player.suspension_roll==0. and not player.suspension_ready,"Recovery resets filters")
-	player.next_gate=LeoCircuit.GATES*2+1
+	player.next_gate=LeoCircuit.GATES*2+1;player.progress=game.circuit.length*2.;player.checkpoint_missed=false
 	game.race_environment.advance(game.karts,2.,false);var progression: float=game.race_environment.progress
-	player.next_gate=1;game.race_environment.advance(game.karts,2.,false)
+	player.next_gate=1;player.progress=0.;game.race_environment.advance(game.karts,2.,false)
 	check(game.race_environment.progress==progression,"Environment progress never regresses")
 	var frozen: float=game.race_environment.displayed;game.race_environment.advance(game.karts,5.,true)
 	check(game.race_environment.displayed==frozen,"Pause/photo freezes transition")

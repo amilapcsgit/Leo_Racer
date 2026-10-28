@@ -3,7 +3,7 @@ extends Control
 var game: Node3D
 var views: Array[SubViewport]=[]
 var cameras: Array[Camera3D]=[]
-var overlays: Array[LeoPlayerHUD]=[]
+var overlays: Array[LeoRaceInstruments]=[]
 var original_canvas_size:=Vector2i(1600,900)
 func _ready() -> void:
  original_canvas_size=get_tree().root.content_scale_size
@@ -14,7 +14,7 @@ func _ready() -> void:
   var viewport:=SubViewport.new();viewport.name="Player%dView" % (slot+1);viewport.world_3d=game.get_world_3d();viewport.handle_input_locally=false;viewport.size=Vector2i(960,1080);viewport.msaa_3d=Viewport.MSAA_2X;viewport.render_target_update_mode=SubViewport.UPDATE_DISABLED;container.add_child(viewport);views.append(viewport)
   var camera:=Camera3D.new();camera.name="Player%dCamera" % (slot+1);camera.fov=63.;camera.far=game.race_camera_far();camera.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;viewport.add_child(camera);cameras.append(camera)
   var layer:=CanvasLayer.new();viewport.add_child(layer)
-  var overlay:=LeoPlayerHUD.new();overlay.game=game;overlay.slot=slot;layer.add_child(overlay);overlays.append(overlay)
+  var overlay:=LeoRaceInstruments.new();overlay.game=game;overlay.slot=slot;layer.add_child(overlay);overlays.append(overlay)
  hide()
 func activate(enabled: bool) -> void:
  get_tree().root.content_scale_size=Vector2i.ZERO if enabled else original_canvas_size
