@@ -76,7 +76,7 @@ def package():
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=R, text=True).strip()
     dump(BASE / 'checkpoint.json', {'branch': 'lighting', 'commit': commit, 'purpose': 'local playtest before garage redesign',
                                   'performance_acceptance': False, 'public_release': False, 'core_sha256': sha(BASE / 'LeoRacer.pck')})
-    archive = OUT / 'LeoRacer-Lighting-Checkpoint-win64.zip'
+    archive = OUT / 'LeoRacer-2.6.0-Lighting-Preview-win64.zip'
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=4) as z:
         for path in sorted(BASE.rglob('*')):
             if path.is_file() and 'UserData' not in path.relative_to(BASE).parts:

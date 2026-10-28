@@ -32,5 +32,13 @@
     "license": "licenses/GameMenuKitLite-MIT.txt",
     "vendored_file": "scripts/ui/vendor/menu_kit_sounds.gd",
     "integration": "Standalone static procedural synth through LeoUIAudio; no plugin/autoload/settings replacement. Neon shaders are original."
+  },
+  "showroom_thumbnails": {
+    "date": "2026-10-28",
+    "generator": "Godot 4.7.2 Forward+",
+    "tool": "tools/render_showroom_thumbnails.gd",
+    "files": "assets/ui/art/garage-cars/*.png",
+    "source": "21 bundled vehicle packages; source attribution and licenses remain in GameAssets/licenses and each vehicle package.",
+    "note": "UI-only rendered derivatives; original models, textures and Blender masters are unchanged."
   }
 }

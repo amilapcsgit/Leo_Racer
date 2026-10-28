@@ -96,3 +96,6 @@ installer/release241-*.nsh
 docs/screenshots/2.4.1/*.import
 installer/release250-*.nsh
 docs/screenshots/2.5.0/*.import
+
+# Reviewed lighting QA captures are not runtime textures.
+docs/qa-lighting/*.png.import

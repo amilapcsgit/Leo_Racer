@@ -17,7 +17,7 @@ var serial:=0
 signal preview_prepared(vehicle: StringName)
 func _ready() -> void:
 	process_mode=Node.PROCESS_MODE_ALWAYS
-	warm_view=SubViewport.new();warm_view.size=Vector2i(1216,488);warm_view.own_world_3d=true;warm_view.msaa_3d=get_tree().root.msaa_3d;warm_view.render_target_update_mode=SubViewport.UPDATE_DISABLED;add_child(warm_view)
+	warm_view=SubViewport.new();warm_view.size=Vector2i(1600,900);warm_view.own_world_3d=true;warm_view.msaa_3d=get_tree().root.msaa_3d;warm_view.render_target_update_mode=SubViewport.UPDATE_DISABLED;add_child(warm_view)
 	warm_root=Node3D.new();warm_view.add_child(warm_root)
 	warm_camera=Camera3D.new();warm_camera.current=true;warm_camera.fov=43.;warm_root.add_child(warm_camera)
 	var environment:=WorldEnvironment.new();environment.environment=Environment.new();environment.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;environment.environment.ambient_light_energy=.55

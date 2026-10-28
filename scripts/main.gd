@@ -630,6 +630,9 @@ func start_race() -> void:
 	if split_view:split_view.activate(human_count==2)
 	for local in local_players:
 		if is_instance_valid(local.camera):local.camera.cull_mask=(local.camera.cull_mask & ~((1<<18)|(1<<19))) | (1<<(18+local.slot))
+	for slot in human_count:
+		local_players[slot].camera_rig.reset();local_players[slot].heading=local_players[slot].kart.rotation.y
+		update_local_camera(local_players[slot],1.)
 	loading.stage("Warming up the race view…",95)
 	hud.show_race();input_router.gameplay_enabled=false
 	await LeoRaceWarmup.prepare(self)

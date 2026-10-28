@@ -161,7 +161,6 @@ func _process(dt: float) -> void:
 	(recovery_overlay.material as ShaderMaterial).set_shader_parameter("animation_time",time)
 	(speed_overlay.material as ShaderMaterial).set_shader_parameter("strength",intensity)
 	(speed_overlay.material as ShaderMaterial).set_shader_parameter("animation_time",time)
-	(speed_overlay.material as ShaderMaterial).set_shader_parameter("glitch",local.feedback.get_recover_glitch() if local.feedback else 0.)
 	var bindings: LeoPlayerInput=game.input_router.players[slot]
 	for i in binding_hints.size():binding_hints[i].text=bindings.describe(ACTIONS[i])
 	labels.position.text = str(game.player_place(slot))

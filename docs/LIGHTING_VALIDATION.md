@@ -79,3 +79,39 @@ Godot documentation used for the implementation:
 
 The Colombo skyline was generated with the built-in image generation tool. The
 saved asset and generation prompt are recorded in `assets/ui/provenance.json`.
+
+## Post-checkpoint showroom work (not in the checkpoint ZIP)
+
+The source now uses a full 3D showroom, a physical cyan/gold platform, a skyline-only
+UV crop of the Colombo image, cyan/violet light strips and colored fill lighting.
+Race cameras and physics controllers are unaffected by these showroom lights.
+All six driver choices use compact portraits; the showroom hides the 3D driver.
+The seven-card carousel uses 21 consistently rendered UI thumbnails. Actual lights,
+doors and trunk actions are available where authored by the selected vehicle.
+
+Both-renderer layout checks cover 720p, 1080p, 1440p and ultrawide. Opening and
+closing Duster actions, portrait visibility, real platform/screen geometry,
+Reduced Motion reset, cache bounds and separate Player 2 ownership are exercised.
+Repeated reopening exposed a freed preview reference; the HUD now checks validity
+before assigning its legacy preview reference.
+
+New regression evidence in build/qa-lighting passed: 153 vehicle/damage allocation
+checks, 226 contact checks and a 360-tick deterministic controller replay with zero
+position, speed or boost-fuel differences. Cold Kandy callbacks measured 2.191 ms
+Forward+ and 2.467 ms Compatibility; surrounding worst frames measured 19.766 and
+14.619 ms. The callback target remains open. Both active race cameras are now
+initialized before effect warm-up; 52 particles, 18 audio streams, six damage
+materials and six skid backends are prepared before countdown.
+
+The playable checkpoint remains pinned to a04e769 and is not silently replaced
+by these later showroom changes. Its Windows export passed packaged smoke tests
+in both renderers, including every driver/car preview combination and offline
+SQLite. The ZIP passed CRC verification; the checksum file accompanies it under
+dist/lighting-checkpoint. No public GitHub release was published.
+
+The final showroom suite passed 20 checks in each renderer. Forward+: UI 2.774 ms,
+prepared selection 21.931 ms, neighbors 11.593/10.682 ms, worst sampled frame
+13.730 ms. Compatibility: UI 2.850 ms, prepared selection 18.641 ms, neighbors
+9.837/10.316 ms, worst sampled frame 15.461 ms. These are warm showroom samples,
+not a replacement for the full cold/warm race acceptance matrix. Captures and
+compact reports are saved in docs/qa-lighting/.

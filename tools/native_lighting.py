@@ -24,7 +24,7 @@ def prepare():
   for path in (R/folder).rglob('*'):
    if not path.is_file() or path.suffix not in suffixes:continue
    name=path.relative_to(R).as_posix();entries.pop(name+'.remap',None);entries[name]=path.read_bytes()
- for name in ['assets/ui/art/lighting-skyline.png','assets/ui/art/lighting-skyline.png.import']:
+ for name in ['assets/ui/art/lighting-skyline.png','assets/ui/art/lighting-skyline.png.import'] + [path.relative_to(R).as_posix() for path in (R/'assets/ui/art/garage-cars').glob('*') if path.suffix in {'.png','.import'}]:
   entries[name]=(R/name).read_bytes()
   if name.endswith('.import'):
    for dependency in re.findall(r'"(res://\.godot/imported/[^"\n]+)"',entries[name].decode()):entries[dependency.removeprefix('res://')]=(R/dependency.removeprefix('res://')).read_bytes()

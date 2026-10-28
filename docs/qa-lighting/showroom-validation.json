@@ -1,0 +1,26 @@
+{
+  "forward": {
+    "status": "PASS",
+    "checks": 20,
+    "ui_ms": 2.774,
+    "warm_ms": 21.931,
+    "neighbor_ms": [
+      11.593,
+      10.682
+    ],
+    "worst_ms": 13.73,
+    "largest_preparation_ms": 0.785
+  },
+  "compatibility": {
+    "status": "PASS",
+    "checks": 20,
+    "ui_ms": 2.85,
+    "warm_ms": 18.641,
+    "neighbor_ms": [
+      9.837,
+      10.316
+    ],
+    "worst_ms": 15.461,
+    "largest_preparation_ms": 0.928
+  }
+}

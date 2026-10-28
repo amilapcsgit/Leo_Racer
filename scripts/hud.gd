@@ -203,7 +203,7 @@ func show_garage(_focus_group: String = "driver") -> void:
 	garage_selector.home_preview=false;garage_selector.show();garage_selector.set_selection(local.driver_id,local.vehicle_id)
 	garage_selector.race_button.text="Keep Racing" if retaining else "Use This Ride"
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
-		game.preview=garage_selector.assembly
+		game.preview=garage_selector.assembly if is_instance_valid(garage_selector.assembly) else null
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
 		garage_selector.identity.text="Nice choice!")
 	garage_selector.name_changed.connect(func(value: String):
@@ -218,7 +218,7 @@ func show_garage(_focus_group: String = "driver") -> void:
 		if retaining:game.cancel_pause_garage()
 		elif from_lobby:frontend.show_setup()
 		else:game.return_menu())
-	game.preview=garage_selector.assembly
+	game.preview=garage_selector.assembly if is_instance_valid(garage_selector.assembly) else null
 	garage_selector.carousel.grab_focus()
 	queue_redraw()
 
