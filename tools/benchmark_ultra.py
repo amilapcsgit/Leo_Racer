@@ -25,9 +25,12 @@ def prepare(version):
     city_packs.write_pack(target/'LeoRacer.pck',engine,entries)
     return source,target
 
-def run(version,compat,dusk):
+def run(version,compat,dusk,night=False,track=None,humans=None):
     source,target=prepare(version)
     label=version+'-'+('compatibility' if compat else 'forward')+'-'+('dusk' if dusk else 'static')
+    if night:label+='-full-night'
+    if track:label+='-'+track
+    if humans:label+='-'+str(humans)+'p'
     output=ROOT/'build/qa270/performance'/label;output.mkdir(parents=True,exist_ok=True)
     profile=output/'profile';profile.mkdir(exist_ok=True)
     env=dict(os.environ,APPDATA=str(profile),LOCALAPPDATA=str(profile),LEO_ASSET_ROOT=str(target/'GameAssets'),DOTNET_ROOT=str(profile/'no-sdk'))
@@ -35,6 +38,9 @@ def run(version,compat,dusk):
     if compat:args+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     args+=['--','--drive-test','--track=astra_coast','--track-check=performance','--vehicles='+str(target/'GameAssets/vehicles'),'--tracks='+str(target/'GameAssets/tracks'),'--qa-output='+str(output)]
     if dusk:args+=['--qa-dusk']
+    if night:args+=['--qa-night']
+    if track:args+=['--qa-track='+track]
+    if humans:args+=['--qa-humans='+str(humans)]
     began=time.monotonic()
     with (output/'process.log').open('w',encoding='utf-8') as log:
         process=subprocess.Popen(args,cwd=target,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.NORMAL_PRIORITY_CLASS|subprocess.CREATE_NO_WINDOW)
@@ -47,10 +53,13 @@ def run(version,compat,dusk):
     text=(output/'process.log').read_text(encoding='utf-8',errors='replace')
     errors=[line for line in text.splitlines() if any(x in line for x in ['SCRIPT ERROR','Parse Error','CrashHandlerException','BENCHMARK_MAP_FAILED','BENCHMARK_MAP_MISMATCH'])]
     rows=json.loads((output/'performance.json').read_text(encoding='utf-8')) if (output/'performance.json').exists() else []
-    report={'status':'PASS' if code==0 and not errors and len(rows)==6 and all(r.get('actual_track')==r['track'] for r in rows) and {r['track'] for r in rows}=={'astra_coast','colombo_city','kandy_lake'} else 'FAIL','exit':code,'errors':errors,'seconds':time.monotonic()-began,'source_core_sha256':sha(source/'LeoRacer.pck'),'diagnostic_core_sha256':sha(target/'LeoRacer.pck'),'execution_speed_throttling_disabled':unthrottled,'normal_priority':True,'rows':len(rows),'p95_goal_ms':16.7,'p95_misses':[r for r in rows if r['p95_ms']>16.7]}
+    expected=(1 if track else 3)*(1 if humans else 2)
+    tracks={track} if track else {'astra_coast','colombo_city','kandy_lake'}
+    valid=code==0 and not errors and len(rows)==expected and all(r.get('actual_track')==r['track'] for r in rows) and {r['track'] for r in rows}==tracks
+    report={'status':'PASS' if valid else 'FAIL','exit':code,'errors':errors,'seconds':time.monotonic()-began,'source_core_sha256':sha(source/'LeoRacer.pck'),'diagnostic_core_sha256':sha(target/'LeoRacer.pck'),'execution_speed_throttling_disabled':unthrottled,'normal_priority':True,'rows':len(rows),'fixed_full_night':night,'p95_goal_ms':16.7,'p95_misses':[r for r in rows if r['p95_ms']>16.7]}
     (output/'process.json').write_text(json.dumps(report,indent=2),encoding='utf-8');print(label,report,flush=True)
     return report['status']=='PASS'
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('version',choices=['2.6','2.7']);p.add_argument('--compatibility',action='store_true');p.add_argument('--dusk',action='store_true');a=p.parse_args()
-    raise SystemExit(0 if run(a.version,a.compatibility,a.dusk) else 1)
+    p=argparse.ArgumentParser();p.add_argument('version',choices=['2.6','2.7']);p.add_argument('--compatibility',action='store_true');p.add_argument('--dusk',action='store_true');p.add_argument('--night',action='store_true');p.add_argument('--track',choices=['astra_coast','colombo_city','kandy_lake']);p.add_argument('--humans',type=int,choices=[1,2]);a=p.parse_args()
+    raise SystemExit(0 if run(a.version,a.compatibility,a.dusk or a.night,a.night,a.track,a.humans) else 1)

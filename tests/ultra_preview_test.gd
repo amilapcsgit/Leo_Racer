@@ -56,6 +56,24 @@ func run() -> void:
 	check(LeoPreviewStream.entries.size()<=3 and selector.scheduler.prepared.size()<=3,"Three-entry caches remain bounded")
 	var missing:=game.catalog.vehicles[0].duplicate() as VehicleDefinition;missing.id=&"missing-art-fixture"
 	check(LeoPreviewArt.texture(missing,true).resource_path.ends_with("/custom-car.png"),"Missing artwork has a transparent custom-car fallback")
+	var custom:=game.catalog.vehicles[0].duplicate() as VehicleDefinition
+	custom.id=&"ultra_custom_capture_fixture";custom.official=false
+	custom.content_data=game.catalog.vehicles[0].content_data.duplicate(true);custom.content_data.erase("pack_sha256");custom.content_data["version"]="capture-fixture-"+str(Time.get_ticks_usec())
+	game.catalog.vehicles.append(custom)
+	var hero_path:=ProjectSettings.globalize_path(LeoPreviewArt.cache_path(custom,true))
+	var card_path:=ProjectSettings.globalize_path(LeoPreviewArt.cache_path(custom,false))
+	selector.set_reduced_motion(true);await selector.set_selection(&"human",custom.id)
+	check(FileAccess.file_exists(hero_path) and FileAccess.file_exists(card_path),"Future imports automatically receive both captures")
+	var custom_hero:=Image.load_from_file(hero_path);var custom_card:=Image.load_from_file(card_path)
+	check(custom_hero!=null and custom_hero.get_size()==LeoPreviewArt.SIZE and custom_hero.get_pixel(0,0).a==0.,"Custom hero keeps full transparent camera canvas")
+	check(custom_card!=null and custom_card.get_width()==752 and custom_card.get_pixel(0,0).a==0.,"Custom thumbnail is cropped and transparent")
+	var live_custom:=await LeoPreviewArt.capture_model(selector.showroom,selector.viewport,self)
+	await process_frame
+	check(custom_hero.get_used_rect()==live_custom.get_used_rect(),"Custom capture matches its live model framing")
+	var prepared_key:=selector.scheduler.key(custom.id,&"human")
+	custom.content_data["version"]="changed-model-version"
+	check(ProjectSettings.globalize_path(LeoPreviewArt.cache_path(custom,true))!=hero_path,"Changed imports invalidate cached artwork")
+	check(selector.scheduler.key(custom.id,&"human")!=prepared_key,"Changed imports invalidate prepared 3D assemblies")
 	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"rows":rows,"renderer":RenderingServer.get_current_rendering_method()}
 	FileAccess.open(output.path_join("previews.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 	print("ULTRA_PREVIEW_TEST ",JSON.stringify(report));await game.quit_game(0 if errors.is_empty() else 1)

@@ -35,6 +35,8 @@ func run() -> void:
 			game.human_count=humans;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"duster"
 			var start:=Time.get_ticks_msec();await game.start_race();var load_ms:=Time.get_ticks_msec()-start
 			game.state="race"
+			if "--qa-night" in OS.get_cmdline_user_args():
+				game.race_environment.progress=1.;game.race_environment.displayed=1.;game.race_environment.apply(true)
 			# Diagnostic switches isolate presentation costs without changing handling.
 			if "--qa-hide-hud" in OS.get_cmdline_user_args():
 				for instrument in game.hud.find_children("*","LeoRaceInstruments",true,false):instrument.hide();instrument.set_process(false)

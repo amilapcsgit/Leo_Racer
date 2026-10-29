@@ -27,7 +27,7 @@ func _ready() -> void:
 	var sun:=DirectionalLight3D.new();sun.rotation_degrees=Vector3(-55,-30,0);sun.light_energy=.35;sun.shadow_enabled=true;sun.directional_shadow_max_distance=20.;warm_root.add_child(sun)
 func key(vehicle: StringName,racer: StringName) -> String:
 	var definition:=catalog.vehicle(vehicle)
-	return String(vehicle)+":"+String(racer)+":"+String(definition.content_data.get("pack_sha256",definition.model_path))+":"+RenderingServer.get_current_rendering_method()+":"+str(warm_view.msaa_3d)
+	return String(vehicle)+":"+String(racer)+":"+String(definition.content_data.get("pack_sha256",definition.model_path))+":"+String(definition.content_data.get("version",""))+":"+RenderingServer.get_current_rendering_method()+":"+str(warm_view.msaa_3d)
 func anticipate(racer: StringName,vehicle: StringName,travel: int=0) -> void:
 	if not catalog or not catalog.vehicle(vehicle) or not catalog.driver(racer):return
 	warm_view.msaa_3d=get_tree().root.msaa_3d

@@ -7,8 +7,10 @@ from run_ultra_checks import run
 def verify():
     target=ROOT.parent.parent/'i270delivery'
     assert target.resolve().is_relative_to(ROOT.parent.parent.resolve()) and not target.exists(), 'Preserve prior installation tests'
-    env=dict(os.environ,TEMP=str(QA/'install-temp'),TMP=str(QA/'install-temp'))
-    Path(env['TEMP']).mkdir(parents=True,exist_ok=True)
+    test_temp=ROOT.parent.parent/'t270-install'
+    assert test_temp.resolve().is_relative_to(ROOT.parent.parent.resolve()) and not test_temp.exists(), 'Preserve prior installer temporary files'
+    test_temp.mkdir()
+    env=dict(os.environ,TEMP=str(test_temp),TMP=str(test_temp))
     setup=OUT/'LeoRacer-Setup.exe'
     def execute(exe,args):
         subprocess.run([str(exe),*args],cwd=ROOT,env=env,check=True,timeout=900,creationflags=subprocess.CREATE_NO_WINDOW)
