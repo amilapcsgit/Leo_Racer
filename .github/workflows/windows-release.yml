@@ -17,15 +17,19 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Verify source and tag versions
         shell: pwsh
         run: |
+          New-Item -ItemType Directory -Force build/qa270 | Out-Null
           $version=[regex]::Match((Get-Content project.godot -Raw),'config/version="([^"]+)"').Groups[1].Value
           if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}' -ne "v$version") {throw 'Tag does not match source version'}
           "BUILD_VERSION=$version" >> $env:GITHUB_ENV
+          "version=$version`ncommit=${{ github.sha }}" | Set-Content build/qa270/ci-context.txt
       - uses: actions/cache@v4
         with:
           path: |
@@ -44,9 +48,9 @@ jobs:
       - name: Preserve source geometry
         shell: pwsh
         run: |
-          python tools/verify_modular_sources.py
+          python tools/verify_modular_sources.py *> build/qa270/source-preservation.log
           if ($LASTEXITCODE -ne 0) {throw 'Source preservation failed'}
-          python tools/verify_bigster_assets.py
+          python tools/verify_bigster_assets.py *> build/qa270/bigster-preservation.log
           if ($LASTEXITCODE -ne 0) {throw 'Bigster preservation failed'}
       - name: Validate and package from staged content
         shell: pwsh

@@ -49,8 +49,16 @@ def run(kind,compat=False,export=None,extra=()):
     started=time.monotonic()
     with (out/'process.log').open('w',encoding='utf-8') as log:
         process=subprocess.Popen(command,cwd=Path(export) if export else ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
-        try:code=process.wait(timeout=1800)
-        except subprocess.TimeoutExpired:process.kill();process.wait();code=-999
+        code=None
+        while process.poll() is None:
+            time.sleep(.5)
+            current=(out/'process.log').read_text(encoding='utf-8',errors='replace')
+            if any(term in current for term in ['SCRIPT ERROR','Parse Error','Corrupted header']) or time.monotonic()-started>1800:
+                if os.name=='nt':subprocess.run(['taskkill','/PID',str(process.pid),'/T','/F'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                else:process.kill()
+                code=-998;break
+        actual=process.wait()
+        if code is None:code=actual
     text=(out/'process.log').read_text(encoding='utf-8',errors='replace')
     errors=[line for line in text.splitlines() if any(term in line for term in ['SCRIPT ERROR','Parse Error','Shader compilation failed','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
     failed=bool(re.search(r'"status"\s*:\s*"FAIL"',text))

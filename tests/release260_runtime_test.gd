@@ -6,9 +6,15 @@ var samples: Array[float]=[]
 var sampling:=false
 var stalls: Array[Dictionary]=[]
 var phase:="opening"
+var trace_clock:=0.
 var output:="res://build/qa260"
 func _initialize() -> void:run.call_deferred()
 func _process(dt: float) -> bool:
+	trace_clock+=dt
+	if trace_clock>10. and game and game.hud:
+		trace_clock=0.
+		var selector: ModularCarSelector=game.hud.garage_selector
+		print("GARAGE_TRACE ",phase," selected=",selector.vehicle_id," driver=",selector.driver_id," busy=",selector.scheduler.busy," suspended=",selector.scheduler.suspended," wanted=",selector.scheduler.wanted," failures=",selector.scheduler.failures," ready=",selector.scheduler.prepared.keys())
 	if sampling:
 		samples.append(dt*1000.)
 		if dt>.05:stalls.append({"phase":phase,"ms":dt*1000.,"clock":Time.get_ticks_msec()})
@@ -99,10 +105,10 @@ func run() -> void:
 	check(game.current_ruleset()=="ultra_v6_static","Static ranking identity")
 	var store=load("res://scripts/LocalRankingStore.cs").new()
 	check(store.open_store(ProjectSettings.globalize_path(output.path_join("rankings.sqlite3"))),"SQLite opens on worker")
-	var request: int=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static")
+	var request: int=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static",3)
 	while not store.request_ready(request):await process_frame
 	check(store.take_query(request).is_empty(),"Async records return on main thread")
-	request=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static");store.cancel_request(request)
+	request=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static",3);store.cancel_request(request)
 	store.close_store()
 	samples.sort()
 	var result:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"ui_ms":ui_ms,"cold_preview_ms":cold_ms,"warm_ms":warm_ms,"garage_worst_ms":samples[-1] if not samples.is_empty() else 0.,"stages":LeoPreviewStream.timings,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}
