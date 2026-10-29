@@ -13,9 +13,9 @@
   },
   "id": "bigster",
   "lods_generated": true,
-  "merged_static_meshes": 223,
-  "pack_sha256": "9434d4ea8a730415c112bf05f99e0cd9ea9dd732016b2277e5a8b1a84310c052",
-  "scene_bytes": 10812544,
+  "merged_static_meshes": 222,
+  "pack_sha256": "d16e514394bdd5ac9334f22df706a2bd4bd112b1285b93866420183c0366d750",
+  "scene_bytes": 10813093,
   "status": "PASS",
   "textures": 9,
   "source_model_sha256": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
@@ -29,6 +29,7 @@
     "dust25_tailgate_chmsl",
     "dust25_tailgateglass",
     "Bigster_Rear_Plate",
-    "Bigster_Rear_Plate_Text"
+    "Bigster_Rear_Plate_Text",
+    "Bigster_Rear_EU_Band"
   ]
 }

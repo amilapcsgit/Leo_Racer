@@ -76,7 +76,7 @@ func run() -> void:
 	check(features.diagnostics.is_empty(),"Hatch reparenting preserves lamp bindings")
 	var hinge:=garage.assembly.find_child("UltraTrunkHinge",true,false) as Node3D
 	print("TRUNK_PARTS ",hinge.get_children().map(func(n):return n.name))
-	check(hinge!=null and hinge.get_child_count()==9,"Complete hatch assembly includes shell, liner, badges, trim, lamp, glass and both number-plate pieces")
+	check(hinge!=null and hinge.get_child_count()==10,"Complete hatch assembly includes shell, liner, badges, trim, lamp, glass and number plate, lettering and blue EU band")
 	garage.yaw=PI;garage.update_camera();await settle()
 	await shot("bigster-trunk-closed")
 	features.trigger(2)

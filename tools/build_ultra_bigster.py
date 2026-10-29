@@ -14,5 +14,5 @@ subprocess.run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-File',st
 target=ROOT/'content/ultra';target.mkdir(exist_ok=True)
 shutil.copy2(destination/'vehicle.pck',target/'bigster-trunk.pck')
 report=json.loads((destination/'compile-report.json').read_text())
-report.update(source_model_sha256=sha(model),source_unchanged=True,moving_parts=['dust25_tailgate_a','dust25_tailgate_carp','Bigster_Tailgate_Badge','Bigster_Tailgate_Dacia_OEM_Badge','Bigster_Tailgate_Patterned_Band','dust25_tailgate_chmsl','dust25_tailgateglass','Bigster_Rear_Plate','Bigster_Rear_Plate_Text'])
+report.update(source_model_sha256=sha(model),source_unchanged=True,moving_parts=['dust25_tailgate_a','dust25_tailgate_carp','Bigster_Tailgate_Badge','Bigster_Tailgate_Dacia_OEM_Badge','Bigster_Tailgate_Patterned_Band','dust25_tailgate_chmsl','dust25_tailgateglass','Bigster_Rear_Plate','Bigster_Rear_Plate_Text','Bigster_Rear_EU_Band'])
 (target/'bigster-trunk.json').write_text(json.dumps(report,indent=2)+'\n')

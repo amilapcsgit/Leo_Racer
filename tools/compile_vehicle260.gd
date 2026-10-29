@@ -19,7 +19,7 @@ func batch_static(root: Node3D, data: Dictionary) -> void:
 	var anchors: Array[Node]=[root];var protected: Array[Node]=[]
 	if data.get("ultra_trunk",false):
 		for node in root.find_children("*","MeshInstance3D",true,false):
-			if "tailgate" in String(node.name).to_lower() or "rear_plate" in String(node.name).to_lower():protected.append(node)
+			if "tailgate" in String(node.name).to_lower() or ("rear_plate" in String(node.name).to_lower() or String(node.name)=="Bigster_Rear_EU_Band"):protected.append(node)
 	for wheel in data.get("wheels",[]):
 		for path in wheel.get("rotating",[])+wheel.get("stationary",[]):
 			var node:=root.get_node_or_null(NodePath(path))

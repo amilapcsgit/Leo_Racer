@@ -30,7 +30,7 @@ static func install_trunk(body: Node3D, authored_actions: Array) -> void:
 	var parts: Array[Node3D]=[]
 	var box:=AABB()
 	for node in body.find_children("*","MeshInstance3D",true,false):
-		if not ("tailgate" in String(node.name).to_lower() or "rear_plate" in String(node.name).to_lower()):continue
+		if not ("tailgate" in String(node.name).to_lower() or ("rear_plate" in String(node.name).to_lower() or String(node.name)=="Bigster_Rear_EU_Band")):continue
 		parts.append(node)
 		var part_box: AABB=local_pose(node,body)*node.mesh.get_aabb()
 		box=part_box if parts.size()==1 else box.merge(part_box)
