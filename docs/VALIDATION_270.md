@@ -131,3 +131,7 @@ Godot detected no connected gamepads, and the user confirmed that no controllers
 | 2.7-forward-static | astra_coast | 2 | 8.79 | 10.15 | 10.62 | PASS |
 | 2.7-forward-static | colombo_city | 1 | 8.63 | 11.97 | 12.98 | PASS |
 | 2.7-forward-static | colombo_city | 2 | 8.49 | 11.26 | 12.09 | PASS |
+
+## Final friends-and-family release checks
+
+The accepted handling and previous broad matrix are retained. Focused final checks cover complete Bigster hatch and plate motion, exact closure and per-instance state, Duster 2024 jet visibility and shutdown, controller confirmation including remaps, held-button suppression, native dropdowns, real settings toggles, garage confirmation and gameplay boost after release. Results and captures are retained in final-fix process logs. Physical pads remain unavailable. The hatch uses a separately compiled runtime derivative; original GLB and published 2.6 packs remain byte-for-byte intact. Evidence packaging now runs the native core check before assembling its first archive, ensuring raw process logs exist on a clean CI runner.

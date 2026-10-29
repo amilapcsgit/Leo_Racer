@@ -10,6 +10,10 @@
 - Earlier records remain available under historical filters. Lap metadata is additive and keeps the database readable by 2.6. New driving rules use a separate 2.7 record identity. Custom cars and modified races retain their existing ranking restrictions.
 - Windows validation now stages checksum-pinned content before tests, uses the current roster and packaging, and preserves failure logs. Preview preparation drains before race transitions and shutdown. Actual contact preparation is warmed behind the loading screen without leaving cosmetic damage.
 
+- Bigster Action 2 opens the full trunk, including its number plate; Action 1 retains the sunroof. Duster 2024 now displays its blue arcade boost jets.
+- Each assigned pad’s configured boost button also confirms menus, garage, settings, dropdowns and dialogs. Held confirmation is consumed through release, preventing accidental double activation or boost on race entry.
+- The release includes a showcase media pack with original artwork, transparent cars, SVG graphics, real captures and website-ready copies.
+
 The Windows portable folder and installer work offline without a development SDK. Keep the complete portable folder together; use **Play Compatibility.cmd** if Vulkan is unavailable. The Vehicle Workshop remains included.
 
 Extract portable releases into a new folder. The installer preserves unrelated custom content and backs up modified managed files under `ContentBackups`. Settings, controller preferences and records retain their existing user-data location. Source assets, vehicle attribution and licenses remain preserved.

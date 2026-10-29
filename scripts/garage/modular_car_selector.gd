@@ -69,6 +69,7 @@ var font: Font = preload("res://assets/fonts/BarlowCondensed-BoldItalic.ttf")
 @onready var viewport: SubViewport = $SubViewportContainer/SubViewport
 
 func _ready() -> void:
+	add_to_group("controller_garage")
 	theme=load("res://assets/ui/theme.tres")
 	if not catalog: catalog=GarageCatalog.shared()
 	var surround := ColorRect.new()
@@ -152,7 +153,7 @@ func build_interface() -> void:
 		var action_slot: int=slot
 		var control:=button(ui,["Lights","Doors","Trunk"][slot],func():preview_action(action_slot));control.position=Vector2(32,300+slot*52);control.size=Vector2(180,42);preview_actions.append(control)
 	stats=positioned_label("",Vector2.ZERO,20);stats.hide()
-	positioned_label("Drag to orbit  ·  Scroll to zoom  ·  LB / RB change ride",Vector2(564,610),20,Color("b9c7d6"))
+	positioned_label("Drag to orbit · Scroll to zoom · LB / RB ride · Boost button: OK",Vector2(564,610),20,Color("b9c7d6"))
 	vehicle_strip=ScrollContainer.new();vehicle_strip.position=Vector2(32,674);vehicle_strip.size=Vector2(1536,138);vehicle_strip.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;vehicle_strip.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER;ui.add_child(vehicle_strip)
 	var row:=HBoxContainer.new();row.add_theme_constant_override("separation",12);vehicle_strip.add_child(row)
 	for vehicle in catalog.vehicles:
@@ -253,6 +254,8 @@ func activate_controller_focus() -> void:
 
 func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree() or not ui:return
+	var router:=get_tree().get_first_node_in_group("menu_input_router")
+	if router and router.menu_confirm(event):return
 	if input_device!=-2 and (event is InputEventJoypadButton or event is InputEventJoypadMotion) and event.device!=input_device:
 		get_viewport().set_input_as_handled();return
 	var input_viewport:=get_viewport()

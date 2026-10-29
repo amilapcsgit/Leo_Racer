@@ -10,6 +10,7 @@ static var entries: Dictionary = {}
 static var recent: Array[StringName] = []
 static var timings: Array[Dictionary] = []
 static func request(vehicle: VehicleDefinition, tree: SceneTree, current: Callable, foreground: bool=true) -> PackedScene:
+	vehicle=LeoVehiclePresentation.resolve(vehicle)
 	if foreground:selected=vehicle.id
 	while busy:
 		if not current.is_valid() or not current.call():return null

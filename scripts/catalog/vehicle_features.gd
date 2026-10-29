@@ -19,7 +19,30 @@ static func install(body: Node3D, definition: VehicleDefinition) -> Node3D:
 	controller.name = "VehicleLighting"
 	body.add_child(controller)
 	controller.configure(body, lamps, definition.actions)
+	if definition.id==&"bigster":
+		var trunk_actions: Array=[]
+		install_trunk(body,trunk_actions)
+		controller.configure(body,[],trunk_actions)
 	return controller
+
+static func install_trunk(body: Node3D, authored_actions: Array) -> void:
+	# Assemble the existing separate hatch pieces at runtime; never rewrite the model.
+	var parts: Array[Node3D]=[]
+	var box:=AABB()
+	for node in body.find_children("*","MeshInstance3D",true,false):
+		if not ("tailgate" in String(node.name).to_lower() or "rear_plate" in String(node.name).to_lower()):continue
+		parts.append(node)
+		var part_box: AABB=local_pose(node,body)*node.mesh.get_aabb()
+		box=part_box if parts.size()==1 else box.merge(part_box)
+	if parts.is_empty():return
+	var hinge:=Node3D.new();hinge.name="UltraTrunkHinge";body.add_child(hinge)
+	hinge.position=Vector3(box.get_center().x,box.end.y,box.position.z+.08)
+	for part in parts:
+		var pose:=local_pose(part,body)
+		part.owner=null
+		part.get_parent().remove_child(part);hinge.add_child(part)
+		part.transform=hinge.transform.affine_inverse()*pose
+	authored_actions.append({"slot":2,"name":"Trunk","type":"transform","duration":1.1,"targets":[{"node":"UltraTrunkHinge","open_rotation":[-78,0,0]}]})
 
 static func legacy_lamps(body: Node3D) -> Array:
 	var result: Array = []

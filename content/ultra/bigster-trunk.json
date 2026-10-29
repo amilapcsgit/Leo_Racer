@@ -1,0 +1,34 @@
+{
+  "bounds": {
+    "position": [
+      -1.03300786018372,
+      0.0,
+      -2.20480465888977
+    ],
+    "size": [
+      2.0733859539032,
+      1.65061235427856,
+      4.56980466842651
+    ]
+  },
+  "id": "bigster",
+  "lods_generated": true,
+  "merged_static_meshes": 223,
+  "pack_sha256": "9434d4ea8a730415c112bf05f99e0cd9ea9dd732016b2277e5a8b1a84310c052",
+  "scene_bytes": 10812544,
+  "status": "PASS",
+  "textures": 9,
+  "source_model_sha256": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
+  "source_unchanged": true,
+  "moving_parts": [
+    "dust25_tailgate_a",
+    "dust25_tailgate_carp",
+    "Bigster_Tailgate_Badge",
+    "Bigster_Tailgate_Dacia_OEM_Badge",
+    "Bigster_Tailgate_Patterned_Band",
+    "dust25_tailgate_chmsl",
+    "dust25_tailgateglass",
+    "Bigster_Rear_Plate",
+    "Bigster_Rear_Plate_Text"
+  ]
+}

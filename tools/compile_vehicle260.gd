@@ -17,6 +17,9 @@ func batch_static(root: Node3D, data: Dictionary) -> void:
 	# Keep every interaction path and all transparent surfaces independent.
 	if not root.find_children("*","AnimationPlayer",true,false).is_empty():return
 	var anchors: Array[Node]=[root];var protected: Array[Node]=[]
+	if data.get("ultra_trunk",false):
+		for node in root.find_children("*","MeshInstance3D",true,false):
+			if "tailgate" in String(node.name).to_lower() or "rear_plate" in String(node.name).to_lower():protected.append(node)
 	for wheel in data.get("wheels",[]):
 		for path in wheel.get("rotating",[])+wheel.get("stationary",[]):
 			var node:=root.get_node_or_null(NodePath(path))
@@ -138,6 +141,7 @@ func run() -> void:
 	if folder.is_empty() or destination.is_empty():quit(2);return
 	var data: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("vehicle.json")))
 	destination_folder=destination;vehicle_prefix="res://leo_vehicles/"+String(data.id)+"/"
+	if data.get("ultra_trunk",false):vehicle_prefix="res://ultra_vehicles/bigster/"
 	DirAccess.make_dir_recursive_absolute(destination.path_join("textures"))
 	var loaded:=LeoVehicleImporter.import_scene(folder.path_join(data.model))
 	if not loaded.scene:push_error(loaded.error);quit(2);return
@@ -158,7 +162,7 @@ func run() -> void:
 	var warmup_file:=destination.path_join("shader_warmup.scn")
 	data.shader_warmup_scene=warmup_scene(root,warmup_file)
 	if data.shader_warmup_scene.is_empty():quit(2);return
-	var target:="res://leo_vehicles/"+String(data.id)+"/model.scn"
+	var target:=vehicle_prefix+"model.scn"
 	var pck:=PCKPacker.new();var pack_file:=destination.path_join("vehicle.pck")
 	if pck.pck_start(pack_file)!=OK or pck.add_file(target,scene_file)!=OK:quit(2);return
 	if pck.add_file(data.shader_warmup_scene,warmup_file)!=OK:quit(2);return

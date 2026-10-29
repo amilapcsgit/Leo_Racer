@@ -45,7 +45,14 @@ try {
         if ($LASTEXITCODE -ne 0 -or (Select-String -Path "$qa/export.log" -Pattern 'SCRIPT ERROR|Export .NET Project: Failed|Safe save failed|Can.t open file from path' -Quiet)) {throw 'Export failed'}
         & "$PSScriptRoot/run_godot.ps1" @('--headless','--script','res://tools/build_workshop_pack.gd','--',"--output=$project/build/Release-2.7.0-Ultra/Tools/VehicleWorkshop")
         if ($LASTEXITCODE -ne 0) {throw 'Workshop package failed'}
-        & $Python tools/package_ultra.py
+        # Retain a real raw native run before the initial evidence archive is assembled.
+        & $Python tools/package_ultra.py stage
+        if ($LASTEXITCODE -ne 0) {throw 'Package staging failed'}
+        & $Python tools/run_ultra_checks.py core --export build/Release-2.7.0-Ultra
+        if ($LASTEXITCODE -ne 0) {throw 'Native core validation failed'}
+        & $Python tools/package_ultra.py installer
+        if ($LASTEXITCODE -ne 0) {throw 'Installer compilation failed'}
+        & $Python tools/package_ultra.py package
         if ($LASTEXITCODE -ne 0) {throw 'Packaging failed'}
         & $Python tools/verify_ultra_delivery.py
         if ($LASTEXITCODE -ne 0) {throw 'Native delivery verification failed'}

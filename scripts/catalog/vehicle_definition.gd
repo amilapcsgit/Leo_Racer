@@ -55,7 +55,7 @@ func boost_emitters() -> PackedVector3Array:
 	# Imported electric cars still need visible arcade boost without exhaust pipes.
 	# Derive positions in vehicle coordinates; normalization is already reflected
 	# in collision dimensions, so the model's scale must not be applied again.
-	if not exhausts.is_empty() or official:return exhausts
+	if not exhausts.is_empty() or (official and id!=&"duster_2024"):return exhausts
 	var half_width:=collision_size.x*.28
 	var height:=maxf(.25,collision_position.y-collision_size.y*.25)
 	var rear:=collision_position.z+collision_size.z*.5+.12

@@ -11,7 +11,7 @@ def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='u
 def inject_checks(entries):
     # Release templates intentionally ignore --script. Opt-in bootstrap probes
     # adapt the same SceneTree tests to Nodes, without a second test implementation.
-    mapping={'core':'ultra_core_test','visual':'ultra_visual_test','previews':'ultra_preview_test','physics':'ultra_physics_test','garage':'release260_runtime_test','contacts':'release260_collision_test','audit':'release260_collision_test','impact':'lighting_world_test'}
+    mapping={'finish':'ultra_finish_test','core':'ultra_core_test','visual':'ultra_visual_test','previews':'ultra_preview_test','physics':'ultra_physics_test','garage':'release260_runtime_test','contacts':'release260_collision_test','audit':'release260_collision_test','impact':'lighting_world_test'}
     adapter='''extends Node
 var root: Window:
  get:return get_tree().root
@@ -38,6 +38,10 @@ def stage():
         shutil.copytree(source/name,BASE/'GameAssets'/name,dirs_exist_ok=True)
     catalog=json.loads((BASE/'GameAssets/catalog.json').read_text(encoding='utf-8'))
     catalog.update(vehicle_api=2,core={'min':'2.7.0','max_major':2})
+    derivative=BASE/'GameAssets/ultra/bigster-trunk.pck'
+    derivative.parent.mkdir(exist_ok=True)
+    shutil.copy2(ROOT/'content/ultra/bigster-trunk.pck',derivative)
+    catalog['packs'].append({'id':'ultra/bigster-trunk','file':'ultra/bigster-trunk.pck','sha256':sha(derivative),'bytes':derivative.stat().st_size})
     neutral=BASE/'GameAssets/environments/dusk-neutral.pck'
     catalog['packs'].append({'id':'environments/dusk-neutral','file':'environments/dusk-neutral.pck','sha256':sha(neutral),'bytes':neutral.stat().st_size})
     dump(BASE/'GameAssets/catalog.json',catalog)
@@ -119,6 +123,8 @@ def package():
         if not any(name.endswith('/process.log') for name in archive.namelist()):raise RuntimeError('Evidence archive must include raw process logs')
     for name in ['RELEASE_NOTES_270.md','VALIDATION_270.md']:shutil.copy2(ROOT/'docs'/name,OUT/('RELEASE_NOTES.md' if name.startswith('RELEASE') else 'TEST_REPORT.md'))
     artifacts=[target,evidence,OUT/'LeoRacer-Setup.exe',OUT/'RELEASE_NOTES.md',OUT/'TEST_REPORT.md']
+    media=OUT/'LeoRacer-2.7.0-Media-Pack.zip'
+    if media.exists():artifacts.append(media)
     rows=[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha(p)} for p in artifacts]
     (OUT/'SHA256SUMS.txt').write_text(''.join(r['sha256']+'  '+r['name']+'\n' for r in rows),encoding='ascii')
     rows.append({'name':'SHA256SUMS.txt','bytes':(OUT/'SHA256SUMS.txt').stat().st_size,'sha256':sha(OUT/'SHA256SUMS.txt')})

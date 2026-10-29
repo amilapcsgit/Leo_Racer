@@ -10,6 +10,8 @@ var pad_numbers: Dictionary = {}
 var next_pad_number := 1
 var claim_slot := -1
 var claimed_releases: Dictionary = {}
+var menu_confirm_held: Dictionary = {}
+var menu_popup: WeakRef
 var capture_slot := -1
 var capture_action := ""
 var capture_rest: Dictionary = {}
@@ -20,6 +22,7 @@ var assignment_locked := false
 var pending_binding: Dictionary = {}
 signal binding_conflict
 func _ready() -> void:
+ add_to_group("menu_input_router")
  process_mode = Node.PROCESS_MODE_ALWAYS
  Input.joy_connection_changed.connect(_connection)
  load_profiles()
@@ -109,7 +112,73 @@ func _input(event: InputEvent) -> void:
  if claim_event(event):return
  if capture_slot >= 0:
   _capture(event); return
+ if menu_confirm(event):return
  if gameplay_enabled or controls_testing:feed(event)
+
+func menu_confirm(event: InputEvent) -> bool:
+ if capture_slot>=0 or claim_slot>=0 or controls_testing or not pending_binding.is_empty():return false
+ if not (event is InputEventJoypadButton or event is InputEventJoypadMotion):return false
+ var key:="%d:%s:%d" % [event.device,"button" if event is InputEventJoypadButton else "axis",event.button_index if event is InputEventJoypadButton else event.axis]
+ var pressed: bool=event.pressed if event is InputEventJoypadButton else absf(event.axis_value)>.5
+ if menu_confirm_held.has(key):
+  if event is InputEventJoypadMotion:
+   var binding: Dictionary=menu_confirm_held[key]
+   var rest:=float(binding.get("rest",0.));var end:=float(binding.get("pressed",1.))
+   pressed=(event.axis_value-rest)/(end-rest)>.5 if absf(end-rest)>.001 else false
+  if not pressed:menu_confirm_held.erase(key)
+  get_viewport().set_input_as_handled();return true
+ if gameplay_enabled:return false
+ for slot in active_slots:
+  var p:=players[slot]
+  if not p.accepts(event):continue
+  for binding in p.bindings.get("boost",[]):
+   if binding.get("type")==("button" if event is InputEventJoypadButton else "axis") and int(binding.get("index",-1))==(event.button_index if event is InputEventJoypadButton else event.axis):
+    if event is InputEventJoypadMotion:
+     var rest:=float(binding.get("rest",0.));var end:=float(binding.get("pressed",1.))
+     pressed=(event.axis_value-rest)/(end-rest)>.5 if absf(end-rest)>.001 else false
+    if not pressed:return false
+    menu_confirm_held[key]=binding.duplicate();p.clear()
+    var focus:=get_viewport().gui_get_focus_owner()
+    _confirm_focused.call_deferred(weakref(focus) if focus else null,event.device)
+    get_viewport().set_input_as_handled();return true
+ return false
+
+func _confirm_focused(previous: WeakRef,device: int) -> void:
+ if gameplay_enabled or claim_slot>=0 or capture_slot>=0:return
+ var popup: PopupMenu=menu_popup.get_ref() if menu_popup else null
+ if is_instance_valid(popup) and popup.visible:
+  var index:=popup.get_focused_item()
+  if index<0:index=0
+  if index<popup.item_count and not popup.is_item_disabled(index):
+   popup.id_pressed.emit(popup.get_item_id(index));popup.hide()
+  return
+ var focused:=get_viewport().gui_get_focus_owner()
+ if previous and previous.get_ref()!=focused:return
+ for garage in get_tree().get_nodes_in_group("controller_garage"):
+  if garage.is_visible_in_tree():
+   if garage.input_device not in [-2,device]:return
+   if garage.name_field.has_focus():garage.open_keyboard()
+   else:garage.activate_controller_focus()
+   return
+ if focused is OptionButton:
+  popup=focused.get_popup();menu_popup=weakref(popup)
+  if not popup.window_input.is_connected(_popup_input):popup.window_input.connect(_popup_input)
+ # Native GUI handling retains correct toggles, dropdowns and popup semantics.
+ for down in [true,false]:
+  var accept:=InputEventKey.new();accept.keycode=KEY_ENTER;accept.physical_keycode=KEY_ENTER;accept.pressed=down
+  accept.set_meta("controller_confirm",true)
+  Input.parse_input_event(accept)
+
+func _popup_input(event: InputEvent) -> void:
+ if menu_confirm(event):
+  var popup: PopupMenu=menu_popup.get_ref() if menu_popup else null
+  if is_instance_valid(popup):popup.set_input_as_handled()
+
+func menu_confirm_label() -> String:
+ var labels: Array[String]=[]
+ for slot in active_slots:
+  if players[slot].kind!="keyboard":labels.append("P%d %s" % [slot+1,players[slot].describe("boost")])
+ return " / ".join(labels) if not labels.is_empty() else "X"
 func feed(event: InputEvent) -> void:
  if event is InputEventMouseButton or event is InputEventMouseMotion:
   var owner:=0

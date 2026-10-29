@@ -372,7 +372,7 @@ func show_results() -> void:
  action(box,"Race Again   →",start_selected,true).grab_focus()
  var row:=HBoxContainer.new();box.add_child(row);action(row,"Change Race",func():show_setup());action(row,"Home",game.return_menu)
 func update_prompt() -> void:
- if is_instance_valid(prompt):prompt.text="D-pad / Stick   Move     A   Select     B   Back" if last_pad else "Arrows   Move     Enter   Select     Esc   Back"
+ if is_instance_valid(prompt):prompt.text="D-pad / Stick   Move     %s   OK     B   Back" % game.input_router.menu_confirm_label() if last_pad else "Arrows   Move     Enter   Select     Esc   Back"
 
 func verify_preview() -> void:
  var errors: Array[String]=[]
@@ -409,10 +409,11 @@ func verify_preview() -> void:
 func _input(event: InputEvent) -> void:
  if game.input_router.claim_slot>=0 or (event is InputEventJoypadButton and game.input_router.claimed_releases.has(event.device)):
   game.input_router.claim_event(event);return
+ if game.input_router.menu_confirm(event):last_pad=true;update_prompt();return
  if is_instance_valid(game.content_panel):return
  if is_instance_valid(game.loading) and game.loading.visible:return
  if event is InputEventJoypadButton or event is InputEventJoypadMotion:last_pad=true;update_prompt()
- elif event is InputEventKey or event is InputEventMouseMotion:last_pad=false;update_prompt()
+ elif (event is InputEventKey and not event.has_meta("controller_confirm")) or event is InputEventMouseMotion:last_pad=false;update_prompt()
  if not game.input_router.pending_binding.is_empty():
   if event.is_action_pressed("ui_cancel"):
    game.input_router.resolve_conflict("cancel")

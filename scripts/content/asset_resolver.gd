@@ -47,6 +47,8 @@ static func mount_packs() -> Error:
 	for pack in manifest.get("packs",[]):
 		if not ProjectSettings.load_resource_pack(safe_file(pack.file),false):
 			failure="Cannot open asset pack: "+String(pack.file);return ERR_FILE_CORRUPT
+	if OS.has_feature("editor") and FileAccess.file_exists("res://content/ultra/bigster-trunk.pck"):
+		if not ProjectSettings.load_resource_pack("res://content/ultra/bigster-trunk.pck",false):return ERR_FILE_CORRUPT
 	return OK
 
 static func override_for(id: String) -> Dictionary:

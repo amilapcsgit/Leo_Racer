@@ -33,6 +33,10 @@ static func resolve(source: VehicleDefinition) -> VehicleDefinition:
 	elif entry.has("length"):factor=float(entry.length)/maxf(.001,measured.size.z)
 	else:factor=minf(4.4/maxf(.001,measured.size.z),minf(2./maxf(.001,measured.size.x),1.8/maxf(.001,measured.size.y)))
 	var resolved:=source.duplicate(true) as VehicleDefinition
+	if source.id==&"bigster" and ResourceLoader.exists("res://ultra_vehicles/bigster/model.scn"):
+		resolved.model=null
+		resolved.model_path="res://ultra_vehicles/bigster/model.scn"
+		resolved.preview_scene=resolved.model_path
 	# Resource.duplicate copies exported fields, not runtime package classification.
 	resolved.official=source.official
 	resolved.content_folder=source.content_folder
