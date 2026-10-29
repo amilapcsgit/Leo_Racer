@@ -11,7 +11,7 @@
 - Windows validation now stages checksum-pinned content before tests, uses the current roster and packaging, and preserves failure logs. Preview preparation drains before race transitions and shutdown. Actual contact preparation is warmed behind the loading screen without leaving cosmetic damage.
 
 - Bigster Action 2 opens the full trunk, including its number plate; Action 1 retains the sunroof. Duster 2024 now displays its blue arcade boost jets.
-- Each assigned pad’s configured boost button also confirms menus, garage, settings, dropdowns and dialogs. Held confirmation is consumed through release, preventing accidental double activation or boost on race entry.
+- Each assigned padâ€™s configured boost button also confirms menus, garage, settings, dropdowns and dialogs. Held confirmation is consumed through release, preventing accidental double activation or boost on race entry.
 - The release includes a showcase media pack with original artwork, transparent cars, SVG graphics, real captures and website-ready copies.
 
 The Windows portable folder and installer work offline without a development SDK. Keep the complete portable folder together; use **Play Compatibility.cmd** if Vulkan is unavailable. The Vehicle Workshop remains included.
