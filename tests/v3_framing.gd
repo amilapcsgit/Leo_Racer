@@ -18,7 +18,7 @@ func _initialize() -> void:run.call_deferred()
 func run() -> void:
 	var rig=load("res://scripts/local/race_camera.gd")
 	for speed in [0.,25.,50.,62.5,-50.]:
-		assert(is_equal_approx(rig.speed_pullback(speed,false),absf(speed)*.012*.5))
+		assert(is_equal_approx(rig.speed_pullback(speed,false),absf(speed)*.012*.5*.1))
 		assert(is_zero_approx(rig.speed_pullback(speed,true)))
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")

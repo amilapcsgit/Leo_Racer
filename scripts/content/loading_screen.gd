@@ -16,7 +16,7 @@ var reduced_motion := false
 func _ready() -> void:
 	layer=100;process_mode=Node.PROCESS_MODE_ALWAYS
 	var panel:=ColorRect.new();panel.color=Color("091a28");panel.theme=load("res://assets/ui/theme.tres");panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);add_child(panel)
-	var art:=TextureRect.new();artwork=art;backdrop_path=LeoLoadingBackdrops.begin_load(operation_id);art.texture=load(backdrop_path);art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED;art.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(art)
+	var art:=TextureRect.new();artwork=art;var saved:=ConfigFile.new();saved.load("user://leo_racer.cfg");backdrop_path=LeoLoadingBackdrops.begin_load(operation_id,String(saved.get_value("game","track_id","colombo_city")));art.texture=load(backdrop_path);art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);art.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;art.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED;art.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(art)
 	var shade:=ColorRect.new();shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);var material:=ShaderMaterial.new();material.shader=preload("res://shaders/ui_loading_shade.gdshader");shade.material=material;shade.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(shade)
 	var cfg:=ConfigFile.new();cfg.load("user://leo_racer.cfg");reduced_motion=bool(cfg.get_value("display","reduced_motion",false))
 	var center:=CenterContainer.new();center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.add_child(center)
@@ -40,6 +40,6 @@ func show_failure(message: String, again: Callable, leave: Callable) -> void:
 	caption.text="LET'S TRY THAT AGAIN";detail.text=message;bar.hide()
 	retry.show();back.show();retry.pressed.connect(again,CONNECT_ONE_SHOT);back.pressed.connect(leave,CONNECT_ONE_SHOT);retry.grab_focus()
 
-func begin_load(id: String) -> void:
-	operation_id=id;backdrop_path=LeoLoadingBackdrops.begin_load(id)
-	if artwork:artwork.texture=load(backdrop_path)
+func begin_load(id: String,track_id: String="",preview: String="") -> void:
+	operation_id=id;backdrop_path=LeoLoadingBackdrops.begin_load(id,track_id,preview)
+	if artwork:artwork.texture=load(backdrop_path) if backdrop_path.begins_with("res://") else LeoAssets.texture(backdrop_path)

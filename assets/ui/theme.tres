@@ -99,18 +99,24 @@ corner_radius_bottom_left = 8
 corner_radius_bottom_right = 8
 [resource]
 default_font = ExtResource("1")
-default_font_size = 8
+default_font_size = 24
 Label/colors/font_color = Color(0.96,0.97,0.98,1)
 Label/colors/font_outline_color = Color(0.02,0.03,0.05,1)
 Label/constants/outline_size = 2
 PanelContainer/styles/panel = SubResource("panel")
 VBoxContainer/constants/separation = 16
 HBoxContainer/constants/separation = 8
-CheckButton/font_sizes/font_size = 8
+CheckButton/font_sizes/font_size = 24
 Button/styles/normal = SubResource("button_normal")
 Button/styles/hover = SubResource("button_hover")
 Button/styles/pressed = SubResource("button_pressed")
 Button/styles/focus = SubResource("button_focus")
 Button/styles/disabled = SubResource("button_disabled")
-Button/font_sizes/font_size = 8
+Button/font_sizes/font_size = 24
 Button/colors/font_color = Color(0.96,0.97,0.98,1)
+
+OptionButton/font_sizes/font_size = 24
+PopupMenu/font_sizes/font_size = 24
+LineEdit/font_sizes/font_size = 24
+SpinBox/font_sizes/font_size = 24
+ItemList/font_sizes/font_size = 24

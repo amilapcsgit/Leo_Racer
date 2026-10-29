@@ -1,6 +1,6 @@
 # Leo Racer contributor SDK
 
-Requires Godot 4.7.2 for authoring. Players need only the modular Leo Racer build (core API 2.2.0); no editor, SDK or network is needed to play your content.
+Requires Godot 4.7.2 for authoring. This SDK targets Leo Racer 2.6.0 and retains earlier content APIs. Players need only the modular game; no editor, SDK or network is needed to play your content.
 
 ## Vehicles
 

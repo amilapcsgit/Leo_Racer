@@ -74,6 +74,7 @@ func run() -> void:
 			for phase in [0.,.5,1.]:
 				controller.progress=phase;controller.displayed=phase;controller.apply(true);await settled()
 				await capture(track+"-"+str(players)+"p-"+("dusk" if phase==0. else "mid" if phase==.5 else "night"))
+			if "--record-transition" in OS.get_cmdline_user_args():await record_transition(track,players)
 		controller.progress=1.;controller.displayed=1.;controller.apply(true);await settled()
 		var clock:=lights.animation_clock;controller.advance(game.karts,.5,true);check(lights.animation_clock==clock,"Photo freezes LED time")
 		game.set_reduced_motion(true);controller.advance(game.karts,.01,false)
@@ -91,3 +92,16 @@ func run() -> void:
 	var report: Dictionary={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"renderer":RenderingServer.get_current_rendering_method(),"results":rows}
 	FileAccess.open(output.path_join("world.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 	print("LIGHTING_WORLD ",JSON.stringify(report));await game.quit_game(0 if errors.is_empty() else 2)
+
+func record_transition(track: String,players: int) -> void:
+	var folder:=output.path_join(track+"-"+str(players)+"p-frames")
+	DirAccess.make_dir_recursive_absolute(folder)
+	var controller: LeoRaceEnvironment=game.race_environment
+	controller.reset();controller.illumination.animation_clock=0.
+	var start:=Time.get_ticks_msec()
+	for index in 120:
+		game.player.progress=game.circuit.length*3.*float(index)/119.;game.player.checkpoint_missed=false
+		await create_timer(.1).timeout
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(folder.path_join("%04d.png"%index))
+	FileAccess.open(folder.path_join("capture.json"),FileAccess.WRITE).store_string(JSON.stringify({"frames":120,"playback_fps":10,"capture_seconds":(Time.get_ticks_msec()-start)/1000.,"source":"actual Godot rendered frames","leader_progress_driven":true,"shared_viewports":players==2}))

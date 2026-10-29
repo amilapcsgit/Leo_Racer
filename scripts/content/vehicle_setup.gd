@@ -65,15 +65,15 @@ func _ready() -> void:
 	var floor_node:=MeshInstance3D.new();var floor_mesh:=PlaneMesh.new();floor_mesh.size=Vector2(250,250);floor_node.mesh=floor_mesh;studio.add_child(floor_node)
 	var floor_material:=StandardMaterial3D.new();floor_material.albedo_color=Color("273e4c");floor_node.material_override=floor_material
 	var ground:=StaticBody3D.new();var shape:=CollisionShape3D.new();var slab:=BoxShape3D.new();slab.size=Vector3(250,1,250);shape.shape=slab;shape.position.y=-.5;ground.add_child(shape);studio.add_child(ground)
-	var controls:=HBoxContainer.new();right.add_child(controls)
+	var controls:=HFlowContainer.new();right.add_child(controls)
 	button(controls,"Orbit ◀",func():yaw-=.35;position_camera());button(controls,"Orbit ▶",func():yaw+=.35;position_camera())
 	var spin_toggle:=CheckButton.new();spin_toggle.text="Spin";spin_toggle.toggled.connect(func(value):spin=value);controls.add_child(spin_toggle)
 	var steer_toggle:=CheckButton.new();steer_toggle.text="Steer";steer_toggle.toggled.connect(func(value):steering=value);controls.add_child(steer_toggle)
 	meshes=ItemList.new();meshes.select_mode=ItemList.SELECT_MULTI;meshes.custom_minimum_size.y=100;right.add_child(meshes)
-	label(right,"Select nodes above; bind them to the chosen wheel.").add_theme_font_size_override("font_size",16)
-	var bind:=HBoxContainer.new();right.add_child(bind)
+	label(right,"Select nodes above; bind them to the chosen wheel.").add_theme_font_size_override("font_size",20)
+	var bind:=HFlowContainer.new();right.add_child(bind)
 	button(bind,"Bind rotating",func():bind_selected("rotating"));button(bind,"Bind calipers",func():bind_selected("stationary"));button(bind,"Center pivot",center_pivot)
-	var footer:=HBoxContainer.new();box.add_child(footer)
+	var footer:=HFlowContainer.new();box.add_child(footer)
 	button(footer,"Validate",validate_report);button(footer,"Private Test Drive",test_drive);button(footer,"Finish Test Drive",end_trial);button(footer,"Save Vehicle Folder",save_vehicle)
 	if not source_path.is_empty():await load_model()
 
@@ -95,7 +95,7 @@ static func slug(value: String) -> String:
 	return ("vehicle_"+result).left(64) if result.is_empty() or not result.substr(0,1).is_valid_identifier() else result.left(64)
 
 func button(parent: Node,words: String,action: Callable) -> Button:
-	var node:=Button.new();node.text=words;node.custom_minimum_size=Vector2(130,46);node.pressed.connect(action);parent.add_child(node);return node
+	var node:=Button.new();node.text=words;node.custom_minimum_size=Vector2(130,48);node.pressed.connect(action);parent.add_child(node);return node
 func label(parent: Node,words: String) -> Label:
 	var node:=Label.new();node.text=words;node.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;parent.add_child(node);return node
 func heading(words: String) -> void:

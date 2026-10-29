@@ -30,9 +30,9 @@ func _ready() -> void:
  for i in game.tracks.size():
   var course: LeoTrackDefinition=game.tracks[i];track.add_item(course.display_name)
   if course.id==game.chosen_track_id:track.select(i)
- filters.add_child(track)
+ track.custom_minimum_size=Vector2(300,48);filters.add_child(track)
  revision=OptionButton.new();revision.add_item("Current course",0);revision.add_item("Kandy / original course archive",1);filters.add_child(revision)
- mode=OptionButton.new();mode.add_item("1 PLAYER",1);mode.add_item("2 PLAYERS",2);filters.add_child(mode)
+ mode=OptionButton.new();mode.add_item("1 PLAYER",1);mode.add_item("2 PLAYERS",2);mode.custom_minimum_size=Vector2(160,48);filters.add_child(mode)
  mode.select(game.human_count-1)
  performance=OptionButton.new();performance.add_item("CURRENT VEHICLE BALANCE");performance.add_item("LEGACY / 165 KM/H");performance.add_item("LEGACY / BIGSTER");performance.add_item("LEGACY / DISTINCT V2");performance.add_item("LEGACY / DISTINCT V3");performance.add_item("LEGACY / DISTINCT V4");filters.add_child(performance)
  performance.select(0)
@@ -41,18 +41,18 @@ func _ready() -> void:
  filters.add_child(vehicle)
  metric=OptionButton.new();metric.add_item("RACE TIME");metric.add_item("BEST LAP");filters.add_child(metric)
  extra_filters=[performance,vehicle,metric]
- for control in extra_filters:control.hide()
- var more:=Button.new();more.text="More Filters";more.pressed.connect(func():advanced=not advanced;more.text="Fewer Filters" if advanced else "More Filters";for_filter_visibility());box.add_child(more)
+ for control in extra_filters:control.custom_minimum_size.y=48;control.hide()
+ var more:=Button.new();more.text="More Filters";more.custom_minimum_size.y=48;more.pressed.connect(func():advanced=not advanced;more.text="Fewer Filters" if advanced else "More Filters";for_filter_visibility());box.add_child(more)
  for filter in [track,revision,mode,performance,vehicle,metric]:filter.item_selected.connect(func(_i):refresh())
  status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(status)
  var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
  entries=VBoxContainer.new();entries.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(entries)
  var legacy:=Label.new();legacy.text="Complete three laps without changing rides to set a record.\nEarlier personal best: %s" % (game.format_time(game.legacy_best_time) if game.legacy_best_time>0 else "No record yet");legacy.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;legacy.hide();box.add_child(legacy)
- var rules:=Button.new();rules.text="Record Rules";rules.pressed.connect(func():legacy.visible=not legacy.visible);box.add_child(rules)
+ var rules:=Button.new();rules.text="Record Rules";rules.custom_minimum_size.y=48;rules.pressed.connect(func():legacy.visible=not legacy.visible);box.add_child(rules)
  var buttons:=HBoxContainer.new();box.add_child(buttons)
  var retry:=Button.new();retry.text="RETRY DATABASE";retry.pressed.connect(func():game.open_rankings();refresh());buttons.add_child(retry)
  retry.name="Retry";retry.text="Try Again";retry.custom_minimum_size=Vector2(220,64)
- var back:=Button.new();back.text="Back";back.custom_minimum_size=Vector2(220,64);back.pressed.connect(func():closed.emit() if embedded else queue_free());buttons.add_child(back);back.grab_focus()
+ var back:=Button.new();back.text="Back";back.custom_minimum_size=Vector2(220,64);back.pressed.connect(close_panel);buttons.add_child(back);back.grab_focus()
  refresh()
 func refresh() -> void:
  query_generation+=1
@@ -81,8 +81,12 @@ func refresh() -> void:
   var empty:=Label.new();empty.text="No records yet. Finish a race to set your first time!";empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;entries.add_child(empty)
  for i in rows.size():
   var row: Dictionary=rows[i]
-  var label:=Label.new();label.text="%02d   %-32s  %s   /   %s" % [i+1,row.name,game.format_time(float(row.lap_ms if metric.selected==1 else row.race_ms)/1000.),vehicle_label(String(row.vehicle))]
-  label.add_theme_font_size_override("font_size",24);entries.add_child(label)
+  var line:=HBoxContainer.new();line.add_theme_constant_override("separation",20);entries.add_child(line)
+  var values: Array[String]=["%02d"%(i+1),str(row.name),game.format_time(float(row.lap_ms if metric.selected==1 else row.race_ms)/1000.),vehicle_label(String(row.vehicle))]
+  for column in 4:
+   var cell:=Label.new();cell.text=values[column];cell.tooltip_text=values[column];cell.add_theme_font_size_override("font_size",24);cell.custom_minimum_size=Vector2([48,280,160,300][column],48);cell.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;cell.clip_text=true
+   if column in [1,3]:cell.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+   line.add_child(cell)
 
 func for_filter_visibility() -> void:
  for control in extra_filters:control.visible=advanced
@@ -90,3 +94,7 @@ func for_filter_visibility() -> void:
 func vehicle_label(key: String) -> String:
  var found: VehicleDefinition=game.catalog.vehicle(StringName(key))
  return found.display_name if found else key
+
+func close_panel() -> void:
+ if embedded:closed.emit()
+ else:queue_free()

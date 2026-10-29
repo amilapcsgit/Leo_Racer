@@ -12,6 +12,8 @@ var active := false
 var reduced_motion := false
 var previous_disabled := false
 func _ready() -> void:
+ # Only the invisible native caption uses a small measurement font.
+ add_theme_font_size_override("font_size",8)
  add_to_group("ui_buttons");custom_minimum_size.y=88 if primary else 64;mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
  for state in ["normal","hover","pressed","focus","disabled"]:add_theme_stylebox_override(state,StyleBoxEmpty.new())
  for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color","font_disabled_color"]:add_theme_color_override(state,Color.TRANSPARENT)

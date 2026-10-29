@@ -88,9 +88,9 @@ func acquire(racer: StringName,vehicle: StringName,valid: Callable) -> Node3D:
 		await get_tree().process_frame
 	return null
 func park(assembly: Node3D) -> void:
-	if not is_instance_valid(assembly):return
+	if not is_instance_valid(assembly) or not is_instance_valid(warm_root) or not warm_root.is_inside_tree():return
 	assembly.hide()
-	if assembly.get_parent()!=warm_root:assembly.reparent(warm_root)
+	if assembly.get_parent()!=warm_root:assembly.reparent(warm_root,false)
 func trim() -> void:
 	var bytes:=0
 	for entry in prepared.values():bytes+=int(entry.bytes)

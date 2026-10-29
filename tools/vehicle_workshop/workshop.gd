@@ -63,6 +63,7 @@ func configure(value: Dictionary) -> void:
 		apply_job()
 
 func _ready() -> void:
+	theme=load("res://assets/ui/theme.tres")
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var background := ColorRect.new()
@@ -145,7 +146,7 @@ func _ready() -> void:
 	front_marker.no_depth_test = true
 	front_marker.position = Vector3(0, .15, -3.5)
 	studio.add_child(front_marker)
-	var previews := HBoxContainer.new()
+	var previews := HFlowContainer.new()
 	right.add_child(previews)
 	spin_toggle = toggle(previews, "Spin wheels", true)
 	steer_toggle = toggle(previews, "Steer", false)
@@ -164,12 +165,12 @@ func _ready() -> void:
 	inventory.item_selected.connect(func(_index): highlight_selection())
 	inventory.multi_selected.connect(func(_index, _selected): highlight_selection())
 	right.add_child(inventory)
-	var assignment := HBoxContainer.new()
+	var assignment := HFlowContainer.new()
 	right.add_child(assignment)
 	button(assignment, "Use as wheel", func(): assign_selection(false))
 	button(assignment, "Use as caliper", func(): assign_selection(true))
 	button(assignment, "Guided region", select_region)
-	var footer := HBoxContainer.new()
+	var footer := HFlowContainer.new()
 	layout.add_child(footer)
 	button(footer, "Import GLB…", choose_source)
 	button(footer, "Apply / Validate", build_preview)
@@ -206,7 +207,7 @@ func label(parent: Node, text: String) -> Label:
 func button(parent: Node, text: String, action: Callable) -> Button:
 	var control := Button.new()
 	control.text = text
-	control.custom_minimum_size.y = 40
+	control.custom_minimum_size.y = 48
 	control.pressed.connect(action)
 	parent.add_child(control)
 	return control

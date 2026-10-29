@@ -64,8 +64,8 @@ func features() -> void:
 	kart.active=true;kart.auto_drive=false
 	var local: LeoLocalPlayer=game.local_players[0]
 	var rig=local.camera_rig
-	check(rig.field_of_view(0.,0.,false)==63. and rig.field_of_view(50.,0.,false)==73.,"Speed FOV endpoints")
-	check(rig.field_of_view(90.,30.,false)==85. and rig.field_of_view(90.,30.,true,67.)==67.,"FOV cap and Reduced Motion")
+	check(rig.field_of_view(0.,0.,false)==63. and rig.field_of_view(50.,0.,false)==64.,"Speed FOV endpoints")
+	check(is_equal_approx(rig.field_of_view(90.,30.,false),65.2) and rig.field_of_view(90.,30.,true,67.)==67.,"FOV cap and Reduced Motion")
 	game.set_reduced_motion(true);kart.speed=50.;game.camera.fov=70.
 	game.update_local_camera(local,1.)
 	check(absf(game.camera.fov-game.base_camera_fov)<.001,"Reduced Motion selects constant base FOV")

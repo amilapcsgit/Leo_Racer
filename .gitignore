@@ -99,3 +99,6 @@ docs/screenshots/2.5.0/*.import
 
 # Reviewed lighting QA captures are not runtime textures.
 docs/qa-lighting/*.png.import
+
+# Rebuilt final installer payload lists contain local staging paths.
+installer/release26-final-*.nsh

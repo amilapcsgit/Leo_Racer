@@ -12,7 +12,9 @@ func begin() -> void:
 		await begin_workshop();return
 	if "--verify-boot-art" in OS.get_cmdline_user_args():
 		var errors: Array[String]=[]
-		for path in [LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]:
+		var paths: Array[String]=[LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]
+		for track in LeoLoadingBackdrops.TRACKS:paths.append_array(LeoLoadingBackdrops.paths(track))
+		for path in paths:
 			var texture:=load(path) as Texture2D
 			if not texture or texture.get_width()<1:errors.append(path)
 		print("BOOT_ART_VALIDATION ",JSON.stringify({"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"before_asset_mount":true}))
@@ -55,6 +57,10 @@ func begin() -> void:
 		var report: Dictionary=await load("res://scripts/content/content_validator.gd").vehicles(get_tree())
 		FileAccess.open("user://content-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 		print("VEHICLE_VALIDATION ",JSON.stringify(report));get_tree().quit(0 if report.status=="PASS" else 2);return
+	if "--drive-test" in OS.get_cmdline_user_args():
+		for probe in ["ui","content","polish"]:
+			if ("--release-"+probe+"-check") in OS.get_cmdline_user_args():
+				screen.hide();var check_node: Node=load("res://scripts/content/release26_"+probe+"_check.gd").new();get_tree().root.add_child(check_node);queue_free();return
 	TRACE.mark("interface_load_begin")
 	screen.stage("Loading interface…",20)
 	var path:="res://scenes/main.tscn"

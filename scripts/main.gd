@@ -558,7 +558,7 @@ func start_race() -> void:
 		hud.garage_selector.home_preview=false;hud.garage_selector.scheduler.pause_for_race();hud.garage_selector.assembly=null;hud.garage_selector.sync_visibility()
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
-	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"))
+	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition))
 	state="loading";loading.stage("Preparing racers…",15)
 	get_tree().paused=false
 	remove_racers()
@@ -750,11 +750,15 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 			if assigned and not assigned.finished and not assigned.retired:
 				var problem:=input_router.ready_problem(slot)
 				if not problem.is_empty():
-					hud.garage_selector.policy.text=problem+" Back to pause and reassign controls before continuing."
+					hud.garage_selector.show_problem(problem+" Back to pause and reassign controls before continuing.")
 					return false
 	var local:=local_players[selected_player_slot]
 	var old:=local.kart
 	if old.finished or old.retired:return false
+	if old.vehicle_key==String(v) and old.visual.get_meta("driver_id")==d:
+		apply_garage_selection(d,v,player_name)
+		resume_pause_garage()
+		return true
 	var fresh:=LeoKart.new()
 	fresh.process_mode=Node.PROCESS_MODE_PAUSABLE
 	add_child(fresh)
@@ -787,7 +791,7 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 			safe_position=position_at;found=true;break
 	if not found:
 		fresh.stop_audio();fresh.queue_free()
-		hud.garage_selector.policy.text="TRACK BUSY — BACK TO PAUSE, RESUME, THEN TRY AGAIN"
+		hud.garage_selector.show_problem("No safe space for this car. Back to pause, resume, then try again.")
 		return false
 	fresh.position=safe_position;fresh.rotation.y=heading
 	for property in ["progress","next_gate","last_reported_gate","checkpoint_missed","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
@@ -804,13 +808,17 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	race_modified=true;garage_from_pause=false
 	if local.feedback:local.feedback.reset_feedback()
 	local.roll=0.;local.slipstream_time=0.;local.heading=heading
+	local.camera_rig.reset()
 	camera_roll=0.;slipstream_time=0.;cam_heading=heading
 	apply_garage_selection(d,v,player_name)
-	paused=false;get_tree().paused=false
+	resume_pause_garage();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
+	return true
+
+func resume_pause_garage() -> void:
+	garage_from_pause=false;paused=false;get_tree().paused=false
 	input_router.clear_all()
 	if split_view:split_view.set_frozen(false)
-	hud.show_race();hud.announce("CAR CHANGED  //  MODIFIED RACE — NO RECORD",3.0)
-	return true
+	hud.show_race()
 
 func reset_motion_feedback() -> void:
 	for local in local_players:
@@ -1277,7 +1285,7 @@ func select_track(id: String) -> bool:
 	for candidate in tracks:
 		if candidate.id==id:target=candidate;break
 	if not target:return false
-	if not loading.visible:loading.begin_load(LeoLoadingBackdrops.new_operation("track"))
+	loading.begin_load(LeoLoadingBackdrops.new_operation("track"),id,loading_preview(target))
 	loading.stage("Checking "+target.display_name+"…",10)
 	await get_tree().process_frame
 	if not target.mount():
@@ -1294,3 +1302,10 @@ func select_track(id: String) -> bool:
 
 func _exit_tree() -> void:
 	LeoAssets.cache.clear();LeoAssets._patched_meshes.clear()
+
+func loading_preview(course: LeoTrackDefinition) -> String:
+	var preview: String=course.metadata.get("preview","")
+	if not preview.is_empty() and LeoVehicleLibrary.safe_relative(preview):
+		var path:=course.folder.path_join(preview)
+		if FileAccess.file_exists(path):return ProjectSettings.globalize_path(path)
+	return ""

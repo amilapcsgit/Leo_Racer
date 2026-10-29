@@ -51,8 +51,8 @@ var stat_labels: Array[Label]=[]
 var portrait_tweens: Dictionary={}
 var keyboard_suspended: Array[Control]=[]
 var camera: Camera3D
-var yaw := -.6
-var pitch := .24
+var yaw := 0.
+var pitch := .12
 var zoom := 1.0
 var dragging := false
 var idle := 0.0
@@ -73,7 +73,7 @@ func _ready() -> void:
 	surround.position=Vector2(-2000,0);surround.size=Vector2(5600,900)
 	surround.color=Color("17140f");surround.mouse_filter=MOUSE_FILTER_IGNORE;add_child(surround);move_child(surround,0)
 	var background := TextureRect.new()
-	background.texture=preload("res://assets/ui/art/lighting-skyline.png")
+	background.texture=preload("res://assets/ui/art/garage-skyline-v26.png")
 	background.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	background.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -91,6 +91,7 @@ func _ready() -> void:
 
 func configure(data: GarageCatalog, d: StringName, v: StringName, reduced: bool) -> void:
 	catalog=data;driver_id=d;vehicle_id=v;reduced_motion=reduced
+	if is_node_ready():reset_view()
 
 func kit(region: Rect2) -> AtlasTexture:
 	var atlas := AtlasTexture.new()
@@ -113,7 +114,7 @@ func label(parent: Node, words: String, font_size: int, color: Color=cream) -> L
 	return node
 
 func positioned_label(words: String, pos: Vector2, font_size: int, color: Color=cream) -> Label:
-	var node := label(ui,words,font_size,color);node.position=pos
+	var node := label(ui,words,maxi(font_size,20),color);node.position=pos
 	return node
 
 func button(parent: Node,words: String,action: Callable,selected:=false) -> Button:
@@ -135,7 +136,7 @@ func build_interface() -> void:
 	carousel=LeoDriverCarousel.new();carousel.compact=true;carousel.catalog=catalog;carousel.reduced_motion=reduced_motion;carousel.position=Vector2(32,518);ui.add_child(carousel);carousel.driver_selected.connect(choose_driver);driver_buttons=carousel.cards
 	caption=positioned_label("",Vector2(32,638),18,Color("b9c7d6"));caption.size=Vector2(440,28);caption.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	for i in 4:
-		var stat:=positioned_label("",Vector2(1290,230+i*54),16,cream);stat_labels.append(stat)
+		var stat:=positioned_label("",Vector2(1290,230+i*54),20,cream);stat_labels.append(stat)
 		var bar:=LeoStatBar.new();bar.position=Vector2(1290,258+i*54);bar.custom_minimum_size=Vector2(250,8);bar.size=Vector2(250,8);bar.reduced_motion=reduced_motion;ui.add_child(bar);stat_bars.append(bar)
 	title=positioned_label("",Vector2(32,64),20,Color("b9c7d6"));title.size=Vector2(990,30)
 	machine=positioned_label("",Vector2(30,90),42,cream);machine.size=Vector2(1000,52);machine.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;machine.clip_text=true
@@ -149,7 +150,7 @@ func build_interface() -> void:
 		var action_slot: int=slot
 		var control:=button(ui,["Lights","Doors","Trunk"][slot],func():preview_action(action_slot));control.position=Vector2(32,300+slot*52);control.size=Vector2(180,42);preview_actions.append(control)
 	stats=positioned_label("",Vector2.ZERO,20);stats.hide()
-	positioned_label("Drag to orbit  ·  Scroll to zoom  ·  LB / RB change ride",Vector2(564,610),17,Color("b9c7d6"))
+	positioned_label("Drag to orbit  ·  Scroll to zoom  ·  LB / RB change ride",Vector2(564,610),20,Color("b9c7d6"))
 	vehicle_strip=ScrollContainer.new();vehicle_strip.position=Vector2(32,674);vehicle_strip.size=Vector2(1536,138);vehicle_strip.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;vehicle_strip.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER;ui.add_child(vehicle_strip)
 	var row:=HBoxContainer.new();row.add_theme_constant_override("separation",12);vehicle_strip.add_child(row)
 	for vehicle in catalog.vehicles:
@@ -160,7 +161,7 @@ func build_interface() -> void:
 		var normal:=StyleBoxFlat.new();normal.bg_color=Color(.025,.045,.065,.75);normal.border_color=Color(.25,.36,.4,.6);normal.set_border_width_all(1);normal.set_corner_radius_all(5);card.add_theme_stylebox_override("normal",normal)
 		var selected:=normal.duplicate() as StyleBoxFlat;selected.bg_color=Color(.04,.16,.20,.86);selected.border_color=cyan;selected.set_border_width_all(2)
 		for state in ["pressed","hover","focus"]:card.add_theme_stylebox_override(state,selected)
-		add_card_content(card,vehicle.display_name,vehicle.thumbnail,Vector2(196,96),17)
+		add_card_content(card,vehicle.display_name,vehicle.thumbnail,Vector2(196,96),20)
 		card.pressed.connect(func():choose_vehicle(id));card.focus_entered.connect(func():scheduler.hint(id));card.mouse_entered.connect(func():scheduler.hint(id))
 	back_button=button(ui,"Back",func():back_requested.emit());back_button.position=Vector2(32,838);back_button.size=Vector2(176,44)
 	var reset:=button(ui,"Reset View",reset_view);reset.position=Vector2(1090,838);reset.size=Vector2(176,44)
@@ -335,7 +336,7 @@ func set_selection(d: StringName,v: StringName) -> void:
 	await get_tree().process_frame
 	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	if not current.call():return
-	loading_preview.hide();loading_caption.hide();race_button.disabled=false
+	loading_preview.hide();loading_caption.hide();race_button.disabled=false;idle=0.
 	LeoPreviewStream.timings.append({"vehicle":String(v),"stage":"first_visible","ms":(Time.get_ticks_usec()-start_time)/1000.})
 	refresh_labels()
 	pulse_rings()
@@ -365,7 +366,7 @@ func choose_vehicle(id: StringName) -> void:
 	set_selection(driver_id,id);selection_changed.emit(driver_id,vehicle_id)
 
 func reset_view() -> void:
-	yaw=-.6;pitch=.24;zoom=1.;idle=0.;update_camera()
+	yaw=0.;pitch=.12;zoom=1.;idle=0.;update_camera()
 
 func update_camera() -> void:
 	if not camera:return
@@ -390,7 +391,7 @@ func _process(dt: float) -> void:
 	idle+=dt
 	var pointer:=Vector2.ZERO if reduced_motion else (get_local_mouse_position()/Vector2(1600,900)*2.-Vector2.ONE).clamp(-Vector2.ONE,Vector2.ONE)
 	showroom_parallax=showroom_parallax.lerp(pointer,1.-exp(-dt*5.))
-	if not reduced_motion and not dragging and idle>4.:yaw+=dt*.12
+	if not reduced_motion and not dragging and not race_button.disabled and idle>4.:yaw+=dt*.12
 	if not dragging:update_camera()
 
 func prewarm_materials() -> void:
@@ -462,7 +463,7 @@ func build_showroom() -> void:
 	var wall:=StandardMaterial3D.new();wall.albedo_color=Color("15232e");wall.roughness=.88
 	LeoRaceVisuals.mesh_box(showroom,Vector3(27,13,.3),Vector3(0,4.8,9.3),wall)
 	var screen:=MeshInstance3D.new();screen.name="ColomboBackdropScreen";var screen_mesh:=QuadMesh.new();screen_mesh.size=Vector2(23,10.5);screen.mesh=screen_mesh;screen.position=Vector3(0,4.4,9.1);screen.rotation.y=PI;screen.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var display:=StandardMaterial3D.new();display.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;display.albedo_texture=preload("res://assets/ui/art/lighting-skyline.png");display.albedo_color=Color(.8,.86,.94);display.uv1_scale=Vector3(1,.45,1);display.uv1_offset=Vector3(0,.20,0);screen.material_override=display;showroom.add_child(screen)
+	var display:=StandardMaterial3D.new();display.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;display.albedo_texture=preload("res://assets/ui/art/garage-skyline-v26.png");display.albedo_color=Color(.8,.86,.94);fit_screen_texture(display,screen_mesh.size);screen.material_override=display;showroom.add_child(screen)
 	var platform:=MeshInstance3D.new();platform.name="VehicleDisplayPlatform";var cylinder:=CylinderMesh.new();cylinder.top_radius=3.45;cylinder.bottom_radius=3.55;cylinder.height=.25;cylinder.radial_segments=96;platform.mesh=cylinder;platform.position.y=-.14;platform.material_override=mat;showroom.add_child(platform)
 	for entry in [[3.40,Color("62dbe2")],[3.52,Color("e3bc6d")]]:
 		var ring:=MeshInstance3D.new();var torus:=TorusMesh.new();torus.inner_radius=entry[0]-.025;torus.outer_radius=entry[0]+.025;torus.rings=96;torus.ring_segments=8;ring.mesh=torus;ring.position.y=-.012
@@ -479,6 +480,17 @@ func build_showroom() -> void:
 	var sun:=DirectionalLight3D.new();sun.rotation_degrees=Vector3(-55,-30,0);sun.light_energy=.35;sun.shadow_enabled=true;sun.directional_shadow_max_distance=20.;showroom.add_child(sun)
 
 	reset_view()
+
+func fit_screen_texture(material: StandardMaterial3D,extent: Vector2) -> void:
+	var ratio:=material.albedo_texture.get_size().aspect()/extent.aspect()
+	var coverage:=Vector2(1.,ratio) if ratio<1. else Vector2(1./ratio,1.)
+	material.uv1_scale=Vector3(coverage.x,coverage.y,1.)
+	material.uv1_offset=Vector3((1.-coverage.x)*.5,(1.-coverage.y)*.5,0.)
+
+func show_problem(message: String) -> void:
+	policy.position=Vector2(390,148);policy.size=Vector2(820,62)
+	policy.add_theme_font_size_override("font_size",24);policy.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	policy.modulate=Color("ffc857");policy.text=message;policy.show()
 
 func showroom_light_bar(extent: Vector3,at: Vector3,tint: Color) -> void:
 	var material:=StandardMaterial3D.new();material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;material.albedo_color=tint;material.emission_enabled=true;material.emission=tint;material.emission_energy_multiplier=1.35

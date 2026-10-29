@@ -1,0 +1,152 @@
+{
+  "version": "2.6.0",
+  "date": "2026-10-29",
+  "generator": "Built-in image_gen",
+  "art_direction": "Colombo motor club, cyan/violet/warm gold; branded original-finish Bigster and Bianco Ghiaccio Duster Home heroes, naturally proportioned skyline, track-specific loading scenes",
+  "images": [
+    {
+      "file": "assets/ui/boot/tracks/astra_coast/01.png",
+      "source": "exec-a9d04604-bc7f-4871-bee7-4cac7b0181e3.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished 16:9 landscape PNG loading-screen BACKGROUND for Leo Racer 2.6, ideally 2048x1152 or higher. Astra Lotus Coast illuminated Lotus Tower landmark hero: turquoise shaft, fine magenta lotus petal outlines, golden antenna, palm-lined asphalt racing boulevard curving gently toward authentic Colombo Lotus Tower. Festive warm street lamps and distant urban skyline. Blue hour, road-level cinematic viewpoint. Art direction: polished full-3D arcade racing game environment, clean physically plausible materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Colombo motor-club showroom. Make it inviting and attractive, not a photographic composite. Keep lower left 40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no user interface, no letters, no text, no logos, no watermark. Preserve geographical Sri Lankan identity. This is finished game artwork, not a mockup.",
+      "sha256": "4354999494d56b93bde575549cc63f1b3bbb1c56b3c1d1d7c7991dc5d2a65ee7",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/astra_coast/02.png",
+      "source": "exec-52669525-22e4-4ac3-a28d-1d2dd3ad7e7b.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished 16:9 landscape PNG loading-screen BACKGROUND for Leo Racer 2.6, ideally 2048x1152 or higher. Astra Lotus Coast coastal racing straight: Colombo tropical oceanfront racing road with palms, low historic waterfront shopfronts, tasteful backlit racing adverts, cyan track-edge accents, distant illuminated Lotus Tower. Ocean visible beyond promenade, navy blue dusk with amber street lights. Low road-level wide view. Art direction: polished full-3D arcade racing game environment, clean physically plausible materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Colombo motor-club showroom. Make it inviting and attractive, not a photographic composite. Keep lower left 40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no user interface, no letters, no text, no logos, no watermark. Preserve geographical Sri Lankan identity. This is finished game artwork, not a mockup.",
+      "sha256": "5a9d4be8156932a756af9a5f1e8df2a70e3af870434e24d533042445314d0358",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/astra_coast/03.png",
+      "source": "exec-bec1c7ff-82e0-4091-a89c-b26f5c3921dd.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished 16:9 landscape PNG loading-screen BACKGROUND for Leo Racer 2.6, ideally 2048x1152 or higher. Astra Lotus Coast festival racing corner: sweeping palm-lined coastal asphalt corner, overhead colorful triangular pennants, Sri Lankan waterfront cafes and decorative racing start gantry, backlit signs, glowing street lamps, distant authentic illuminated Lotus Tower. Twilight navy, cyan and warm gold, dynamic wide composition. Art direction: polished full-3D arcade racing game environment, clean physically plausible materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Colombo motor-club showroom. Make it inviting and attractive, not a photographic composite. Keep lower left 40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no user interface, no letters, no text, no logos, no watermark. Preserve geographical Sri Lankan identity. This is finished game artwork, not a mockup.",
+      "sha256": "3234ad9c2ccd76bdebca6fd93ba3a41d3f2a2c00af663d6912a391d6e571d5be",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/colombo_city/01.png",
+      "source": "exec-e50a293e-cb65-42c1-b185-2e3db05857fe.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished16:9 landscape PNG loading-screen BACKGROUND for Leo Racer2.6, ideally2048x1152 or higher. Colombo City Grand Prix waterfront: wide smooth asphalt racing boulevard beside Galle Face promenade, Indian Ocean visible beyond low stone sea wall, tropical palms, Colombo commercial skyline and distant lit Lotus Tower, red/white racing curbs and warm streetlamps. Twilight wide road-level composition. Art direction: polished full-3D arcade racing game environment, clean physically plausible PBR materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Sri Lankan motor-club showroom. Inviting and attractive, not a photographic composite. Keep lower left40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no UI, no letters, no text, no logos, no watermark. Preserve the specified Sri Lankan geographical identity. Finished game artwork, not a mockup.",
+      "sha256": "dc8beb964d436c6b79ebe2196f8ab0324b666f6ab2a1f291de80b0182a5ef059",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/colombo_city/02.png",
+      "source": "exec-fa7282e6-3040-49bd-b72b-364448fc5a61.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished16:9 landscape PNG loading-screen BACKGROUND for Leo Racer2.6, ideally2048x1152 or higher. Colombo City Grand Prix commercial streets: distinctive Sri Lankan colonial shopfronts mixed with modern offices, broad urban racing road, backlit abstract advertising lightboxes without text, flags and warm street lighting, cyan and violet architectural accents. Attractive blue-hour city street perspective. Art direction: polished full-3D arcade racing game environment, clean physically plausible PBR materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Sri Lankan motor-club showroom. Inviting and attractive, not a photographic composite. Keep lower left40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no UI, no letters, no text, no logos, no watermark. Preserve the specified Sri Lankan geographical identity. Finished game artwork, not a mockup.",
+      "sha256": "bda8bde2167b9b94028cfc402b4ad1ee9e47738a4dc1ff1582f5015e3216e74e",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/colombo_city/03.png",
+      "source": "exec-6ce46438-0d0e-40d1-96ca-665d3c5ec8ac.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished16:9 landscape PNG loading-screen BACKGROUND for Leo Racer2.6, ideally2048x1152 or higher. Colombo City Grand Prix backlit junction: gently curving urban race street at a spacious illuminated intersection, Colombo colonial facades, palms, bus-stop-style advertising screens with abstract cyan/magenta artwork and NO typography, distant Lotus Tower, amber lamps and tasteful reflective asphalt. Dramatic night skyline composition. Art direction: polished full-3D arcade racing game environment, clean physically plausible PBR materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Sri Lankan motor-club showroom. Inviting and attractive, not a photographic composite. Keep lower left40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no UI, no letters, no text, no logos, no watermark. Preserve the specified Sri Lankan geographical identity. Finished game artwork, not a mockup.",
+      "sha256": "26d53ab57c31dd83c38ee6403e38c555efc4aab43f5c62e2f54113bbaa2e44e7",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/kandy_lake/01.png",
+      "source": "exec-59920a17-f054-43ea-8b50-03cf6cf1212c.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished16:9 landscape PNG loading-screen BACKGROUND for Leo Racer2.6, ideally2048x1152 or higher. Kandy Lake Circuit lake promenade: scenic asphalt racing road following authentic Kandy Lake's white wave-shaped Walakulu Bamma wall, forested hills, warm street lamps and lush trees, distant Sri Lankan architecture. Calm blue-hour mist above the lake, restrained cyan racing edge accents. No Colombo skyscrapers or Lotus Tower. Art direction: polished full-3D arcade racing game environment, clean physically plausible PBR materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Sri Lankan motor-club showroom. Inviting and attractive, not a photographic composite. Keep lower left40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no UI, no letters, no text, no logos, no watermark. Preserve the specified Sri Lankan geographical identity. Finished game artwork, not a mockup.",
+      "sha256": "465c6ea4289fe01d2e7b768488f0df7ed865ae32e3adf2fc267d8fa943503ed9",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/kandy_lake/02.png",
+      "source": "exec-7f9a0a74-b2fc-4310-bdae-6be0889f04de.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished16:9 landscape PNG loading-screen BACKGROUND for Leo Racer2.6, ideally2048x1152 or higher. Kandy Lake Circuit temple precinct: respectful accurate Sri Lankan Kandyan temple precinct beside smooth racing street, white low walls, traditional red tiled roofs and golden warm temple illumination, Sri Lankan flags, dense tropical trees and soft hill silhouettes. Dusk with cyan/violet racing accents only on temporary barriers. No people, no religious figures, no Colombo skyscrapers. Art direction: polished full-3D arcade racing game environment, clean physically plausible PBR materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Sri Lankan motor-club showroom. Inviting and attractive, not a photographic composite. Keep lower left40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no UI, no letters, no text, no logos, no watermark. Preserve the specified Sri Lankan geographical identity. Finished game artwork, not a mockup.",
+      "sha256": "b84b761ed0e02d033dc30d9bd25104d8ba18621f622d5b93380d7dc835fb2bd7",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/boot/tracks/kandy_lake/03.png",
+      "source": "exec-da8513a5-df71-461b-ab40-a209fc5d5cfb.png",
+      "prompt": "Use case: stylized-concept. Generate ONE finished16:9 landscape PNG loading-screen BACKGROUND for Leo Racer2.6, ideally2048x1152 or higher. Kandy Lake Circuit hill-country corner: broad gentle elevated asphalt racing bend overlooking Kandy Lake, forested green hills and distant Sri Lankan town buildings, illuminated street lamps, white lakeside wall, red/white racing curb and tasteful cyan illuminated boost-pad-style road arrows without text. Moody beautiful blue-hour mist. No Colombo skyscrapers or Lotus Tower. Art direction: polished full-3D arcade racing game environment, clean physically plausible PBR materials, cinematic soft lighting, charcoal/navy with restrained cyan, violet and warm gold matching an elegant Sri Lankan motor-club showroom. Inviting and attractive, not a photographic composite. Keep lower left40% calmer and darker for readable live loading UI. No cars, no drivers, no people, no UI, no letters, no text, no logos, no watermark. Preserve the specified Sri Lankan geographical identity. Finished game artwork, not a mockup.",
+      "sha256": "3d89a39574e2e0420724dfc136caf203b1383ac2c5b289cb72354bd9c4f091f8",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/art/home-road-v26.png",
+      "source": "exec-35ba9a9d-3658-45d0-a042-5795fe2ce799.png",
+      "reference": "Actual transparent Home vehicle camera captured in build/qa-lighting/presentation-forward/home.png",
+      "prompt": "Create finished vehicle-free Home background from actual Home camera screenshot. Landscape16:9. Remove every interface element and vehicle. Reserve former vehicle footprint (x48–78%, front tyre64%/73%, rear tyre76%/61%) as empty asphalt road; horizon near38%. Colombo skyline and illuminated Lotus Tower upper right; cyan/violet/warm-gold blue-hour motor-club palette. Left36% dark quiet negative space. No vehicles, people, logos, UI, text, borders or watermarks.",
+      "sha256": "9be6f16bfd7652701169759c89c6fd4d1e12c4c59bb783aba98a46a6e15e0751",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/art/home-bigster-v26.png",
+      "source": "exec-0493ebb9-5dca-4c48-9310-b7c846032fc7.png",
+      "prompt": "Use case: stylized-concept. Generate a finished 16:9 premium arcade racing game Home hero background PNG. Reference image shows exact Dacia Bigster Extreme identity: charcoal dark green metallic SUV, copper mirrors, distinctive Dacia grille, horizontal LED headlights and factory roof rails. Preserve this car faithfully, but render it beautifully as part of ONE cohesive cinematic scene, NOT a cutout or composited low-poly car. Bigster occupies right half (x52-90%, y45-83%), wheels planted convincingly on asphalt with rich contact shadows and plausible reflections. Colombo motor-club boulevard at blue hour, naturally proportioned illuminated Lotus Tower in distant skyline, tasteful cyan/violet/amber lights, palms, warm roadside lamps. Entire left 38% is calm dark navy negative space for live menus, no car or bright foreground objects there. Small elegant roadside illuminated sign in upper right reads exactly 'LEO RACER'. No other text, no UI, no people, no driver, no racing liveries, no showroom platform, no border, no watermark. Polished and attractive physically based 3D key art, accurate original car proportions.",
+      "sha256": "6f47c79346e2871fbe80e7f62d65d18d01ab721279998fbd13cf3833b2aff76f",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/art/home-duster-v26.png",
+      "source": "exec-4ff3ec1d-a567-48e4-bb20-1e465ae2f846.png",
+      "prompt": "Use case: stylized-concept. Finished 16:9 Home hero background PNG for Leo Racer. Use reference for exact 2014 Dacia Duster Laureate identity: Bianco Ghiaccio nonmetallic white, original silver grille with blue Dacia shield badge, correct 2014 rectangular headlights, silver alloy wheels, black factory longitudinal roof rails, original trim. Render car beautifully in one cohesive cinematic Colombo motor-club road scene, not pasted or floating. Car occupies right half x52-90%, y43-83%, front three-quarter view, tyres firmly on asphalt with contact shadows and realistic cyan/violet/amber reflections. Blue-hour Colombo skyline, authentic naturally proportioned turquoise/magenta Lotus Tower, palms and warm lamps. Entire left38% calm dark navy negative space for live menu; keep car and bright foreground objects out of it. Tasteful small upper-right roadside illuminated sign reads exactly 'LEO RACER'. No other text, no UI, people, driver, racing livery, platform, border or watermark. Premium physically based 3D arcade racing key art, inviting and accurate original vehicle proportions. Match companion Bigster hero palette.",
+      "sha256": "e4ee100a5d864ead97f6b519fbaaa55a24511252d5e9f6a0b0dafa1a604256bc",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/art/home-pair-v26.png",
+      "source": "exec-2e2355d4-88fa-43ff-9881-5839055f9a94.png",
+      "prompt": "Use case: stylized-concept. Finished 16:9 Leo Racer Home key-art background PNG, ONE cohesive premium physically based 3D cinematic illustration. Both reference cars together on a Colombo motor-club boulevard: charcoal dark green Dacia Bigster Extreme (copper mirrors, modern Dacia grille and LEDs) and the white Bianco Ghiaccio 2014 Dacia Duster Laureate (blue shield grille badge, correct original 2014 headlights, black factory longitudinal roof rails). Preserve their distinct reference designs, original finishes, no racing liveries. Both cars grouped entirely in right60% of frame: Bigster slightly rear and right, white 2014 Duster nearer foreground x50-74%; show both clearly with tyres firmly planted, realistic contact shadows and coherent wet-asphalt reflections. No pasted or floating appearance. Blue-hour Colombo skyline with naturally proportioned illuminated turquoise/magenta Lotus Tower and palms. Tasteful small sign high on right reads exactly 'LEO RACER'. Left38% very calm dark navy negative space for live menu controls. Cyan/violet/warm-gold premium motor club palette matching companion solo-car heroes. No people, drivers, UI, other text, border, watermark, or showroom platform.",
+      "sha256": "4d216b21ff689d7f338ce0516aa6df72895d4e6b70d2c926483b359d9652a7e4",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "assets/ui/art/garage-skyline-v26.png",
+      "source": "exec-4a542dce-5105-4ba1-ac63-d06b9a8a5f3a.png",
+      "prompt": "Edit this panoramic skyline artwork for a real 3D garage display. Preserve the natural building/tower shapes, cyan/violet/gold blue-hour palette and panoramic 23:10.5 aspect ratio. CRITICAL composition change: zoom the entire skyline OUT significantly and lower it so ALL buildings and the COMPLETE Lotus Tower including antenna occupy only the lower 45% of the image. Top 45% of image must be open beautiful blue-hour sky. Complete Lotus Tower antenna begins at y=46% and its base is at y=87%; tower x=72%. Other high rises should be smaller and naturally proportional, bases around y=87%. Bottom13% trees and city foreground. No water, no cars, no people, no lettering. This is the texture itself, not an image of a garage. This distant skyline composition is required because the actual garage camera sees mainly the lower portion of its tall wall display. Do NOT elongate any building or tower.",
+      "sha256": "ae7f24be780a4685f8aed8a323de07d13aafc867434c1f36877c41ecc0613082",
+      "dimensions": [
+        1854,
+        848
+      ]
+    }
+  ],
+  "retired_images": [
+    "assets/ui/art/home-road-v26.png"
+  ]
+}

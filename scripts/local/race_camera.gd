@@ -11,16 +11,17 @@ var follow_position := Vector3.ZERO
 var follow_velocity := Vector3.ZERO
 var look_ahead := Vector3.ZERO
 var warm := false
+var previous_origin := Vector3.ZERO
 
 func reset() -> void:
 	warm=false;follow_velocity=Vector3.ZERO;look_ahead=Vector3.ZERO
 
 static func field_of_view(speed: float, boost: float, reduced: bool, base: float = 63.) -> float:
-	return base if reduced else clampf(base+10.*smoothstep(0.,50.,absf(speed))+boost,base,85.)
+	var previous_target:=clampf(base+10.*smoothstep(0.,50.,absf(speed))+boost,base,85.)
+	return base if reduced else lerpf(base,previous_target,.1)
 
 static func speed_pullback(speed: float, reduced: bool) -> float:
-	# Retain the speed effect at half its previous travel; size clearance is separate.
-	return 0. if reduced else absf(speed)*.006
+	return 0. if reduced else absf(speed)*.0006
 
 func advance(speed: float,input: LeoPlayerInput,dt: float) -> void:
 	if speed<-.75:reverse_time+=dt
@@ -57,6 +58,10 @@ func update(local: LeoLocalPlayer,view: Camera3D,kart: LeoKart,input: LeoPlayerI
 	# narrower selected FOV must still contain the vehicle at rest.
 	distance*=maxf(1.,tan(deg_to_rad(63.)*.5)/tan(deg_to_rad(view.fov)*.5))
 	var desired := origin+behind*distance*cos(pitch)+Vector3.UP*(3.1+kart.camera_height_offset+distance*sin(pitch))
+	# Carry translation directly; damp only changes in the relative chase offset.
+	# Otherwise a moving target creates a speed-dependent spring lag of 2v/12.
+	if warm:follow_position+=origin-previous_origin
+	previous_origin=origin
 	if not warm or follow_position.distance_to(desired)>25. or mode!="chase" or reduced:
 		follow_position=desired;follow_velocity=Vector3.ZERO;warm=true
 	else:

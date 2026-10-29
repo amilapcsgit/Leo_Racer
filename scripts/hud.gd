@@ -240,6 +240,10 @@ func close_settings() -> void:
 
 func show_race() -> void:
 	unified_hud=null
+	if is_instance_valid(garage_selector):
+		garage_selector.hide();garage_selector.race_context=false
+		if garage_selector.keyboard and garage_selector.keyboard.visible:garage_selector.close_keyboard(true)
+		garage_selector.scheduler.pause_for_race()
 	frontend.close_modal(false);scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
 	game.input_router.gameplay_enabled=true;game.input_router.assignment_locked=true;game.input_router.clear_all()
 	hud_root.visible=game.human_count==1
