@@ -45,7 +45,7 @@ func read_manifest(path: String) -> void:
 		var version_pattern:=RegEx.new();version_pattern.compile("^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
 		if not core.get("min") is String or not version_pattern.search(core.min) or (not core.get("max_major") is int and not core.get("max_major") is float):error="Invalid core compatibility";return
 		var minimum:=String(core.min).split(".")
-		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>2004000 or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
+		if minimum.size()!=3 or int(minimum[0])*1000000+int(minimum[1])*1000+int(minimum[2])>(LeoVehicleLibrary.CORE_VERSION.x*1000000+LeoVehicleLibrary.CORE_VERSION.y*1000+LeoVehicleLibrary.CORE_VERSION.z) or int(metadata.get("core",{}).get("max_major",0))<2:error="Incompatible track core version";return
 		if metadata.get("world_kind")!="external":error="Track API 2 requires external world data";return
 		if not metadata.get("lighting",{}) is Dictionary:error="Invalid lighting parameters";return
 		var lighting: Dictionary=metadata.get("lighting",{})

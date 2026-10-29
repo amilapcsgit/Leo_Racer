@@ -40,7 +40,7 @@ func anticipate(racer: StringName,vehicle: StringName,travel: int=0) -> void:
 		if not id in wanted:wanted.append(id)
 	LeoPreviewStream.selected=selected;trim()
 func current(vehicle: StringName,racer: StringName) -> bool:
-	return is_inside_tree() and not suspended and racer==driver and vehicle in wanted
+	return is_inside_tree() and not suspended and racer==driver and vehicle in wanted and (vehicle==selected or prepared.has(key(selected,driver)))
 func hint(vehicle: StringName) -> void:
 	if vehicle==selected or not catalog.vehicle(vehicle) or selected==&"":return
 	wanted.erase(vehicle);wanted.insert(1,vehicle)
@@ -102,6 +102,9 @@ func trim() -> void:
 			bytes-=int(entry.bytes);entry.assembly.queue_free();prepared.erase(token)
 func pause_for_race() -> void:
 	suspended=true;wanted.clear()
+	# Let in-flight texture requests finish while their owner is still alive.
+	while busy:await get_tree().process_frame
+	warm_view.render_target_update_mode=SubViewport.UPDATE_DISABLED
 	for entry in prepared.values():
 		if is_instance_valid(entry.assembly):entry.assembly.queue_free()
 	prepared.clear();LeoPreviewStream.clear()

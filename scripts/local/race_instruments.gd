@@ -164,7 +164,7 @@ func _process(dt: float) -> void:
 	var bindings: LeoPlayerInput=game.input_router.players[slot]
 	for i in binding_hints.size():binding_hints[i].text=bindings.describe(ACTIONS[i])
 	labels.position.text = str(game.player_place(slot))
-	labels.lap.text = "%d / 3" % p.lap
+	labels.lap.text = "%d / %d" % [p.lap,game.active_laps]
 	labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
 	display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-visual_dt*12))
 	display_nitro = lerpf(display_nitro,p.boost_fuel,1.0-exp(-visual_dt*10))

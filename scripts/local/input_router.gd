@@ -6,6 +6,10 @@ signal binding_changed
 var players: Array[LeoPlayerInput] = [LeoPlayerInput.new("keyboard"),LeoPlayerInput.new("gamepad")]
 var settings_path := "user://local_inputs.cfg"
 var active_slots := 1
+var pad_numbers: Dictionary = {}
+var next_pad_number := 1
+var claim_slot := -1
+var claimed_releases: Dictionary = {}
 var capture_slot := -1
 var capture_action := ""
 var capture_rest: Dictionary = {}
@@ -26,6 +30,7 @@ func connected_devices() -> Array[int]:
  return Input.get_connected_joypads()
 func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  last_error = ""
+ stop_feedback()
  if slot<0 or slot>=players.size():return false
  var connected:=connected_devices()
  var former_kind:=players[slot].kind
@@ -49,7 +54,7 @@ func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  p.preference="manual"
  if p.kind != kind:p.switch_kind(kind)
  p.device = id if kind != "keyboard" else -1
- p.identity = fingerprint(id) if id in Input.get_connected_joypads() else {}
+ p.identity = fingerprint(id) if id in connected else {}
  p.clear()
  configure_keyboards(active_slots)
  if save: save_profiles()
@@ -57,7 +62,7 @@ func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  return true
 func ready_problem(slot: int) -> String:
  var p := players[slot]
- if p.kind != "keyboard" and not p.device in Input.get_connected_joypads(): return "Player %d: choose a connected controller or wheel." % (slot+1)
+ if p.kind != "keyboard" and not p.device in connected_devices(): return "Player %d: choose a connected controller or wheel." % (slot+1)
  for action in ["accelerate","brake","left","right"]:
   if p.bindings.get(action,[]).is_empty(): return "Player %d: bind %s." % [slot+1,action]
  if active_slots==2 and players[0].kind=="keyboard" and players[1].kind=="keyboard":
@@ -65,11 +70,43 @@ func ready_problem(slot: int) -> String:
    for binding in p.bindings.get(action,[]):
     if not conflicts(slot,action,binding).is_empty():return "Keyboard controls overlap. Open Controls to choose another key."
  return ""
+func stop_feedback() -> void:
+ if is_inside_tree():get_tree().call_group("haptics","stop_all")
 func clear_all() -> void:
+ stop_feedback()
  for p in players:
   if p.kind=="gamepad" and p.device>=0:Input.stop_joy_vibration(p.device)
   p.clear()
+func begin_claim(slot: int) -> void:
+ clear_all();claim_slot=slot;binding_changed.emit()
+func device_label(device: int) -> String:
+ var devices:=connected_devices();devices.sort()
+ if not device in devices:return "Disconnected controller"
+ var owner:="Unassigned"
+ for slot in active_slots:
+  if players[slot].kind!="keyboard" and players[slot].device==device:owner="Player %d" % (slot+1)
+ for id in devices:
+  if not pad_numbers.has(id):pad_numbers[id]=next_pad_number;next_pad_number+=1
+ var name:=String(fingerprint(device).get("name","Controller"))
+ if "xbox" in name.to_lower() or "xinput" in name.to_lower():name="Xbox Controller"
+ return "%s · Pad %d · %s" % [name,int(pad_numbers[device]),owner]
+func identify(slot: int) -> void:
+ var p:=players[slot]
+ if p.kind!="keyboard" and p.device>=0:get_tree().call_group("haptics","play",p.device,"identify",1.)
+func claim_event(event: InputEvent) -> bool:
+ if event is InputEventJoypadButton and claimed_releases.has(event.device):
+  if not event.pressed and event.button_index==JOY_BUTTON_A:claimed_releases.erase(event.device)
+  get_viewport().set_input_as_handled();return true
+ if claim_slot<0:return false
+ if (event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_B):
+  claim_slot=-1;binding_changed.emit()
+ elif event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_A:
+  var slot:=claim_slot;claim_slot=-1
+  claimed_releases[event.device]=true
+  assign(slot,"gamepad",event.device)
+ get_viewport().set_input_as_handled();return true
 func _input(event: InputEvent) -> void:
+ if claim_event(event):return
  if capture_slot >= 0:
   _capture(event); return
  if gameplay_enabled or controls_testing:feed(event)
@@ -90,8 +127,9 @@ func feed(event: InputEvent) -> void:
      if is_inside_tree():get_viewport().set_input_as_handled()
     command.emit(slot,action)
 func _notification(what: int) -> void:
- if what == NOTIFICATION_APPLICATION_FOCUS_OUT: clear_all()
+ if what == NOTIFICATION_APPLICATION_FOCUS_OUT: claim_slot=-1;clear_all()
 func _connection(id: int, connected: bool) -> void:
+ stop_feedback()
  if connected:
   var identity:=fingerprint(id)
   var owners: Array[LeoPlayerInput]=[]
@@ -140,6 +178,7 @@ func start_capture(slot: int, action: String) -> void:
   for axis in JOY_AXIS_MAX: capture_rest[axis] = Input.get_joy_axis(p.device,axis)
  p.clear()
 func cancel_capture() -> void:
+ claim_slot=-1
  capture_slot = -1; capture_action = ""
  clear_all()
 func _capture(event: InputEvent) -> void:

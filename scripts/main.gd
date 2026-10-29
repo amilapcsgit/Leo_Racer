@@ -38,6 +38,9 @@ var selected_kart := 0
 var custom_player_name := ""
 var garage_from_pause := false
 var race_modified := false
+var selected_laps := 3
+var active_laps := 3
+var haptics: LeoHaptics
 var countdown := 3.6
 var race_time := 0.0
 var lap_start := 0.0
@@ -119,6 +122,7 @@ func refresh_content() -> bool:
 	return true
 
 func _ready() -> void:
+	haptics=LeoHaptics.new();haptics.name="Haptics";add_child(haptics)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().auto_accept_quit=false
 	get_tree().root.close_requested.connect(quit_game)
@@ -546,20 +550,22 @@ func default_ai_vehicle(index: int) -> VehicleDefinition:
 
 func current_ruleset(course: LeoTrackDefinition=null) -> String:
 	if not course:course=track_definition
-	return ("distinct_v5_dusk_night" if race_variant=="dusk_night" else "distinct_v5_static")+("+arcade_elevation_v1" if course.elevated() else "")
+	return ("ultra_v6_dusk_night" if race_variant=="dusk_night" else "ultra_v6_static")+("+arcade_elevation_v1" if course.elevated() else "")
 
 func set_race_variant(value: String) -> void:
 	race_variant=value if value in ["static","dusk_night"] else "static"
 	save_settings()
 
 func start_race() -> void:
+	active_laps=clampi(selected_laps,1,10)
+	if haptics:haptics.stop_all()
 	if catalog.vehicles.is_empty():show_content_manager();return
-	if is_instance_valid(hud.garage_selector):
-		hud.garage_selector.home_preview=false;hud.garage_selector.scheduler.pause_for_race();hud.garage_selector.assembly=null;hud.garage_selector.sync_visibility()
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
-	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · 3 laps"
+	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · %d laps" % active_laps
 	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition))
 	state="loading";loading.stage("Preparing racers…",15)
+	if is_instance_valid(hud.garage_selector):
+		hud.garage_selector.home_preview=false;await hud.garage_selector.scheduler.pause_for_race();hud.garage_selector.assembly=null;hud.garage_selector.sync_visibility()
 	get_tree().paused=false
 	remove_racers()
 	for i in 6:
@@ -601,7 +607,7 @@ func start_race() -> void:
 		var kart:=LeoKart.new();kart.process_mode=Node.PROCESS_MODE_PAUSABLE;add_child(kart)
 		var d: StringName=local_players[i].driver_id if i<human_count else catalog.drivers[i%catalog.drivers.size()].id
 		var v: StringName=local_players[i].vehicle_id if i<human_count else default_ai_vehicle(i).id
-		kart.setup(circuit,i,i<human_count,String(d),String(v))
+		kart.setup(circuit,i,i<human_count,String(d),String(v),null,active_laps)
 		LeoRaceRules.apply(kart)
 		kart.racer_name=catalog.driver(d).display_name
 		if i<human_count:
@@ -614,13 +620,13 @@ func start_race() -> void:
 		var lanes: Array=grid.get("lanes",[-3.2,3.2])
 		kart.place(float(grid.get("start",-8.))-(i/2)*row_span,float(lanes[i%2]))
 		if i<human_count:local_players[i].heading=kart.rotation.y
-		kart.gate_crossed.connect(on_gate);kart.boosted.connect(on_boost);kart.impacted.connect(on_impact);kart.recovered.connect(on_recover)
+		connect_racer_feedback(kart)
 		karts.append(kart)
 		await get_tree().process_frame
 	player=karts[0]
 	if ranking_store and not diagnostic_run():
 		best_time=0.
-		for row in await LeoRankingRequests.query(ranking_store,get_tree(),human_count,LeoRaceRules.resolve(player.definition).class_id,"",false,track_definition.id,track_definition.revision,current_ruleset()):
+		for row in await LeoRankingRequests.query(ranking_store,get_tree(),human_count,LeoRaceRules.resolve(player.definition).class_id,"",false,track_definition.id,track_definition.revision,current_ruleset(),Callable(),active_laps):
 			if row.profile_id==local_players[0].profile_id:best_time=float(row.race_ms)/1000.;break
 	local_players[0].camera=camera;local_players[0].feedback=feedback
 	if test_mode:player.auto_drive=true
@@ -640,6 +646,13 @@ func start_race() -> void:
 	loading.hide()
 	input_router.gameplay_enabled=true;input_router.clear_all()
 
+func connect_racer_feedback(kart: LeoKart) -> void:
+	kart.surface_feedback.connect(func(kind: String,strength: float):
+		if kart.control_input and kart.control_input.kind=="gamepad":haptics.play(kart.control_input.device,kind,strength))
+	kart.contact_reported.connect(func(contact: Dictionary):
+		if kart.control_input and kart.control_input.kind=="gamepad" and contact.get("phase","")=="scrape":haptics.play(kart.control_input.device,"scrape",clampf(float(contact.get("tangent_speed",0.))/35.,.1,.5)))
+	kart.gate_crossed.connect(on_gate);kart.boosted.connect(on_boost);kart.impacted.connect(on_impact);kart.recovered.connect(on_recover)
+
 func on_gate(kart: LeoKart, gate: int) -> void:
 	if kart.finished or kart.retired or gate<=kart.last_reported_gate:return
 	kart.last_reported_gate=gate
@@ -647,11 +660,12 @@ func on_gate(kart: LeoKart, gate: int) -> void:
 	if gate>0 and gate%LeoCircuit.GATES==0 and local:
 		local.best_lap=minf(local.best_lap,race_time-local.lap_started)
 		local.lap_started=race_time
-		if gate<24:
-			announce_player(local.slot,"FINAL LAP!" if gate==16 else "LAP 2 / KEEP IT FLOWING",2.2)
+		if gate<LeoCircuit.GATES*active_laps:
+			announce_player(local.slot,"FINAL LAP!" if gate==LeoCircuit.GATES*(active_laps-1) else "LAP %d / KEEP IT FLOWING" % kart.lap,2.2)
 			hud.play_arcade_cue("lap")
 		if local.slot==0:best_lap=local.best_lap;lap_start=local.lap_started
-	if gate==24 and not kart.finished and not kart.retired:
+	if gate==LeoCircuit.GATES*active_laps and not kart.finished and not kart.retired:
+		if kart.control_input:haptics.stop_device(kart.control_input.device)
 		kart.finished=true;kart.finish_time=race_time;kart.active=false;kart.boost_time=0
 		kart.collision_layer=0;kart.collision_mask=1
 		if local:
@@ -672,7 +686,7 @@ func on_impact(kart: LeoKart, _point: Vector3, _normal: Vector3, strength: float
 	var local:=state_for(kart)
 	if local and local.feedback:local.feedback.play_impact(strength)
 	if kart.control_input and kart.control_input.kind=="gamepad" and kart.control_input.device>=0:
-		Input.start_joy_vibration(kart.control_input.device,strength*.3,strength*.6,.12)
+		haptics.play(kart.control_input.device,"crash",strength)
 
 func on_recover(kart: LeoKart) -> void:
 	var local:=state_for(kart)
@@ -695,9 +709,9 @@ func set_reduced_motion(value: bool) -> void:
 
 func finish_race() -> void:
 	if test_mode:
-		check(player.lap == 3, "Autonomous racer completes all three laps")
-		check(player.next_gate == 25, "Finish requires all 24 ordered sectors after the start gate")
-		check(boost_count >= 12, "Boost pads activate across all three laps")
+		check(player.lap == active_laps, "Autonomous racer completes all three laps")
+		check(player.next_gate == LeoCircuit.GATES*active_laps+1, "Finish requires all 24 ordered sectors after the start gate")
+		check(boost_count >= 4*active_laps, "Boost pads activate across all three laps")
 		for kart in karts:
 			if not kart.is_player: check(kart.finished, "AI %s completes all three laps without stalling" % kart.racer_name)
 	state = "results"
@@ -762,7 +776,7 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	var fresh:=LeoKart.new()
 	fresh.process_mode=Node.PROCESS_MODE_PAUSABLE
 	add_child(fresh)
-	fresh.setup(circuit,old.racer_id,true,String(d),String(v))
+	fresh.setup(circuit,old.racer_id,true,String(d),String(v),null,old.lap_count)
 	LeoRaceRules.apply(fresh)
 	fresh.local_slot=selected_player_slot;fresh.control_input=input_router.players[selected_player_slot]
 	var query:=PhysicsShapeQueryParameters3D.new()
@@ -794,13 +808,13 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 		hud.garage_selector.show_problem("No safe space for this car. Back to pause, resume, then try again.")
 		return false
 	fresh.position=safe_position;fresh.rotation.y=heading
-	for property in ["progress","next_gate","last_reported_gate","checkpoint_missed","lap","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
+	for property in ["progress","next_gate","last_reported_gate","checkpoint_missed","lap","lap_count","last_s","nearest_index","finished","finish_time","active","auto_drive"]:fresh.set(property,old.get(property))
 	fresh.speed=clampf(old.speed,-10.,fresh.max_speed)
 	fresh.road_offset=circuit.project(fresh.position,fresh.nearest_index).offset
 	fresh.velocity=-fresh.global_basis.z*fresh.speed
 	fresh.boost_fuel=old.boost_fuel
 	fresh.racer_name=player_name.strip_edges() if not player_name.strip_edges().is_empty() else catalog.driver(d).display_name
-	fresh.gate_crossed.connect(on_gate);fresh.boosted.connect(on_boost);fresh.impacted.connect(on_impact);fresh.recovered.connect(on_recover)
+	connect_racer_feedback(fresh)
 	fresh.reset_physics_interpolation()
 	old.effects._recover(old);old.stop_audio();remove_child(old);old.queue_free()
 	karts[karts.find(old)]=fresh;local.kart=fresh
@@ -894,7 +908,7 @@ func _process(dt: float) -> void:
 	if smoke_mode:
 		test_tick+=1
 		if test_tick==30:run_smoke_checks()
-	if test_mode and state in ["race","finishing"] and race_time>circuit.length*3/15.:
+	if test_mode and state in ["race","finishing"] and race_time>circuit.length*active_laps/15.:
 		test_errors.append("Autonomous race exceeded route-scaled time limit");complete_test()
 
 func update_slipstream(dt: float) -> void:
@@ -948,6 +962,10 @@ func save_settings() -> void:
 	cfg.load("user://leo_racer.cfg")
 	cfg.set_value("game","track_id",chosen_track_id)
 	cfg.set_value("game","race_variant",race_variant)
+	cfg.set_value("game","laps",selected_laps)
+	if haptics:
+		cfg.set_value("controls","rumble",haptics.enabled)
+		cfg.set_value("controls","rumble_intensity",haptics.intensity)
 	cfg.set_value("game","human_count",human_count)
 	cfg.set_value("audio", "volume", master_volume)
 	cfg.set_value("audio", "music", music_enabled)
@@ -978,6 +996,10 @@ func load_settings() -> void:
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
 		chosen_track_id=cfg.get_value("game","track_id","colombo_city")
 		race_variant=cfg.get_value("game","race_variant","static")
+		selected_laps=clampi(int(cfg.get_value("game","laps",3)),1,10)
+		if haptics:
+			haptics.enabled=bool(cfg.get_value("controls","rumble",true))
+			haptics.intensity=clampf(float(cfg.get_value("controls","rumble_intensity",1.)),0.,1.)
 		human_count=clampi(int(cfg.get_value("game","human_count",1)),1,2)
 		legacy_best_time = cfg.get_value("game", "best_time_astra", 0.0)
 		for local in local_players:
@@ -999,6 +1021,10 @@ func format_time(seconds: float) -> String:
 func quit_game(exit_code: int = 0) -> void:
 	if shutting_down:return
 	shutting_down=true;get_tree().paused=false
+	if haptics:haptics.stop_all()
+	if is_instance_valid(hud.garage_selector):
+		hud.garage_selector.selection_generation+=1
+		await hud.garage_selector.scheduler.pause_for_race()
 	if world:
 		var streamer: Node3D=world.find_child("ColomboSceneryStreaming",true,false)
 		if streamer:await streamer.stop()
@@ -1261,7 +1287,7 @@ func save_ranking_results() -> void:
 		ranking_message="RANKINGS SAVE FAILED / Racing is still available.";return
 	var rows:=ranking_rows()
 	var saved_session:=session_id
-	var request: int=ranking_store.write_async(session_id,human_count,rows,false,false,track_definition.id,track_definition.revision,current_ruleset())
+	var request: int=ranking_store.write_async(session_id,human_count,rows,false,false,track_definition.id,track_definition.revision,current_ruleset(),active_laps)
 	if request<0:ranking_message="RANKINGS SAVE FAILED";return
 	ranking_message="Saving results…"
 	while not ranking_store.request_ready(request):await get_tree().process_frame
@@ -1301,6 +1327,8 @@ func select_track(id: String) -> bool:
 	loading.hide();save_settings();return_menu();return true
 
 func _exit_tree() -> void:
+	LeoPreviewStream.clear();LeoPreviewStream.shader_warmups.clear()
+	if ranking_store:ranking_store.close_store()
 	LeoAssets.cache.clear();LeoAssets._patched_meshes.clear()
 
 func loading_preview(course: LeoTrackDefinition) -> String:

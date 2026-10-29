@@ -42,7 +42,7 @@ func run() -> void:
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
  FileAccess.open("res://build/qa-ui/rankings.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RANKING_TEST ",report)
- game.return_menu();game.stop_all_audio();game.queue_free();store.close_store()
+ store.close_store()
  for suffix in ["","-shm","-wal",".corrupt"]:DirAccess.remove_absolute(path+suffix)
- await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)
+ await game.quit_game(0 if errors.is_empty() else 1)
 

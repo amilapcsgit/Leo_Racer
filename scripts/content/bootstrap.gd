@@ -3,7 +3,7 @@ var screen: LeoLoadingScreen
 const TRACE=preload("res://scripts/content/boot_trace.gd")
 func _ready() -> void:
 	TRACE.mark("bootstrap_ready")
-	DisplayServer.window_set_title("Leo Racer")
+	DisplayServer.window_set_title("Leo Racer — 2.7 Ultra")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
 	await begin()
@@ -58,6 +58,13 @@ func begin() -> void:
 		FileAccess.open("user://content-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 		print("VEHICLE_VALIDATION ",JSON.stringify(report));get_tree().quit(0 if report.status=="PASS" else 2);return
 	if "--drive-test" in OS.get_cmdline_user_args():
+		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--ultra-check="):
+				var name:=argument.trim_prefix("--ultra-check=")
+				if name not in ["core","visual","previews","physics","garage","contacts","audit","impact"]:get_tree().quit(2);return
+				screen.hide()
+				var trial: Node=load("res://tests/native270/"+name+".gd").new()
+				get_tree().root.add_child(trial);queue_free();return
 		for probe in ["ui","content","polish"]:
 			if ("--release-"+probe+"-check") in OS.get_cmdline_user_args():
 				screen.hide();var check_node: Node=load("res://scripts/content/release26_"+probe+"_check.gd").new();get_tree().root.add_child(check_node);queue_free();return

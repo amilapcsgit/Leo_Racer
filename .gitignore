@@ -102,3 +102,6 @@ docs/qa-lighting/*.png.import
 
 # Rebuilt final installer payload lists contain local staging paths.
 installer/release26-final-*.nsh
+
+# Generated 2.7 installer lists contain local staging paths.
+installer/release270-*.nsh

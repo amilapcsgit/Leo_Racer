@@ -208,11 +208,11 @@ func _process(dt: float) -> void:
 	var moving := absf(kart.wheel_motion_speed)>4.0
 	var camera:=get_viewport().get_camera_3d()
 	var near := kart.is_player or (is_instance_valid(camera) and camera.global_position.distance_to(kart.global_position)<55)
-	for emitter in smoke: emitter.emitting = kart.drifting and moving and kart.active and near
+	for emitter in smoke: emitter.emitting = kart.grounded and kart.drifting and moving and kart.active and near
 	var charge_color := Color("00b9d4").lerp(Color("ffae36"),smoothstep(.65,2.5,kart.drift_charge))
 	trace_material.emission = charge_color
 	for spark in kart.tire_sparks:
-		spark.emitting = kart.drifting and moving and kart.active and near and kart.drift_charge>.3
+		spark.emitting = kart.grounded and kart.drifting and moving and kart.active and near and kart.drift_charge>.3
 		(spark.draw_pass_1.material as StandardMaterial3D).emission = charge_color
 	var gain := 1.0 if kart.boost_time>0 and kart.active else 0.0
 	if kart.is_player and kart.get_parent().get("feedback"):
@@ -230,7 +230,7 @@ func _process(dt: float) -> void:
 		material.emission = Color("9effdd").lerp(Color("00e4ff"),.5+.4*sin(elapsed*22)) if electric else Color("ffad38").lerp(Color("20dfff"),.55+.35*sin(elapsed*18))
 		if electric: flame.scale.z=.55+gain*.35
 	mark_timer -= dt
-	if kart.drifting and moving and kart.active and near and mark_timer<=0:
+	if kart.grounded and kart.drifting and moving and kart.active and near and mark_timer<=0:
 		mark_timer = .045
 		for tire in kart.rear_tire_positions:
 			var mark := marks[mark_cursor]

@@ -15,13 +15,14 @@ public partial class LocalRankingStore : RefCounted
     private sealed record ResultRow(bool Finished, bool Retired, int Gate, double Race, double Lap,
         string Profile, string Name, string Driver, string Vehicle, string Class, int Place);
     private sealed record Entry(string Name, string Driver, string Vehicle, long Race, long Lap, string Profile);
-    private readonly BlockingCollection<System.Action> work = new();
+    private BlockingCollection<System.Action> work = new();
     private readonly ConcurrentDictionary<int, object> completed = new();
     private readonly ConcurrentDictionary<int, bool> cancelled = new();
-    private readonly Thread worker;
+    private Thread worker;
     private int serial;
     private bool closed;
-    public LocalRankingStore() {
+    public LocalRankingStore() { StartWorker(); }
+    private void StartWorker() {
         worker = new Thread(() => { foreach (var action in work.GetConsumingEnumerable()) action(); })
             { IsBackground = true, Name = "Leo rankings" };
         worker.Start();
@@ -67,17 +68,22 @@ public partial class LocalRankingStore : RefCounted
             ["vehicle"]=row.Vehicle, ["race_ms"]=row.Race, ["lap_ms"]=row.Lap, ["profile_id"]=row.Profile });
         return result;
     }
-    public int query_async(int mode, string performanceClass, string vehicle, bool laps, string trackId, int revision, string ruleset)
-        => Enqueue(() => Query(mode, performanceClass, vehicle, laps, trackId, revision, ruleset));
+    public int query_async(int mode, string performanceClass, string vehicle, bool laps, string trackId, int revision, string ruleset, int lapCount = 3)
+        => Enqueue(() => Query(mode, performanceClass, vehicle, laps, trackId, revision, ruleset, lapCount));
     public GArray take_query(int id) => completed.TryRemove(id, out var value) && value is List<Entry> rows ? Present(rows) : new GArray();
-    public int write_async(string session, int mode, GArray rows, bool modified, bool diagnostic, string track, int revision, string ruleset) {
-        var snapshot = Snapshot(rows);
-        return Enqueue(() => Save(session, mode, snapshot, modified, diagnostic, track, revision, ruleset));
+    public int write_async(string session, int mode, GArray rows, bool modified, bool diagnostic, string track, int revision, string ruleset, int lapCount = 3) {
+        try {
+            var snapshot = Snapshot(rows);
+            return Enqueue(() => Save(session, mode, snapshot, modified, diagnostic, track, revision, ruleset, lapCount));
+        } catch (Exception ex) { error = ex.Message; return -1; }
     }
     private SqliteConnection connection;
     private volatile string error = "";
     public string get_error() => error;
-    public bool open_store(string filename) => Execute(() => Open(filename));
+    public bool open_store(string filename) {
+        if (closed) { work = new(); closed = false; StartWorker(); }
+        return Execute(() => Open(filename));
+    }
     private bool Open(string filename)
     {
         try
@@ -110,6 +116,9 @@ CREATE INDEX IF NOT EXISTS result_times ON results(class_id,race_ms,lap_ms);
 CREATE TABLE IF NOT EXISTS session_courses (
  session_id TEXT PRIMARY KEY REFERENCES sessions(id), revision INTEGER NOT NULL);
 INSERT OR IGNORE INTO session_courses SELECT id,1 FROM sessions;
+CREATE TABLE IF NOT EXISTS session_laps (
+ session_id TEXT PRIMARY KEY REFERENCES sessions(id), lap_count INTEGER NOT NULL CHECK(lap_count BETWEEN 1 AND 10));
+INSERT OR IGNORE INTO session_laps SELECT id,3 FROM sessions;
 PRAGMA user_version=1;";
             command.ExecuteNonQuery();
             error = "";
@@ -120,13 +129,17 @@ PRAGMA user_version=1;";
     public int save_session(string sessionId, int mode, GArray rows, bool modified, bool diagnostic)
         => save_session_for_track(sessionId, mode, rows, modified, diagnostic, "astra_coast", 1);
 
-    public int save_session_for_track(string sessionId, int mode, GArray rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset = "balanced_v1") {
-        var snapshot = Snapshot(rows);
-        return Execute(() => Save(sessionId, mode, snapshot, modified, diagnostic, trackId, courseRevision, ruleset));
+    public int save_session_for_track(string sessionId, int mode, GArray rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset = "balanced_v1", int lapCount = 3) {
+        if (closed) { error = "Ranking database is closed."; return -1; }
+        try {
+            var snapshot = Snapshot(rows);
+            return Execute(() => Save(sessionId, mode, snapshot, modified, diagnostic, trackId, courseRevision, ruleset, lapCount));
+        } catch (Exception ex) { error = ex.Message; return -1; }
     }
-    private int Save(string sessionId, int mode, ResultRow[] rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset)
+    private int Save(string sessionId, int mode, ResultRow[] rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset, int lapCount = 3)
     {
         if (modified || diagnostic) return 0;
+        if (lapCount < 1 || lapCount > 10) { error = "Invalid lap count."; return -1; }
         if (string.IsNullOrWhiteSpace(trackId) || courseRevision < 1) { error = "Invalid course identity."; return -1; }
         if (connection == null) { error = "Ranking database is unavailable."; return -1; }
         try
@@ -150,10 +163,21 @@ PRAGMA user_version=1;";
                 course.Parameters.AddWithValue("$revision",courseRevision);
                 course.ExecuteNonQuery();
             }
+            using (var laps = connection.CreateCommand()) {
+                laps.Transaction = transaction;
+                laps.CommandText = "SELECT lap_count FROM session_laps WHERE session_id=$id";
+                laps.Parameters.AddWithValue("$id",sessionId);
+                var existing = laps.ExecuteScalar();
+                if (existing != null && Convert.ToInt32(existing) != lapCount)
+                    throw new InvalidOperationException("Conflicting lap count for existing session.");
+                laps.CommandText = "INSERT OR IGNORE INTO session_laps(session_id,lap_count) VALUES ($id,$laps)";
+                laps.Parameters.AddWithValue("$laps",lapCount);
+                laps.ExecuteNonQuery();
+            }
             int count = 0;
             foreach (var row in rows)
             {
-                if (!row.Finished || row.Retired || row.Gate < 25) continue;
+                if (!row.Finished || row.Retired || row.Gate != 8 * lapCount + 1) continue;
                 double race = row.Race, lap = row.Lap;
                 if (!double.IsFinite(race) || !double.IsFinite(lap) || race <= 0 || lap <= 0 || lap >= 99999) continue;
                 using var insert = connection.CreateCommand();
@@ -180,9 +204,9 @@ PRAGMA user_version=1;";
     public GArray best_times(int mode, string performanceClass, string vehicle, bool laps)
         => best_times_for_track(mode, performanceClass, vehicle, laps, "astra_coast", 1);
 
-    public GArray best_times_for_track(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset = "balanced_v1")
-        => Present(Execute(() => Query(mode, performanceClass, vehicle, laps, trackId, courseRevision, ruleset)));
-    private List<Entry> Query(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset)
+    public GArray best_times_for_track(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset = "balanced_v1", int lapCount = 3)
+        => closed ? new GArray() : Present(Execute(() => Query(mode, performanceClass, vehicle, laps, trackId, courseRevision, ruleset, lapCount)));
+    private List<Entry> Query(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset, int lapCount = 3)
     {
         var result = new List<Entry>();
         if (connection == null) { error = "Ranking database is unavailable."; return result; }
@@ -194,8 +218,9 @@ PRAGMA user_version=1;";
 SELECT r.*,s.ended_utc, ROW_NUMBER() OVER(PARTITION BY r.profile_id ORDER BY r.{metric},s.ended_utc,r.session_id) AS number
 FROM results r JOIN sessions s ON r.session_id=s.id
 LEFT JOIN session_courses c ON c.session_id=s.id
+LEFT JOIN session_laps l ON l.session_id=s.id
 WHERE s.track_id=$track AND COALESCE(c.revision,1)=$revision AND s.ruleset=$rules AND s.mode=$mode
-AND r.class_id=$class AND ($vehicle='' OR r.vehicle_id=$vehicle))
+AND COALESCE(l.lap_count,3)=$laps AND r.class_id=$class AND ($vehicle='' OR r.vehicle_id=$vehicle))
 WHERE number=1 ORDER BY {metric},ended_utc,profile_id LIMIT 100";
             command.Parameters.AddWithValue("$mode",mode);
             command.Parameters.AddWithValue("$rules",ruleset);
@@ -203,6 +228,7 @@ WHERE number=1 ORDER BY {metric},ended_utc,profile_id LIMIT 100";
             command.Parameters.AddWithValue("$revision",courseRevision);
             command.Parameters.AddWithValue("$class",performanceClass);
             command.Parameters.AddWithValue("$vehicle",vehicle);
+            command.Parameters.AddWithValue("$laps",lapCount);
             using var reader = command.ExecuteReader();
             while (reader.Read()) result.Add(new Entry(reader.GetString(0), reader.GetString(1), reader.GetString(2),
                 reader.GetInt64(3), reader.GetInt64(4), reader.GetString(5)));

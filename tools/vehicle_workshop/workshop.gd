@@ -637,7 +637,7 @@ func export_to(root: String) -> Dictionary:
 		if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return {"ok": false, "error": "Cancelled before export"}
 		await RenderingServer.frame_post_draw
 		if not is_instance_valid(alive.get_ref()) or not is_inside_tree(): return {"ok": false, "error": "Cancelled before export"}
-		converted.thumbnail = viewport.get_texture().get_image()
+		converted.thumbnail = await LeoPreviewArt.capture_model(studio,viewport,get_tree())
 		for index in helpers.size():
 			if is_instance_valid(helpers[index]): helpers[index].visible = visibility[index]
 	# The real thumbnail is staged together with GLB/metadata, not changed after

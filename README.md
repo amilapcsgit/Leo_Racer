@@ -1,10 +1,10 @@
-> **2.6 preview branch:** This branch adds the 21-car compiled roster, streamed garage, the 2014 and 2024 Dusters, dynamic race lighting and presentation polish. The public 2.5 downloads below remain the stable release. Local preview artifacts are prepared separately; no public 2.6 release is published. See [2.6 notes](docs/RELEASE_NOTES_260.md), [validation](docs/QUALITY260.md), and [Vehicle API 2 SDK](sdk/README.md).
+> **2.7 Ultra:** 21 cars, six drivers, three Sri Lankan tracks, transparent garage previews, refreshed race setup and records, configurable 1–10 laps, clearer controller assignment, and livelier arcade dynamics. See [release notes](docs/RELEASE_NOTES_270.md) and [validation](docs/VALIDATION_270.md).
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/amilapcsgit/Leo_Racer/v2.4.1/assets/art/astra/leo_road_crest.png" alt="Leo Racer lion and lotus racing crest" width="96">
 </p>
 
-<h1 align="center">LEO RACER</h1>
+<h1 align="center">LEO RACER 2.7 ULTRA</h1>
 
 <p align="center">
   <strong>Island roads. Arcade rules.</strong><br>
@@ -41,9 +41,9 @@
 <table>
   <tr>
     <td align="center" width="25%"><h3>3</h3><strong>Sri Lankan circuits</strong><br><sub>Coast · City · Hill country</sub></td>
-    <td align="center" width="25%"><h3>6</h3><strong>Racers on the grid</strong><br><sub>Three laps. Find your opening.</sub></td>
+    <td align="center" width="25%"><h3>6</h3><strong>Racers on the grid</strong><br><sub>1–10 laps. Find your opening.</sub></td>
     <td align="center" width="25%"><h3>1–2</h3><strong>Local players</strong><br><sub>Solo or vertical split-screen</sub></td>
-    <td align="center" width="25%"><h3>20</h3><strong>Included cars</strong><br><sub>Distinct handling and performance</sub></td>
+    <td align="center" width="25%"><h3>21</h3><strong>Included cars</strong><br><sub>Distinct handling and performance</sub></td>
   </tr>
 </table>
 
@@ -80,13 +80,23 @@ Seven official vehicles and thirteen imports are included. Imported cars remain 
 ![Colombo city gameplay](docs/screenshots/2.5.0/colombo.png)
 ![Independent split-screen cameras](docs/screenshots/2.5.0/split-screen.png)
 
+## 2.7 Ultra showroom and menus
+
+These are captures from the Windows build; leaderboard names are isolated test fixtures.
+
+![2.7 Ultra race setup](docs/screenshots/2.7.0/lets-race.png)
+
+| Garage | Records | Settings |
+|---|---|---|
+| ![Garage](docs/screenshots/2.7.0/garage.png) | ![Records](docs/screenshots/2.7.0/records.png) | ![Settings](docs/screenshots/2.7.0/settings.png) |
+
 ## Download
 
 **[Download the latest Windows installer](https://github.com/amilapcsgit/Leo_Racer/releases/latest/download/LeoRacer-Setup.exe)** — everything is bundled for offline installation and play.
 
-The 2.5.0 full offline installer includes **all three tracks and all 20 selected cars**, with optional track selection. Existing user-added Vehicle API 1 packages remain supported and unranked. No additional downloads are needed to play.
+The 2.7 Ultra full offline installer includes **all three tracks and all 21 selected cars**, with optional track selection. Existing user-added Vehicle API 1 packages remain supported and unranked. No additional downloads are needed to play.
 
-Prefer a ZIP? **[Portable v2.5.0](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.5.0/LeoRacer-2.5.0-win64.zip)** includes the same three tracks and twenty cars. Extract the **complete folder** and run `LeoRacer.exe`. Use `Play Compatibility.cmd` if Vulkan is unavailable.
+Prefer a ZIP? **[Portable v2.7.0](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.7.0/LeoRacer-2.7.0-win64.zip)** includes the same three tracks and 21 cars. Extract the **complete folder** and run `LeoRacer.exe`. Use `Play Compatibility.cmd` if Vulkan is unavailable.
 
 <details>
 <summary><strong>Upgrading, Compatibility mode &amp; checksums</strong></summary>

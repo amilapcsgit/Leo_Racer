@@ -40,12 +40,14 @@ func refresh() -> void:
  button("BACK",func():pending_device={};router.cancel_capture();closed.emit(),tabs)
  button("Test Controls" if not testing else "Back to Bindings",func():testing=not testing;refresh(),tabs)
  button("Advanced" if not advanced else "Simple",func():advanced=not advanced;refresh(),tabs)
+ button("Identify Controller",func():router.identify(slot),tabs)
+ button("Press A to Assign",func():router.begin_claim(slot),tabs)
  var devices := OptionButton.new();body.add_child(devices)
  devices.add_item("Keyboard");devices.set_item_metadata(0,{"kind":"keyboard","device":-1})
  devices.add_item("Auto · first available controller, or keyboard");devices.set_item_metadata(1,{"kind":"auto","device":-1})
  for id in Input.get_connected_joypads():
   for mode in ["gamepad","wheel"]:
-   devices.add_item("%s / %s #%d" % [Input.get_joy_name(id),mode.to_upper(),id]);devices.set_item_metadata(devices.item_count-1,{"kind":mode,"device":id})
+   devices.add_item("%s / %s" % [router.device_label(id),mode.to_upper()]);devices.set_item_metadata(devices.item_count-1,{"kind":mode,"device":id})
  var p := router.players[slot]
  var selected := -1
  for i in devices.item_count:
@@ -118,6 +120,8 @@ func ambiguous_device(id: int) -> bool:
  return matches>1
 
 func _input(event: InputEvent) -> void:
+ if router.claim_slot>=0 or (event is InputEventJoypadButton and router.claimed_releases.has(event.device)):
+  router.claim_event(event);return
  if not pending_device.is_empty():
   if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE):
    pending_device={};refresh()

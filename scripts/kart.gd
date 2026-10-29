@@ -24,6 +24,12 @@ var finished := false
 var finish_time := 0.0
 var progress := -10.0
 var next_gate := 0
+var lap_count := 3
+var grounded := false
+var airborne_time := 0.
+var landing_suppression := .25
+var dynamics := LeoArcadeDynamics.new()
+signal surface_feedback(kind: String,strength: float)
 var lap := 1
 var nearest_index := -1
 var last_s := 0.0
@@ -112,7 +118,8 @@ static func vehicle_spec(key: String) -> Dictionary:
 static func seat_driver(model: Node3D,key: String) -> void:
 	model.transform = LeoVehiclePresentation.resolve(GarageCatalog.shared().vehicle(key)).seat * model.transform
 
-func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String, authored: VehicleDefinition = null) -> void:
+func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color: String, authored: VehicleDefinition = null, laps: int = 3) -> void:
+	lap_count=clampi(laps,1,10)
 	circuit = track
 	racer_id = id
 	is_player = player
@@ -140,7 +147,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	add_child(collision)
 	collision_layer = 2
 	collision_mask = 1 | 2
-	floor_snap_length = .5
+	floor_snap_length = LeoArcadeDynamics.SNAP
 	for exhaust_index in exhaust_positions.size():
 		var f := MeshInstance3D.new()
 		f.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -332,7 +339,7 @@ func advance_checkpoints(projection: Dictionary, motion: Vector3) -> void:
 	if valid and change>0. and to_gate>=-.001 and to_gate<=change+.001:
 		var crossed:=next_gate
 		next_gate+=1
-		lap=mini(3,1+maxi(0,next_gate-1)/LeoCircuit.GATES)
+		lap=mini(lap_count,1+maxi(0,next_gate-1)/LeoCircuit.GATES)
 		checkpoint_missed=false
 		gate_crossed.emit(self,crossed)
 		expected=float(next_gate)*segment
@@ -390,6 +397,7 @@ func recover() -> void:
 	recovered.emit(self)
 
 func reset_suspension() -> void:
+	dynamics.reset();grounded=false;airborne_time=0.;landing_suppression=.25
 	suspension_ready=false;suspension_roll=0.;suspension_pitch=0.;drafting=false
 
 func update_suspension(dt: float, reduced: bool, motion_velocity: Vector3=Vector3.INF) -> void:
@@ -401,9 +409,8 @@ func update_suspension(dt: float, reduced: bool, motion_velocity: Vector3=Vector
 	var lateral:=acceleration_world.dot(global_basis.x)
 	var longitudinal:=acceleration_world.dot(-global_basis.z)
 	var yaw_rate:=angle_difference(suspension_yaw,rotation.y)/maxf(dt,.001)
-	var blend:=1.-exp(-dt*8.)
-	suspension_roll=lerpf(suspension_roll,clampf(-lateral*.0018+yaw_rate*.012,-deg_to_rad(4.),deg_to_rad(4.)),blend)
-	suspension_pitch=lerpf(suspension_pitch,clampf(longitudinal*.0012,-deg_to_rad(1.5),deg_to_rad(1.5)),blend)
+	var response:=dynamics.spring(Vector3(0.,clampf(longitudinal*.0012,-deg_to_rad(3.),deg_to_rad(3.)),clampf(-lateral*.0018+yaw_rate*.012,-deg_to_rad(5.),deg_to_rad(5.))),dt)
+	suspension_roll=response.z;suspension_pitch=response.y
 	suspension_velocity=measured;suspension_yaw=rotation.y
 
 func boost(duration: float, source: String, kind: String="nitro", tier: int=0) -> void:
@@ -472,19 +479,36 @@ func _physics_process(dt: float) -> void:
 	var grip := clampf(absf(speed) / 8, 0, 1)
 	var turn_rate := lerpf(2.2, 1.65, clampf(absf(speed) / 40, 0, 1)) * handling
 	rotation.y -= steer * turn_rate * grip * dt * (-1.0 if speed < -.1 else 1.0) * (1.12 if drifting else 1.0)
-	if circuit.elevated:basis=circuit.frame_at(last_s,rotation.y)
+	if grounded and is_on_floor():
+		var support:=get_floor_normal()
+		var heading:=Vector3(-sin(rotation.y),0,-cos(rotation.y)).slide(support).normalized()
+		if heading.length_squared()>.01:basis=basis.slerp(Basis.looking_at(heading,support),1.-exp(-dt*14.)).orthonormalized()
 	var forward := -global_basis.z
 	var target_vel := forward * speed
-	var lateral_grip := 3.0 if drifting else 10.0
+	var lateral_grip := (3.0 if drifting else 10.0)*(1. if grounded else LeoArcadeDynamics.AIR_GRIP)
 	velocity.x = lerpf(velocity.x, target_vel.x, minf(1, dt * lateral_grip))
 	velocity.z = lerpf(velocity.z, target_vel.z, minf(1, dt * lateral_grip))
 	if circuit.elevated and is_on_floor():
-		var up:=circuit.frame_at(last_s).y
+		var up:=get_floor_normal()
 		velocity.y=-(velocity.x*up.x+velocity.z*up.z)/maxf(up.y,.5)
-	velocity.y -= 18 * dt
+	landing_suppression=maxf(0.,landing_suppression-dt)
+	floor_snap_length=LeoArcadeDynamics.SNAP if velocity.y<=0. and grounded else 0.
+	velocity.y -= LeoArcadeDynamics.GRAVITY * dt
 	var motion_origin := global_position
 	var contact_velocity := velocity
+	var was_grounded:=grounded
 	move_and_slide()
+	grounded=is_on_floor()
+	if grounded:
+		var normal_speed:=maxf(0.,-contact_velocity.dot(get_floor_normal()))
+		if not was_grounded and airborne_time>.035 and landing_suppression<=0. and normal_speed>LeoArcadeDynamics.LANDING_THRESHOLD:
+			var strength:=clampf(normal_speed/10.,0.,1.)
+			dynamics.spring_velocity.x=-strength*1.2
+			surface_feedback.emit("landing",strength)
+		elif was_grounded and absf(contact_velocity.y-velocity.y)>1. and landing_suppression<=0.:
+			surface_feedback.emit("bump",clampf(absf(contact_velocity.y-velocity.y)/12.,.1,.45))
+		airborne_time=0.
+	else:airborne_time+=dt
 	LeoContactSolver.solve(self,contact_velocity)
 	# Soft continuous barrier response avoids gaps between modular rail meshes.
 	var projection := circuit.project(position, nearest_index)
@@ -513,14 +537,15 @@ func _physics_process(dt: float) -> void:
 	# Keep the RC's body response; Reduced Motion suppresses presentation offsets.
 	var reduced:=bool(get_parent().get("reduced_motion")) if get_parent().get("reduced_motion")!=null else false
 	air_hop = move_toward(air_hop, 0, dt * .8)
-	visual.position.y = (.20 if definition.hovering else 0.) if reduced else ((.20 + sin(Time.get_ticks_msec()*.0018)*.055 if definition.hovering else 0.0) + air_hop + sin(Time.get_ticks_msec() * .018) * .012 * absf(speed) / 33)
+
 	var photo:=false
 	if is_player and get_parent().get("local_players")!=null:photo=get_parent().local_players[local_slot].photo
 	update_suspension(dt,reduced or photo,(global_position-motion_origin)/maxf(dt,.001))
+	visual.position.y=(.20 if definition.hovering else 0.) if reduced else ((.20+sin(Time.get_ticks_msec()*.0018)*.055) if definition.hovering else clampf(dynamics.compression.x+air_hop,-.06,.20))
 	visual.rotation.z = suspension_roll
 	visual.rotation.y = 0. if reduced else lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
-	contact_recoil=Vector3.ZERO if reduced else contact_recoil.move_toward(Vector3.ZERO,dt*1.8)
-	visual.rotation.z+=contact_recoil.z;visual.rotation.x=suspension_pitch+contact_recoil.x
+	contact_recoil=Vector3.ZERO
+	visual.rotation.x=suspension_pitch
 	if is_player and engine:
 		if motor_audio:motor_audio.throttle=throttle;motor_audio.update(dt)
 		skid.volume_db = lerpf(skid.volume_db, -13.0 if drifting else -65.0, dt * 8)
@@ -534,7 +559,7 @@ func _process(dt: float) -> void:
 		flame.scale = Vector3(1, 1.6 + sin(effect_clock * 38) * .3, 1)
 	for trail in exhaust_trails:
 		trail.emitting = boost_time > 0 and active
-	for sparks in tire_sparks: sparks.emitting = drifting and drift_charge > .3 and absf(wheel_motion_speed)>4.
+	for sparks in tire_sparks: sparks.emitting = grounded and drifting and drift_charge > .3 and absf(wheel_motion_speed)>4.
 
 func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
 	if impact_feedback_cooldown>0: return
@@ -550,7 +575,7 @@ func report_contact(point: Vector3, normal: Vector3, relative: Vector3, other: L
 	contact_reported.emit(event)
 	if phase=="impact":
 		var strength:=clampf(closing/35.,0.,1.)
-		contact_recoil=Vector3(-.035*strength,0.,global_basis.x.dot(normal)*.055*strength)
+		dynamics.spring_velocity.y-=.35*strength;dynamics.spring_velocity.z+=global_basis.x.dot(normal)*.5*strength
 		if impact_feedback_cooldown<=0.:
 			impact_feedback_cooldown=.18;impacted.emit(self,point,normal,strength)
 

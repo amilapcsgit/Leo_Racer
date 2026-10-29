@@ -314,11 +314,12 @@ func save_vehicle() -> void:
 	if DirAccess.rename_absolute(temporary,folder.path_join("vehicle.json"))!=OK:status.text="Cannot replace vehicle definition.";saving=false;return
 	if not FileAccess.file_exists(folder.path_join("LICENSE.txt")):FileAccess.open(folder.path_join("LICENSE.txt"),FileAccess.WRITE).store_string(String(data.get("attribution","Author must supply redistribution terms."))+"\n")
 	if DisplayServer.get_name()=="headless":
-		var image:=Image.create(256,144,false,Image.FORMAT_RGB8);image.fill(Color("102733"));image.save_png(folder.path_join("thumbnail.png"))
+		var image:=Image.create(256,144,false,Image.FORMAT_RGBA8);image.fill(Color.TRANSPARENT);image.save_png(folder.path_join("thumbnail.png"))
 	else:
 		collision_hint.hide();await get_tree().process_frame;await RenderingServer.frame_post_draw
 		if not is_inside_tree():return
-		viewport.get_texture().get_image().save_png(folder.path_join("thumbnail.png"));collision_hint.show()
+		var cutout:=await LeoPreviewArt.capture_model(studio,viewport,get_tree())
+		cutout.save_png(folder.path_join("thumbnail.png"));collision_hint.show()
 	saved_folder=folder;saving=false;status.text="Saved "+String(data.id)+". Back → Refresh Content makes it selectable. Share this complete folder."
 
 func _process(dt: float) -> void:

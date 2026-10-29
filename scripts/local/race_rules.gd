@@ -1,6 +1,6 @@
 class_name LeoRaceRules
 extends RefCounted
-const ID := "distinct_v5_static"
+const ID := "ultra_v6_static"
 const CLASS := "arcade_v2"
 static var _balance: Dictionary = {}
 

@@ -1,0 +1,9 @@
+{
+  "version": "2.6.0",
+  "url": "https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.6.0/LeoRacer-2.6.0-win64.zip",
+  "sha256": "7c2df4a81e4931da8b7039c4ae9c49eafbe7255126ed2dd9181b26fa5087ec5e",
+  "bytes": 644470422,
+  "prefix": "LeoRacer/GameAssets/",
+  "vehicles": 21,
+  "tracks": 3
+}

@@ -243,7 +243,7 @@ func show_race() -> void:
 	if is_instance_valid(garage_selector):
 		garage_selector.hide();garage_selector.race_context=false
 		if garage_selector.keyboard and garage_selector.keyboard.visible:garage_selector.close_keyboard(true)
-		garage_selector.scheduler.pause_for_race()
+		garage_selector.scheduler.suspended=true
 	frontend.close_modal(false);scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
 	game.input_router.gameplay_enabled=true;game.input_router.assignment_locked=true;game.input_router.clear_all()
 	hud_root.visible=game.human_count==1
@@ -297,7 +297,7 @@ func _process(dt: float) -> void:
 		var bindings: LeoPlayerInput=game.input_router.players[0]
 		for i in binding_hints.size():binding_hints[i].text=bindings.describe(HINT_ACTIONS[i])
 		labels.position.text = str(game.player_place())
-		labels.lap.text = "%d / 3" % p.lap
+		labels.lap.text = "%d / %d" % [p.lap,game.active_laps]
 		labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
 		display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-visual_dt*12))
 		display_nitro = lerpf(display_nitro,p.boost_fuel,1.0-exp(-visual_dt*10))

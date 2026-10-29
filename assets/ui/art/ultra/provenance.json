@@ -1,0 +1,26 @@
+{
+  "version": "2.7.0",
+  "tool": "built-in image_gen",
+  "prompts": {
+    "fallback": "Use case: stylized-concept. Asset type: transparent PNG fallback for future imported cars in Leo Racer 2.7 Ultra. Render a single generic unbranded sporty car facing directly toward the camera, a little elevated looking down, centered, entire car and tires visible, metallic charcoal body, restrained cyan edge lighting, dark glass, clean premium 3D arcade showroom look. Truly transparent background, no floor, no scene, no rectangular backdrop, no shadow rectangle. No text, no logos, no driver, no badge, no border. Wide composition, generous transparent margin, crisp silhouette readable at thumbnail size.",
+    "winner": "Use case: stylized-concept. Asset type: transparent winner trophy artwork for a premium arcade racing game's leaderboard. Single polished gold racing trophy cup framed by a beautifully sculpted golden laurel wreath, small black and white checkered ribbon at its base, restrained cyan light accents, bold clean premium 3D game render. Centered entire object, generous transparent margin, genuinely transparent background. No letters, words, numbers, logos, border, pedestal scene or background. Designed to sit on a dark navy cyan and gold showroom UI, strong readable silhouette."
+  },
+  "generated_files": {
+    "custom-car.png": "exec-267f8923-771a-4506-a2fd-d75199e4c763.png",
+    "winner.png": "exec-2e7a4028-3bee-4bd8-b6fb-586dd37b51b2.png"
+  },
+  "vehicle_images": {
+    "method": "Native Godot model render; no geometry or source asset edits",
+    "script": "tools/render_ultra_previews.gd",
+    "renderers": [
+      "forward_plus",
+      "gl_compatibility"
+    ],
+    "hero_size": [
+      1600,
+      900
+    ],
+    "alpha": true,
+    "driver_visible": false
+  }
+}

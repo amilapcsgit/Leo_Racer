@@ -21,11 +21,11 @@ static func solve(kart: LeoKart, incoming: Vector3) -> void:
 			var key:="%d:%d"%[mini(kart.get_instance_id(),other.get_instance_id()),maxi(kart.get_instance_id(),other.get_instance_id())]
 			if pairs.has(key):continue
 			pairs[key]=true
-			# Equal-mass inelastic impulse: no pair kinetic-energy gain.
-			kart.velocity=incoming+normal*closing*.5
-			other.velocity-=normal*closing*.5
+			# Damped equal-mass impulse: no pair kinetic-energy gain.
+			kart.velocity=incoming+normal*closing*(1.+LeoArcadeDynamics.RESTITUTION)*.5
+			other.velocity-=normal*closing*(1.+LeoArcadeDynamics.RESTITUTION)*.5
 			other.speed=signf(other.speed)*minf(absf(other.speed),Vector2(other.velocity.x,other.velocity.z).length())
-		else:kart.velocity=remove_closing(incoming,normal)
+		else:kart.velocity=remove_closing(incoming,normal)+normal*closing*LeoArcadeDynamics.RESTITUTION
 		kart.speed=signf(kart.speed)*minf(absf(kart.speed),Vector2(kart.velocity.x,kart.velocity.z).length())
 		kart.report_contact(hit.get_position(),normal,relative,other,"paint" if other else String(hit.get_collider().get_meta("contact_surface","concrete")))
 		if other:other.report_contact(hit.get_position(),-normal,-relative,kart,"paint")

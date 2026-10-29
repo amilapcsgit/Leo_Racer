@@ -30,6 +30,8 @@ var vehicle_id: StringName = &"blue"
 var reduced_motion := false
 var assembly: Node3D
 var selection_generation := 0
+var preview_fade: Tween
+var capture_busy := false
 var loading_preview: TextureRect
 var loading_caption: Label
 var warm_only := false
@@ -154,14 +156,12 @@ func build_interface() -> void:
 	vehicle_strip=ScrollContainer.new();vehicle_strip.position=Vector2(32,674);vehicle_strip.size=Vector2(1536,138);vehicle_strip.vertical_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;vehicle_strip.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_SHOW_NEVER;ui.add_child(vehicle_strip)
 	var row:=HBoxContainer.new();row.add_theme_constant_override("separation",12);vehicle_strip.add_child(row)
 	for vehicle in catalog.vehicles:
-		var thumbnail_path:="res://assets/ui/art/garage-cars/"+String(vehicle.id)+".png"
-		if ResourceLoader.exists(thumbnail_path):vehicle.thumbnail=load(thumbnail_path)
 		var id: StringName=vehicle.id
 		var card:=Button.new();card.custom_minimum_size=Vector2(209,134);card.toggle_mode=true;card.tooltip_text=vehicle.display_name;row.add_child(card);vehicle_cards[id]=card
 		var normal:=StyleBoxFlat.new();normal.bg_color=Color(.025,.045,.065,.75);normal.border_color=Color(.25,.36,.4,.6);normal.set_border_width_all(1);normal.set_corner_radius_all(5);card.add_theme_stylebox_override("normal",normal)
 		var selected:=normal.duplicate() as StyleBoxFlat;selected.bg_color=Color(.04,.16,.20,.86);selected.border_color=cyan;selected.set_border_width_all(2)
 		for state in ["pressed","hover","focus"]:card.add_theme_stylebox_override(state,selected)
-		add_card_content(card,vehicle.display_name,vehicle.thumbnail,Vector2(196,96),20)
+		add_card_content(card,LeoPreviewArt.name_for(vehicle),LeoPreviewArt.texture(vehicle),Vector2(196,96),20)
 		card.pressed.connect(func():choose_vehicle(id));card.focus_entered.connect(func():scheduler.hint(id));card.mouse_entered.connect(func():scheduler.hint(id))
 	back_button=button(ui,"Back",func():back_requested.emit());back_button.position=Vector2(32,838);back_button.size=Vector2(176,44)
 	var reset:=button(ui,"Reset View",reset_view);reset.position=Vector2(1090,838);reset.size=Vector2(176,44)
@@ -288,7 +288,10 @@ func valid_selection(generation: int) -> bool:
 func prefetch_neighbors(_generation: int) -> void:
 	scheduler.anticipate(driver_id,vehicle_id)
 
-func _exit_tree() -> void:selection_generation+=1
+func _exit_tree() -> void:
+	selection_generation+=1
+	if preview_fade:preview_fade.kill()
+	if ring_tween:ring_tween.kill()
 
 func set_selection(d: StringName,v: StringName) -> void:
 	if is_node_ready():viewport.msaa_3d=get_tree().root.msaa_3d
@@ -296,6 +299,7 @@ func set_selection(d: StringName,v: StringName) -> void:
 	driver_id=d;vehicle_id=v
 	if not is_node_ready():return
 	selection_generation+=1
+	if preview_fade:preview_fade.kill()
 	var generation:=selection_generation
 	var car:=catalog.vehicle(v)
 	var racer:=catalog.driver(d)
@@ -310,9 +314,15 @@ func set_selection(d: StringName,v: StringName) -> void:
 	refresh_labels()
 	var start_time:=Time.get_ticks_usec()
 	if not loading_preview:
-		loading_preview=TextureRect.new();loading_preview.position=Vector2(480,160);loading_preview.size=Vector2(850,400);loading_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;loading_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;loading_preview.mouse_filter=MOUSE_FILTER_IGNORE;ui.add_child(loading_preview)
+		loading_preview=TextureRect.new();loading_preview.position=Vector2.ZERO;loading_preview.size=Vector2(1600,900);loading_preview.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;loading_preview.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;loading_preview.mouse_filter=MOUSE_FILTER_IGNORE;add_child(loading_preview);move_child(loading_preview,ui.get_index())
 		loading_caption=positioned_label("",Vector2(700,570),22,cyan)
-	loading_preview.texture=car.thumbnail;loading_preview.show();loading_caption.text="Loading your ride…";loading_caption.show();race_button.disabled=true
+	var initial:=LeoVehiclePresentation.resolve(car)
+	base_distance=initial.preview_distance*.95;target=initial.preview_target-Vector3.UP*.4
+	showroom_parallax=Vector2.ZERO;reset_view()
+	loading_preview.texture=LeoPreviewArt.texture(car,true)
+	var generic:=loading_preview.texture.resource_path.ends_with("/custom-car.png")
+	loading_preview.position=Vector2(500,220) if generic else Vector2.ZERO;loading_preview.size=Vector2(600,400) if generic else Vector2(1600,900)
+	loading_preview.modulate.a=1.;loading_preview.show();loading_caption.text="Loading your ride…";loading_caption.show();race_button.disabled=true
 	if is_instance_valid(assembly):assembly.hide()
 	for control in preview_actions:control.disabled=true
 	var current:=func():return valid_selection(generation)
@@ -336,12 +346,20 @@ func set_selection(d: StringName,v: StringName) -> void:
 	await get_tree().process_frame
 	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	if not current.call():return
-	loading_preview.hide();loading_caption.hide();race_button.disabled=false;idle=0.
+	loading_caption.hide();race_button.disabled=false;idle=0.
+	if reduced_motion:loading_preview.hide()
+	else:
+		preview_fade=create_tween()
+		preview_fade.tween_property(loading_preview,"modulate:a",0.,.18)
+		preview_fade.tween_callback(func():
+			if generation==selection_generation:loading_preview.hide())
 	LeoPreviewStream.timings.append({"vehicle":String(v),"stage":"first_visible","ms":(Time.get_ticks_usec()-start_time)/1000.})
 	refresh_labels()
 	pulse_rings()
 	preview_ready.emit()
 	prefetch_neighbors(generation)
+	if not car.official and not FileAccess.file_exists(LeoPreviewArt.cache_path(car,true)):
+		await capture_art(ProjectSettings.globalize_path(LeoPreviewArt.cache_path(car,true)),ProjectSettings.globalize_path(LeoPreviewArt.cache_path(car,false)))
 
 func preview_features() -> LeoVehicleFeatures:
 	if not is_instance_valid(assembly):return null
@@ -389,10 +407,10 @@ func _gui_input(event: InputEvent) -> void:
 func _process(dt: float) -> void:
 	if get_tree().paused and not race_context:return
 	idle+=dt
-	var pointer:=Vector2.ZERO if reduced_motion else (get_local_mouse_position()/Vector2(1600,900)*2.-Vector2.ONE).clamp(-Vector2.ONE,Vector2.ONE)
+	var pointer:=Vector2.ZERO if reduced_motion or (loading_preview and loading_preview.visible) else (get_local_mouse_position()/Vector2(1600,900)*2.-Vector2.ONE).clamp(-Vector2.ONE,Vector2.ONE)
 	showroom_parallax=showroom_parallax.lerp(pointer,1.-exp(-dt*5.))
-	if not reduced_motion and not dragging and not race_button.disabled and idle>4.:yaw+=dt*.12
-	if not dragging:update_camera()
+	if not reduced_motion and not dragging and not race_button.disabled and idle>2.:yaw+=dt*.12
+	if not dragging and not capture_busy:update_camera()
 
 func prewarm_materials() -> void:
 	# OpenGL has no background pipeline compilation. Compile tiny material
@@ -444,7 +462,7 @@ func build_showroom() -> void:
 	viewport.msaa_3d=get_tree().root.msaa_3d
 	viewport.transparent_bg=false
 	$SubViewportContainer.material=null
-	camera=Camera3D.new();camera.fov=36;camera.current=true;showroom.add_child(camera)
+	camera=Camera3D.new();camera.fov=LeoPreviewArt.FOV;camera.current=true;showroom.add_child(camera)
 	var env := WorldEnvironment.new();env.environment=Environment.new();env.environment.background_mode=Environment.BG_COLOR;env.environment.background_color=Color("0d1621");env.environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR;env.environment.ambient_light_color=Color("c5d2de");env.environment.ambient_light_energy=.45;env.environment.tonemap_mode=Environment.TONE_MAPPER_ACES;showroom.add_child(env)
 	var sky := Sky.new()
 	var sky_mat := ProceduralSkyMaterial.new()
@@ -514,3 +532,12 @@ func set_reduced_motion(value: bool) -> void:
 	for bar in stat_bars:bar.fx_set_reduced(value)
 	if value and ring_tween:ring_tween.kill()
 	for material in ring_materials:material.emission_energy_multiplier=1.1;material.albedo_color=material.emission
+
+func capture_art(hero_path: String,card_path: String) -> Error:
+	if capture_busy or not is_instance_valid(assembly):return ERR_BUSY
+	capture_busy=true
+	var generation:=selection_generation
+	var image:=await LeoPreviewArt.capture_model(showroom,viewport,get_tree())
+	capture_busy=false
+	if generation!=selection_generation:return ERR_SKIP
+	return LeoPreviewArt.save(image,hero_path,card_path)

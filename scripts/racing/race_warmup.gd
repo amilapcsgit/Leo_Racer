@@ -6,6 +6,7 @@ static func prepare(game: Node3D) -> void:
 	var particles: Array[Dictionary]=[];var audio: Array[Dictionary]=[];var callbacks: Array[Dictionary]=[]
 	var warm_meshes: Array[MeshInstance3D]=[]
 	var skid_nodes: Array[Dictionary]=[]
+	var damage_warmups: Array[Dictionary]=[]
 	for kart in game.karts:
 		# Render the actual selected skid backend, including its receiving surface.
 		if kart.effects and not kart.effects.marks.is_empty():
@@ -26,6 +27,14 @@ static func prepare(game: Node3D) -> void:
 			if node.has_method("_process") or node.has_method("_physics_process"):
 				callbacks.append({"node":node,"process":node.is_processing(),"physics":node.is_physics_processing()});node.set_process(false);node.set_physics_process(false)
 			if node is LeoCosmeticDamage and not node.available.is_empty():
+				# Warm the real spatial lookup and patch allocation before the first crash.
+				# Restore the pool below: this must never leave visible or recorded damage.
+				if node.patches.is_empty() and not node.centers.is_empty():
+					await LeoPreparationBudget.checkpoint(game.get_tree())
+					var contact_began:=Time.get_ticks_usec()
+					node.on_contact({"phase":"impact","normal_speed":12.,"point":node.to_global(node.centers[0])})
+					LeoPreparationBudget.record(contact_began)
+					if not node.patches.is_empty():damage_warmups.append({"damage":node,"patch":node.patches[-1]})
 				# Match the real patch vertex format: no UV, explicit normals/tangents.
 				var representative:=MeshInstance3D.new();var mesh:=ArrayMesh.new();var arrays:=[];arrays.resize(Mesh.ARRAY_MAX)
 				arrays[Mesh.ARRAY_VERTEX]=PackedVector3Array([Vector3(-.15,-.15,0),Vector3(.15,-.15,0),Vector3(0,.15,0),Vector3(0,.15,0),Vector3(.15,-.15,0),Vector3(-.15,-.15,0)])
@@ -41,5 +50,7 @@ static func prepare(game: Node3D) -> void:
 	for entry in audio:entry.node.stop();entry.node.volume_db=entry.volume
 	for entry in callbacks:entry.node.set_process(entry.process);entry.node.set_physics_process(entry.physics)
 	for entry in skid_nodes:entry.node.global_transform=entry.transform;entry.node.visible=entry.visible
+	for entry in damage_warmups:
+		entry.patch.hide();entry.patch.mesh=null;entry.damage.patches.erase(entry.patch);entry.damage.available.append(entry.patch);entry.damage.cursor=0;entry.damage.last_contact_ms=0.
 	for mesh in warm_meshes:mesh.free()
-	last_report={"particles":particles.size(),"audio_streams":audio.size(),"damage_materials":warm_meshes.size()-skid_nodes.size(),"skid_backends":skid_nodes.size(),"milliseconds":(Time.get_ticks_usec()-began)/1000.,"post_draw":DisplayServer.get_name()!="headless"}
+	last_report={"particles":particles.size(),"audio_streams":audio.size(),"damage_materials":warm_meshes.size()-skid_nodes.size(),"actual_contact_warmups":damage_warmups.size(),"skid_backends":skid_nodes.size(),"milliseconds":(Time.get_ticks_usec()-began)/1000.,"post_draw":DisplayServer.get_name()!="headless"}

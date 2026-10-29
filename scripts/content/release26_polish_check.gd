@@ -53,7 +53,7 @@ func run() -> void:
 		check(is_equal_approx(selector.yaw,0.) and is_equal_approx(selector.pitch,.12) and is_equal_approx(selector.zoom,1.),"Front spawn / "+String(vehicle.id))
 		check(is_instance_valid(selector.assembly) and not selector.race_button.disabled,"Ready car / "+String(vehicle.id))
 		if String(vehicle.id) in ["bigster","duster","duster_2024"]:await capture("front-"+String(vehicle.id))
-	selector.set_reduced_motion(false);selector.reset_view();selector._process(3.9);check(is_zero_approx(selector.yaw),"Four-second display hold")
+	selector.set_reduced_motion(false);selector.reset_view();selector._process(1.9);check(is_zero_approx(selector.yaw),"Two-second display hold")
 	selector._process(.2);check(selector.yaw>0.,"Slow rotation starts after hold")
 	selector.dragging=true;var yaw:=selector.yaw;selector._process(1.);check(selector.yaw==yaw,"Dragging pauses automatic rotation");selector.dragging=false
 	selector.set_reduced_motion(true);selector.reset_view();selector._process(8.);check(is_zero_approx(selector.yaw),"Reduced Motion stops rotation")

@@ -1,7 +1,7 @@
 class_name LeoVehicleLibrary
 extends RefCounted
 ## Metadata-only discovery. A bad optional car never prevents boot.
-const CORE_VERSION := Vector3i(2,6,0)
+const CORE_VERSION := Vector3i(2,7,0)
 static var generation := 0
 static var entries: Array[VehicleDefinition]=[]
 static var unavailable: Array[Dictionary]=[]
@@ -122,7 +122,7 @@ static func problems(data: Variant, folder: String, files: bool=true) -> PackedS
 		if not finite_vector(wheel.get("pivot")) or not finite_vector(wheel.get("axle")):errors.append("Invalid wheel pivot/axle")
 		elif not is_equal_approx(LeoVehicleCodec.vector(wheel.axle).length(),1.):errors.append("Wheel axle must be normalized")
 		if not wheel.get("radius") is float and not wheel.get("radius") is int:errors.append("Invalid wheel radius")
-		elif float(wheel.radius)<=.01 or float(wheel.radius)>3.:errors.append("Wheel radius outside 0.01ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ3 m")
+		elif float(wheel.radius)<=.01 or float(wheel.radius)>3.:errors.append("Wheel radius outside 0.01 to 3 m")
 		for key in ["rotating","stationary"]:
 			var paths: Variant=wheel.get(key,[])
 			if not paths is Array:errors.append("Invalid wheel groups");continue

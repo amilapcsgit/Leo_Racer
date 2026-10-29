@@ -45,7 +45,7 @@ func run() -> void:
 		if arg=="--impact-only":impact_only=true
 	DirAccess.make_dir_recursive_absolute(output)
 	root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size);Engine.max_fps=120
-	check(LeoAssets.configure(ProjectSettings.globalize_path("res://build/lighting-content/GameAssets"))==OK and LeoAssets.mount_packs()==OK,"Lighting dependencies mount")
+	check(LeoAssets.configure(OS.get_environment("LEO_ASSET_ROOT") if not OS.get_environment("LEO_ASSET_ROOT").is_empty() else OS.get_executable_path().get_base_dir().path_join("GameAssets"))==OK and LeoAssets.mount_packs()==OK,"Lighting dependencies mount")
 	LeoVehicleLibrary.discover();game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished
 	game.diagnostics_mode=true;game.graphics_quality=1
 	for track in ([selected] if not selected.is_empty() else ["astra_coast"] if impact_only else ["astra_coast","colombo_city","kandy_lake"]):

@@ -46,7 +46,7 @@ func _process(dt: float) -> void:
  visible=not local.photo
  var width:=size.x;var height:=size.y;var compact: bool=game.human_count==2
  title.position=Vector2(28,20);title.size=Vector2(width-56,32);title.text="P%d · %s" % [slot+1,kart.racer_name]
- info.position=Vector2(28,54);info.size=Vector2(width-56,40);info.text="#%d / 6     Lap %d / 3     %s" % [game.player_place(slot),kart.lap,game.format_time(kart.finish_time if kart.finished else game.race_time)]
+ info.position=Vector2(28,54);info.size=Vector2(width-56,40);info.text="#%d / 6     Lap %d / %d     %s" % [game.player_place(slot),kart.lap,game.active_laps,game.format_time(kart.finish_time if kart.finished else game.race_time)]
  speed.position=Vector2(width-220,height-170);speed.size=Vector2(190,95);speed.text="%03d" % int(absf(kart.wheel_motion_speed)*3.6);speed.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
  units.position=Vector2(width-100,height-80);units.text="KM/H"
  boost.position=Vector2(width-258,height-50);boost.size=Vector2(228,18);boost.value=kart.boost_fuel

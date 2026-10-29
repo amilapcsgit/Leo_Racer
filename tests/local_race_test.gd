@@ -58,7 +58,7 @@ func run() -> void:
  first.speed=20.;second.speed=-20.;game._process(.6)
  check(game.local_players[1].wrong_way>.5 and game.local_players[0].wrong_way==0.,"Wrong-way feedback is independent")
  game.selected_player_slot=1;game.toggle_pause();game.hud.show_garage("pause")
- var swap_id: StringName=&"blue" if game.catalog.vehicle(&"blue") else &"duster"
+ var swap_id: StringName=&"blue" if game.catalog.vehicle(&"blue") else &"duster_2024"
  check(game.swap_player_vehicle(&"mario",swap_id,"SECOND SWAP") and game.karts[0]==first and game.karts[1]!=second and game.local_players[1].kart==game.karts[1],"Pause car swap targets only P2")
  game.toggle_pause();game.hud.show_garage("pause");game.input_router.players[1].device=-1;game.diagnostics_mode=false
  check(not game.swap_player_vehicle(&"mario",&"duster","MISSING DEVICE") and game.paused,"Car change cannot bypass mandatory device reassignment")
@@ -66,4 +66,4 @@ func run() -> void:
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
  FileAccess.open("res://build/qa-ui/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RACE_TEST ",report)
- game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)
+ await game.quit_game(0 if errors.is_empty() else 1)

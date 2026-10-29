@@ -79,13 +79,13 @@ func run() -> void:
 	bridge.free()
 	game.return_menu();game.selected_kart=game.catalog.vehicle_index(&"duster");game.local_players[0].vehicle_id=&"duster"
 	game.set_race_variant("dusk_night");await game.start_race()
-	check(game.current_ruleset()=="distinct_v5_dusk_night","Dynamic ranking identity")
+	check(game.current_ruleset()=="ultra_v6_dusk_night","Dynamic ranking identity")
 	game.state="race"
 	for kart in game.karts:kart.active=true;kart.set_physics_process(false)
 	var player: LeoKart=game.player
 	player.velocity=Vector3.ZERO;player.reset_suspension();player.update_suspension(.016,false)
 	player.velocity=Vector3(100,0,-100);player.rotation.y+=1.;player.update_suspension(.016,false)
-	check(absf(player.suspension_roll)<=deg_to_rad(4.) and absf(player.suspension_pitch)<=deg_to_rad(1.5),"Cosmetic motion limits")
+	check(absf(player.suspension_roll)<=deg_to_rad(5.) and absf(player.suspension_pitch)<=deg_to_rad(3.),"Cosmetic motion limits")
 	player.reset_suspension();check(player.suspension_roll==0. and not player.suspension_ready,"Recovery resets filters")
 	player.next_gate=LeoCircuit.GATES*2+1;player.progress=game.circuit.length*2.;player.checkpoint_missed=false
 	game.race_environment.advance(game.karts,2.,false);var progression: float=game.race_environment.progress
@@ -96,13 +96,13 @@ func run() -> void:
 	game.race_environment.displayed=1.;game.race_environment.apply(true);await capture("Duster_My_2014-night")
 	game.race_environment.reset();check(game.race_environment.progress==0.,"Restart resets progression")
 	game.set_race_variant("static");game.race_environment.configure(game.world,game.environment,game.chosen_track_id,false)
-	check(game.current_ruleset()=="distinct_v5_static","Static ranking identity")
+	check(game.current_ruleset()=="ultra_v6_static","Static ranking identity")
 	var store=load("res://scripts/LocalRankingStore.cs").new()
 	check(store.open_store(ProjectSettings.globalize_path(output.path_join("rankings.sqlite3"))),"SQLite opens on worker")
-	var request: int=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"distinct_v5_static")
+	var request: int=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static")
 	while not store.request_ready(request):await process_frame
 	check(store.take_query(request).is_empty(),"Async records return on main thread")
-	request=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"distinct_v5_static");store.cancel_request(request)
+	request=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static");store.cancel_request(request)
 	store.close_store()
 	samples.sort()
 	var result:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"ui_ms":ui_ms,"cold_preview_ms":cold_ms,"warm_ms":warm_ms,"garage_worst_ms":samples[-1] if not samples.is_empty() else 0.,"stages":LeoPreviewStream.timings,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name()}

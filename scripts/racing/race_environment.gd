@@ -136,7 +136,7 @@ func advance(karts: Array, dt: float, frozen: bool) -> void:
 	if not enabled or frozen:return
 	for kart in karts:
 		if not is_instance_valid(kart) or kart.retired or kart.checkpoint_missed:continue
-		progress=maxf(progress,1. if kart.finished else clampf(float(kart.progress)/(kart.circuit.length*3.),0.,1.))
+		progress=maxf(progress,1. if kart.finished else clampf(float(kart.progress)/(kart.circuit.length*kart.lap_count),0.,1.))
 	displayed=lerpf(displayed,progress,1.-exp(-dt/float(profile.get("transition_seconds",1.5))))
 	ensure_visual_skies()
 	sky_update_clock+=dt
