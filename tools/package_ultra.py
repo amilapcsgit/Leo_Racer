@@ -65,13 +65,27 @@ def payload(items):
     def escape(value):return str(value).replace('$','$$').replace('"','$\\"')
     for file in items:
         relative=file.relative_to(BASE)
-        short=ROOT/'build/nsis270'/sha(file);short.parent.mkdir(parents=True,exist_ok=True)
+        digest=sha(file);short=ROOT/'build/nsis270'/digest;short.parent.mkdir(parents=True,exist_ok=True)
+        # A previous input can share an inode with a regenerated candidate.
+        if short.exists() and sha(short)!=digest:short.unlink()
         if not short.exists():
             try:os.link(file,short)
             except OSError:shutil.copy2(file,short)
         parent=str(relative.parent).replace('/','\\')
         lines+=['SetOutPath "$PLUGINSDIR\\payload'+('\\'+escape(parent) if parent!='.' else '')+'"','File "/oname='+escape(file.name)+'" "'+escape('..\\'+str(short.relative_to(ROOT)))+'"']
     return '\n'.join(lines)+'\n'
+
+def track_selection(tracks):
+    text='StrCpy $R3 ",$TrackSelection,"\n'
+    for index,row in enumerate(tracks):
+        text+='''SectionSetFlags ${TRACK_@INDEX@} 0
+${StrStr} $R2 $R3 ",@TRACK@,"
+${If} $TrackSelection == "all"
+${OrIf} $R2 != ""
+SectionSetFlags ${TRACK_@INDEX@} ${SF_SELECTED}
+${EndIf}
+'''.replace('@INDEX@',str(index)).replace('@TRACK@',row['id'])
+    return text
 def installer():
     OUT.mkdir(parents=True,exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
     compiler=ROOT/'.tools/nsis/nsis-3.13/Bin/makensis.exe'
@@ -84,7 +98,7 @@ def installer():
         if suffix=='required':text=payload([p for p in files(BASE) if not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')])
         elif suffix=='tracks':text='\n'.join('Section "'+row['name']+'" TRACK_'+str(i)+'\nSectionIn 1 2\n'+payload(files(BASE/'GameAssets/tracks'/row['id']))+'SectionEnd' for i,row in enumerate(tracks))
         elif suffix=='descriptions':text='\n'.join('!insertmacro MUI_DESCRIPTION_TEXT ${TRACK_'+str(i)+'} "'+row['name']+'; solo and split-screen."' for i,row in enumerate(tracks))
-        else:text=(ROOT/'installer/release250-selection.nsh').read_text(encoding='utf-8')
+        else:text=track_selection(tracks)
         (ROOT/('installer/release270-'+suffix+'.nsh')).write_text(text,encoding='utf-8')
     env=os.environ.copy();env['TEMP']=str(ROOT/'build/nsis270-temp');env['TMP']=env['TEMP'];Path(env['TEMP']).mkdir(exist_ok=True)
     with (QA/'installer-build.log').open('w',encoding='utf-8') as log:
