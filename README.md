@@ -13,6 +13,16 @@
 
 Race five AI rivals, or share the screen with someone next to you. Charge a drift, catch a slipstream, and spend your nitro on the next straight. Choose your driver and car in the illuminated showroom, then chase your best time. Play offline: no account or developer tools required.
 
+## License and indie-project notice
+
+Copyright (c) 2026 L.J. Amila Prasad Perera. **Author: L.J. Amila Prasad Perera**
+
+Original work distributed under the [Leo Racer Custom Non-Commercial License](LICENSE) from this revision permits free personal use, study and private modification. Commercial use (including internal business use), sale, sublicensing and redistribution require prior written permission. Please share the official download link with friends and family.
+
+**Leo Racer is an independent indie project.** All third-party trademarks, logos, names, characters and vehicle brands belong to their respective owners. No affiliation, sponsorship or endorsement is implied, and no third-party rights are granted by this notice. Individual software and asset licenses remain applicable.
+
+**Earlier copies retain their existing license rights.** This change does not revoke AGPL-3.0 permissions already granted or relicense third-party material. The [previous AGPL text](licenses/AGPL-3.0-legacy.txt) is preserved. Existing release downloads, tags and the separate `2.7-ultra` branch have not been relicensed or rebuilt by this main-branch notice.
+
 ## Download and play
 
 1. Download **LeoRacer-Setup.exe** using the button above, from this repository’s GitHub release.
