@@ -34,6 +34,12 @@ def main():
         obj=ref['object'];actual=api('/git/tags/'+obj['sha'])['object']['sha'] if obj['type']=='tag' else obj['sha'];assert actual==commit,'Existing tag points elsewhere'
     else:api('/git/refs','POST',{'ref':'refs/tags/'+tag,'sha':commit})
     release=api('/releases/tags/'+tag,missing=True)
+    if not release:
+        # GitHub's by-tag endpoint omits unpublished drafts. Resume through the
+        # authenticated collection instead of creating a second draft on retry.
+        drafts=[row for row in api('/releases?per_page=100') if row.get('draft') and row.get('tag_name')==tag]
+        if len(drafts)>1:raise RuntimeError('Multiple drafts for '+tag+'; resolve them before publishing')
+        if drafts:release=drafts[0]
     if not release:release=api('/releases','POST',{'tag_name':tag,'target_commitish':commit,'name':a.title or 'Leo Racer '+version+' — Modular Content','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':False})
     existing={row['name']:row for row in release['assets']}
     if not release['draft']:
