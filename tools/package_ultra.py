@@ -113,8 +113,10 @@ def package():
         if archive.testzip():raise RuntimeError('Portable archive failed CRC validation')
     evidence=OUT/'LeoRacer-2.7.0-Evidence.zip'
     with zipfile.ZipFile(evidence,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
-        for file in files(QA):
-            if file.suffix in ['.json','.log','.png','.md']:archive.write(file,file.relative_to(QA).as_posix())
+        for file in sorted(QA.rglob('*')):
+            if file.is_file() and file.suffix in ['.json','.log','.png','.md']:archive.write(file,file.relative_to(QA).as_posix())
+    with zipfile.ZipFile(evidence) as archive:
+        if not any(name.endswith('/process.log') for name in archive.namelist()):raise RuntimeError('Evidence archive must include raw process logs')
     for name in ['RELEASE_NOTES_270.md','VALIDATION_270.md']:shutil.copy2(ROOT/'docs'/name,OUT/('RELEASE_NOTES.md' if name.startswith('RELEASE') else 'TEST_REPORT.md'))
     artifacts=[target,evidence,OUT/'LeoRacer-Setup.exe',OUT/'RELEASE_NOTES.md',OUT/'TEST_REPORT.md']
     rows=[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha(p)} for p in artifacts]

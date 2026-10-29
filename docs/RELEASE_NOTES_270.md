@@ -15,3 +15,7 @@ The Windows portable folder and installer work offline without a development SDK
 Extract portable releases into a new folder. The installer preserves unrelated custom content and backs up modified managed files under `ContentBackups`. Settings, controller preferences and records retain their existing user-data location. Source assets, vehicle attribution and licenses remain preserved.
 
 See **TEST_REPORT.md** for the exact checks, performance measurements and remaining limitations. Gamepad rumble is supported; steering-wheel force feedback is unavailable. Generated trophy/fallback artwork and its prompts are documented in the source artwork provenance file; official car cutouts are native model renders.
+
+Measured limits: all 13 sampled 2.7 Forward+ cases met the 16.7 ms p95 goal. Kandy split-screen Compatibility samples exceed it (16.744–17.790 ms p95), and brief cold garage/streaming stalls remain. Physical two-Xbox reconnect and rumble feel are unverified because no controllers were available.
+
+[Validation and full timing table](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.7.0/TEST_REPORT.md) · [SHA256 checksums](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.7.0/SHA256SUMS.txt)
