@@ -11,5 +11,6 @@ if ($bytes.Length -lt 2 -or $bytes[0] -ne 80 -or $bytes[1] -ne 75) {
     if ($download -notmatch '^https://[^/]*sourceforge\.net/') {throw 'Unexpected NSIS download host'}
     Invoke-WebRequest -Uri $download -OutFile $archive
 }
-if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLower() -ne 'ba63dffc4410ee89193e1cb5a41989991bd77c61068da17e3156d136b7b0b3d8') {throw 'NSIS 3.13 checksum mismatch'}
+$digest=[BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash([IO.File]::ReadAllBytes($archive))).Replace('-','').ToLowerInvariant()
+if ($digest -ne 'ba63dffc4410ee89193e1cb5a41989991bd77c61068da17e3156d136b7b0b3d8') {throw 'NSIS 3.13 checksum mismatch'}
 Expand-Archive -LiteralPath $archive -DestinationPath (Join-Path $project '.tools/nsis') -Force

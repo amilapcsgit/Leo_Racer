@@ -45,9 +45,9 @@ def run(version,compat,dusk):
         try:code=process.wait(timeout=1800)
         except subprocess.TimeoutExpired:process.kill();process.wait();code=-999
     text=(output/'process.log').read_text(encoding='utf-8',errors='replace')
-    errors=[line for line in text.splitlines() if any(x in line for x in ['SCRIPT ERROR','Parse Error','CrashHandlerException'])]
+    errors=[line for line in text.splitlines() if any(x in line for x in ['SCRIPT ERROR','Parse Error','CrashHandlerException','BENCHMARK_MAP_FAILED','BENCHMARK_MAP_MISMATCH'])]
     rows=json.loads((output/'performance.json').read_text(encoding='utf-8')) if (output/'performance.json').exists() else []
-    report={'status':'PASS' if code==0 and not errors and len(rows)==6 else 'FAIL','exit':code,'errors':errors,'seconds':time.monotonic()-began,'source_core_sha256':sha(source/'LeoRacer.pck'),'diagnostic_core_sha256':sha(target/'LeoRacer.pck'),'execution_speed_throttling_disabled':unthrottled,'normal_priority':True,'rows':len(rows),'p95_goal_ms':16.7,'p95_misses':[r for r in rows if r['p95_ms']>16.7]}
+    report={'status':'PASS' if code==0 and not errors and len(rows)==6 and all(r.get('actual_track')==r['track'] for r in rows) and {r['track'] for r in rows}=={'astra_coast','colombo_city','kandy_lake'} else 'FAIL','exit':code,'errors':errors,'seconds':time.monotonic()-began,'source_core_sha256':sha(source/'LeoRacer.pck'),'diagnostic_core_sha256':sha(target/'LeoRacer.pck'),'execution_speed_throttling_disabled':unthrottled,'normal_priority':True,'rows':len(rows),'p95_goal_ms':16.7,'p95_misses':[r for r in rows if r['p95_ms']>16.7]}
     (output/'process.json').write_text(json.dumps(report,indent=2),encoding='utf-8');print(label,report,flush=True)
     return report['status']=='PASS'
 

@@ -76,7 +76,7 @@ def installer():
     OUT.mkdir(parents=True,exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
     compiler=ROOT/'.tools/nsis/nsis-3.13/Bin/makensis.exe'
     if not compiler.exists():
-        subprocess.run(['powershell','-NoProfile','-ExecutionPolicy','Bypass','-File',str(ROOT/'tools/setup_ultra_nsis.ps1')],check=True)
+        subprocess.run([shutil.which('pwsh') or 'powershell','-NoProfile','-ExecutionPolicy','Bypass','-File',str(ROOT/'tools/setup_ultra_nsis.ps1')],check=True)
     script=(ROOT/'installer/FocusedCars250.nsi').read_text(encoding='utf-8').replace('2.5.0','2.7.0').replace('release250-','release270-').replace('20 tested cars','21 tested cars').replace('20 cars','21 cars').replace('20 default cars','21 default cars').replace('selected 20 vehicles','selected 21 vehicles')
     (ROOT/'installer/Release270.nsi').write_text(script,encoding='utf-8')
     tracks=json.loads((ROOT/'content/releases/2.3.2.json').read_text(encoding='utf-8'))['tracks']

@@ -27,7 +27,10 @@ func run() -> void:
 	Engine.max_fps=120;DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	for track in (tracks_override if not tracks_override.is_empty() else ["astra_coast","colombo_city"] if extra_baselines else ["kandy_lake"] if baseline else ["kandy_lake","astra_coast","colombo_city"]):
 		game.return_menu()
-		if game.chosen_track_id!=track:assert(await game.select_track(track))
+		if game.chosen_track_id!=track:
+			var selected: bool=await game.select_track(track)
+			if not selected:printerr("BENCHMARK_MAP_FAILED ",track);await game.quit_game(2);return
+		if game.track_definition.id!=track:printerr("BENCHMARK_MAP_MISMATCH ",track);await game.quit_game(2);return
 		for humans in (humans_override if not humans_override.is_empty() else [1,2]):
 			game.human_count=humans;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"duster"
 			var start:=Time.get_ticks_msec();await game.start_race();var load_ms:=Time.get_ticks_msec()-start
@@ -74,7 +77,7 @@ func run() -> void:
 				draws+=Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME);primitives+=Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)
 			FileAccess.open(output.path_join("frame-times-"+track+"-"+str(humans)+".json"),FileAccess.WRITE).store_string(JSON.stringify(frames))
 			frames.sort()
-			var result:={"track":track,"humans":humans,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"resolution":[1920,1080],"warmup_seconds":6,"sample_seconds":30,"p50_ms":frames[int(frames.size()*.5)],"p95_ms":frames[int(frames.size()*.95)],"p99_ms":frames[int(frames.size()*.99)],"max_frame_ms":frames[-1],"load_ms":load_ms,"static_memory_bytes":OS.get_static_memory_usage(),"peak_static_memory_bytes":OS.get_static_memory_peak_usage(),"video_memory_bytes":Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)}
+			var result:={"track":track,"actual_track":game.track_definition.id,"track_length":game.circuit.length,"humans":humans,"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),"resolution":[1920,1080],"warmup_seconds":6,"sample_seconds":30,"p50_ms":frames[int(frames.size()*.5)],"p95_ms":frames[int(frames.size()*.95)],"p99_ms":frames[int(frames.size()*.99)],"max_frame_ms":frames[-1],"load_ms":load_ms,"static_memory_bytes":OS.get_static_memory_usage(),"peak_static_memory_bytes":OS.get_static_memory_peak_usage(),"video_memory_bytes":Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)}
 			result.cpu_process_mean_ms=cpu_process/frames.size();result.cpu_physics_mean_ms=cpu_physics/frames.size();result.draw_calls_mean=draws/frames.size();result.primitives_mean=primitives/frames.size()
 			result.viewport_gpu_ms=viewport_gpu/frames.size();result.viewport_cpu_ms=viewport_cpu/frames.size()
 			result.vehicles=game.karts.map(func(car):return car.vehicle_key)

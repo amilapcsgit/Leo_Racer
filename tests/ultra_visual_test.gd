@@ -36,7 +36,13 @@ func run() -> void:
 		game.hud.frontend.show_settings();await shot("settings-"+name);game.hud.frontend.close_modal()
 		game.hud.frontend.show_records();await shot("records-"+name);game.hud.frontend.close_modal()
 		game.hud.frontend.show_tracks();await shot("tracks-"+name);game.hud.frontend.close_modal()
-	root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size)
+	root.size=Vector2i(900,900);DisplayServer.window_set_size(root.size);await settle()
+	game.hud.frontend.show_settings();await shot("settings-narrow")
+	var settings_columns:=game.hud.modal_root.find_child("SettingsColumns",true,false) as GridContainer
+	check(settings_columns!=null and settings_columns.columns==1,"Narrow settings use one column")
+	root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size);await settle()
+	check(settings_columns.columns==2,"Settings reflow on live window resize")
+	game.hud.frontend.close_modal()
 	game.local_players[0].player_name="LEO";game.local_players[0].driver_id=&"human";game.local_players[0].vehicle_id=&"import_2019_ford_mustang_rtr_spec5_10th_anniversary"
 	game.local_players[1].player_name="MAYA";game.local_players[1].vehicle_id=&"duster_2024"
 	game.hud.frontend.show_setup(2);await shot("setup-showcase")

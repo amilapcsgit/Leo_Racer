@@ -261,8 +261,13 @@ func show_settings() -> void:
  var leave: Callable=show_pause if game.paused else close_modal
  var box:=dialog("SETTINGS / TUNE YOUR EXPERIENCE","Small adjustments. Better races.",leave,1280)
  var scroll:=ScrollContainer.new();scroll.follow_focus=true;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;scroll.custom_minimum_size.y=550;box.add_child(scroll)
- var columns:=GridContainer.new();columns.columns=2;columns.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_theme_constant_override("h_separation",24);scroll.add_child(columns)
- columns.resized.connect(func():columns.columns=2 if columns.size.x>=1050 else 1)
+ var columns:=GridContainer.new();columns.name="SettingsColumns";columns.columns=2;columns.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_theme_constant_override("h_separation",24);scroll.add_child(columns)
+ var window:=get_tree().root
+ var reflow:=func():columns.columns=1 if window.size.x<1050 or columns.size.x<1050 else 2
+ columns.resized.connect(reflow);window.size_changed.connect(reflow)
+ columns.tree_exiting.connect(func():
+  if window.size_changed.is_connected(reflow):window.size_changed.disconnect(reflow))
+ reflow.call()
  var audio_box:=card(columns);audio_box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;label(audio_box,"AUDIO",26,Color("67d6db"))
  add_slider(audio_box,"Master",game.master_volume,game.set_volume)
  for bus in ["Music","Effects","UI","Voice"]:
