@@ -93,10 +93,23 @@ def archive(name,mapping):
  return target
 
 def package():
- functional_gate();assert json.loads((Q/'installer-full.json').read_text())['core_sha256']==sha(BASE/'LeoRacer.pck')
+ functional_gate();installed=json.loads((Q/'installer-full.json').read_text())
+ assert installed['status']=='PASS' and installed['core_sha256']==sha(BASE/'LeoRacer.pck')
+ assert installed['installer_sha256']==sha(OUT/'LeoRacer-Setup.exe')
  smoke=json.loads((Q/'export-smoke.json').read_text(encoding='utf-8'))
  assert smoke['status']=='PASS' and smoke['core_sha256']==sha(BASE/'LeoRacer.pck')
  artifacts=[archive('LeoRacer-2.6.0-win64.zip',{'LeoRacer/'+p.relative_to(BASE).as_posix():p for p in files(BASE)})]
+ extracted=Q/'portable-extract'
+ assert not extracted.exists(),'Preserve earlier portable extraction tests'
+ with zipfile.ZipFile(artifacts[0]) as z:
+  assert all(name.startswith('LeoRacer/') and '..' not in Path(name).parts for name in z.namelist())
+  z.extractall(extracted)
+ portable=extracted/'LeoRacer'
+ assert sha(portable/'LeoRacer.pck')==sha(BASE/'LeoRacer.pck')
+ verify.QA=Q/'portable';verify.QA.mkdir(exist_ok=True)
+ assert verify.run('content',portable,args=['--verify-content'])
+ assert verify.run('workshop',portable,args=['--vehicle-workshop','--workshop-smoke'])
+ dump(Q/'portable-extraction.json',{'status':'PASS','sdk_removed':True,'core_sha256':sha(portable/'LeoRacer.pck'),'content':True,'offline_workshop':True})
  content.sdk();shutil.copy2(R/'dist/LeoRacer-Contributor-SDK.zip',OUT/'LeoRacer-Contributor-SDK-2.6.0.zip')
  art={p.relative_to(R/'assets/ui').as_posix():p for p in [*(R/'assets/ui/art').glob('home-*-v26.png'),R/'assets/ui/art/garage-skyline-v26.png',R/'assets/ui/art/artwork-v26.json',*(R/'assets/ui/boot/tracks').glob('*/*.png')]}
  artifacts.append(archive('LeoRacer-2.6.0-UI-Art.zip',art))
