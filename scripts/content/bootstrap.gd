@@ -61,7 +61,7 @@ func begin() -> void:
 		for argument in OS.get_cmdline_user_args():
 			if argument.begins_with("--ultra-check="):
 				var name:=argument.trim_prefix("--ultra-check=")
-				if name not in ["core","visual","previews","physics","garage","contacts","audit","impact"]:get_tree().quit(2);return
+				if name not in ["core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
 				screen.hide()
 				var trial: Node=load("res://tests/native270/"+name+".gd").new()
 				get_tree().root.add_child(trial);queue_free();return
