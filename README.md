@@ -1,5 +1,5 @@
 <p align="center"><img src="assets/ui/icons/crest.svg" width="100" alt="Leo Racer crest"></p>
-<h1 align="center">Leo Racer · 2.7 Ultra</h1>
+<h1 align="center">Leo Racer · 2.7.1 Ultra</h1>
 <p align="center"><strong>Your ride. Your coast. Your next best lap.</strong><br>A Windows arcade racer on stylized Sri Lankan roads.</p>
 
 <p align="center">
@@ -12,6 +12,14 @@
 **21 cars · 6 drivers · 3 tracks · 1–2 local players · 1–10 laps**
 
 Race five AI rivals, or share the screen with someone next to you. Charge a drift, catch a slipstream, and spend your nitro on the next straight. Choose your driver and car in the illuminated showroom, then chase your best time. Play offline: no account or developer tools required.
+
+## Credits and license
+
+Created by **L.J. Amila Prasad Perera**. I made Leo Racer for my son, **Shaven Leo**, who is six years old.
+
+Leo Racer is an independent indie project. Third-party trademarks, names, logos and characters belong to their respective owners; their inclusion does not imply affiliation or endorsement. See [licenses](licenses/) for the creators and terms of third-party materials.
+
+Original work is offered under the [custom non-commercial license](LICENSE) where the author holds the necessary rights. Earlier AGPL and MIT permissions remain in effect for material previously supplied under those terms. Third-party licenses continue to apply.
 
 ## Download and play
 
@@ -74,7 +82,7 @@ The Controls screen shows the actual bindings for each player, including shared-
 
 The included **Vehicle Workshop** supports custom imports. Use **Vehicle Workshop.cmd** in the game folder, or open the in-game content tools. The game generates matching transparent previews for future imports.
 
-For a showcase website or social post, download **LeoRacer-2.7.0-Media-Pack.zip** from the [latest release](https://github.com/amilapcsgit/Leo_Racer/releases/latest). It includes transparent cars, artwork, vectors, track outlines, real screenshots and attribution guidance. Promotional illustrations are labeled as artwork rather than gameplay.
+For a showcase website or social post, download **LeoRacer-2.7.1-Media-Pack.zip** from the [latest release](https://github.com/amilapcsgit/Leo_Racer/releases/latest). It includes transparent cars, artwork, vectors, track outlines, real screenshots and attribution guidance. Promotional illustrations are labeled as artwork rather than gameplay.
 
 ## Feedback and known limits
 
@@ -93,7 +101,7 @@ Kenney's Racing Starter Kit and City Kit remain the foundation. The project also
 
 Rokojori source is obtained separately under its Public Indie License and is not republished as a standalone toolkit. Existing character and vehicle meshes retain their original notices. Leo Racer is an independent project.
 
-[Licenses](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/) · [Astra artwork and audio](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/SRILANKA_ASSETS.md) · [Kandy attribution](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/Kandy-2.3.1.txt)
+[Licenses](licenses/) · [Astra artwork and audio](licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](licenses/SRILANKA_ASSETS.md) · [Kandy attribution](licenses/Kandy-2.3.1.txt)
 
 </details>
 

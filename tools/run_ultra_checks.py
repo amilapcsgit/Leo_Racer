@@ -20,7 +20,7 @@ def run(kind,compat=False,export=None,extra=()):
     if export:export=Path(export).resolve()
     renderer='compatibility' if compat else 'forward'
     label=('export-' if export else 'source-')+kind+'-'+renderer
-    out=ROOT/'build/qa270'/label;out.mkdir(parents=True,exist_ok=True)
+    out=ROOT/'build/qa271'/label;out.mkdir(parents=True,exist_ok=True)
     profile=out/'profile';profile.mkdir(exist_ok=True)
     env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
     assets=Path(export)/'GameAssets' if export else ROOT/'build/content-baseline/GameAssets'

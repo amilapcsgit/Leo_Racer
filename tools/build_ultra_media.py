@@ -3,8 +3,8 @@ from pathlib import Path
 import hashlib, html, json, shutil, zipfile
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
-PACK=ROOT.parent.parent/'Leo_Racer_Media_Pack_2.7'
-ZIP=ROOT/'dist/release-2.7.0/LeoRacer-2.7.0-Media-Pack.zip'
+PACK=ROOT.parent.parent/'Leo_Racer_Media_Pack_2.7.1'
+ZIP=ROOT/'dist/release-2.7.1/LeoRacer-2.7.1-Media-Pack.zip'
 
 def build():
     PACK.mkdir(exist_ok=True)

@@ -105,3 +105,5 @@ installer/release26-final-*.nsh
 
 # Generated 2.7 installer lists contain local staging paths.
 installer/release270-*.nsh
+installer/release271-*.nsh
+installer/Release271.nsi

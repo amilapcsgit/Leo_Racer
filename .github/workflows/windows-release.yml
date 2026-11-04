@@ -25,11 +25,11 @@ jobs:
       - name: Verify source and tag versions
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force build/qa270 | Out-Null
+          New-Item -ItemType Directory -Force build/qa271 | Out-Null
           $version=[regex]::Match((Get-Content project.godot -Raw),'config/version="([^"]+)"').Groups[1].Value
           if ('${{ github.ref_type }}' -eq 'tag' -and '${{ github.ref_name }}' -ne "v$version") {throw 'Tag does not match source version'}
           "BUILD_VERSION=$version" >> $env:GITHUB_ENV
-          "version=$version`ncommit=${{ github.sha }}" | Set-Content build/qa270/ci-context.txt
+          "version=$version`ncommit=${{ github.sha }}" | Set-Content build/qa271/ci-context.txt
       - uses: actions/cache@v4
         with:
           path: |
@@ -48,9 +48,9 @@ jobs:
       - name: Preserve source geometry
         shell: pwsh
         run: |
-          python tools/verify_modular_sources.py *> build/qa270/source-preservation.log
+          python tools/verify_modular_sources.py *> build/qa271/source-preservation.log
           if ($LASTEXITCODE -ne 0) {throw 'Source preservation failed'}
-          python tools/verify_bigster_assets.py *> build/qa270/bigster-preservation.log
+          python tools/verify_bigster_assets.py *> build/qa271/bigster-preservation.log
           if ($LASTEXITCODE -ne 0) {throw 'Bigster preservation failed'}
       - name: Validate and package from staged content
         shell: pwsh
@@ -60,8 +60,8 @@ jobs:
         with:
           name: ultra-windows-evidence
           path: |
-            build/qa270/**
+            build/qa271/**
             build/qa-ui/*.json
-            dist/release-2.7.0/**
+            dist/release-2.7.1/**
           retention-days: 30
       # Hosted checks do not certify GPU performance or physical controller feel.

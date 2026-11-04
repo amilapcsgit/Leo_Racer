@@ -89,6 +89,7 @@ func show_home() -> void:
  action(grid,"Settings",show_settings)
  action(grid,"How to Play",show_guide)
  action(grid,"Content",game.show_content_manager)
+ action(grid,"Credits",show_credits)
  label(left,"Pick your ride. Hit the road.",24,Color("ffc857"))
  prepare_home_neighbors()
  restore(go)
@@ -305,6 +306,13 @@ func add_slider(parent: Node,words: String,value: float,changed: Callable) -> vo
 
 func add_toggle(parent: Node,words: String,value: bool,changed: Callable) -> void:
  var toggle:=CheckButton.new();toggle.text=words;toggle.button_pressed=value;toggle.custom_minimum_size.y=38;parent.add_child(toggle);toggle.toggled.connect(changed)
+func show_credits() -> void:
+ var box:=dialog("CREDITS","An independent indie project",close_modal,960)
+ label(box,"Created by L.J. Amila Prasad Perera",28,Color("ffc857"))
+ label(box,"I made Leo Racer for my son, Shaven Leo, who is six years old.",25)
+ label(box,"Built with Godot and contributions from Kenney, Rokojori and other creators. See GameAssets/licenses for full credits and license terms.",22)
+ label(box,"All third-party trademarks, names, logos and characters belong to their respective owners. No affiliation or endorsement is implied.",22)
+ action(box,"Back",close_modal,true).grab_focus()
 func show_guide() -> void:
  var leave: Callable=show_pause if game.paused else close_modal
  var box:=dialog("HOW TO PLAY","A little sideways. A lot faster.",leave,960)

@@ -153,7 +153,7 @@ def split(folder,loose_vehicles=False):
         (root/'tracks'/track.name/'manifest.json').write_text(json.dumps(metadata,indent=2)+'\n',encoding='utf-8')
     import shutil
     shutil.copytree(ROOT/'licenses',root/'licenses',dirs_exist_ok=True)
-    if loose_vehicles:shutil.copy2(ROOT/'LICENSE',root/'licenses/LeoRacer-AGPL-3.0.txt')
+    if loose_vehicles:shutil.copy2(ROOT/'LICENSE',root/'licenses/LeoRacer-Custom-License.txt')
     (root/'README.txt').write_text('Optimized game content. Install complete compatible track folders under tracks/.\nRegistered cosmetic GLB/PNG/SVG overrides are listed in catalog.json overrides.\nEach override has id (resource path), file (relative GameAssets path), affects_rules (boolean).\nRoute/handling modifications cannot set official records. Keep settings and rankings in user data.\n',encoding='utf-8')
     report={'exe_bytes':(folder/'LeoRacer.exe').stat().st_size,'core_bytes':source.stat().st_size,'packs':packs,
             'installed_bytes':sum(p.stat().st_size for p in folder.rglob('*') if p.is_file()),

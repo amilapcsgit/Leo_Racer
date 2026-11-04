@@ -88,6 +88,16 @@ func run() -> void:
   root.size=extent;DisplayServer.window_set_size(extent);await settle()
   var size_label:="%dx%d"%[extent.x,extent.y]
   game.hud.frontend.show_home();await settle(12);font_check(game.hud.menu_root);await capture("home-"+size_label)
+  var credits_button:=button(game.hud.menu_root,"Credits")
+  check(credits_button!=null,"Credits accessible from home / "+size_label)
+  if credits_button:
+   await POINTER.click(get_tree(),credits_button);await settle()
+   var text:=" ".join(game.hud.modal_root.find_children("*","Label",true,false).map(func(node):return node.text))
+   check(text.contains("L.J. Amila Prasad Perera") and text.contains("Shaven Leo"),"Credits include author and dedication / "+size_label)
+   check(button(game.hud.modal_root,"Back")!=null,"Credits Back available / "+size_label)
+   font_check(game.hud.modal_root);await capture("credits-"+size_label)
+   await POINTER.click(get_tree(),button(game.hud.modal_root,"Back"));await settle()
+   check(game.hud.modal_root.get_child_count()==0,"Credits closes / "+size_label)
   game.hud.frontend.show_settings();font_check(game.hud.modal_root);await capture("settings-"+size_label)
   for node in game.hud.modal_root.find_children("*","ScrollContainer",true,false):node.scroll_vertical=10000
   await capture("settings-bottom-"+size_label);await POINTER.click(get_tree(),button(game.hud.modal_root,"Back"))
