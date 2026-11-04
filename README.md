@@ -1,5 +1,5 @@
 <p align="center"><img src="assets/ui/icons/crest.svg" width="100" alt="Leo Racer crest"></p>
-<h1 align="center">Leo Racer · 2.7 Ultra</h1>
+<h1 align="center">Leo Racer · 2.7.1 Ultra</h1>
 <p align="center"><strong>Your ride. Your coast. Your next best lap.</strong><br>A Windows arcade racer on stylized Sri Lankan roads.</p>
 
 <p align="center">
@@ -13,15 +13,13 @@
 
 Race five AI rivals, or share the screen with someone next to you. Charge a drift, catch a slipstream, and spend your nitro on the next straight. Choose your driver and car in the illuminated showroom, then chase your best time. Play offline: no account or developer tools required.
 
-## License and indie-project notice
+## Credits and license
 
-Copyright (c) 2026 L.J. Amila Prasad Perera. **Author: L.J. Amila Prasad Perera**
+Created by **L.J. Amila Prasad Perera**. I made Leo Racer for my son, **Shaven Leo**, who is six years old.
 
-Original work distributed under the [Leo Racer Custom Non-Commercial License](LICENSE) from this revision permits free personal use, study and private modification. Commercial use (including internal business use), sale, sublicensing and redistribution require prior written permission. Please share the official download link with friends and family.
+Leo Racer is an independent indie project. Third-party trademarks, names, logos and characters belong to their respective owners; their inclusion does not imply affiliation or endorsement. See [licenses](licenses/) for the creators and terms of third-party materials.
 
-**Leo Racer is an independent indie project.** All third-party trademarks, logos, names, characters and vehicle brands belong to their respective owners. No affiliation, sponsorship or endorsement is implied, and no third-party rights are granted by this notice. Individual software and asset licenses remain applicable.
-
-**Earlier copies retain their existing license rights.** This change does not revoke AGPL-3.0 permissions already granted or relicense third-party material. The [previous AGPL text](licenses/AGPL-3.0-legacy.txt) is preserved. Existing release downloads, tags and the separate `2.7-ultra` branch have not been relicensed or rebuilt by this main-branch notice.
+Original work is offered under the [custom non-commercial license](LICENSE) where the author holds the necessary rights. Earlier AGPL and MIT permissions remain in effect for material previously supplied under those terms. Third-party licenses continue to apply.
 
 ## Download and play
 
@@ -84,7 +82,7 @@ The Controls screen shows the actual bindings for each player, including shared-
 
 The included **Vehicle Workshop** supports custom imports. Use **Vehicle Workshop.cmd** in the game folder, or open the in-game content tools. The game generates matching transparent previews for future imports.
 
-For a showcase website or social post, download **LeoRacer-2.7.0-Media-Pack.zip** from the [latest release](https://github.com/amilapcsgit/Leo_Racer/releases/latest). It includes transparent cars, artwork, vectors, track outlines, real screenshots and attribution guidance. Promotional illustrations are labeled as artwork rather than gameplay.
+For a showcase website or social post, download **LeoRacer-2.7.1-Media-Pack.zip** from the [latest release](https://github.com/amilapcsgit/Leo_Racer/releases/latest). It includes transparent cars, artwork, vectors, track outlines, real screenshots and attribution guidance. Promotional illustrations are labeled as artwork rather than gameplay.
 
 ## Feedback and known limits
 
@@ -93,8 +91,6 @@ Friends and family: please [send feedback or report a problem](https://github.co
 This release prioritizes the finished UI and playable arcade experience. Further physics tuning is deferred. Short cold-preview stalls remain; Kandy split-screen narrowly misses the 60 FPS frame-time target in some Compatibility tests. Physical two-controller reconnect/rumble feel has not been verified because controllers were unavailable. See the [measured validation report](docs/VALIDATION_270.md) and [release notes](docs/RELEASE_NOTES_270.md).
 
 ## Build and contribute
-
-The 2.7 game source is on [2.7-ultra](https://github.com/amilapcsgit/Leo_Racer/tree/2.7-ultra). Check out that branch before building.
 
 Godot **4.7.2 .NET**, with pinned tools and reproducible published content. See [setup instructions](docs/COLOMBO_SETUP.md). The shared Windows validation/package entrypoint is `tools/ultra_windows.ps1 -Package`; it stages content before gameplay tests and produces the installer, portable archive and diagnostics. Synced project sources and original model assets are preserved.
 
@@ -105,7 +101,7 @@ Kenney's Racing Starter Kit and City Kit remain the foundation. The project also
 
 Rokojori source is obtained separately under its Public Indie License and is not republished as a standalone toolkit. Existing character and vehicle meshes retain their original notices. Leo Racer is an independent project.
 
-[Licenses](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/) · [Astra artwork and audio](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/SRILANKA_ASSETS.md) · [Kandy attribution](https://github.com/amilapcsgit/Leo_Racer/blob/v2.4.1/licenses/Kandy-2.3.1.txt)
+[Licenses](licenses/) · [Astra artwork and audio](licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](licenses/SRILANKA_ASSETS.md) · [Kandy attribution](licenses/Kandy-2.3.1.txt)
 
 </details>
 
