@@ -1255,8 +1255,8 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	var pose: Transform3D=kart.get_global_transform_interpolated()
 	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
 	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2,reduced_motion)
+	if local.feedback:local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
 	if local.feedback and LeoCameraViews.effective(local)=="chase":
-		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
 		var desired_fov: float=local.camera_rig.field_of_view(kart.wheel_motion_speed,float(local.feedback.get_fov_offset()),reduced_motion,base_camera_fov)
 		view.fov=base_camera_fov if reduced_motion else lerpf(view.fov,desired_fov,1.-exp(-dt*12.))
 		var target:=0. if reduced_motion else -kart.steer*deg_to_rad(art_profile.camera_roll_degrees)*clampf(absf(kart.speed)/36.,0.,1.)

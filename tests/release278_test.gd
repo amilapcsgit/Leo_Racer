@@ -50,6 +50,10 @@ func run() -> void:
 	second.camera_view="cockpit";game.update_local_camera(second,1./60.)
 	check(LeoCameraViews.effective(second)=="chase" and second.camera_view=="cockpit","Unavailable cockpit retains saved preference")
 	second.camera_view="chase"
+	for view in ["ghost","cockpit"]:
+		first.camera_view=view;first.kart.boost_time=0.;first.feedback.play_boost_explicit("drift",1,1.6)
+		game.update_local_camera(first,1./60.)
+		check(first.feedback.get_boost_gain()==0.,"Cancelled boost feedback clears in "+view)
 	for mode in ["chase","ghost","cockpit"]:
 		first.camera_view=mode;game.update_local_camera(first,1./60.);game.update_local_camera(second,1./60.)
 		check(bool(first.camera.cull_mask & LeoCameraViews.BODY_BITS[0])==(mode!="ghost"),"Own-body visibility / "+mode)
