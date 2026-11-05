@@ -44,6 +44,7 @@ func run() -> void:
 	print("RELEASE278_STAGE cameras")
 	await game.start_race();game.state="race";game.set_process(false);game.set_physics_process(false)
 	for kart in game.karts:kart.set_physics_process(false);kart.active=true
+	checkpoint_contacts()
 	check(LeoCameraViews.available(game.player.definition)==["chase","ghost","cockpit"],"Bigster has reviewed cockpit")
 	check(LeoCameraViews.available(game.local_players[1].kart.definition)==["chase","ghost"],"Unreviewed interior skips cockpit")
 	var first: LeoLocalPlayer=game.local_players[0];var second: LeoLocalPlayer=game.local_players[1]
@@ -253,3 +254,16 @@ func collision_review() -> void:
 	check((body.layers & local.camera.cull_mask)==0,"Night receiver layer cannot reveal Ghost car")
 	local.camera_view="chase";game.update_local_camera(local,1.)
 	await shot("bigster-night-chase")
+
+func checkpoint_contacts() -> void:
+	var kart:=LeoKart.new();game.add_child(kart);kart.set_physics_process(false)
+	kart.circuit=game.circuit;kart.definition=game.player.definition;kart.active=true
+	var gate: float=game.circuit.length/LeoCircuit.GATES
+	var start: Vector3=game.circuit.sample(gate-.2)
+	var finish: Vector3=game.circuit.sample(gate+.1)
+	for driving_speed in [0.,1.,20.]:
+		kart.next_gate=1;kart.last_s=gate-.2;kart.position=finish;kart.contact_this_tick=true
+		kart.checkpoint_velocity=game.circuit.direction(gate)*driving_speed
+		kart.advance_checkpoints(game.circuit.project(finish),finish-start,1./60.)
+		check(kart.next_gate==(2 if driving_speed==20. else 1),"Contact crossing respects self-driven motion / "+str(driving_speed))
+	kart.free()

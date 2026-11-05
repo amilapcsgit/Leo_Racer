@@ -100,6 +100,7 @@ var damage: LeoCosmeticDamage
 var prepared_frame := -1
 var prepared_throttle := 0.0
 var contact_this_tick := false
+var checkpoint_velocity := Vector3.ZERO
 var contact_clock:=0.0
 var last_contact_at:=-10.0
 var contact_times: Dictionary={}
@@ -325,14 +326,12 @@ func place(distance: float, lane: float) -> void:
 	wheel_visual_speed = 0
 	reset_physics_interpolation()
 
-func advance_checkpoints(projection: Dictionary, motion: Vector3) -> void:
+func advance_checkpoints(projection: Dictionary, motion: Vector3, dt: float=1./60.) -> void:
 	var s: float=projection.distance
 	var previous:=last_s
 	var change:=circuit.delta_distance(previous,s)
 	last_s=s
 	if not active or finished or retired:return
-	# Contact cannot push a racer through a checkpoint in the impact tick.
-	if contact_this_tick:return
 	var segment:=circuit.length/LeoCircuit.GATES
 	var expected:=float(next_gate)*segment
 	var gate_s:=fposmod(expected,circuit.length)
@@ -341,6 +340,12 @@ func advance_checkpoints(projection: Dictionary, motion: Vector3) -> void:
 	valid=valid and absf(position.y-float(projection.center.y))<maxf(3.,definition.collision_size.y)
 	var to_gate:=circuit.delta_distance(previous,gate_s)
 	if valid and change>0. and to_gate>=-.001 and to_gate<=change+.001:
+		if contact_this_tick:
+			# Allow a legitimate glancing crossing, but not a collision push.
+			var tangent:=circuit.direction(gate_s).normalized()
+			var own_distance:=checkpoint_velocity.dot(tangent)*dt
+			var needed: float=(circuit.sample(gate_s)-(global_position-motion)).dot(tangent)
+			if own_distance<=.001 or needed>own_distance+.01:return
 		var crossed:=next_gate
 		next_gate+=1
 		lap=mini(lap_count,1+maxi(0,next_gate-1)/LeoCircuit.GATES)
@@ -508,6 +513,8 @@ func prepare_motion(dt: float) -> void:
 	landing_suppression=maxf(0.,landing_suppression-dt)
 	floor_snap_length=LeoArcadeDynamics.SNAP if velocity.y<=0. and grounded else 0.
 	velocity.y -= LeoArcadeDynamics.GRAVITY * dt
+	var own_fraction:=minf(1.,absf(speed)/maxf(.0001,Vector2(velocity.x,velocity.z).length()))
+	checkpoint_velocity=velocity*own_fraction
 	prepared_throttle=throttle
 
 func _physics_process(dt: float) -> void:
@@ -550,7 +557,7 @@ func _physics_process(dt: float) -> void:
 		stuck_time += dt
 		if stuck_time>3.0: recover(); return
 	else: stuck_time = 0
-	advance_checkpoints(projection,global_position-motion_origin)
+	advance_checkpoints(projection,global_position-motion_origin,dt)
 	if active and boost_cooldown <= 0:
 		for fraction in circuit.boosts:
 			if absf(circuit.delta_distance(projection.distance, float(fraction) * circuit.length)) < 2.5 and absf(offset) < 6.5:
