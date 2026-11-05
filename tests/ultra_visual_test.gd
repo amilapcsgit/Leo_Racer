@@ -38,10 +38,10 @@ func run() -> void:
 		game.hud.frontend.show_tracks();await shot("tracks-"+name);game.hud.frontend.close_modal()
 	root.size=Vector2i(900,900);DisplayServer.window_set_size(root.size);await settle()
 	game.hud.frontend.show_settings();await shot("settings-narrow")
-	var settings_columns:=game.hud.modal_root.find_child("SettingsColumns",true,false) as GridContainer
-	check(settings_columns!=null and settings_columns.columns==1,"Narrow settings use one column")
+	var settings_tabs:=game.hud.modal_root.find_child("SettingsTabs",true,false) as TabContainer
+	check(settings_tabs!=null and settings_tabs.get_tab_count()==4,"Narrow settings keep four scrollable tabs")
 	root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size);await settle()
-	check(settings_columns.columns==2,"Settings reflow on live window resize")
+	check(settings_tabs.get_global_rect().end.x<=root.get_visible_rect().size.x,"Settings fit after live resize")
 	game.hud.frontend.close_modal()
 	game.local_players[0].player_name="LEO";game.local_players[0].driver_id=&"human";game.local_players[0].vehicle_id=&"import_2019_ford_mustang_rtr_spec5_10th_anniversary"
 	game.local_players[1].player_name="MAYA";game.local_players[1].vehicle_id=&"duster_2024"

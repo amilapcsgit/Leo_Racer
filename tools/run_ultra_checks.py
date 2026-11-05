@@ -3,6 +3,12 @@ from pathlib import Path
 import argparse, json, os, re, subprocess, time
 from stage_ultra_content import ROOT, sha
 TESTS={
+    'release278':('tests/release278_test.gd',None),
+    'unit':('tests/release278_test.gd','--ultra-check=release278'),
+    'capture':('tests/release260_collision_test.gd','--ultra-check=contacts'),
+    'input':('tests/local_input_test.gd',None),
+    'ranking':('tests/local_ranking_test.gd',None),
+    'race':('tests/local_race_test.gd',None),
     'finish':('tests/ultra_finish_test.gd',None),
     'ui':('tests/release26_ui_test.gd','--release-ui-check'),
     'polish':('tests/release26_polish_test.gd','--release-polish-check'),
@@ -20,7 +26,7 @@ def run(kind,compat=False,export=None,extra=()):
     if export:export=Path(export).resolve()
     renderer='compatibility' if compat else 'forward'
     label=('export-' if export else 'source-')+kind+'-'+renderer
-    out=ROOT/'build/qa271'/label;out.mkdir(parents=True,exist_ok=True)
+    out=ROOT/'build/qa278'/label;out.mkdir(parents=True,exist_ok=True)
     profile=out/'profile';profile.mkdir(exist_ok=True)
     env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
     assets=Path(export)/'GameAssets' if export else ROOT/'build/content-baseline/GameAssets'
@@ -38,12 +44,14 @@ def run(kind,compat=False,export=None,extra=()):
         if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
         env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
         command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
-    render=kind in ['ui','polish','garage','visual','previews','impact','finish']
+    render=kind in ['capture','release278','ui','polish','garage','visual','previews','impact','finish']
     command+=['--position','-3200,-3200'] if render else ['--headless']
     if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--tracks='+str(assets/'tracks'),'--qa-output='+str(out)]
     if export:command.append(switch if switch else '--ultra-check='+kind)
     if kind in ['contacts','audit']:command.append('--quality25-mode='+kind)
+    if kind=='capture':command.append('--quality25-mode=capture')
+    if kind=='unit':command.append('--unit-only')
     if kind=='garage':command.append('--no-captures')
     if kind=='impact':command.append('--impact-only')
     command.extend(extra)
@@ -55,8 +63,7 @@ def run(kind,compat=False,export=None,extra=()):
             time.sleep(.5)
             current=(out/'process.log').read_text(encoding='utf-8',errors='replace')
             if any(term in current for term in ['SCRIPT ERROR','Parse Error','Corrupted header']) or time.monotonic()-started>1800:
-                if os.name=='nt':subprocess.run(['taskkill','/PID',str(process.pid),'/T','/F'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-                else:process.kill()
+                process.kill()
                 code=-998;break
         actual=process.wait()
         if code is None:code=actual

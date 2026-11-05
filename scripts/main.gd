@@ -72,6 +72,7 @@ var content_refreshing := false
 var content_panel: CanvasLayer
 var art_profile: LeoArtProfile = preload("res://assets/config/astra.tres")
 var feedback: Node
+var graphics: LeoGraphicsSettings
 var graphics_quality := 1
 var base_camera_fov := 63.0
 var opponent_audio: LeoOpponentAudio
@@ -142,6 +143,7 @@ func _ready() -> void:
 	for v in catalog.vehicles:
 		var rules:=LeoRaceRules.resolve(v)
 		KARTS.append({"name":v.display_name,"color":String(v.id),"speed":(rules.max_speed-29.)/.9,"grip":(rules.handling-.8)/.05,"accel":(rules.acceleration-13.)/1.2,"top":rules.max_speed})
+	graphics=LeoGraphicsSettings.new();graphics.game=self;add_child(graphics)
 	configure_input()
 	input_router = LeoInputRouter.new()
 	input_router.name = "PlayerInputs"
@@ -203,6 +205,7 @@ func _ready() -> void:
 	ui_audio=LeoUIAudio.new();add_child(ui_audio)
 	music.bus="Music"
 	for sound in [click_sound,countdown_sound,go_sound,finish_sound]:sound.bus="Effects"
+	var post: CanvasLayer=load("res://scripts/local/driving_post.gd").new();post.game=self;add_child(post)
 	var layer := CanvasLayer.new()
 	add_child(layer)
 	hud = LeoHUD.new()
@@ -500,9 +503,10 @@ func apply_graphics() -> void:
 		LeoGraphics.install_reflections(world,circuit)
 	LeoGraphics.apply(world,environment,graphics_quality,human_count==2,state=="garage")
 	race_environment.enforce_graphics()
+	if graphics:graphics.apply()
 
 func set_graphics_quality(value: int) -> void:
-	graphics_quality=clampi(value,0,2);apply_graphics();save_settings()
+	graphics_quality=clampi(value,0,2);graphics.preset(graphics_quality);apply_graphics();save_settings()
 
 func set_camera_fov(value: float) -> void:
 	base_camera_fov=clampf(value,55.,75.);save_settings()
@@ -550,7 +554,7 @@ func default_ai_vehicle(index: int) -> VehicleDefinition:
 
 func current_ruleset(course: LeoTrackDefinition=null) -> String:
 	if not course:course=track_definition
-	return ("ultra_v6_dusk_night" if race_variant=="dusk_night" else "ultra_v6_static")+("+arcade_elevation_v1" if course.elevated() else "")
+	return ("distinct_v4+contact_v278_dusk_night" if race_variant=="dusk_night" else "distinct_v4+contact_v278_static")+("+arcade_elevation_v1" if course.elevated() else "")
 
 func set_race_variant(value: String) -> void:
 	race_variant=value if value in ["static","dusk_night"] else "static"
@@ -607,6 +611,7 @@ func start_race() -> void:
 		var kart:=LeoKart.new();kart.process_mode=Node.PROCESS_MODE_PAUSABLE;add_child(kart)
 		var d: StringName=local_players[i].driver_id if i<human_count else catalog.drivers[i%catalog.drivers.size()].id
 		var v: StringName=local_players[i].vehicle_id if i<human_count else default_ai_vehicle(i).id
+		kart.local_slot=i if i<human_count else -1
 		kart.setup(circuit,i,i<human_count,String(d),String(v),null,active_laps)
 		LeoRaceRules.apply(kart)
 		kart.racer_name=catalog.driver(d).display_name
@@ -776,6 +781,7 @@ func swap_player_vehicle(d: StringName,v: StringName,player_name: String) -> boo
 	var fresh:=LeoKart.new()
 	fresh.process_mode=Node.PROCESS_MODE_PAUSABLE
 	add_child(fresh)
+	fresh.local_slot=selected_player_slot
 	fresh.setup(circuit,old.racer_id,true,String(d),String(v),null,old.lap_count)
 	LeoRaceRules.apply(fresh)
 	fresh.local_slot=selected_player_slot;fresh.control_input=input_router.players[selected_player_slot]
@@ -868,6 +874,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif hud.modal_root.get_child_count()>0 and state in ["menu","garage"]:hud.clear(hud.modal_root)
 		elif state=="garage":return_menu()
 		else:toggle_pause()
+
+func _physics_process(dt: float) -> void:
+	if not initialized or paused:return
+	# Prepare every incoming velocity before any CharacterBody moves.
+	for kart in karts:
+		if is_instance_valid(kart) and kart.is_physics_processing():kart.prepare_motion(dt)
 
 func _process(dt: float) -> void:
 	if not initialized:return
@@ -976,10 +988,11 @@ func save_settings() -> void:
 	cfg.set_value("game","custom_player_name",custom_player_name.strip_edges())
 	# Legacy 1.6 best_time_astra is deliberately preserved in the loaded config.
 	for local in local_players:cfg.set_value("local_players",str(local.slot),local.selection())
-	cfg.set_value("display", "fullscreen", DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN)
+	cfg.set_value("display", "fullscreen", graphics.previous.mode==DisplayServer.WINDOW_MODE_FULLSCREEN if graphics and graphics.pending else DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN)
 	cfg.set_value("display", "reduced_motion", reduced_motion)
 	cfg.set_value("display","graphics_quality",graphics_quality)
 	cfg.set_value("display","camera_fov",base_camera_fov)
+	if graphics:graphics.write(cfg)
 	cfg.save("user://leo_racer.cfg")
 
 func load_settings() -> void:
@@ -1006,6 +1019,7 @@ func load_settings() -> void:
 			var data: Variant=cfg.get_value("local_players",str(local.slot),{})
 			if data is Dictionary:local.restore(data,catalog)
 		if cfg.get_value("display", "fullscreen", false): DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	graphics.read(cfg)
 	if local_players[0].profile_id==local_players[1].profile_id or local_players[1].profile_id.is_empty():
 		local_players[1].profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
 	if local_players[0].profile_id.is_empty():local_players[0].profile_id=Crypto.new().generate_random_bytes(16).hex_encode()
@@ -1207,6 +1221,8 @@ func _on_local_command(slot: int, action: String) -> void:
 	if not input_router.gameplay_enabled:return
 	var local:=local_players[slot]
 	var kart:=local.kart
+	if action=="change_camera" and is_instance_valid(kart):
+		cycle_camera(slot);return
 	if action=="pause_race":
 		if garage_from_pause and slot!=selected_player_slot:return
 		if garage_from_pause:cancel_pause_garage()
@@ -1227,6 +1243,10 @@ func _on_local_command(slot: int, action: String) -> void:
 		reset_motion_feedback()
 		local.photo=not local.photo
 		if slot==0 and human_count==1:hud.photo_mode=local.photo;hud.hud_root.visible=not local.photo
+func cycle_camera(slot: int) -> void:
+	if slot<0 or slot>=human_count:return
+	LeoCameraViews.cycle(local_players[slot]);save_settings()
+
 func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	if not is_instance_valid(local.camera) or not is_instance_valid(local.kart):return
 	var kart:=local.kart
@@ -1235,7 +1255,7 @@ func update_local_camera(local: LeoLocalPlayer, dt: float) -> void:
 	var pose: Transform3D=kart.get_global_transform_interpolated()
 	local.heading=lerp_angle(local.heading,pose.basis.get_euler().y,1.-exp(-dt*6.))
 	local.camera_rig.update(local,view,kart,input_router.players[local.slot],dt,get_world_3d().direct_space_state,human_count==2,reduced_motion)
-	if local.feedback:
+	if local.feedback and LeoCameraViews.effective(local)=="chase":
 		local.feedback.set_boost_active(kart.boost_time>0 and kart.active)
 		var desired_fov: float=local.camera_rig.field_of_view(kart.wheel_motion_speed,float(local.feedback.get_fov_offset()),reduced_motion,base_camera_fov)
 		view.fov=base_camera_fov if reduced_motion else lerpf(view.fov,desired_fov,1.-exp(-dt*12.))

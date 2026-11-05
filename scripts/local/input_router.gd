@@ -229,7 +229,7 @@ func load_profiles() -> void:
   var data: Variant = cfg.get_value("player_%d" % i,"profile",{})
   if data is Dictionary and not data.is_empty():
    players[i].restore(data)
-   if int(data.get("version",1))<3:
+   if int(data.get("version",1))<4:
     for action in LeoPlayerInput.FEATURE_ACTIONS:
      if not data.get("bindings",{}).has(action):added.append({"slot":i,"action":action})
  for entry in added:

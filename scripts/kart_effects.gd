@@ -19,11 +19,12 @@ var scrape_level:=0.0
 var contact_shadows: Array[MeshInstance3D]=[]
 var ground_contacts: Array[Dictionary]=[]
 var shadow_timer:=0.0
+var contact_ramps: Dictionary={}
 var trace_material: StandardMaterial3D
 
 func setup(owner_kart: LeoKart) -> void:
 	kart = owner_kart
-	decal_backend=kart.is_player and RenderingServer.get_current_rendering_method()=="forward_plus" and int(kart.get_parent().get("graphics_quality"))==2 and int(kart.get_parent().get("human_count"))<2
+	decal_backend=false # Surface-aligned meshes work consistently in both renderers.
 	if kart.is_player:
 		wind=LeoDraftingWind.new();add_child(wind);wind.setup(kart)
 	for slot in kart.exhaust_positions.size():
@@ -128,6 +129,11 @@ func setup(owner_kart: LeoKart) -> void:
 	impact_sparks.explosiveness = 1.0
 	impact_sparks.lifetime = .35
 	impact_sparks.local_coords = false
+	impact_sparks.top_level=true
+	for surface in ["paint","concrete","dirt"]:
+		var tint:=Color("ffcc75") if surface=="paint" else (Color("856448") if surface=="dirt" else Color("c0b3a0"))
+		var gradient:=Gradient.new();gradient.set_color(0,Color(tint,1.));gradient.set_color(1,Color(tint,0.))
+		var ramp:=GradientTexture1D.new();ramp.gradient=gradient;contact_ramps[surface]=ramp
 	kart.contact_reported.connect(_contact)
 	# Local impacts share the existing per-player panner/reverb bus and stay
 	# audible when the split-screen cameras are far apart. Rivals remain spatial.
@@ -160,7 +166,9 @@ func setup(owner_kart: LeoKart) -> void:
 		else:
 			var mesh_mark:=MeshInstance3D.new();var mesh:=BoxMesh.new();mesh.size=Vector3(.13,.006,.8)
 			mesh_mark.mesh=mesh;mesh_mark.material_override=material;mesh_mark.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mark=mesh_mark
-		mark.top_level=true;mark.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;mark.visible=false;add_child(mark);marks.append(mark)
+		mark.top_level=true;mark.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;mark.visible=false
+		if not LeoContactBudget.reserve_mark(mark):mark.free();break
+		add_child(mark);marks.append(mark)
 	for wheel in kart.wheel_steering_pivots:
 		var shadow:=MeshInstance3D.new();var quad:=QuadMesh.new();quad.size=Vector2(.7,1.05)
 		shadow.mesh=quad;shadow.top_level=true;shadow.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;shadow.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -208,7 +216,16 @@ func _process(dt: float) -> void:
 	var moving := absf(kart.wheel_motion_speed)>4.0
 	var camera:=get_viewport().get_camera_3d()
 	var near := kart.is_player or (is_instance_valid(camera) and camera.global_position.distance_to(kart.global_position)<55)
-	for emitter in smoke: emitter.emitting = kart.grounded and kart.drifting and moving and kart.active and near
+	for i in smoke.size():
+		var emitter:=smoke[i]
+		var origin:=kart.visual.global_transform*kart.rear_tire_positions[i]
+		var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*.8,origin-Vector3.UP*2.,1)
+		var hit:=kart.get_world_3d().direct_space_state.intersect_ray(query)
+		emitter.emitting=kart.grounded and kart.drifting and moving and kart.active and near and not hit.is_empty()
+		if not hit.is_empty():
+			var normal: Vector3=hit.normal
+			var forward:=(-kart.global_basis.z).slide(normal).normalized()
+			emitter.global_transform=Transform3D(Basis.looking_at(forward,normal),hit.position+normal*.04)
 	var charge_color := Color("00b9d4").lerp(Color("ffae36"),smoothstep(.65,2.5,kart.drift_charge))
 	trace_material.emission = charge_color
 	for spark in kart.tire_sparks:
@@ -230,7 +247,7 @@ func _process(dt: float) -> void:
 		material.emission = Color("9effdd").lerp(Color("00e4ff"),.5+.4*sin(elapsed*22)) if electric else Color("ffad38").lerp(Color("20dfff"),.55+.35*sin(elapsed*18))
 		if electric: flame.scale.z=.55+gain*.35
 	mark_timer -= dt
-	if kart.grounded and kart.drifting and moving and kart.active and near and mark_timer<=0:
+	if not marks.is_empty() and kart.grounded and kart.drifting and moving and kart.active and near and mark_timer<=0:
 		mark_timer = .045
 		for tire in kart.rear_tire_positions:
 			var mark := marks[mark_cursor]
@@ -258,9 +275,15 @@ func _contact(event: Dictionary) -> void:
 	var process:=impact_sparks.process_material as ParticleProcessMaterial
 	process.direction=event.normal
 	process.initial_velocity_min=1.+strength*2.;process.initial_velocity_max=3.+strength*7.
-	process.color=Color("ffcc75") if event.surface=="paint" else Color("c0b3a0")
+	var paint: bool=event.surface in ["paint","metal"]
+	process.color=Color("ffcc75") if paint else (Color("856448") if event.surface in ["dirt","grass"] else Color("c0b3a0"))
+	process.scale_min=.4 if paint else 2.;process.scale_max=.9 if paint else 5.
+	process.color_ramp=contact_ramps["paint" if paint else ("dirt" if event.surface in ["dirt","grass"] else "concrete")];process.color=Color.WHITE
+	var material: StandardMaterial3D=impact_sparks.draw_pass_1.material
+	material.emission_energy_multiplier=2.4 if paint else 0.
+	process.gravity=Vector3(0,-7.,0) if paint else Vector3(0,.3,0)
 	impact_sparks.amount_ratio=strength
-	impact_sparks.restart()
+	LeoContactBudget.emit(impact_sparks)
 	if event.phase=="impact":
 		contact_audio.volume_db=-22.+strength*10.;contact_audio.play()
 

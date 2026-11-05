@@ -1,0 +1,9 @@
+{
+  "bigster": {
+    "cockpit": true,
+    "eye": [-0.3663, 1.29, -0.09],
+    "rotation_degrees": [-3.0, 0.0, 0.0],
+    "space": "resolved_vehicle",
+    "note": "Driver-eye anchor above the authored left-hand seat; reviewed against the runtime Bigster cockpit."
+  }
+}

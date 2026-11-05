@@ -97,8 +97,12 @@ var wheel_radii: Array[float] = []
 var wheel_axes: Array[Vector3] = []
 var wheel_angles: Array[float] = []
 var damage: LeoCosmeticDamage
+var prepared_frame := -1
+var prepared_throttle := 0.0
+var contact_this_tick := false
 var contact_clock:=0.0
 var last_contact_at:=-10.0
+var contact_times: Dictionary={}
 var contact_recoil:=Vector3.ZERO
 var vehicle_lighting: Node
 
@@ -139,14 +143,11 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	for binding in definition.wheels:
 		if not binding.steering: rear_tire_positions.append(chassis.transform * binding.pivot)
 		attach_binding(binding)
-	var collision := CollisionShape3D.new()
-	var shape := BoxShape3D.new()
-	shape.size = definition.collision_size
-	collision.shape = shape
-	collision.position = definition.collision_position
-	add_child(collision)
+	LeoCollisionShapes.install(self)
 	collision_layer = 2
 	collision_mask = 1 | 2
+	# Another CharacterBody is a contact partner, never a moving platform.
+	platform_floor_layers=1;platform_wall_layers=0;platform_on_leave=CharacterBody3D.PLATFORM_ON_LEAVE_DO_NOTHING
 	floor_snap_length = LeoArcadeDynamics.SNAP
 	for exhaust_index in exhaust_positions.size():
 		var f := MeshInstance3D.new()
@@ -195,6 +196,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 	visual.add_child(effects)
 	effects.setup(self)
 	damage=LeoCosmeticDamage.new();visual.add_child(damage);damage.setup(self)
+	LeoCameraViews.tag(self)
 	ai.reset(ai_seed+racer_id*7919+int(circuit.length),ai_lane)
 	reset_physics_interpolation()
 
@@ -329,6 +331,8 @@ func advance_checkpoints(projection: Dictionary, motion: Vector3) -> void:
 	var change:=circuit.delta_distance(previous,s)
 	last_s=s
 	if not active or finished or retired:return
+	# Contact cannot push a racer through a checkpoint in the impact tick.
+	if contact_this_tick:return
 	var segment:=circuit.length/LeoCircuit.GATES
 	var expected:=float(next_gate)*segment
 	var gate_s:=fposmod(expected,circuit.length)
@@ -402,14 +406,23 @@ func reset_suspension() -> void:
 
 func update_suspension(dt: float, reduced: bool, motion_velocity: Vector3=Vector3.INF) -> void:
 	var measured:=Vector3(velocity.x,0,velocity.z) if not motion_velocity.is_finite() else Vector3(motion_velocity.x,0,motion_velocity.z)
-	if not suspension_ready or reduced or not active:
+	if not suspension_ready or not active:
 		suspension_velocity=measured;suspension_yaw=rotation.y;suspension_ready=true
 		suspension_roll=0.;suspension_pitch=0.;return
 	var acceleration_world:=(measured-suspension_velocity)/maxf(dt,.001)
 	var lateral:=acceleration_world.dot(global_basis.x)
 	var longitudinal:=acceleration_world.dot(-global_basis.z)
 	var yaw_rate:=angle_difference(suspension_yaw,rotation.y)/maxf(dt,.001)
-	var response:=dynamics.spring(Vector3(0.,clampf(longitudinal*.0012,-deg_to_rad(3.),deg_to_rad(3.)),clampf(-lateral*.0018+yaw_rate*.012,-deg_to_rad(5.),deg_to_rad(5.))),dt)
+	if reduced:
+		# Smooth load transfer without suspension oscillation or impact recoil.
+		var speed_factor:=clampf(absf(speed)/20.,0.,1.)
+		var target_roll: float=clampf(steer*speed_factor*deg_to_rad(2.),-deg_to_rad(2.),deg_to_rad(2.))
+		var target_pitch:=clampf(longitudinal*.0012,-deg_to_rad(2.),deg_to_rad(2.))
+		suspension_roll=lerpf(suspension_roll,target_roll,1.-exp(-dt*5.))
+		suspension_pitch=lerpf(suspension_pitch,target_pitch,1.-exp(-dt*5.))
+		suspension_velocity=measured;suspension_yaw=rotation.y
+		return
+	var response:=dynamics.spring(Vector3(0.,clampf(longitudinal*.0012,-deg_to_rad(3.),deg_to_rad(3.)),clampf(lateral*.0018-yaw_rate*.012,-deg_to_rad(5.),deg_to_rad(5.))),dt)
 	suspension_roll=response.z;suspension_pitch=response.y
 	suspension_velocity=measured;suspension_yaw=rotation.y
 
@@ -423,8 +436,9 @@ func boosted_ceiling() -> float:
 	if race_boost_ceiling>0:return race_boost_ceiling
 	return definition.boosted_speed*(max_speed/definition.max_speed) if definition and definition.boosted_speed>0 else max_speed*1.4
 
-func _physics_process(dt: float) -> void:
-	if not circuit: return
+func prepare_motion(dt: float) -> void:
+	if not circuit:return
+	prepared_frame=Engine.get_physics_frames();contact_this_tick=false
 	boost_time = maxf(0, boost_time - dt)
 	boost_cooldown = maxf(0, boost_cooldown - dt)
 	bump_cooldown = maxf(0, bump_cooldown - dt)
@@ -443,7 +457,7 @@ func _physics_process(dt: float) -> void:
 				boost(1.6, "HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
 		else:
 			var command := ai.commands(self,dt)
-			if command.recover:recover();return
+			if command.recover:recover();prepared_frame=-2;return
 			throttle=command.throttle;desired_steer=command.steer;want_drift=command.drift
 			if command.boost and boost_fuel>=1.:
 				boost_fuel=0.;boost(1.6,"HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
@@ -494,6 +508,14 @@ func _physics_process(dt: float) -> void:
 	landing_suppression=maxf(0.,landing_suppression-dt)
 	floor_snap_length=LeoArcadeDynamics.SNAP if velocity.y<=0. and grounded else 0.
 	velocity.y -= LeoArcadeDynamics.GRAVITY * dt
+	prepared_throttle=throttle
+
+func _physics_process(dt: float) -> void:
+	if not circuit:return
+	if prepared_frame!=Engine.get_physics_frames():prepare_motion(dt)
+	if prepared_frame==-2:prepared_frame=-1;return
+	prepared_frame=-1
+	var throttle:=prepared_throttle
 	var motion_origin := global_position
 	var contact_velocity := velocity
 	var was_grounded:=grounded
@@ -569,13 +591,18 @@ func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
 func report_contact(point: Vector3, normal: Vector3, relative: Vector3, other: LeoKart, surface: String) -> void:
 	var closing:=maxf(0.,-relative.dot(normal))
 	var tangent:=relative.slide(normal).length()
-	var phase:="impact" if contact_clock-last_contact_at>.18 and closing>2. else "scrape"
-	last_contact_at=contact_clock
-	var event:={"kart":self,"other":other,"point":point,"normal":normal,"normal_speed":closing,"tangent_speed":tangent,"surface":surface,"phase":phase}
+	var key:=str(other.get_instance_id()) if is_instance_valid(other) else surface+str(normal.snapped(Vector3.ONE*.25))
+	var phase:="impact" if contact_clock-float(contact_times.get(key,-10.))>.18 and closing>2. else "scrape"
+	contact_times[key]=contact_clock;last_contact_at=contact_clock
+	if contact_times.size()>32:
+		for old_key in contact_times.keys():
+			if contact_clock-float(contact_times[old_key])>1.:contact_times.erase(old_key)
+	var event:={"participants":[self,other],"kart":self,"other":other,"point":point,"normal":normal,"normal_speed":closing,"tangent_speed":tangent,"surface":surface,"phase":phase}
 	contact_reported.emit(event)
 	if phase=="impact":
 		var strength:=clampf(closing/35.,0.,1.)
-		dynamics.spring_velocity.y-=.35*strength;dynamics.spring_velocity.z+=global_basis.x.dot(normal)*.5*strength
+		if not bool(get_parent().get("reduced_motion")):
+			dynamics.spring_velocity.y-=.35*strength;dynamics.spring_velocity.z+=global_basis.x.dot(normal)*.5*strength
 		if impact_feedback_cooldown<=0.:
 			impact_feedback_cooldown=.18;impacted.emit(self,point,normal,strength)
 

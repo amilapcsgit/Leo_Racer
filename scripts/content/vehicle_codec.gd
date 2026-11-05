@@ -1,7 +1,7 @@
 class_name LeoVehicleCodec
 extends RefCounted
 ## JSON adapter; never evaluates expressions or accepts user scripts.
-const FIELDS := ["preview_scene","compiled_bounds","estimated_bytes","display_name","collision_size","collision_position","max_speed","boosted_speed","electric_boost","braking_regeneration","ai_lateral_acceleration","acceleration","handling","camera_height","preview_target","preview_distance","exhausts","driver_policy","seat","normalization","driver_fits","hovering","preserve_materials","visual_profile","lighting","actions","fixed_driver_id","setup_complete","attribution"]
+const FIELDS := ["preview_scene","compiled_bounds","estimated_bytes","display_name","collision_size","collision_position","max_speed","boosted_speed","electric_boost","braking_regeneration","ai_lateral_acceleration","acceleration","handling","contact_shapes","camera_height","camera_views","preview_target","preview_distance","exhausts","driver_policy","seat","normalization","driver_fits","hovering","preserve_materials","visual_profile","lighting","actions","fixed_driver_id","setup_complete","attribution"]
 
 static func encode(value: Variant) -> Variant:
 	if value is Vector3:return [value.x,value.y,value.z]
@@ -15,6 +15,13 @@ static func encode(value: Variant) -> Variant:
 		for item in value:result.append(encode(item))
 		return result
 	return String(value) if value is StringName else value
+
+static func finite_vector(value: Variant) -> bool:
+	if not value is Array or value.size()!=3:return false
+	for component in value:
+		if not component is int and not component is float:return false
+		if not is_finite(float(component)):return false
+	return true
 
 static func vector(value: Variant) -> Vector3:
 	return Vector3(float(value[0]),float(value[1]),float(value[2]))
@@ -41,6 +48,8 @@ static func deserialize(data: Dictionary, folder: String) -> VehicleDefinition:
 	for key in FIELDS:
 		if not data.has(key):continue
 		var value: Variant=data[key]
+		if key=="camera_views" and not value is Dictionary:continue
+		if key=="contact_shapes" and not value is Array:continue
 		if key in ["collision_size","collision_position","preview_target"]:value=vector(value)
 		elif key in ["seat","normalization"]:value=transform(value)
 		elif key=="driver_fits":

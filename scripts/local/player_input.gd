@@ -1,7 +1,7 @@
 class_name LeoPlayerInput
 extends RefCounted
-const ACTIONS := ["accelerate","brake","left","right","drift","boost","recover","horn","pause_race","photo","headlights","vehicle_action_1","vehicle_action_2","look_back","camera_left","camera_right","camera_up","camera_down"]
-const FEATURE_ACTIONS := ["headlights", "vehicle_action_1", "vehicle_action_2", "look_back", "camera_left", "camera_right", "camera_up", "camera_down"]
+const ACTIONS := ["accelerate","brake","left","right","drift","boost","recover","horn","pause_race","photo","headlights","vehicle_action_1","vehicle_action_2","look_back","camera_left","camera_right","camera_up","camera_down","change_camera"]
+const FEATURE_ACTIONS := ["headlights", "vehicle_action_1", "vehicle_action_2", "look_back", "camera_left", "camera_right", "camera_up", "camera_down","change_camera"]
 var mouse_orbit := Vector2.ZERO
 var orbit_dragging := false
 var kind := "keyboard"
@@ -100,7 +100,7 @@ func describe(action: String) -> String:
     if kind=="gamepad":labels.append("RT" if n==JOY_AXIS_TRIGGER_RIGHT else "LT" if n==JOY_AXIS_TRIGGER_LEFT else "Left Stick ←" if action=="left" else "Left Stick →" if action=="right" else "Right Stick "+action.trim_prefix("camera_") if action.begins_with("camera_") else "Stick")
     else:labels.append("Steering Wheel" if action in ["left","right"] else "Accelerator" if action=="accelerate" else "Brake Pedal" if action=="brake" else "Wheel Axis")
  return " / ".join(labels) if not labels.is_empty() else "UNBOUND"
-func serialize() -> Dictionary: return {"version":3,"preference":preference,"keyboard_preset":keyboard_preset,"custom_bindings":custom_bindings,"solo_bindings":solo_bindings.duplicate(true),"stored_bindings":stored_bindings.duplicate(true),"keyboard_profiles":keyboard_profiles.duplicate(true),"kind":kind,"identity":identity.duplicate(true),"bindings":bindings.duplicate(true)}
+func serialize() -> Dictionary: return {"version":4,"preference":preference,"keyboard_preset":keyboard_preset,"custom_bindings":custom_bindings,"solo_bindings":solo_bindings.duplicate(true),"stored_bindings":stored_bindings.duplicate(true),"keyboard_profiles":keyboard_profiles.duplicate(true),"kind":kind,"identity":identity.duplicate(true),"bindings":bindings.duplicate(true)}
 func restore(data: Dictionary) -> void:
  reset_defaults(str(data.get("kind","keyboard")))
  preference=str(data.get("preference","manual"))
@@ -122,14 +122,16 @@ func restore(data: Dictionary) -> void:
     if type == "axis" and absf(float(binding.get("pressed",1.))-float(binding.get("rest",0.)))<.1: continue
     valid.append(binding.duplicate(true))
    bindings[action] = valid
+ if int(data.get("version",1))<4 and not custom_bindings:
+  for action in ["look_back","change_camera"]:bindings.erase(action)
  for action in FEATURE_ACTIONS:
   if not incoming.has(action):bindings.erase(action)
  bindings=upgrade_bindings(bindings,kind,keyboard_preset)
- if not solo_bindings.is_empty():solo_bindings=upgrade_bindings(solo_bindings,"keyboard","solo")
- for preset in keyboard_profiles:keyboard_profiles[preset]=upgrade_bindings(keyboard_profiles[preset],"keyboard",preset)
+ if not solo_bindings.is_empty():solo_bindings=upgrade_bindings(camera_defaults(solo_bindings,"keyboard","solo") if int(data.get("version",1))<4 and not custom_bindings else solo_bindings,"keyboard","solo")
+ for preset in keyboard_profiles:keyboard_profiles[preset]=upgrade_bindings(camera_defaults(keyboard_profiles[preset],"keyboard",preset) if int(data.get("version",1))<4 and not custom_bindings else keyboard_profiles[preset],"keyboard",preset)
  for saved_kind in stored_bindings:
   var saved: Dictionary=stored_bindings[saved_kind]
-  saved.bindings=upgrade_bindings(saved.get("bindings",{}),saved_kind,saved.get("keyboard_preset","solo"))
+  saved.bindings=upgrade_bindings(camera_defaults(saved.get("bindings",{}),saved_kind,saved.get("keyboard_preset","solo")) if int(data.get("version",1))<4 and not saved.get("custom_bindings",false) else saved.get("bindings",{}),saved_kind,saved.get("keyboard_preset","solo"))
   if not saved.get("solo_bindings",{}).is_empty():saved.solo_bindings=upgrade_bindings(saved.solo_bindings,"keyboard","solo")
  device = -1
  if int(data.get("version",1))<2 and kind=="gamepad" and identity.is_empty() and not custom_bindings:preference="auto"
@@ -180,8 +182,8 @@ static func binding_overlap(a: Dictionary,b: Dictionary) -> bool:
 
 static func upgrade_bindings(source: Dictionary,input_kind: String,preset: String="solo") -> Dictionary:
  var result:=source.duplicate(true)
- var keys_default: Dictionary={"headlights":KEY_L,"vehicle_action_1":KEY_O,"vehicle_action_2":KEY_K,"look_back":KEY_C} if preset!="shared2" else {"headlights":KEY_KP_1,"vehicle_action_1":KEY_KP_2,"vehicle_action_2":KEY_KP_3,"look_back":KEY_KP_0}
- var pad: Dictionary={"headlights":JOY_BUTTON_DPAD_LEFT,"vehicle_action_1":JOY_BUTTON_DPAD_UP,"vehicle_action_2":JOY_BUTTON_DPAD_DOWN,"look_back":JOY_BUTTON_RIGHT_STICK}
+ var keys_default: Dictionary={"headlights":KEY_L,"vehicle_action_1":KEY_O,"vehicle_action_2":KEY_K,"look_back":KEY_V,"change_camera":KEY_C} if preset!="shared2" else {"headlights":KEY_KP_1,"vehicle_action_1":KEY_KP_2,"vehicle_action_2":KEY_KP_3,"look_back":KEY_KP_0,"change_camera":KEY_KP_4}
+ var pad: Dictionary={"headlights":JOY_BUTTON_DPAD_LEFT,"vehicle_action_1":JOY_BUTTON_DPAD_UP,"vehicle_action_2":JOY_BUTTON_DPAD_DOWN,"look_back":JOY_BUTTON_LEFT_STICK,"change_camera":JOY_BUTTON_RIGHT_STICK}
  for action in FEATURE_ACTIONS:
   if result.has(action):continue
   var candidates: Array=[]
@@ -200,3 +202,10 @@ static func upgrade_bindings(source: Dictionary,input_kind: String,preset: Strin
 
 func orbit_delta() -> Vector2:
  var delta:=mouse_orbit;mouse_orbit=Vector2.ZERO;return delta
+
+static func camera_defaults(source: Dictionary,input_kind: String,preset: String) -> Dictionary:
+ var result:=source.duplicate(true)
+ if result.has("change_camera"):return result
+ var old: Dictionary={"type":"button","index":JOY_BUTTON_RIGHT_STICK} if input_kind=="gamepad" else {"type":"key","index":KEY_KP_0 if preset=="shared2" else KEY_C}
+ if result.get("look_back",[])==[old]:result.erase("look_back")
+ return result

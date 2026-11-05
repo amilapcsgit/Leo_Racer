@@ -30,7 +30,7 @@ func audit() -> void:
 	check(LeoDefaultRoster.ids().size()==21,"Locked default roster contains twenty-one IDs")
 	check(game.catalog.vehicles.size()==21,"Fresh selected content has exactly twenty-one packages")
 	check(LeoDefaultRoster.ai_vehicles(game.catalog).size()==21,"All default AI choices come from roster")
-	check(LeoRaceRules.ID=="ultra_v6_static","Collision changes have a new record ruleset")
+	check(LeoRaceRules.ID=="distinct_v4+contact_v278_static","Collision changes have a new record ruleset")
 	var missing:=LeoLocalPlayer.new(1);missing.restore({"vehicle":"excluded_temporarily"},game.catalog)
 	check(missing.vehicle_id==&"bigster" and missing.preferred_vehicle_id==&"excluded_temporarily","Unavailable saved car uses Bigster without losing preference")
 	var rows: Array=[]
@@ -128,7 +128,7 @@ func addons() -> void:
 	subject.queue_free();await physics_frame
 
 func collision_capture() -> void:
-	game.return_menu();assert(await game.select_track("kandy_lake"));game.human_count=1
+	game.return_menu();check(await game.select_track("kandy_lake"),"Capture uses Kandy track");game.human_count=1
 	game.selected_kart=game.catalog.vehicle_index(&"bigster");await game.start_race();game.state="race"
 	root.size=Vector2i(1280,720)
 	for car in game.karts:car.set_physics_process(false);car.active=false;car.collision_layer=0

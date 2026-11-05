@@ -10,9 +10,11 @@ func _ready() -> void:
  set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);mouse_filter=Control.MOUSE_FILTER_IGNORE
  var row:=HBoxContainer.new();row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);row.add_theme_constant_override("separation",3);row.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(row)
  for slot in 2:
-  var container:=SubViewportContainer.new();container.stretch=true;container.size_flags_horizontal=Control.SIZE_EXPAND_FILL;container.size_flags_vertical=Control.SIZE_EXPAND_FILL;container.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(container)
+  var container:=SubViewportContainer.new();container.stretch=true;container.size_flags_horizontal=Control.SIZE_EXPAND_FILL;container.size_flags_vertical=Control.SIZE_EXPAND_FILL;container.mouse_filter=Control.MOUSE_FILTER_PASS;row.add_child(container)
   var viewport:=SubViewport.new();viewport.name="Player%dView" % (slot+1);viewport.world_3d=game.get_world_3d();viewport.handle_input_locally=false;viewport.size=Vector2i(960,1080);viewport.msaa_3d=Viewport.MSAA_2X;viewport.render_target_update_mode=SubViewport.UPDATE_DISABLED;container.add_child(viewport);views.append(viewport)
+  viewport.size_changed.connect(game.graphics.apply_view.bind(viewport),CONNECT_DEFERRED)
   var camera:=Camera3D.new();camera.name="Player%dCamera" % (slot+1);camera.fov=63.;camera.far=game.race_camera_far();camera.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;viewport.add_child(camera);cameras.append(camera)
+  var post: CanvasLayer=load("res://scripts/local/driving_post.gd").new();post.game=game;post.slot=slot;viewport.add_child(post)
   var layer:=CanvasLayer.new();viewport.add_child(layer)
   var overlay:=LeoRaceInstruments.new();overlay.game=game;overlay.slot=slot;layer.add_child(overlay);overlays.append(overlay)
  hide()

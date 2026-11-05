@@ -107,3 +107,6 @@ installer/release26-final-*.nsh
 installer/release270-*.nsh
 installer/release271-*.nsh
 installer/Release271.nsi
+
+installer/release278-*.nsh
+installer/Release278.nsi

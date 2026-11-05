@@ -37,7 +37,7 @@ func _ready() -> void:
  mode=OptionButton.new();mode.add_item("1 PLAYER",1);mode.add_item("2 PLAYERS",2);mode.custom_minimum_size=Vector2(160,48);filters.add_child(mode)
  mode.select(game.human_count-1)
  performance=OptionButton.new();performance.add_item("CURRENT VEHICLE BALANCE");performance.add_item("LEGACY / 165 KM/H");performance.add_item("LEGACY / BIGSTER");performance.add_item("LEGACY / DISTINCT V2");performance.add_item("LEGACY / DISTINCT V3");performance.add_item("LEGACY / DISTINCT V4");filters.add_child(performance)
- performance.add_item("2.6 / STATIC");performance.add_item("2.6 / DUSK TO NIGHT")
+ performance.add_item("2.6 / STATIC");performance.add_item("2.6 / DUSK TO NIGHT");performance.add_item("2.7.1 / STATIC");performance.add_item("2.7.1 / DUSK TO NIGHT")
  performance.select(0)
  vehicle=OptionButton.new();vehicle.add_item("ALL VEHICLES")
  for v in game.catalog.vehicles:vehicle.add_item(v.display_name)
@@ -72,10 +72,11 @@ func refresh() -> void:
  revision.visible=course.id=="kandy_lake"
  var ruleset: String = game.current_ruleset(course) if performance.selected==0 else ("balanced_v1+arcade_elevation_v1" if course.elevated() else "balanced_v1")
  if performance.selected in [6,7]:ruleset=("distinct_v5_static" if performance.selected==6 else "distinct_v5_dusk_night")+("+arcade_elevation_v1" if course.elevated() else "")
+ if performance.selected in [8,9]:ruleset=("ultra_v6_static" if performance.selected==8 else "ultra_v6_dusk_night")+("+arcade_elevation_v1" if course.elevated() else "")
  if performance.selected==5:ruleset="distinct_v4"+("+arcade_elevation_v1" if course.elevated() else "")
  if performance.selected==4:ruleset="distinct_v3"+("+arcade_elevation_v1" if course.elevated() else "")
  if performance.selected==3:ruleset="distinct_v2"+("+arcade_elevation_v1" if course.elevated() else "")
- var class_id := LeoRaceRules.CLASS if performance.selected in [0,3,4,5,6,7] else ("standard165" if performance.selected==1 else "suv180")
+ var class_id := LeoRaceRules.CLASS if performance.selected in [0,3,4,5,6,7,8,9] else ("standard165" if performance.selected==1 else "suv180")
  status.text="Loading your records…"
  if game.ranking_store:rows=await LeoRankingRequests.query(game.ranking_store,get_tree(),mode.get_selected_id(),class_id,selected_vehicle,metric.selected==1,course.id,course_revision,ruleset,func():return is_inside_tree() and generation==query_generation,int(lap_count.value))
  if not is_inside_tree() or generation!=query_generation:return

@@ -1,5 +1,6 @@
 extends RefCounted
 ## One rig per local player; inputs and camera state never cross viewports.
+var driving_view := "chase"
 var reverse_time := 0.
 var reverse_view := false
 var orbit := Vector2.ZERO
@@ -46,6 +47,22 @@ func advance(speed: float,input: LeoPlayerInput,dt: float) -> void:
 	pitch=lerpf(pitch,vertical,1.-exp(-dt*7.))
 
 func update(local: LeoLocalPlayer,view: Camera3D,kart: LeoKart,input: LeoPlayerInput,dt: float,space: PhysicsDirectSpaceState3D,split: bool,reduced: bool = false) -> void:
+	driving_view=LeoCameraViews.effective(local)
+	LeoCameraViews.visibility(local)
+	if driving_view!="chase":
+		var pose:=kart.get_global_transform_interpolated()
+		var eye:=Vector3(0.,1.0,kart.definition.collision_position.z-kart.definition.collision_size.z*.5-.08)
+		var rotation_degrees:=Vector3.ZERO
+		if driving_view=="cockpit":
+			var data:=LeoCameraViews.profile(kart.definition)
+			eye=LeoVehicleCodec.vector(data.eye)
+			rotation_degrees=LeoVehicleCodec.vector(data.get("rotation_degrees",[0,0,0]))
+		var facing:=Basis.from_euler(rotation_degrees*PI/180.)
+		if input.value("look_back")>.5:facing=Basis(Vector3.UP,PI)*facing
+		view.global_transform=pose*Transform3D(facing,eye)
+		view.near=.04;warm=false
+		return
+	view.near=.05
 	advance(kart.speed,input,dt)
 	var pose := kart.get_global_transform_interpolated()
 	var yaw := (pose.basis.get_euler().y if reduced else local.heading)+angle
@@ -84,6 +101,7 @@ func update(local: LeoLocalPlayer,view: Camera3D,kart: LeoKart,input: LeoPlayerI
 	protect(view,kart,space)
 
 func protect(view: Camera3D,kart: LeoKart,space: PhysicsDirectSpaceState3D) -> void:
+	if driving_view!="chase":return
 	# Always run again after final shake/roll offsets have been applied.
 	var pose:=kart.get_global_transform_interpolated()
 	var center:=body_bounds(kart).get_center()

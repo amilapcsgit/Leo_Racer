@@ -85,7 +85,7 @@ func run() -> void:
 	bridge.free()
 	game.return_menu();game.selected_kart=game.catalog.vehicle_index(&"duster");game.local_players[0].vehicle_id=&"duster"
 	game.set_race_variant("dusk_night");await game.start_race()
-	check(game.current_ruleset()=="ultra_v6_dusk_night","Dynamic ranking identity")
+	check(game.current_ruleset()=="distinct_v4+contact_v278_dusk_night","Dynamic ranking identity")
 	game.state="race"
 	for kart in game.karts:kart.active=true;kart.set_physics_process(false)
 	var player: LeoKart=game.player
@@ -102,7 +102,7 @@ func run() -> void:
 	game.race_environment.displayed=1.;game.race_environment.apply(true);await capture("Duster_My_2014-night")
 	game.race_environment.reset();check(game.race_environment.progress==0.,"Restart resets progression")
 	game.set_race_variant("static");game.race_environment.configure(game.world,game.environment,game.chosen_track_id,false)
-	check(game.current_ruleset()=="ultra_v6_static","Static ranking identity")
+	check(game.current_ruleset()=="distinct_v4+contact_v278_static","Static ranking identity")
 	var store=load("res://scripts/LocalRankingStore.cs").new()
 	check(store.open_store(ProjectSettings.globalize_path(output.path_join("rankings.sqlite3"))),"SQLite opens on worker")
 	var request: int=store.query_async(1,"arcade_v2","",false,"astra_coast",1,"ultra_v6_static",3)

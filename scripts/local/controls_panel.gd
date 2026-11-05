@@ -70,7 +70,7 @@ func refresh() -> void:
  for action in LeoPlayerInput.ACTIONS:
   var target: String=action
   var row:=HBoxContainer.new();rows.add_child(row)
-  var title:=label(action.replace("_"," ").to_upper()+(" · "+String(action_names.get(action,"Unassigned")) if action.begins_with("vehicle_action_") else ""),row);title.custom_minimum_size.x=255
+  var title:=label(("CHANGE CAMERA VIEW" if action=="change_camera" else action.replace("_"," ").to_upper())+(" · "+String(action_names.get(action,"Unassigned")) if action.begins_with("vehicle_action_") else ""),row);title.custom_minimum_size.x=255
   var bind:=button(p.describe(action),func():router.start_capture(slot,target);status.text="Player %d: press a key/button or move fully toward %s. Escape cancels." % [slot+1,target],row);bind.custom_minimum_size.x=360
   bind.disabled=testing
   var value_label:=label("○",row);live[action]=value_label

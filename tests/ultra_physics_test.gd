@@ -14,7 +14,8 @@ func proxy(vehicle: VehicleDefinition,id: int,laps: int) -> LeoKart:
 	kart.circuit=game.circuit;kart.racer_id=id;kart.vehicle_key=String(vehicle.id);kart.lap_count=laps
 	kart.definition=LeoVehiclePresentation.resolve(vehicle);LeoRaceRules.apply(kart)
 	kart.visual=Node3D.new();kart.add_child(kart.visual)
-	var collider:=CollisionShape3D.new();var shape:=BoxShape3D.new();shape.size=kart.definition.collision_size;collider.shape=shape;collider.position=kart.definition.collision_position;kart.add_child(collider)
+	LeoCollisionShapes.install(kart)
+	kart.platform_floor_layers=1;kart.platform_wall_layers=0;kart.platform_on_leave=CharacterBody3D.PLATFORM_ON_LEAVE_DO_NOTHING
 	kart.collision_layer=2;kart.collision_mask=3;kart.floor_snap_length=LeoArcadeDynamics.SNAP
 	kart.ai_lane=-3.2 if id%2==0 else 3.2;kart.place(-8.-float(id/2)*12.,kart.ai_lane)
 	kart.active=true;kart.auto_drive=true

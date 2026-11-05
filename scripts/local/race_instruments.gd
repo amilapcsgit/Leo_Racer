@@ -25,6 +25,11 @@ var accent:=Color("00f2fe")
 var gold:=Color("ffb94f")
 var muted:=Color("b9d0d5")
 var layout_extent:=Vector2.ZERO
+var camera_button: Button
+var camera_hint: Label
+var camera_fade: ColorRect
+var diagnostic_clock := 0.0
+var diagnostic_extent := Vector2i.ZERO
 var speed: Label
 var static_view: SubViewport
 var static_canvas: Control
@@ -50,6 +55,10 @@ func _ready() -> void:
 	recovery_overlay=ColorRect.new();recovery_overlay.mouse_filter=MOUSE_FILTER_IGNORE;var recovery:=ShaderMaterial.new();recovery.shader=preload("res://shaders/recovery_edges.gdshader");recovery_overlay.material=recovery;add_child(recovery_overlay)
 	build()
 	speed=labels.speed
+	LeoSpeedDigits.configure(speed)
+	get_tree().root.focus_entered.connect(log_digits.bind("focus"))
+	get_tree().root.size_changed.connect(log_digits.bind("resize"))
+	log_digits("ready")
 	for child in get_children():
 		if child is Control and not child.has_meta("design_position"):child.set_meta("design_position",child.position)
 	layout()
@@ -113,7 +122,13 @@ func build() -> void:
 	labels.callout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	labels.launch = text_at(self,Vector2(380,517),Vector2(840,35),"TAP ACCELERATE ON THE FINAL BEAT FOR A LAUNCH BOOST",20,accent,true)
 	labels.launch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	camera_button=Button.new();camera_button.name="CameraView";camera_button.focus_mode=Control.FOCUS_NONE;camera_button.position=Vector2(1260,120);camera_button.size=Vector2(300,48);camera_button.add_theme_font_size_override("font_size",22);camera_button.pressed.connect(func():game.cycle_camera(slot));add_child(camera_button)
+	camera_hint=text_at(self,Vector2(1260,170),Vector2(300,30),"",16,muted);camera_hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;camera_hint.clip_text=true
+	camera_fade=ColorRect.new();camera_fade.mouse_filter=Control.MOUSE_FILTER_IGNORE;camera_fade.color=Color(0,0,0,0);camera_fade.z_index=20;add_child(camera_fade)
 	queue_redraw()
+
+func log_digits(reason: String) -> void:
+	if is_instance_valid(speed):LeoSpeedDigits.diagnostic(speed,reason,slot)
 
 func layout() -> void:
 	var available: Vector2=get_parent().size if get_parent() is Control else get_viewport_rect().size
@@ -129,6 +144,7 @@ func layout() -> void:
 			var fs: int=child.get_meta("font_size",20);child.add_theme_font_size_override("font_size",maxi(fs,ceili(17./maxf(.01,factor))) if game.human_count==2 else fs)
 	speed_overlay.position=Vector2.ZERO;speed_overlay.size=size
 	recovery_overlay.position=Vector2.ZERO;recovery_overlay.size=size
+	camera_fade.size=size
 	if game.human_count==2:
 		labels.nitro.position=Vector2(1230,555+extra);labels.nitro.size=Vector2(330,40);labels.nitro.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 func rebuild_map() -> void:static_key="";queue_redraw()
@@ -152,6 +168,13 @@ func _process(dt: float) -> void:
 	time+=visual_dt;ready_flash=maxf(0.,ready_flash-visual_dt)
 	var local: LeoLocalPlayer=game.local_players[slot]
 	var p: LeoKart=local.kart
+	camera_button.text="Camera: "+LeoCameraViews.NAMES[LeoCameraViews.effective(local)]
+	camera_hint.text="Change view · "+game.input_router.players[slot].describe("change_camera")
+	local.camera_transition=maxf(0.,local.camera_transition-dt)
+	camera_fade.color.a=0. if game.reduced_motion else local.camera_transition/.16*.45
+	diagnostic_clock+=dt
+	if "--hud-diagnostics" in OS.get_cmdline_user_args() and diagnostic_clock>10.:
+		diagnostic_clock=0.;log_digits("sample")
 	var actual_speed := absf(p.wheel_motion_speed)
 	var intensity := LeoHUD.speed_line_strength(actual_speed,p.boost_time>0,p.active,game.reduced_motion)
 	speed_overlay.visible=not local.photo and intensity>.001

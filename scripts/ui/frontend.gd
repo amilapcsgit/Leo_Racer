@@ -259,44 +259,7 @@ func show_pause() -> void:
  action(box,"How to Play",show_guide)
  action(box,"Leave Race",func():confirm("Leave this race?","This race's progress will be lost.",game.return_menu,show_pause))
 func show_settings() -> void:
- var leave: Callable=show_pause if game.paused else close_modal
- var box:=dialog("SETTINGS / TUNE YOUR EXPERIENCE","Small adjustments. Better races.",leave,1280)
- var scroll:=ScrollContainer.new();scroll.follow_focus=true;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;scroll.custom_minimum_size.y=550;box.add_child(scroll)
- var columns:=GridContainer.new();columns.name="SettingsColumns";columns.columns=2;columns.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_theme_constant_override("h_separation",24);scroll.add_child(columns)
- var window:=get_tree().root
- var reflow:=func():columns.columns=1 if window.size.x<1050 or columns.size.x<1050 else 2
- columns.resized.connect(reflow);window.size_changed.connect(reflow)
- columns.tree_exiting.connect(func():
-  if window.size_changed.is_connected(reflow):window.size_changed.disconnect(reflow))
- reflow.call()
- var audio_box:=card(columns);audio_box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;label(audio_box,"AUDIO",26,Color("67d6db"))
- add_slider(audio_box,"Master",game.master_volume,game.set_volume)
- for bus in ["Music","Effects","UI","Voice"]:
-  var name: String=bus
-  add_slider(audio_box,bus,float(audio.levels[bus]),func(value):audio.set_level(name,value))
- add_toggle(audio_box,"Music",game.music_enabled,game.set_music)
- add_toggle(audio_box,"Spoken cheers",audio.voice_enabled,audio.set_voice)
- var right:=VBoxContainer.new();right.size_flags_horizontal=Control.SIZE_EXPAND_FILL;columns.add_child(right)
- var display:=card(right);display.add_theme_constant_override("separation",6);label(display,"DISPLAY & CAMERA",26,Color("67d6db"))
- var graphics_row:=HBoxContainer.new();display.add_child(graphics_row);label(graphics_row,"Quality").size_flags_horizontal=Control.SIZE_EXPAND_FILL
- var graphics:=OptionButton.new()
- for quality in LeoGraphics.NAMES:graphics.add_item(quality)
- graphics.select(game.graphics_quality);graphics.item_selected.connect(game.set_graphics_quality);graphics_row.add_child(graphics)
- add_toggle(display,"Fullscreen",DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN,game.set_fullscreen)
- var fov_row:=HBoxContainer.new();display.add_child(fov_row);label(fov_row,"Field of view",22).size_flags_horizontal=Control.SIZE_EXPAND_FILL
- var fov:=SpinBox.new();fov.min_value=55;fov.max_value=75;fov.step=1;fov.value=game.base_camera_fov;fov_row.add_child(fov);fov.value_changed.connect(game.set_camera_fov)
- label(display,"Split-screen uses up to Medium quality.",20,Color("b9c7d6"))
- var controls:=card(right);controls.add_theme_constant_override("separation",6);label(controls,"CONTROLS & ACCESSIBILITY",26,Color("ffc857"))
- add_toggle(controls,"Reduced Motion",game.reduced_motion,game.set_reduced_motion)
- add_toggle(controls,"Controller rumble",game.haptics.enabled,func(value):game.haptics.enabled=value;game.haptics.stop_all();game.save_settings())
- add_slider(controls,"Strength",game.haptics.intensity,func(value):game.haptics.intensity=value;game.save_settings())
- var test_rumble:=action(controls,"Test Rumble",func():
-  for slot in game.human_count:game.input_router.identify(slot))
- test_rumble.custom_minimum_size.y=44
- for section in [audio_box,display,controls]:
-  var compact:=section.get_parent().get_theme_stylebox("panel").duplicate() as StyleBoxFlat
-  compact.content_margin_top=12;compact.content_margin_bottom=12;section.get_parent().add_theme_stylebox_override("panel",compact)
- action(box,"Back",leave).grab_focus()
+ load("res://scripts/ui/settings_screen.gd").build(self)
 
 func add_slider(parent: Node,words: String,value: float,changed: Callable) -> void:
  var row:=HBoxContainer.new();parent.add_child(row);label(row,words,22).custom_minimum_size.x=130

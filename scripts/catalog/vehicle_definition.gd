@@ -24,6 +24,8 @@ enum DriverPolicy { SEATED, IDENTITY_ONLY, FIXED, CABIN }
 @export var ai_lateral_acceleration := 0.0
 @export var acceleration := 18.0
 @export var handling := 1.0
+@export var contact_shapes: Array = []
+@export var camera_views: Dictionary = {}
 @export var camera_height := 0.0
 @export var preview_target := Vector3(0,.9,0)
 @export var preview_distance := 7.6
