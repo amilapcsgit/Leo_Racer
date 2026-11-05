@@ -10,7 +10,7 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 |---|---|
 | Input / rankings / local race | 35 / 26 / 21 checks passed |
 | Core | 54 checks passed in source and native export |
-| New settings/camera/contact regressions | 101 native checks passed per renderer |
+| New settings/camera/contact regressions | 107 native checks passed per renderer |
 | Focused migration/metadata/budget checks | 43 native checks passed; included in headless CI |
 | Collision contacts / vehicle audit | 226 / 153 checks passed |
 | Content | 449 checks passed |
@@ -18,7 +18,7 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 | Camera/presentation polish | 255 checks passed per renderer |
 | Production-controller physics matrix | 2,228 checks passed; all six racers finished 1, 3 and 10 laps on all three tracks |
 
-The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
+The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. It precedes the final glancing-contact gate refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
 
 Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Split-screen camera buttons were exercised through real GUI pointer delivery.
 
@@ -36,14 +36,14 @@ Initialization measures scene initialization after bootstrap; complete startup s
 | 2.7.1-compatibility | kandy_lake / 2 / chase | 9284.0 | 3235.8 | 9.67 / 16.46 / 34.27 | 330.9 | PASS |
 | 2.7.1-forward | astra_coast / 1 / chase | 11732.0 | 18.5 | 8.91 / 10.14 / 10.57 | 11.7 | PASS |
 | 2.7.1-forward | kandy_lake / 2 / chase | 14291.2 | 52.9 | 10.08 / 12.36 / 20.10 | 27.5 | PASS |
-| 2.7.8-compatibility | astra_coast / 1 / chase | 1278.8 | 26.1 | 7.63 / 9.84 / 10.16 | 118.7 | PASS |
-| 2.7.8-compatibility | kandy_lake / 2 / chase | 1446.2 | 163.0 | 11.59 / 17.12 / 24.80 | 118.7 | MISS |
-| 2.7.8-compatibility | astra_coast / 1 / ghost | 1366.1 | 10.4 | 7.96 / 9.81 / 10.12 | 18.9 | PASS |
-| 2.7.8-compatibility | astra_coast / 1 / cockpit | 582.1 | 10.2 | 7.82 / 9.83 / 10.02 | 20.1 | PASS |
-| 2.7.8-forward | astra_coast / 1 / chase | 2175.2 | 17.6 | 8.88 / 9.80 / 10.13 | 10.8 | PASS |
-| 2.7.8-forward | kandy_lake / 2 / chase | 5381.6 | 62.6 | 10.20 / 12.50 / 20.50 | 24.0 | PASS |
-| 2.7.8-forward | astra_coast / 1 / ghost | 5304.0 | 17.6 | 7.69 / 9.80 / 10.09 | 10.8 | PASS |
-| 2.7.8-forward | astra_coast / 1 / cockpit | 1881.1 | 10.7 | 9.06 / 9.93 / 10.46 | 11.3 | PASS |
+| 2.7.8-compatibility | astra_coast / 1 / chase | 12590.7 | 605.6 | 7.62 / 9.84 / 10.29 | 1151.7 | PASS |
+| 2.7.8-compatibility | kandy_lake / 2 / chase | 9291.0 | 3725.7 | 9.37 / 16.25 / 27.75 | 313.2 | PASS |
+| 2.7.8-compatibility | astra_coast / 1 / ghost | 1351.2 | 10.1 | 8.33 / 9.84 / 10.03 | 82.7 | PASS |
+| 2.7.8-compatibility | astra_coast / 1 / cockpit | 580.6 | 10.2 | 7.64 / 9.83 / 10.14 | 22.3 | PASS |
+| 2.7.8-forward | astra_coast / 1 / chase | 11726.8 | 30.5 | 9.04 / 9.83 / 10.21 | 10.9 | PASS |
+| 2.7.8-forward | kandy_lake / 2 / chase | 13638.0 | 40.9 | 10.29 / 12.82 / 20.30 | 28.3 | PASS |
+| 2.7.8-forward | astra_coast / 1 / ghost | 5206.3 | 17.4 | 8.88 / 9.87 / 10.24 | 11.8 | PASS |
+| 2.7.8-forward | astra_coast / 1 / cockpit | 1936.1 | 10.4 | 8.84 / 10.04 / 10.63 | 11.3 | PASS |
 
 ## Limits and launch instructions
 
