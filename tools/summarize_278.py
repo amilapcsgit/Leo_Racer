@@ -21,7 +21,7 @@ def summarize():
     for path in sorted((QA/'performance').glob('*/performance.json')):
         value=json.loads(path.read_text(encoding='utf-8'))
         for row in value['cases']:performance.append(dict(row,build=path.parent.name,initialization_ms=value['initialization_ms']))
-    if len(performance)!=12:raise RuntimeError('Expected all twelve matched/default and new-view performance cases')
+    if len(performance)!=14:raise RuntimeError('Expected fourteen baseline, new-view and previous-candidate cockpit performance cases')
     report={'status':'FUNCTIONAL_PASS','processes':processes,'performance':performance,
             'performance_goal_ms':16.7,'performance_misses':[r for r in performance if r['p95_ms']>16.7],
             'core_sha256':sha(BASE/'LeoRacer.pck'),'physical_4k_tv':'UNVERIFIED','physical_controllers':'UNVERIFIED','physical_wheel':'UNVERIFIED'}
@@ -73,7 +73,7 @@ Shared-world mirror probes confirm live geometry reaches every mirror texture. F
 
 Windows, NVIDIA RTX A1000 6 GB laptop GPU, driver 566.14, Godot 4.7.2 .NET; native offscreen, non-minimized windows, 1920×1080, Medium, six racers, normal process priority, VSync disabled, 120 FPS ceiling. Runs were sequential without another game test workload. Each case uses six seconds of first-use warmup and a ten-second warmed wall-clock sample. This is a focused diagnostic comparison, not the older 48-case performance certification.
 
-Fresh processes reuse warmed OS/driver caches; single runs and default-setting differences limit causal conclusions. These are default-setting comparisons: the previous solo default used MSAA 4×, the candidate uses MSAA 2×; split-screen uses MSAA 2×. Neither build uses upscaling or motion blur in these samples. Differences therefore do not isolate collision or camera implementation cost.
+Fresh processes reuse warmed OS/driver caches; single runs and default-setting differences limit causal conclusions. These are default-setting comparisons: the previous solo default used MSAA 4×, the candidate uses MSAA 2×; split-screen uses MSAA 2×. The previous local 2.7.8 candidate is additionally measured with the same cockpit probe. Its camera framing differs, so that comparison is not an isolated mirror-cost experiment. Warm mirror update rates are retained per case; cockpit first-use sampling includes left/right head-look before the centred warmed sample. Neither build uses upscaling or motion blur in these samples. Differences therefore do not isolate collision or camera implementation cost.
 
 Initialization measures scene initialization after bootstrap; complete startup stage timestamps remain in each process log. Loading measures race preparation. First-use peaks cover the six seconds before warmed sampling. Warmed peaks and raw per-frame samples remain separate.
 

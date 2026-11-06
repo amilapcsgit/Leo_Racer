@@ -5,7 +5,7 @@ import city_packs
 from package_ultra import ROOT, BASE, QA, sha
 
 def prepare(version):
-    source=BASE if version=='2.7.8' else ROOT/'build/Release-2.7.1-Ultra'
+    source={'2.7.8':BASE,'2.7.1':ROOT/'build/Release-2.7.1-Ultra','2.7.8-previous':ROOT/'build/preserved-candidate-278-before-live-feedback'}[version]
     target=QA/'benchmark-copies'/version
     def link(src,dst):
         try:os.link(src,dst)
@@ -37,6 +37,7 @@ def run(version,compat):
     if compat:args+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     args+=['--','--drive-test','--ultra-check=visual','--track=astra_coast','--vehicles='+str(target/'GameAssets/vehicles'),'--tracks='+str(target/'GameAssets/tracks'),'--qa-output='+str(output)]
     if version=='2.7.1':args+=['--baseline271']
+    if version=='2.7.8-previous':args+=['--cockpit-only']
     began=time.monotonic()
     with (output/'process.log').open('w',encoding='utf-8') as log:
         process=subprocess.Popen(args,cwd=target,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW|subprocess.NORMAL_PRIORITY_CLASS)
@@ -46,14 +47,14 @@ def run(version,compat):
             if 'SCRIPT ERROR' in current or 'Parse Error' in current or time.monotonic()-began>600:process.kill();break
         code=process.wait()
     text=(output/'process.log').read_text(encoding='utf-8',errors='replace')
-    report={'exit_code':code,'seconds':round(time.monotonic()-began,2),'source_core_sha256':sha((BASE if version=='2.7.8' else ROOT/'build/Release-2.7.1-Ultra')/'LeoRacer.pck'),'errors':[line for line in text.splitlines() if 'SCRIPT ERROR' in line or 'Parse Error' in line]}
+    report={'exit_code':code,'seconds':round(time.monotonic()-began,2),'source_core_sha256':sha(({'2.7.8':BASE,'2.7.1':ROOT/'build/Release-2.7.1-Ultra','2.7.8-previous':ROOT/'build/preserved-candidate-278-before-live-feedback'}[version])/'LeoRacer.pck'),'errors':[line for line in text.splitlines() if 'SCRIPT ERROR' in line or 'Parse Error' in line]}
     (output/'process.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
     if code or report['errors'] or not (output/'performance.json').exists():raise RuntimeError('Benchmark failed: '+label+'\n'+text[-3000:])
     print('BENCHMARK278',label,json.dumps(report),flush=True)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--version',choices=['2.7.1','2.7.8']);parser.add_argument('--compatibility',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--version',choices=['2.7.1','2.7.8','2.7.8-previous']);parser.add_argument('--compatibility',action='store_true');args=parser.parse_args()
     if args.version:run(args.version,args.compatibility)
     else:
         for compat in [False,True]:
-            for version in ['2.7.1','2.7.8']:run(version,compat)
+            for version in ['2.7.1','2.7.8','2.7.8-previous']:run(version,compat)
