@@ -1,6 +1,6 @@
 """Run source/export checks with isolated profiles, real exits, and retained logs."""
 from pathlib import Path
-import argparse, json, os, re, subprocess, time
+import argparse, json, os, re, subprocess, time, shutil
 from stage_ultra_content import ROOT, sha
 TESTS={
     'speedometer':('tests/release278_test.gd','--ultra-check=release278'),
@@ -54,7 +54,7 @@ def run(kind,compat=False,export=None,extra=()):
     if export:command.append(switch if switch else '--ultra-check='+kind)
     if kind in ['contacts','audit']:command.append('--quality25-mode='+kind)
     if kind=='capture':command.append('--quality25-mode=capture')
-    if kind=='speedometer':command.append('--speedometer-only')
+    if kind=='speedometer':command+=['--speedometer-only','--hud-diagnostics']
     if kind=='unit':command.append('--unit-only')
     if kind=='garage':command.append('--no-captures')
     if kind=='impact':command.append('--impact-only')
@@ -78,6 +78,10 @@ def run(kind,compat=False,export=None,extra=()):
     warnings=[line for line in text.splitlines() if any(term in line for term in ['leaked','resources still in use','Pages in use'])]
     report={'status':'PASS' if code==0 and not errors and not failed else 'FAIL','exit_code':code,'seconds':round(time.monotonic()-started,2),'errors':errors,'shutdown_warnings':warnings,'sdk_removed':bool(export)}
     if export:report['core_sha256']=sha(Path(export)/'LeoRacer.pck')
+    if kind=='speedometer':
+        launch=next((str(arg).split('=',1)[1] for arg in extra if str(arg).startswith('--launch=')),'1')
+        for diagnostic in profile.rglob('speedometer-diagnostics.jsonl'):
+            shutil.copy2(diagnostic,out/('launch-'+launch+'-display-diagnostics.jsonl'))
     (out/'process.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
     print('ULTRA_CHECK',label,json.dumps(report),flush=True)
     if report['status']!='PASS':print('\n'.join(text.splitlines()[-25:]),flush=True)

@@ -62,7 +62,7 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 
 The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. The final source matrix includes the barrier rebound refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
 
-Repeated exported fullscreen sessions use isolated fresh and then existing test data, with three race/restart cycles per launch and injected app focus notifications. Physical OS focus switching remains unverified. Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Camera selection stays in settings; per-player camera actions are exercised independently.
+Repeated exported fullscreen sessions use isolated fresh and then existing test data, with three race/restart cycles per launch and injected app focus notifications. The monitor reported 1920 x 1200 native fullscreen output; the test requested 1920 x 1080 before entering fullscreen. This is not a physical 1080p-only monitor test. Physical OS focus switching remains unverified. Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Camera selection stays in settings; per-player camera actions are exercised independently.
 
 ## Final refinement evidence
 
@@ -97,10 +97,10 @@ Initialization measures scene initialization after bootstrap; complete startup s
 ## Limits and launch instructions
 
 - The original intermittent missing-speed trigger was not conclusively reproduced. The affected rendering path is hardened and bounded focus/resize diagnostics are included. Physical 4K-TV hotplug/scaling remains **UNVERIFIED**; windowed/render-size checks do not certify TV behavior.
-- Physical controller sensation and wireless reconnect remain **UNVERIFIED**. Injected controls and rumble envelopes pass.
+- Physical gamepad/wheel operation, vibration sensation and wireless reconnect remain **UNVERIFIED**. Injected controls and rumble envelopes pass.
 - Startup/first-use and warmed spikes are reported above. No universal locked-60-FPS claim is made. Existing renderer texture/resource shutdown warnings remain in raw logs; they are not silently converted into functional failures or claimed fixed.
 - The .NET build passed with cached dependencies; the restricted network prevented the optional NuGet vulnerability lookup (NU1900 warnings).
-- The 32-bit NSIS loader could not run in the normal build sandbox (WinError 623). Installer compilation/isolated installer tests require the reviewed native build path; their final outcome is in `delivery.json`.
+- The 32-bit NSIS loader could not run in the normal build sandbox (WinError 623). Installer compilation/isolated installer tests require the reviewed native build path; their final outcome is in the Evidence ZIP's `delivery.json`.
 
 Extract the portable ZIP into a new folder and run `LeoRacer.exe`, or use `Play Compatibility.cmd`. Keep the full folder together. No SDK, account or network is needed. Press C/right-stick click for camera selection; V/left-stick click is the default look-back. Bigster and Duster 2024 have reviewed Cockpit views, with the approved animated wheel, stalk removal, live displays and a centred road-facing camera. Rear mirrors run at 128 x 64 / 10 Hz; side updates are gated on relevant head-look. Generic wheel button callouts use explicit button IDs where hardware-specific positions are unknown. Settings and historical records are retained; consult RELEASE_NOTES.md for the new contact namespace and custom-binding migration.
 '''

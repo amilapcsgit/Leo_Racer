@@ -166,7 +166,7 @@ def package():
         for file in sorted(QA.rglob('*')):
             parts=file.relative_to(QA).parts
             if parts[0]=='benchmark-copies' or 'profile' in parts:continue
-            if file.is_file() and file.suffix in ['.json','.log','.png','.md','.mp4']:archive.write(file,file.relative_to(QA).as_posix())
+            if file.is_file() and file.suffix in ['.json','.jsonl','.log','.png','.md','.mp4']:archive.write(file,file.relative_to(QA).as_posix())
     with zipfile.ZipFile(evidence) as archive:
         if not any(name.endswith('/process.log') for name in archive.namelist()):raise RuntimeError('Evidence archive must include raw process logs')
     for name in ['RELEASE_NOTES_'+REV+'.md','VALIDATION_'+REV+'.md']:shutil.copy2(ROOT/'docs'/name,OUT/('RELEASE_NOTES.md' if name.startswith('RELEASE') else 'TEST_REPORT.md'))
