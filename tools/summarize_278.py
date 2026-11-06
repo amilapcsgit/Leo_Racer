@@ -11,7 +11,7 @@ REQUIRED=['source-input-forward','source-core-forward','source-ranking-forward',
           'export-contacts-forward','export-capture-forward','source-capture-compatibility',
           'source-loading-forward','source-loading-compatibility','source-refinements-forward','source-refinements-compatibility',
           'export-loading-forward','export-loading-compatibility','export-refinements-forward','export-refinements-compatibility',
-          'export-ui-forward','export-ui-compatibility','export-contacts-compatibility']
+          'export-ui-forward','export-ui-compatibility','export-contacts-compatibility','export-speedometer-forward','export-speedometer-compatibility']
 
 def summarize():
     processes={name:json.loads((QA/name/'process.json').read_text(encoding='utf-8')) for name in REQUIRED}
@@ -59,7 +59,7 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 
 The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. The final source matrix includes the barrier rebound refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
 
-Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Camera selection stays in settings; per-player camera actions are exercised independently.
+Repeated exported fullscreen sessions use isolated fresh and then existing test data, with three race/restart cycles per launch and injected app focus notifications. Physical OS focus switching remains unverified. Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Camera selection stays in settings; per-player camera actions are exercised independently.
 
 ## Final refinement evidence
 

@@ -21,6 +21,8 @@ func run() -> void:
 	check(LeoAssets.configure(OS.get_environment("LEO_ASSET_ROOT"))==OK and LeoAssets.mount_packs()==OK,"Released assets mount without changes")
 	LeoVehicleLibrary.discover()
 	game=load("res://scenes/main.tscn").instantiate();game.diagnostics_mode=true;root.add_child(game);await game.initialization_finished
+	if "--speedometer-only" in OS.get_cmdline_user_args():
+		await fullscreen_speedometer();return
 	print("RELEASE278_STAGE settings")
 	settings()
 	inputs()
@@ -270,3 +272,28 @@ func checkpoint_contacts() -> void:
 		kart.advance_checkpoints(game.circuit.project(finish),finish-start,1./60.)
 		check(kart.next_gate==(2 if driving_speed==20. else 1),"Contact crossing respects self-driven motion / "+str(driving_speed))
 	kart.free()
+
+func fullscreen_speedometer() -> void:
+	var launch:="1"
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--launch="):launch=arg.trim_prefix("--launch=")
+	var original_mode:=DisplayServer.window_get_mode();var original_size:=root.size
+	game.selected_kart=game.catalog.vehicle_index(&"bigster");game.human_count=1
+	for cycle in 3:
+		if cycle>0:game.return_menu()
+		root.size=Vector2i(1920,1080);DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		await game.start_race();game.set_process(false);game.local_players[0].camera_view="chase";game.hud.show_race()
+		await settle(8)
+		var instruments: LeoRaceInstruments=game.hud.unified_hud
+		await digit_pixels(instruments)
+		# Exercise the app's focus-reset path without stealing the user's desktop focus.
+		game.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
+		game.propagate_notification(NOTIFICATION_APPLICATION_FOCUS_IN)
+		await digit_pixels(instruments)
+		await shot("speedometer-fullscreen-launch-"+launch+"-cycle-"+str(cycle))
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED);await settle(3)
+	game.save_settings()
+	DisplayServer.window_set_mode(original_mode);root.size=original_size
+	var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors,"launch":launch,"fullscreen_race_cycles":3,"focus_events":"injected app notifications; physical focus switching unverified","physical_4k_tv":"unverified","measurements":measurements}
+	FileAccess.open(output.path_join("speedometer-launch-"+launch+".json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+	print("SPEEDOMETER278 ",JSON.stringify(report));await game.quit_game(0 if errors.is_empty() else 1)

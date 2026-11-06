@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse, json, os, re, subprocess, time
 from stage_ultra_content import ROOT, sha
 TESTS={
+    'speedometer':('tests/release278_test.gd','--ultra-check=release278'),
     'loading':('tests/loading_controls278_test.gd',None),
     'refinements':('tests/refinements278_test.gd',None),
     'release278':('tests/release278_test.gd',None),
@@ -46,13 +47,14 @@ def run(kind,compat=False,export=None,extra=()):
         if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
         env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
         command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
-    render=kind in ['loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
+    render=kind in ['speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
     command+=['--position','-3200,-3200'] if render else ['--headless']
     if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--tracks='+str(assets/'tracks'),'--qa-output='+str(out)]
     if export:command.append(switch if switch else '--ultra-check='+kind)
     if kind in ['contacts','audit']:command.append('--quality25-mode='+kind)
     if kind=='capture':command.append('--quality25-mode=capture')
+    if kind=='speedometer':command.append('--speedometer-only')
     if kind=='unit':command.append('--unit-only')
     if kind=='garage':command.append('--no-captures')
     if kind=='impact':command.append('--impact-only')
