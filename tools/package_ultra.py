@@ -11,6 +11,13 @@ QA=ROOT/('build/qa'+REV)
 def files(root):return sorted(p for p in root.rglob('*') if p.is_file() and not p.name.endswith('.log'))
 def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
 def inject_checks(entries):
+    # Keep the brand available before asset mounts, including refreshes of an
+    # already-split candidate. Copying preserves original content-pack hashes.
+    for pack in ['textures/art.pck','textures/imported.pck']:
+        source=BASE/'GameAssets'/pack
+        if source.exists():
+            for key,value in city_packs.read_pack(source)[1].items():
+                if 'neon_lion.svg' in key:entries[key]=value
     # Runtime keyboard reflow reads vector groups as data, not an imported texture.
     for path in sorted((ROOT/"assets/ui/controls").glob("*.svg")):
         entries[path.relative_to(ROOT).as_posix()]=path.read_bytes()
@@ -157,6 +164,8 @@ def package():
     evidence=OUT/('LeoRacer-'+VERSION+'-Evidence.zip')
     with zipfile.ZipFile(evidence,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
         for file in sorted(QA.rglob('*')):
+            parts=file.relative_to(QA).parts
+            if parts[0]=='benchmark-copies' or 'profile' in parts:continue
             if file.is_file() and file.suffix in ['.json','.log','.png','.md','.mp4']:archive.write(file,file.relative_to(QA).as_posix())
     with zipfile.ZipFile(evidence) as archive:
         if not any(name.endswith('/process.log') for name in archive.namelist()):raise RuntimeError('Evidence archive must include raw process logs')

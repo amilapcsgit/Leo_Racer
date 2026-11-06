@@ -98,6 +98,12 @@ func contacts() -> void:
 		var projection: Dictionary=game.circuit.project(subject.position)
 		check(absf(projection.offset)<width+.2,"Physical rail contains vehicle / "+track)
 		check(subject.next_gate==gate,"Barrier contact cannot gain a checkpoint / "+track)
+		var contact_offset: float=absf(projection.offset)
+		subject.control_input.inject_test("accelerate",0.);subject.control_input.inject_test("brake",1.);subject.control_input.inject_test("left",.65)
+		for tick in 80:await physics_frame;subject._physics_process(1./60.)
+		var escaped: Dictionary=game.circuit.project(subject.position)
+		check(absf(escaped.offset)<contact_offset-.5,"Reverse and steering can leave prolonged barrier contact / "+track)
+		rows.append({"track":track,"wall_offset":contact_offset,"after_reverse_steer_offset":absf(escaped.offset)})
 	game.return_menu();await game.select_track("astra_coast");await game.start_race()
 	for kart in game.karts:kart.set_physics_process(false);kart.collision_layer=0
 	var other: LeoKart=game.karts[1]

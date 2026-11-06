@@ -72,7 +72,7 @@ def run(kind,compat=False,export=None,extra=()):
         actual=process.wait()
         if code is None:code=actual
     text=(out/'process.log').read_text(encoding='utf-8',errors='replace')
-    errors=[line for line in text.splitlines() if any(term in line for term in ['SCRIPT ERROR','Parse Error','Shader compilation failed','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
+    errors=[line for line in text.splitlines() if any(term in line for term in ['SCRIPT ERROR','Parse Error','Shader compilation failed','No loader found for resource','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
     failed=bool(re.search(r'"status"\s*:\s*"FAIL"',text))
     if not re.search(r'"status"\s*:\s*"PASS"',text):errors.append('Expected test PASS report missing')
     warnings=[line for line in text.splitlines() if any(term in line for term in ['leaked','resources still in use','Pages in use'])]

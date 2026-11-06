@@ -45,7 +45,7 @@ def write_pack(path,engine,entries):
     # An independent read verifies all offsets and hashes before delivery.
     assert read_pack(path)[1]==entries
 
-BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png'}
+BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png','assets/art/neon_lion.svg'}
 
 def category(name):
     if name.removesuffix('.remap') in ['assets/materials/automotive_paint.tres','assets/materials/automotive_glass.tres']:return 'core'

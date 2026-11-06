@@ -171,21 +171,27 @@ func run() -> void:
  print("REFINEMENTS278 ",JSON.stringify(report));await game.quit_game(0 if errors.is_empty() else 1)
 
 
-func red_pixels(image: Image) -> int:
+func probe_pixels(image: Image) -> int:
  var count:=0
  for x in range(0,image.get_width(),2):
   for y in range(0,image.get_height(),2):
    var c:=image.get_pixel(x,y)
-   if c.r>.6 and c.g<.25 and c.b<.25:count+=1
+   if c.r>.6 and c.g<.25 and c.b>.6:count+=1
  return count
 func mirror_probe(systems: LeoCockpitSystems,row: Dictionary,id: String) -> void:
  systems.update_mirror(row);await settle(2);await RenderingServer.frame_post_draw
- var before:=red_pixels(row.view.get_texture().get_image())
+ var before_image: Image=row.view.get_texture().get_image()
+ var before:=probe_pixels(before_image)
  var probe:=MeshInstance3D.new();var sphere:=SphereMesh.new();sphere.radius=.65;sphere.height=1.3;probe.mesh=sphere
- var material:=StandardMaterial3D.new();material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;material.albedo_color=Color.RED;probe.material_override=material;probe.layers=1<<11;game.world.add_child(probe)
+ var material:=StandardMaterial3D.new();material.shading_mode=BaseMaterial3D.SHADING_MODE_UNSHADED;material.albedo_color=Color.MAGENTA;probe.material_override=material;probe.layers=1<<11;game.world.add_child(probe)
  probe.global_position=row.camera.global_position-row.camera.global_basis.z*4.
  systems.update_mirror(row);await settle(3);await RenderingServer.frame_post_draw
- var actual:=red_pixels(row.view.get_texture().get_image())
- check(actual>before+8,"Mirror renders moving shared-world geometry / "+id+" / "+String(row.surface.name))
- measurements[id+"-"+String(row.surface.name)]={"baseline_red_pixels":before,"probe_red_pixels":actual,"texture_size":str(row.view.size)}
+ var after_image: Image=row.view.get_texture().get_image()
+ var actual:=probe_pixels(after_image);var changed:=0
+ for x in range(0,after_image.get_width(),2):
+  for y in range(0,after_image.get_height(),2):
+   var a: Color=before_image.get_pixel(x,y);var b: Color=after_image.get_pixel(x,y)
+   if b.r>.6 and b.g<.25 and b.b>.6 and absf(a.r-b.r)+absf(a.g-b.g)+absf(a.b-b.b)>.25:changed+=1
+ check(changed>12,"Mirror renders moving shared-world geometry / "+id+" / "+String(row.surface.name))
+ measurements[id+"-"+String(row.surface.name)]={"baseline_magenta_pixels":before,"probe_magenta_pixels":actual,"changed_probe_pixels":changed,"texture_size":str(row.view.size)}
  probe.free();systems.update_mirror(row);await settle(2)

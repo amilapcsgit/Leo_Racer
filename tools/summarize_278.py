@@ -17,6 +17,9 @@ def summarize():
     processes={name:json.loads((QA/name/'process.json').read_text(encoding='utf-8')) for name in REQUIRED}
     failed=[name for name,row in processes.items() if row['status']!='PASS']
     if failed:raise RuntimeError('Unresolved required checks: '+', '.join(failed))
+    core_hash=sha(BASE/'LeoRacer.pck')
+    stale=[name for name,row in processes.items() if name.startswith('export-') and row.get('core_sha256')!=core_hash]
+    if stale:raise RuntimeError('Export results do not match final core: '+', '.join(stale))
     performance=[]
     for path in sorted((QA/'performance').glob('*/performance.json')):
         value=json.loads(path.read_text(encoding='utf-8'))
@@ -55,7 +58,7 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 | Content | 449 checks passed |
 | UI typography, pointer, keyboard and injected controller | {ui[0]} Forward+ / {ui[1]} Compatibility checks passed |
 | Camera/presentation polish | 255 checks passed per renderer |
-| Production-controller physics matrix | 2,228 checks passed; all six racers finished 1, 3 and 10 laps on all three tracks |
+| Production vehicle-physics matrix | 2,228 checks passed; all six racers finished 1, 3 and 10 laps on all three tracks |
 
 The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. The final source matrix includes the barrier rebound refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
 
@@ -82,6 +85,14 @@ Initialization measures scene initialization after bootstrap; complete startup s
 '''
     for row in performance:
         text+=f"| {row['build']} | {row['track']} / {row['humans']} / {row['camera']} | {row['loading_ms']:.1f} | {row['first_use_peak_ms']:.1f} | {row['p50_ms']:.2f} / {row['p95_ms']:.2f} / {row['p99_ms']:.2f} | {row['peak_ms']:.1f} | {'PASS' if row['p95_ms']<=16.7 else 'MISS'} |\n"
+    text+='\n### Warm cockpit mirror workload\n\n| Renderer | Previous rear / left / right updates per second | Final rear / left / right updates per second |\n|---|---:|---:|\n'
+    for renderer in ['forward','compatibility']:
+        rates=[]
+        for build in ['2.7.8-previous-'+renderer,'2.7.8-'+renderer]:
+            row=next(r for r in performance if r['build']==build and r['camera']=='cockpit')
+            values=row['warm_mirror_updates_per_second']
+            rates.append(' / '.join(f"{values.get(name+'LiveMirror',0.):.2f}" for name in ['Rear','Left','Right']))
+        text+=f"| {renderer} | {rates[0]} | {rates[1]} |\n"
     text+='''
 ## Limits and launch instructions
 
