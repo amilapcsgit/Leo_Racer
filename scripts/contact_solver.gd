@@ -3,6 +3,12 @@ extends RefCounted
 ## Contact response shares the existing CharacterBody driving path.
 static var pair_frame := -1
 static var pairs: Dictionary={}
+const BARRIER_RESTITUTION=.18
+const MAX_REBOUND=3.
+static func barrier_response(incoming: Vector3,normal: Vector3,fresh: bool=true) -> Vector3:
+	var closing:=maxf(0.,-incoming.dot(normal))
+	var outward:=minf(MAX_REBOUND,closing*BARRIER_RESTITUTION) if fresh and closing>=2. else 0.
+	return remove_closing(incoming,normal)+normal*outward
 static func remove_closing(velocity: Vector3, normal: Vector3) -> Vector3:
 	return velocity-normal*minf(0.,velocity.dot(normal))
 static func pair_response(a: Vector3,b: Vector3,normal: Vector3) -> Array[Vector3]:
@@ -26,6 +32,9 @@ static func solve(kart: LeoKart, incoming: Vector3) -> void:
 		var relative:=incoming-(other.velocity if other else Vector3.ZERO)
 		var closing:=maxf(0.,-relative.dot(normal))
 		# Tangential contact still produces a sustained scrape event.
+		if not other:
+			var latch: String="barrier"+str(normal.snapped(Vector3.ONE*.25))
+			if closing<.15:kart.barrier_frames[latch]=frame
 		if closing<.15:
 			if relative.slide(normal).length()>1.:
 				kart.report_contact(hit.get_position(),normal,relative,other,"paint" if other else String(hit.get_collider().get_meta("contact_surface","concrete")))
@@ -40,7 +49,12 @@ static func solve(kart: LeoKart, incoming: Vector3) -> void:
 			kart.velocity=response[0];other.velocity=response[1]
 			other.contact_this_tick=true
 			other.speed=signf(other.speed)*minf(absf(other.speed),Vector2(other.velocity.x,other.velocity.z).length())
-		else:kart.velocity=remove_closing(incoming,normal)
+		else:
+			var key: String="barrier"+str(normal.snapped(Vector3.ONE*.25))
+			var fresh: bool=frame-int(kart.barrier_frames.get(key,-100))>2
+			kart.barrier_frames[key]=frame
+			kart.velocity=barrier_response(incoming,normal,fresh)
+			kart.speed=kart.velocity.dot(-kart.global_basis.z)
 		kart.speed=signf(kart.speed)*minf(absf(kart.speed),Vector2(kart.velocity.x,kart.velocity.z).length())
 		kart.report_contact(hit.get_position(),normal,relative,other,"paint" if other else String(hit.get_collider().get_meta("contact_surface","concrete")))
 		if other:other.report_contact(hit.get_position(),-normal,-relative,kart,"paint")

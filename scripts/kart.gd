@@ -598,6 +598,8 @@ func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
 	impact_feedback_cooldown = .35
 	impacted.emit(self,point,normal,clampf(absf(speed)/42.0,0,1))
 
+var barrier_frames: Dictionary={}
+
 func report_contact(point: Vector3, normal: Vector3, relative: Vector3, other: LeoKart, surface: String) -> void:
 	var closing:=maxf(0.,-relative.dot(normal))
 	var tangent:=relative.slide(normal).length()
@@ -610,7 +612,7 @@ func report_contact(point: Vector3, normal: Vector3, relative: Vector3, other: L
 	var event:={"participants":[self,other],"kart":self,"other":other,"point":point,"normal":normal,"normal_speed":closing,"tangent_speed":tangent,"surface":surface,"phase":phase}
 	contact_reported.emit(event)
 	if phase=="impact":
-		var strength:=clampf(closing/35.,0.,1.)
+		var strength:=clampf(closing/22.,0.,1.)
 		if not bool(get_parent().get("reduced_motion")):
 			dynamics.spring_velocity.y-=.35*strength;dynamics.spring_velocity.z+=global_basis.x.dot(normal)*.5*strength
 		if impact_feedback_cooldown<=0.:

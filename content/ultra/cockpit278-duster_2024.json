@@ -14,10 +14,12 @@
   "id": "duster_2024",
   "lods_generated": true,
   "merged_static_meshes": 88,
-  "pack_sha256": "5f7844f9a1ca5eeaec31874b7d0b9ec366adea346facd67d952a3903178c7af7",
-  "scene_bytes": 11637700,
+  "pack_sha256": "4a09ab91928942d5b21a04651cb378cb43ef162d6edf5fd97a3f094166ec40ac",
+  "scene_bytes": 11606816,
   "status": "PASS",
   "textures": 12,
+  "removed_stalk_triangles": 2026,
+  "column_repair_vertices": 2439,
   "original_sha256": "b1945c391848ab09cdab06808f002b47a9099abf82482e6fa9098553a7d58db0",
-  "derivative_sha256": "5f7844f9a1ca5eeaec31874b7d0b9ec366adea346facd67d952a3903178c7af7"
+  "derivative_sha256": "4a09ab91928942d5b21a04651cb378cb43ef162d6edf5fd97a3f094166ec40ac"
 }

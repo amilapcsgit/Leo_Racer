@@ -11,7 +11,14 @@ func run() -> void:
  for arg in OS.get_cmdline_user_args():
   if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
  DirAccess.make_dir_recursive_absolute(output)
- var screen:=LeoLoadingScreen.new();root.add_child(screen);screen.stage("Loading track…",72)
+ var screen:=LeoLoadingScreen.new();root.add_child(screen);screen.stage("Startup",10)
+ check(not screen.diagram.visible,"Startup guide hidden by default")
+ screen.begin_load("track-test","astra_coast");screen.stage("Track change",20)
+ check(not screen.diagram.visible,"Track change guide hidden")
+ screen.begin_load("race-test","astra_coast","","race");screen.stage("Loading track...",72)
+ check(screen.diagram.visible,"Explicit race context enables guide")
+ check(screen.spinner.text.is_empty(),"Noninteractive loading has no confirm/back hints")
+ check(screen.bar.size.y<=7.,"Loading progress bar stays slim after theme minimum sizing")
  for extent in [Vector2i(1280,720),Vector2i(1920,1080),Vector2i(3840,2160)]:
   root.size=extent
   var cases: Array=[["keyboard"],["gamepad"],["wheel"]]
@@ -35,7 +42,7 @@ func run() -> void:
    for slot in types.size():
     var panel: LeoControlMapPanel=screen.diagram.panels[slot]
     check(panel.kind==("controller" if types[slot]=="gamepad" else types[slot]),"Diagram follows this player's assigned device")
-    check(panel.callouts.size()==11,"All eleven actions have one live callout")
+    check(panel.callouts.size()==6,"Six primary actions have graphical callouts")
     check(panel.route_errors.is_empty(),"All bound actions have routable connectors: "+str(panel.route_errors))
     for row in panel.callouts:
      check(Rect2(Vector2.ZERO,panel.size).encloses(row.rect),"Callout stays inside its panel / "+row.action)
@@ -62,16 +69,19 @@ func run() -> void:
        check(not crossed,"Leader lines for different controls do not cross / "+row.action+" / "+other.action)
      if row.action=="right":check(row.key!="" and row.path.size()>1,"Steering right is present and connected")
  var r: LeoInputRouter=screen.diagram.fallback;r.active_slots=1
- var p: LeoPlayerInput=r.players[0];p.reset_defaults("keyboard");p.bindings.change_camera=[{"type":"key","index":KEY_F}]
+ var p: LeoPlayerInput=r.players[0];p.reset_defaults("keyboard");p.bindings.accelerate=[{"type":"key","index":KEY_F}]
  for i in 5:await process_frame
  var panel: LeoControlMapPanel=screen.diagram.panels[0]
- var camera: Dictionary=panel.callouts.filter(func(row):return row.action=="change_camera")[0]
- check(camera.key=="key_F" and camera.path[-1].is_equal_approx(panel.controls.key_F.point),"Saved camera remap moves label and connector endpoint to F")
- await RenderingServer.frame_post_draw;root.get_texture().get_image().save_png(output.path_join("loading-camera-remapped-F.png"))
- p.bindings.change_camera=[]
+ var camera: Dictionary=panel.callouts.filter(func(row):return row.action=="accelerate")[0]
+ check(camera.key=="key_F" and camera.path[-1].is_equal_approx(panel.controls.key_F.point),"Saved accelerator remap moves label and connector endpoint to F")
+ await RenderingServer.frame_post_draw;root.get_texture().get_image().save_png(output.path_join("loading-accelerator-remapped-F.png"))
+ p.bindings.accelerate=[]
  for i in 4:await process_frame
- panel=screen.diagram.panels[0];camera=panel.callouts.filter(func(row):return row.action=="change_camera")[0]
+ panel=screen.diagram.panels[0];camera=panel.callouts.filter(func(row):return row.action=="accelerate")[0]
  check(camera.binding.text=="Not assigned" and camera.path.is_empty(),"Unassigned action has no misleading connector")
+ screen.begin_load("general-after-race");screen.stage("General operation",50)
+ check(not screen.diagram.visible,"General loading after race clears guide visibility")
+ await RenderingServer.frame_post_draw;root.get_texture().get_image().save_png(output.path_join("loading-general-no-guide.png"))
  var calls:=[0];screen.show_failure("Test content failure",func():calls[0]+=1,func():calls[0]+=10)
  check(screen.retry.has_focus(),"Content error gives controller focus to retry")
  var event:=InputEventJoypadButton.new();event.button_index=JOY_BUTTON_B;event.pressed=true;screen._input(event)

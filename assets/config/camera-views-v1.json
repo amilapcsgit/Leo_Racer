@@ -2,31 +2,31 @@
   "bigster": {
     "cockpit": true,
     "eye": [
-      -0.3663,
-      1.23,
+      0,
+      1.32,
       0.16
     ],
     "rotation_degrees": [
-      -3.0,
-      0.0,
-      0.0
+      0,
+      0,
+      0
     ],
     "space": "resolved_vehicle",
-    "note": "Driver-eye anchor above the authored left-hand seat; reviewed against the runtime Bigster cockpit."
+    "note": "Reviewed shared cabin, road-facing camera centred on vehicle longitudinal axis."
   },
   "duster_2024": {
     "cockpit": true,
     "eye": [
-      -0.3663,
-      1.23,
+      0,
+      1.32,
       0.16
     ],
     "rotation_degrees": [
-      -3.0,
-      0.0,
-      0.0
+      0,
+      0,
+      0
     ],
     "space": "resolved_vehicle",
-    "note": "Shared reviewed Bigster cabin fitted to Duster 2024; exterior and door geometry retained."
+    "note": "Reviewed shared cabin, road-facing camera centred on vehicle longitudinal axis."
   }
 }

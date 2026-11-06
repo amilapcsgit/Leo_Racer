@@ -41,7 +41,7 @@ func run() -> void:
  var sample:=LeoPlayerInput.new("gamepad");sample.bindings.change_camera=[{"type":"button","index":JOY_BUTTON_LEFT_SHOULDER}]
  var restore:=LeoPlayerInput.new("gamepad");restore.restore(sample.serialize())
  check(restore.bindings.change_camera[0].index==JOY_BUTTON_LEFT_SHOULDER,"Custom gamepad camera binding survives save/restore")
- game.loading.stage("Your controller settings",50);await shot("loading-controller-map");game.loading.hide()
+ game.loading.begin_load("qa-race","astra_coast","","race");game.loading.stage("Your controller settings",50);await shot("loading-controller-map");game.loading.hide()
  var h:=LeoHaptics.new();root.add_child(h)
  var now:=[0.];var sent: Array=[]
  h.clock=func():return now[0]
@@ -130,11 +130,23 @@ func run() -> void:
   for mirror in systems.mirrors:
    check(mirror.surface.has_meta("reviewed_surface"),"Mirror conforms to authored glass / "+String(id)+" / "+String(mirror.surface.name))
    await mirror_probe(systems,mirror,String(id))
+  check(systems.mirrors[0].view.size==Vector2i(128,64),"Rear mirror stays low resolution")
+  for row in systems.mirrors:row.renders=0
+  systems.set_meta("next_mirror",0.)
+  systems._process(.11)
+  check(systems.mirrors[0].renders==1 and systems.mirrors[1].renders==0 and systems.mirrors[2].renders==0,"Forward view updates rear mirror only")
+  check(absf((game.player.global_transform.affine_inverse()*game.local_players[0].camera.global_position).x)<.05,"Default cockpit is centred on car")
   var origin: Vector3=game.local_players[0].camera.global_position
   game.input_router.players[0].inject_test("camera_right",1.);game.update_local_camera(game.local_players[0],1.)
   check(origin.distance_to(game.local_players[0].camera.global_position)<.001,"Cockpit head-look keeps the driver-eye position inside the cabin")
+  for row in systems.mirrors:row.renders=0
+  systems.set_meta("next_mirror",0.);systems._process(.11)
+  check(systems.mirrors[2].renders==1 and systems.mirrors[1].renders==0,"Head-look updates only the visible side mirror")
   await shot(String(id)+"-look-right")
   game.input_router.players[0].inject_test("camera_right",0.);game.local_players[0].camera_rig.reset();game.update_local_camera(game.local_players[0],1.)
+  for row in systems.mirrors:row.renders=0
+  systems.set_meta("next_mirror",0.);systems._process(.11)
+  check(systems.mirrors[1].renders==0 and systems.mirrors[2].renders==0,"Side mirror updates stop after returning forward")
   await shot(String(id)+"-cockpit")
  if "--capture-countdown" in OS.get_cmdline_user_args():
   print("REFINE_STAGE countdown-film");Engine.max_fps=30
@@ -174,6 +186,6 @@ func mirror_probe(systems: LeoCockpitSystems,row: Dictionary,id: String) -> void
  probe.global_position=row.camera.global_position-row.camera.global_basis.z*4.
  systems.update_mirror(row);await settle(3);await RenderingServer.frame_post_draw
  var actual:=red_pixels(row.view.get_texture().get_image())
- check(actual>before+25,"Mirror renders moving shared-world geometry / "+id+" / "+String(row.surface.name))
+ check(actual>before+8,"Mirror renders moving shared-world geometry / "+id+" / "+String(row.surface.name))
  measurements[id+"-"+String(row.surface.name)]={"baseline_red_pixels":before,"probe_red_pixels":actual,"texture_size":str(row.view.size)}
  probe.free();systems.update_mirror(row);await settle(2)

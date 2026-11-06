@@ -136,6 +136,28 @@ func warmup_scene(root: Node3D, disk: String) -> String:
 	var packed:=PackedScene.new();packed.pack(proxies)
 	var result:=ResourceSaver.save(packed,disk);proxies.free()
 	return vehicle_prefix+"shader_warmup.scn" if result==OK else ""
+func remove_cockpit_stalks(root: Node3D) -> int:
+	var removed:=0
+	for node in root.find_children("*","MeshInstance3D",true,false):
+		if String(node.name)!="dust25_dash":continue
+		var mesh:=ArrayMesh.new()
+		for surface in node.mesh.get_surface_count():
+			var arrays: Array=node.mesh.surface_get_arrays(surface)
+			var vertices: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+			var indices: PackedInt32Array=arrays[Mesh.ARRAY_INDEX];var kept:=PackedInt32Array()
+			for i in range(0,indices.size(),3):
+				var stalk:=true
+				for j in 3:
+					var p: Vector3=vertices[indices[i+j]]
+					var right:=p.x>=.140 and p.x<=.277 and p.y>=.833 and p.y<=.945 and p.z>=.437 and p.z<=.558
+					if not right:stalk=false;break
+				if stalk:removed+=1
+				else:
+					for j in 3:kept.append(indices[i+j])
+			if kept.is_empty():continue
+			arrays[Mesh.ARRAY_INDEX]=kept;mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays);mesh.surface_set_material(mesh.get_surface_count()-1,node.get_active_material(surface))
+		node.mesh=mesh
+	return removed
 func recess_cockpit_column(root: Node3D) -> int:
 	# Reviewed interior-only shroud: the supplied reversed wheel left its fixed
 	# column cover protruding in front of the now-correct driver-facing rim.
@@ -181,7 +203,9 @@ func run() -> void:
 			var part:=node.duplicate() as Node3D;part.transform=relative_pose(node,donor)
 			shared.add_child(part);part.owner=root;own_children(part,root)
 		donor.free()
-	if data.get("ultra_cockpit",false):data.column_repair_vertices=recess_cockpit_column(root)
+	if data.get("ultra_cockpit",false):
+		data.removed_stalk_triangles=remove_cockpit_stalks(root)
+		data.column_repair_vertices=recess_cockpit_column(root)
 	preload("res://scripts/catalog/vehicle_finish.gd").install(root,String(data.get("visual_profile","")))
 	preload("res://scripts/catalog/vehicle_surface_profile.gd").install(root,String(data.id))
 	batch_static(root,data)

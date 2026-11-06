@@ -75,29 +75,38 @@ func active() -> bool:
  var locals: Array=kart.get_parent().local_players
  return kart.local_slot<locals.size() and not locals[kart.local_slot].photo and locals[kart.local_slot].kart==kart and LeoCameraViews.effective(locals[kart.local_slot])=="cockpit"
 func apply_quality() -> void:
- var quality: int=clampi(int(kart.get_parent().graphics_quality),0,2)
- if quality==last_quality:return
- last_quality=quality
  for row in mirrors:
-  row.view.size=[Vector2i(128,64),Vector2i(192,96),Vector2i(256,128)][quality]
-  row.camera.far=[80.,120.,180.][quality]
+  row.view.size=Vector2i(128,64);row.camera.far=80.
+func mirror_visible(row: Dictionary) -> bool:
+ if row.surface.name=="RearLiveMirror":return true
+ var local: LeoLocalPlayer=kart.get_parent().local_players[kart.local_slot]
+ var yaw: float=local.camera_rig.head_offset.x
+ if absf(yaw)<deg_to_rad(12.):return false
+ if (row.surface.name=="LeftLiveMirror")!=(yaw>0.):return false
+ var camera: Camera3D=local.camera
+ var point: Vector3=row.surface.global_transform*row.surface.get_aabb().get_center()
+ if camera.is_position_behind(point):return false
+ var screen:=camera.unproject_position(point)
+ return camera.get_viewport().get_visible_rect().grow(24.).has_point(screen)
 func update_mirror(row: Dictionary) -> void:
  apply_quality()
  var pose:=kart.visual.global_transform;var camera: Camera3D=row.camera
  camera.global_position=pose*row.eye;camera.look_at(camera.global_position+pose.basis*row.direction,pose.basis.y)
  row.view.render_target_update_mode=SubViewport.UPDATE_ONCE;row.renders+=1
 func warm() -> void:
- for row in mirrors:update_mirror(row)
+ for row in mirrors:
+  if row.surface.name=="RearLiveMirror":update_mirror(row)
  for row in screens:row.canvas.queue_redraw();row.view.render_target_update_mode=SubViewport.UPDATE_ONCE
  warmed=true
 func _process(dt: float) -> void:
  if not is_instance_valid(kart):return
  clock+=dt
  var enabled:=active()
- for row in mirrors:row.surface.visible=enabled
+ for row in mirrors:row.surface.visible=enabled and mirror_visible(row)
  if not enabled:return
  for row in screens:
   if clock>=float(row.next):row.canvas.queue_redraw();row.view.render_target_update_mode=SubViewport.UPDATE_ONCE;row.next=clock+.08
- var hz:=10. if kart.get_parent().human_count==2 else 15.
  if clock>=float(get_meta("next_mirror",0.)):
-  update_mirror(mirrors[cursor]);cursor=(cursor+1)%mirrors.size();set_meta("next_mirror",clock+1./(hz*3.))
+  for row in mirrors:
+   if mirror_visible(row):update_mirror(row)
+  set_meta("next_mirror",clock+.1)

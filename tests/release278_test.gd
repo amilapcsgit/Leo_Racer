@@ -144,6 +144,12 @@ func inputs() -> void:
 	check(keyboard.bindings.look_back[0].index==KEY_C and keyboard.bindings.change_camera.is_empty(),"Custom bindings remain intact when C is occupied")
 
 func contacts() -> void:
+	for closing in [0.,1.,2.,10.,50.]:
+		var incoming:=Vector3(-closing,0,12.)
+		var response:=LeoContactSolver.barrier_response(incoming,Vector3.RIGHT)
+		check(response.x>=0. and response.x<=3. and is_equal_approx(response.z,12.),"Barrier rebound is bounded and preserves tangent")
+		check(response.length_squared()<=incoming.length_squared()+.001,"Barrier rebound cannot add energy")
+		check(LeoContactSolver.barrier_response(incoming,Vector3.RIGHT,false).x==0.,"Sustained contact does not repeatedly rebound")
 	var max_energy_delta:=0.
 	for a in [Vector3(30,0,0),Vector3(30,0,10),Vector3.ZERO]:
 		for b in [Vector3(-20,0,0),Vector3(10,0,4),Vector3.ZERO]:

@@ -562,7 +562,7 @@ func start_race() -> void:
 	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · %d laps" % active_laps
-	if state!="loading":loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition))
+	loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition),"race")
 	state="loading";loading.stage("Preparing racers…",15)
 	if is_instance_valid(hud.garage_selector):
 		hud.garage_selector.home_preview=false;await hud.garage_selector.scheduler.pause_for_race();hud.garage_selector.assembly=null;hud.garage_selector.sync_visibility()

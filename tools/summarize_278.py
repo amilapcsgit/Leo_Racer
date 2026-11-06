@@ -8,7 +8,10 @@ REQUIRED=['source-input-forward','source-core-forward','source-ranking-forward',
           'source-ui-forward','source-ui-compatibility','source-polish-forward','source-polish-compatibility',
           'source-content-forward','source-unit-forward','source-release278-compatibility',
           'export-core-forward','export-unit-forward','export-release278-forward','export-release278-compatibility',
-          'export-contacts-forward','export-capture-forward','source-capture-compatibility']
+          'export-contacts-forward','export-capture-forward','source-capture-compatibility',
+          'source-loading-forward','source-loading-compatibility','source-refinements-forward','source-refinements-compatibility',
+          'export-loading-forward','export-loading-compatibility','export-refinements-forward','export-refinements-compatibility',
+          'export-ui-forward','export-ui-compatibility','export-contacts-compatibility']
 
 def summarize():
     processes={name:json.loads((QA/name/'process.json').read_text(encoding='utf-8')) for name in REQUIRED}
@@ -21,11 +24,16 @@ def summarize():
     if len(performance)!=12:raise RuntimeError('Expected all twelve matched/default and new-view performance cases')
     report={'status':'FUNCTIONAL_PASS','processes':processes,'performance':performance,
             'performance_goal_ms':16.7,'performance_misses':[r for r in performance if r['p95_ms']>16.7],
-            'core_sha256':sha(BASE/'LeoRacer.pck'),'physical_4k_tv':'UNVERIFIED','physical_controllers':'UNVERIFIED'}
+            'core_sha256':sha(BASE/'LeoRacer.pck'),'physical_4k_tv':'UNVERIFIED','physical_controllers':'UNVERIFIED','physical_wheel':'UNVERIFIED'}
     (QA/'summary.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     features=json.loads((QA/'export-release278-forward/release278.json').read_text(encoding='utf-8'))
     units=json.loads((QA/'export-unit-forward/release278-unit.json').read_text(encoding='utf-8'))
     ui=[json.loads((QA/('source-ui-'+r)/'ui.json').read_text(encoding='utf-8'))['checks'] for r in ['forward','compatibility']]
+    loading=json.loads((QA/'export-loading-forward/loading.json').read_text(encoding='utf-8'))
+    refinements=json.loads((QA/'export-refinements-forward/refinements278.json').read_text(encoding='utf-8'))
+    contacts=json.loads((QA/'export-contacts-forward/contacts.json').read_text(encoding='utf-8'))
+    audio=json.loads((QA/'audio-audit.json').read_text(encoding='utf-8'))
+    assert audio['status']=='PASS'
     text=f'''# Leo Racer 2.7.8 validation
 
 All {len(REQUIRED)} required functional processes passed. Raw logs, screenshots, collision videos and machine-readable results are in the Evidence ZIP. Installer/portable preservation results are recorded separately in `delivery.json` after packaging.
@@ -40,15 +48,26 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 | Core | 54 checks passed in source and native export |
 | New settings/camera/contact regressions | {features['checks']} native checks passed per renderer |
 | Focused migration/metadata/budget checks | {units['checks']} native checks passed; included in headless CI |
-| Collision contacts / vehicle audit | 226 / 153 checks passed |
+| Collision contacts / vehicle audit | {contacts["checks"]} / 153 checks passed |
+| Compact race-loading guide | {loading["checks"]} native checks passed; all ordered device combinations at 720p, 1080p and rendered 4K |
+| Cockpits, controller A, throttle, mirrors and playlist | {refinements["checks"]} native checks passed per renderer |
+| Offline audio | 36 recordings decoded and checked against bundled hashes; peaks below clipping |
 | Content | 449 checks passed |
 | UI typography, pointer, keyboard and injected controller | {ui[0]} Forward+ / {ui[1]} Compatibility checks passed |
 | Camera/presentation polish | 255 checks passed per renderer |
 | Production-controller physics matrix | 2,228 checks passed; all six racers finished 1, 3 and 10 laps on all three tracks |
 
-The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. It precedes the final glancing-contact gate refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
+The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. The final source matrix includes the barrier rebound refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
 
 Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Camera selection stays in settings; per-player camera actions are exercised independently.
+
+## Final refinement evidence
+
+The compact guide is explicitly race-only. Startup, track changes and a subsequent general operation remain guide-free. Six primary actions retain connectors; secondary actions show saved bindings, including custom and unassigned values. Keyboard artwork is derived at runtime from supplied SVG groups to show assigned driving keys without leaders across unrelated keys. Original SVGs and anchors remain intact.
+
+Physical barrier tests on all three tracks retain containment and checkpoint integrity while producing bounded outward separation under held throttle. Vehicle-pair tests cover head-on, rear-end and side impacts. Changed collision behavior uses the existing 2.7.8 contact namespace.
+
+Shared-world mirror probes confirm live geometry reaches every mirror texture. Forward-view and head-look tests verify update gating. Countdown videos combine actual rendered frames with bundled announcement recordings on the diagnostic cue timeline; they are not a loopback recording of the full game audio mix.
 
 ## Measured performance
 
@@ -70,9 +89,9 @@ Initialization measures scene initialization after bootstrap; complete startup s
 - Physical controller sensation and wireless reconnect remain **UNVERIFIED**. Injected controls and rumble envelopes pass.
 - Startup/first-use and warmed spikes are reported above. No universal locked-60-FPS claim is made. Existing renderer texture/resource shutdown warnings remain in raw logs; they are not silently converted into functional failures or claimed fixed.
 - The .NET build passed with cached dependencies; the restricted network prevented the optional NuGet vulnerability lookup (NU1900 warnings).
-- Local build sandboxing rejected the 32-bit NSIS loader with WinError 623. Installer compilation/isolated installer tests require the reviewed native build path; their final outcome is in `delivery.json`.
+- The 32-bit NSIS loader could not run in the normal build sandbox (WinError 623). Installer compilation/isolated installer tests require the reviewed native build path; their final outcome is in `delivery.json`.
 
-Extract the portable ZIP into a new folder and run `LeoRacer.exe`, or use `Play Compatibility.cmd`. Keep the full folder together. No SDK, account or network is needed. Press C/right-stick click for camera selection; V/left-stick click is the default look-back. Bigster has the reviewed Cockpit view. Settings and historical records are retained; consult RELEASE_NOTES.md for the new contact namespace and custom-binding migration.
+Extract the portable ZIP into a new folder and run `LeoRacer.exe`, or use `Play Compatibility.cmd`. Keep the full folder together. No SDK, account or network is needed. Press C/right-stick click for camera selection; V/left-stick click is the default look-back. Bigster and Duster 2024 have reviewed Cockpit views, with the approved animated wheel, stalk removal, live displays and a centred road-facing camera. Rear mirrors run at 128 x 64 / 10 Hz; side updates are gated on relevant head-look. Generic wheel button callouts use explicit button IDs where hardware-specific positions are unknown. Settings and historical records are retained; consult RELEASE_NOTES.md for the new contact namespace and custom-binding migration.
 '''
     (ROOT/'docs/VALIDATION_278.md').write_text(text,encoding='utf-8')
     print('VALIDATION278_SUMMARIZED',len(processes),'processes',len(performance),'performance cases',len(report['performance_misses']),'p95 misses',flush=True)

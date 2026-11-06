@@ -4,14 +4,15 @@
 - New Graphics, Audio, Controls and Accessibility tabs. Added 720p/1080p/native rendering choices, timed display confirmation, AA/glow controls, optional world-only speed blur and Forward+ FSR 2 upscaling.
 - Settings-based camera selection and remappable action: Chase, Ghost and reviewed Bigster/Duster 2024 Cockpit. Camera preferences are independent per player. Ghost hides your car only in your viewport.
 - Reduced Motion retains gentle turn lean and braking/acceleration pitch while suppressing camera motion, impact jolts, bounce and motion blur.
-- Reviewed two-part Bigster/Duster collision hulls, inelastic contact/sliding, per-tick vehicle-pair resolution and protection against moving-platform launch impulses and contact-driven checkpoint gains.
+- Reviewed two-part Bigster/Duster collision hulls, bounded barrier rebound and sliding, per-tick vehicle-pair resolution and protection against moving-platform launch impulses and contact-driven checkpoint gains.
+- Barrier impacts remove incoming motion and add bounded outward separation (0.18 restitution, up to 3 m/s), preserving glancing movement without repeating strong rebounds during sustained contact.
 - Shared contact events drive material-specific effects, audio and rumble. Surface-aligned mesh skid marks work in both renderers; global effect budgets remain bounded.
 - Existing settings, custom bindings, historical records, portable vehicle files and source assets are preserved.
 
 ## Final refinements
 
-- Corrected the driver-facing Bigster steering wheel, with animated steering and a shared fitted cockpit for Duster 2024. Live RPM/speed/gear/boost displays, track navigation and real rear/side mirrors work in both renderers. The right stick provides bounded cockpit head-look.
-- Standard controller A confirmation, controller-only menu operation and saved-binding diagrams while loading, using the user-supplied controller/keyboard/wheel SVG pack. Exactly one selected-device diagram per player uses live action labels, routed leaders, endpoint dots and highlights. Split-screen has a dedicated compact HUD layout. Stronger bounded rumble with a settings test.
+- Corrected the driver-facing Bigster steering wheel, with animated steering and a shared fitted cockpit for Duster 2024. Live RPM/speed/gear/boost displays, track navigation and real rear/side mirrors work in both renderers. The cockpit defaults to a road-facing view centred on the car. Floating stalks are removed; the approved wheel orientation is retained. The right stick or mouse provides bounded cockpit head-look. Rear mirrors run at 128 x 64 / 10 Hz; side mirrors update only while looking toward them.
+- Standard controller A confirmation, controller-only menu operation and saved-binding diagrams while loading, using the user-supplied controller/keyboard/wheel SVG pack. The compact translucent guide appears only when entering a race, with exactly one selected-device diagram per player. Six primary actions use live labels, short routed leaders, endpoint dots and highlights; secondary actions use saved-binding glyphs. Startup, track changes and general loads omit the guide. Split-screen has a dedicated compact HUD layout. Stronger bounded rumble with a settings test.
 - Held throttle revs before GO and continues accelerating afterward. The analog instrument shows engine RPM; digital speed remains actual km/h.
 - Spoken female countdown, extruded 3D letters and Rokojori-sequenced effects, with restrained Reduced Motion presentation and separate Announcer volume.
 - Three licensed CC0 instrumental racing tracks with shuffle/crossfade, refreshed original engine/tire/boost layers and licensed impact sounds. All audio is bundled for offline use; see GameAssets/licenses/racing-audio-manifest.json.

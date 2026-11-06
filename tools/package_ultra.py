@@ -11,6 +11,9 @@ QA=ROOT/('build/qa'+REV)
 def files(root):return sorted(p for p in root.rglob('*') if p.is_file() and not p.name.endswith('.log'))
 def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
 def inject_checks(entries):
+    # Runtime keyboard reflow reads vector groups as data, not an imported texture.
+    for path in sorted((ROOT/"assets/ui/controls").glob("*.svg")):
+        entries[path.relative_to(ROOT).as_posix()]=path.read_bytes()
     # Release templates intentionally ignore --script. Opt-in bootstrap probes
     # adapt the same SceneTree tests to Nodes, without a second test implementation.
     mapping={'loading':'loading_controls278_test','refinements':'refinements278_test','perf278':'release278_performance','release278':'release278_test','finish':'ultra_finish_test','core':'ultra_core_test','visual':'ultra_visual_test','previews':'ultra_preview_test','physics':'ultra_physics_test','garage':'release260_runtime_test','contacts':'release260_collision_test','audit':'release260_collision_test','impact':'lighting_world_test'}

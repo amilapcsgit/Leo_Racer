@@ -81,12 +81,20 @@ func contacts() -> void:
 		for kart in game.karts:kart.set_physics_process(false);kart.collision_layer=0
 		subject=game.player;subject.collision_layer=2;subject.active=true;subject.auto_drive=false;subject.control_input=LeoPlayerInput.new()
 		var station: float=game.circuit.length*.12;var width: float=game.circuit.width_at(station)*.5
-		subject.place(station,width-subject.definition.collision_size.x*.5-.4)
+		subject.place(station,width-subject.definition.collision_size.z*.5-.7)
 		var outward: Vector3=game.circuit.frame_at(station).x
 		subject.rotation.y=atan2(-outward.x,-outward.z);subject.speed=40.;subject.velocity=outward*40.
 		subject.control_input.inject_test("accelerate",1.)
 		var gate:=subject.next_gate
-		for tick in 30:await physics_frame;subject._physics_process(1./60.)
+		var outward_min:=0.;var rebounds:=0;var had_contact:=false
+		for tick in 120:
+			await physics_frame;subject._physics_process(1./60.)
+			if subject.contact_this_tick:had_contact=true
+			if had_contact:outward_min=minf(outward_min,subject.velocity.dot(outward))
+			if subject.contact_this_tick and subject.velocity.dot(outward)<-.5:rebounds+=1
+		check(outward_min<-.5,"Physical barrier gives visible outward separation / "+track)
+		check(rebounds<=4,"Sustained throttle does not cause repeated strong wall bouncing / "+track)
+		rows.append({"track":track,"outward_min":outward_min,"strong_rebound_ticks":rebounds})
 		var projection: Dictionary=game.circuit.project(subject.position)
 		check(absf(projection.offset)<width+.2,"Physical rail contains vehicle / "+track)
 		check(subject.next_gate==gate,"Barrier contact cannot gain a checkpoint / "+track)
