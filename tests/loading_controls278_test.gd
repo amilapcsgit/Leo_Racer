@@ -79,6 +79,8 @@ func run() -> void:
  for i in 4:await process_frame
  panel=screen.diagram.panels[0];camera=panel.callouts.filter(func(row):return row.action=="accelerate")[0]
  check(camera.binding.text=="Not assigned" and camera.path.is_empty(),"Unassigned action has no misleading connector")
+ screen.hide();screen.stage("General stage after hidden race",50)
+ check(not screen.diagram.visible,"Hiding a completed load clears race context for later generic stages")
  screen.begin_load("general-after-race");screen.stage("General operation",50)
  check(not screen.diagram.visible,"General loading after race clears guide visibility")
  await RenderingServer.frame_post_draw;root.get_texture().get_image().save_png(output.path_join("loading-general-no-guide.png"))

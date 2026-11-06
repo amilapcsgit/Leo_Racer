@@ -44,6 +44,11 @@ func _ready() -> void:
  spinner=words(design,Vector2(64,844),Vector2(900,28),"",18,Color("b0c5d2"))
  retry=Button.new();retry.text="Try Again";retry.position=Vector2(960,839);retry.size=Vector2(270,48);retry.hide();design.add_child(retry)
  back=Button.new();back.text="Choose Another Track";back.position=Vector2(1246,839);back.size=Vector2(290,48);back.hide();design.add_child(back)
+ visibility_changed.connect(reset_hidden_context)
+func reset_hidden_context() -> void:
+ if not visible:
+  race_loading=false
+  if diagram:diagram.hide();player_badge.hide()
 func _process(dt: float) -> void:
  elapsed+=dt
  if not visible:return
