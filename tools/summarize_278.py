@@ -48,7 +48,7 @@ The branch starts from 2.7.1 commit `a34196e`. Original release packages and syn
 
 The free-space Bigster replay against the original 2.7.1 driving function recorded zero speed, heading, velocity and boost-fuel differences. The physics matrix uses production collision shapes and omits vehicle presentation for repeatability. It precedes the final glancing-contact gate refinement; focused native regressions additionally verify that stationary/underpowered pushes cannot earn a gate while a self-driven glancing crossing still counts. Native collision tests and both renderer camera/settings suites run with SDK paths removed.
 
-Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Split-screen camera buttons were exercised through real GUI pointer delivery.
+Digital speed was checked through actual pixel differences for 000, 099, 199 and 249, not only label properties. Screenshots include 720p/1080p settings, Chase/Ghost/Cockpit, split-screen, reviewed Bigster/Duster hull overlays and night-time visibility. The shared lighting-receiver layer cannot reveal the hidden Ghost car. Camera selection stays in settings; per-player camera actions are exercised independently.
 
 ## Measured performance
 

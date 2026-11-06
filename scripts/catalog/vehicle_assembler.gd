@@ -37,6 +37,7 @@ static func finish_body(root: Node3D,vehicle: VehicleDefinition) -> void:
 	if not body.get_meta("finish_prepared",false):preload("res://scripts/catalog/vehicle_finish.gd").install(body,vehicle.visual_profile)
 	if not body.get_meta("surface_prepared",false):preload("res://scripts/catalog/vehicle_surface_profile.gd").install(body,String(vehicle.id))
 	LeoVehicleFeatures.install(body,vehicle)
+	LeoCockpitSteering.install(body,vehicle)
 
 static func assemble_async(vehicle: VehicleDefinition,racer: DriverDefinition,tree: SceneTree,current: Callable,preview_scene: PackedScene=null) -> Node3D:
 	if not current.is_valid() or not current.call():return null

@@ -59,13 +59,14 @@ static func build(front: LeoFrontend) -> void:
 	var audio: VBoxContainer=pages.Audio
 	front.label(audio,"AUDIO MIX",26,Color("67d6db"))
 	front.add_slider(audio,"Master",game.master_volume,game.set_volume)
-	for bus in ["Music","Effects","UI","Voice"]:
+	for bus in ["Music","Effects","UI","Voice","Announcer"]:
 		var name: String=bus
 		front.add_slider(audio,bus,float(front.audio.levels[bus]),func(value):front.audio.set_level(name,value))
 	front.add_toggle(audio,"Music",game.music_enabled,game.set_music)
 	front.add_toggle(audio,"Spoken cheers",front.audio.voice_enabled,front.audio.set_voice)
 	var controls: VBoxContainer=pages.Controls
 	front.label(controls,"DRIVING & CAMERA",26,Color("67d6db"))
+	front.label(controls,"Cockpit: right stick looks around the cabin and side mirrors. Camera look directions can be rebound below.",20,Color("b9c7d6"))
 	front.action(controls,"Configure Buttons & Devices",front.show_controls)
 	for slot in game.human_count:
 		var index: int=slot
@@ -77,7 +78,7 @@ static func build(front: LeoFrontend) -> void:
 		var camera:=choice(front,controls,"Player %d camera"%(slot+1),names,maxi(0,options.find(local.camera_view)))
 		camera.item_selected.connect(func(selected):
 			game.local_players[index].camera_view=options[selected];game.local_players[index].camera_rig.reset();game.local_players[index].camera_transition=.16;game.save_settings())
-		if not "cockpit" in options:front.label(controls,"Cockpit is available only on reviewed detailed interiors, including Bigster.",20,Color("b9c7d6"))
+		if not "cockpit" in options:front.label(controls,"Cockpit is available only on reviewed detailed interiors, including Bigster and Duster 2024.",20,Color("b9c7d6"))
 	var fov:=SpinBox.new();fov.min_value=55;fov.max_value=75;fov.step=1;fov.value=game.base_camera_fov
 	row(front,controls,"Field of view",fov);fov.value_changed.connect(game.set_camera_fov)
 	var access: VBoxContainer=pages.Accessibility

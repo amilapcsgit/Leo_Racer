@@ -43,7 +43,7 @@ def main():
     if not release:release=api('/releases','POST',{'tag_name':tag,'target_commitish':commit,'name':a.title or 'Leo Racer '+version+' — Modular Content','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':False})
     existing={row['name']:row for row in release['assets']}
     if not release['draft']:
-        assert all(row['name'] in existing and existing[row['name']]['size']==row['bytes'] for _,row in files),'Public release differs; refusing replacement'
+        assert all(row['name'] in existing and existing[row['name']]['size']==row['bytes'] and existing[row['name']].get('digest')=='sha256:'+row['sha256'] for _,row in files),'Public release differs; refusing replacement'
         print('RELEASE_ALREADY_PUBLIC',release['html_url']);return
     for file,row in files:
         old=existing.get(file.name)

@@ -6,7 +6,7 @@ var intensity := 1.
 var channels: Dictionary = {}
 var output: Callable
 var clock: Callable
-const SHAPES={"bump":Vector3(.22,.12,.065),"landing":Vector3(.35,.85,.22),"crash":Vector3(.65,1.,.30),"scrape":Vector3(.28,.18,.08),"identify":Vector3(.55,.75,.26)}
+const SHAPES={"bump":Vector3(.22,.12,.065),"landing":Vector3(.35,.85,.22),"crash":Vector3(.65,1.,.30),"scrape":Vector3(.28,.18,.08),"identify":Vector3(1.,1.,.65)}
 func _ready() -> void:
 	process_mode=Node.PROCESS_MODE_ALWAYS
 	add_to_group("haptics")
@@ -21,7 +21,8 @@ func send(device: int,weak: float,strong: float,duration: float) -> void:
 func play(device: int,kind: String,strength: float=1.) -> void:
 	if device<0 or not enabled or intensity<=0.:return
 	var shape: Vector3=SHAPES.get(kind,SHAPES.bump)
-	var gain:=clampf(strength,0.,1.)*clampf(intensity,0.,1.)
+	# Lift weak source events while preserving a linear user intensity control.
+	var gain:=sqrt(clampf(strength,0.,1.))*clampf(intensity,0.,1.)
 	if gain<=0.:return
 	var t:=now()
 	if not channels.has(device):channels[device]=[]
@@ -33,7 +34,7 @@ func play(device: int,kind: String,strength: float=1.) -> void:
 	while lane.size()>5:lane.pop_front()
 	tick()
 func tick() -> void:
-	if not enabled:stop_all();return
+	if not enabled or intensity<=0.:stop_all();return
 	var t:=now()
 	for device in channels.keys():
 		var lane: Array=channels[device]
@@ -41,7 +42,7 @@ func tick() -> void:
 		for i in range(lane.size()-1,-1,-1):
 			var event: Dictionary=lane[i]
 			if t>=float(event.end):lane.remove_at(i);continue
-			var envelope:=clampf((float(event.end)-t)/(float(event.end)-float(event.start)),0.,1.)
+			var envelope:=clampf((float(event.end)-t)/minf(.06,float(event.end)-float(event.start)),0.,1.)
 			weak=maxf(weak,float(event.weak)*envelope);strong=maxf(strong,float(event.strong)*envelope)
 			remaining=maxf(remaining,float(event.end)-t)
 		if lane.is_empty():stop_device(device)

@@ -1,6 +1,6 @@
 class_name LeoVehicleAudio
 extends Node
-## Original generated loop layers; no external recordings or runtime dependencies.
+## Offline-authored loop layers with a deterministic legacy fallback.
 static var streams: Dictionary = {}
 var kart: LeoKart
 var layers: Array[AudioStreamPlayer] = []
@@ -18,15 +18,23 @@ var cover_timer := 0.0
 
 static func profile(vehicle: VehicleDefinition) -> String:
 	var key := String(vehicle.id)
-	if key in ["bigster","duster"]:return "suv"
+	if key in ["bigster","duster","duster_2024"]:return "suv"
 	if vehicle.electric_boost or key=="hover" or "byd" in key or "concept" in key or "future" in key or "h2_speed" in key:return "electric"
 	if key=="race_bus":return "bus"
-	if key in ["bigster","duster"] or LeoRaceRules.balance().imports.get(key,"") in ["duster","utility"]:return "suv"
+	if key in ["bigster","duster","duster_2024"] or LeoRaceRules.balance().imports.get(key,"") in ["duster","utility"]:return "suv"
 	var group: String=LeoRaceRules.balance().imports.get(key,"")
 	if key in ["race_tuk","colombo_tuk","pony","aqua","pink","blue"] or group=="compact" or (group.is_empty() and not LeoRaceRules.balance().vehicles.has(key)):return "small"
 	return "sport"
 
-static func loop(kind: String, layer: int) -> AudioStreamWAV:
+static func loop(kind: String, layer: int) -> AudioStream:
+	var path:="res://assets/audio/racing278/"+kind+str(layer)+".ogg"
+	if ResourceLoader.exists(path):
+		var recorded:=load(path) as AudioStreamOggVorbis
+		recorded.loop=true
+		return recorded
+	return legacy_loop(kind,layer)
+
+static func legacy_loop(kind: String, layer: int) -> AudioStreamWAV:
 	var key := kind+str(layer)
 	if streams.has(key):return streams[key]
 	var stream := AudioStreamWAV.new()
@@ -77,18 +85,21 @@ func update(dt: float) -> void:
 	elif desired_gear<gear and ratio<float(gear-1)*.2-.025:gear=desired_gear;shift_time=.12
 	shift_time=maxf(0.,shift_time-dt)
 	var desired_rpm := 900.+clampf((ratio-float(gear-1)*.2)/.2,0.,1.)*5300.
+	if not kart.active:desired_rpm=900.+clampf(throttle,0.,1.)*5300.
 	rpm=lerpf(rpm,desired_rpm,1.-exp(-dt*10.))
-	load_gain=lerpf(load_gain,(absf(throttle) if kart.speed<-.5 else maxf(0.,throttle)) if kart.active else 0.,1.-exp(-dt*6.))
+	load_gain=lerpf(load_gain,(absf(throttle) if kart.speed<-.5 else maxf(0.,throttle)) if kart.active else maxf(0.,throttle),1.-exp(-dt*6.))
 	var rev := clampf((rpm-900.)/5300.,0.,1.)
 	var mix := [1.-smoothstep(.05,.35,ratio),1.-absf(rev-.45),smoothstep(.35,.95,rev)]
 	var split_gain := .7 if kart.get_parent().get("human_count")==2 else 1.
-	panner.pan=(-.25 if kart.local_slot==0 else .25) if split_gain<1. else 0.
+	var music: Variant=kart.get_parent().get("music")
+	if music is LeoRaceAudio and music.duck>0.:split_gain*=.4
+	panner.pan=(-.25 if kart.local_slot==0 else .25) if kart.get_parent().get("human_count")==2 else 0.
 	for i in 3:
 		var gain: float=mix[i]*(.35+.65*load_gain)*split_gain*(.65 if shift_time>0. else 1.)
 		layers[i].volume_db=linear_to_db(maxf(.0001,gain)) - 24.
 		layers[i].pitch_scale=.75+rev*.85
 	layers[3].volume_db=linear_to_db(maxf(.0001,ratio*ratio*split_gain))-23.
-	layers[4].volume_db=linear_to_db(maxf(.0001,ratio*(.8 if kart.drifting else .12)*split_gain))-25.
+	layers[4].volume_db=linear_to_db(maxf(.0001,ratio*(.8 if kart.tire_slipping else .12)*split_gain))-25.
 	# Authored Area3D volumes are presentation-only and independent per player.
 	var room := 0.0
 	cover_timer-=dt

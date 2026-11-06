@@ -51,7 +51,7 @@ var boost_count := 0
 var last_beep := -1
 var master_volume := .72
 var music_enabled := true
-var music: AudioStreamPlayer
+var music: LeoRaceAudio
 var click_sound: AudioStreamPlayer
 var countdown_sound: AudioStreamPlayer
 var go_sound: AudioStreamPlayer
@@ -193,16 +193,12 @@ func _ready() -> void:
 	add_child(feedback)
 	feedback.configure(art_profile.camera_boost_peak,art_profile.camera_boost_hold)
 	feedback.set_reduced_motion(reduced_motion)
-	music = make_sound("island_music.wav", -22)
-	(music.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
-	(music.stream as AudioStreamWAV).loop_end = int((music.stream as AudioStreamWAV).get_length() * (music.stream as AudioStreamWAV).mix_rate)
-	music.play()
-	if not music_enabled: music.stream_paused = true
 	click_sound = make_sound("click.wav", -14)
 	countdown_sound = make_sound("countdown.wav", -12)
 	go_sound = make_sound("go.wav", -12)
 	finish_sound = make_sound("finish.wav", -10)
 	ui_audio=LeoUIAudio.new();add_child(ui_audio)
+	music=LeoRaceAudio.new();add_child(music)
 	music.bus="Music"
 	for sound in [click_sound,countdown_sound,go_sound,finish_sound]:sound.bus="Effects"
 	var post: CanvasLayer=load("res://scripts/local/driving_post.gd").new();post.game=self;add_child(post)
@@ -649,7 +645,7 @@ func start_race() -> void:
 	await LeoRaceWarmup.prepare(self)
 	state="countdown";countdown=3.6
 	loading.hide()
-	input_router.gameplay_enabled=true;input_router.clear_all()
+	input_router.gameplay_enabled=true;input_router.clear_all();input_router.sync_held()
 
 func connect_racer_feedback(kart: LeoKart) -> void:
 	kart.surface_feedback.connect(func(kind: String,strength: float):
@@ -888,9 +884,9 @@ func _process(dt: float) -> void:
 	if state=="countdown":
 		countdown-=dt
 		var beat:=int(ceil(countdown))
-		if beat!=last_beep and beat<=3 and beat>0:last_beep=beat;countdown_sound.play()
+		if beat!=last_beep and beat<=3 and beat>0:last_beep=beat;music.announce(str(beat))
 		if countdown<=0:
-			state="race";go_sound.play()
+			state="race";music.announce("go")
 			for kart in karts:kart.active=true
 			for slot in human_count:
 				if local_players[slot].launch_charged:local_players[slot].kart.boost(.9,"PERFECT LAUNCH")
@@ -1053,6 +1049,7 @@ func quit_game(exit_code: int = 0) -> void:
 
 func stop_all_audio() -> void:
 	if is_instance_valid(ui_audio):ui_audio.voice.stop();ui_audio.stop_effects()
+	if music is LeoRaceAudio:music.stop_all()
 	for sound in [music,click_sound,countdown_sound,go_sound,finish_sound]:
 		if is_instance_valid(sound):sound.stop()
 	for kart in karts: kart.stop_audio()

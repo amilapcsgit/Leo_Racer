@@ -1,6 +1,7 @@
 extends RefCounted
 ## One rig per local player; inputs and camera state never cross viewports.
 var driving_view := "chase"
+var head_offset:=Vector2.ZERO
 var reverse_time := 0.
 var reverse_view := false
 var orbit := Vector2.ZERO
@@ -15,7 +16,7 @@ var warm := false
 var previous_origin := Vector3.ZERO
 
 func reset() -> void:
-	warm=false;follow_velocity=Vector3.ZERO;look_ahead=Vector3.ZERO
+	warm=false;follow_velocity=Vector3.ZERO;look_ahead=Vector3.ZERO;head_offset=Vector2.ZERO
 
 static func field_of_view(speed: float, boost: float, reduced: bool, base: float = 63.) -> float:
 	var previous_target:=clampf(base+10.*smoothstep(0.,50.,absf(speed))+boost,base,85.)
@@ -57,6 +58,13 @@ func update(local: LeoLocalPlayer,view: Camera3D,kart: LeoKart,input: LeoPlayerI
 			var data:=LeoCameraViews.profile(kart.definition)
 			eye=LeoVehicleCodec.vector(data.eye)
 			rotation_degrees=LeoVehicleCodec.vector(data.get("rotation_degrees",[0,0,0]))
+		var mouse:=input.orbit_delta()
+		if driving_view=="cockpit":
+			var target:=Vector2(input.value("camera_left")-input.value("camera_right"),input.value("camera_up")-input.value("camera_down"))*Vector2(deg_to_rad(75.),deg_to_rad(22.))
+			if input.orbit_dragging:target=head_offset+Vector2(-mouse.x*.005,-mouse.y*.004)
+			target.x=clampf(target.x,-deg_to_rad(75.),deg_to_rad(75.));target.y=clampf(target.y,-deg_to_rad(22.),deg_to_rad(22.))
+			head_offset=target if reduced else head_offset.lerp(target,1.-exp(-dt*12.))
+			rotation_degrees+=Vector3(rad_to_deg(head_offset.y),rad_to_deg(head_offset.x),0.)
 		var facing:=Basis.from_euler(rotation_degrees*PI/180.)
 		if input.value("look_back")>.5:facing=Basis(Vector3.UP,PI)*facing
 		view.global_transform=pose*Transform3D(facing,eye)

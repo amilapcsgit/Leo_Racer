@@ -139,7 +139,7 @@ func setup(owner_kart: LeoKart) -> void:
 	# audible when the split-screen cameras are far apart. Rivals remain spatial.
 	scrape_audio=AudioStreamPlayer.new() if kart.is_player else AudioStreamPlayer3D.new()
 	contact_audio=AudioStreamPlayer.new() if kart.is_player else AudioStreamPlayer3D.new()
-	scrape_audio.stream=load("res://assets/audio/skid.ogg");contact_audio.stream=load("res://assets/audio/impact.ogg")
+	scrape_audio.stream=load("res://assets/audio/racing278/scrape.ogg");contact_audio.stream=load("res://assets/audio/racing278/impact.ogg")
 	var bus:=kart.motor_audio.bus_name if kart.motor_audio else "Effects"
 	scrape_audio.bus=bus;contact_audio.bus=bus;scrape_audio.volume_db=-70.
 	if not kart.is_player:
@@ -164,7 +164,7 @@ func setup(owner_kart: LeoKart) -> void:
 			var decal:=Decal.new();decal.texture_albedo=mark_texture;decal.size=Vector3(.16,.05,.8)
 			decal.albedo_mix=1.;decal.normal_fade=.6;decal.distance_fade_enabled=true;decal.distance_fade_begin=35.;decal.distance_fade_length=10.;mark=decal
 		else:
-			var mesh_mark:=MeshInstance3D.new();var mesh:=BoxMesh.new();mesh.size=Vector3(.13,.006,.8)
+			var mesh_mark:=MeshInstance3D.new();var mesh:=BoxMesh.new();mesh.size=Vector3(.22,.008,.8)
 			mesh_mark.mesh=mesh;mesh_mark.material_override=material;mesh_mark.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mark=mesh_mark
 		mark.top_level=true;mark.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;mark.visible=false
 		if not LeoContactBudget.reserve_mark(mark):mark.free();break
@@ -213,7 +213,12 @@ func _process(dt: float) -> void:
 			shadow.global_transform=Transform3D(Basis(x,normal.cross(x).normalized(),normal),position_on_ground)
 	if shadow_timer<=0.:shadow_timer=.1
 	# The displacement-derived physics speed stays stable between rendered frames.
-	var moving := absf(kart.wheel_motion_speed)>4.0
+	var moving := absf(kart.wheel_motion_speed)>1.0
+	var braking:=((kart.control_input.value("brake")>.6 and kart.wheel_motion_speed>4.) or (kart.control_input.value("accelerate")>.6 and kart.wheel_motion_speed< -4.)) if kart.control_input else kart.prepared_throttle<-.6 and kart.wheel_motion_speed>4.
+	var lateral_slip:=absf(kart.velocity.dot(kart.global_basis.x))>2.2 or (absf(kart.steer)>.38 and absf(kart.wheel_motion_speed)>13.)
+	var wheelspin:=kart.rev_throttle>.7 and absf(kart.wheel_motion_speed)>.4 and absf(kart.wheel_motion_speed)<5.
+	var slipping:=(kart.drifting and moving) or (braking and moving) or lateral_slip or wheelspin
+	kart.tire_slipping=slipping and kart.grounded and kart.active
 	var camera:=get_viewport().get_camera_3d()
 	var near := kart.is_player or (is_instance_valid(camera) and camera.global_position.distance_to(kart.global_position)<55)
 	for i in smoke.size():
@@ -221,7 +226,7 @@ func _process(dt: float) -> void:
 		var origin:=kart.visual.global_transform*kart.rear_tire_positions[i]
 		var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*.8,origin-Vector3.UP*2.,1)
 		var hit:=kart.get_world_3d().direct_space_state.intersect_ray(query)
-		emitter.emitting=kart.grounded and kart.drifting and moving and kart.active and near and not hit.is_empty()
+		emitter.emitting=kart.grounded and slipping and kart.active and near and not hit.is_empty()
 		if not hit.is_empty():
 			var normal: Vector3=hit.normal
 			var forward:=(-kart.global_basis.z).slide(normal).normalized()
@@ -247,7 +252,7 @@ func _process(dt: float) -> void:
 		material.emission = Color("9effdd").lerp(Color("00e4ff"),.5+.4*sin(elapsed*22)) if electric else Color("ffad38").lerp(Color("20dfff"),.55+.35*sin(elapsed*18))
 		if electric: flame.scale.z=.55+gain*.35
 	mark_timer -= dt
-	if not marks.is_empty() and kart.grounded and kart.drifting and moving and kart.active and near and mark_timer<=0:
+	if not marks.is_empty() and kart.grounded and slipping and kart.active and near and mark_timer<=0:
 		mark_timer = .045
 		for tire in kart.rear_tire_positions:
 			var mark := marks[mark_cursor]
@@ -261,7 +266,7 @@ func _process(dt: float) -> void:
 			mark.global_transform=Transform3D(Basis.looking_at(forward,up),hit.position+up*.012)
 			if mark is Decal:mark.size.z=maxf(.8,absf(kart.wheel_motion_speed)*.065)
 			else:(mark.mesh as BoxMesh).size.z=maxf(.8,absf(kart.wheel_motion_speed)*.065)
-			mark.set_meta("expires",elapsed+.9)
+			mark.set_meta("expires",elapsed+24.)
 			mark.visible = true
 	for mark in marks:
 		if mark.visible and elapsed>float(mark.get_meta("expires",0)): mark.visible = false

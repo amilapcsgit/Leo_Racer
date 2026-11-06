@@ -1,5 +1,7 @@
 extends Control
 var instruments: Control
+var slot: int:
+	get:return instruments.slot
 var game: Node3D:
 	get:return instruments.game
 var heading_font: Font:

@@ -13,6 +13,7 @@ const ACTIONS=["drift","boost","recover","horn","pause_race"]
 var speed_overlay: ColorRect
 var recovery_overlay: ColorRect
 var nitro_liquid: ColorRect
+var display_rpm := 900.0
 var display_speed:=0.
 var display_nitro:=1.
 var time:=0.
@@ -25,8 +26,10 @@ var accent:=Color("00f2fe")
 var gold:=Color("ffb94f")
 var muted:=Color("b9d0d5")
 var layout_extent:=Vector2.ZERO
-var camera_button: Button
-var camera_hint: Label
+var view_layout:=""
+var countdown_container: SubViewportContainer
+var countdown_letters: Node3D
+var countdown_view: SubViewport
 var camera_fade: ColorRect
 var diagnostic_clock := 0.0
 var diagnostic_extent := Vector2i.ZERO
@@ -43,7 +46,7 @@ func text_at(parent: Node,p: Vector2,extent: Vector2,words: String,fs: int=24,co
 	var label:=Label.new();label.position=p;label.size=extent;label.text=words
 	label.add_theme_font_override("font",heading_font if heading else body_font);label.add_theme_font_size_override("font_size",fs);label.add_theme_color_override("font_color",color)
 	label.add_theme_color_override("font_outline_color",Color(.015,.025,.04,.9));label.add_theme_constant_override("outline_size",2);label.mouse_filter=MOUSE_FILTER_IGNORE;parent.add_child(label)
-	label.set_meta("design_position",p);label.set_meta("font_size",fs);return label
+	label.set_meta("design_size",extent);label.set_meta("design_position",p);label.set_meta("font_size",fs);return label
 func _ready() -> void:
 	mouse_filter=MOUSE_FILTER_IGNORE
 	if not instrument_heading:
@@ -93,7 +96,8 @@ func build() -> void:
 	labels.speed.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	labels.speed.add_theme_constant_override("shadow_outline_size",4)
 	labels.speed.add_theme_color_override("font_shadow_color",Color(0,.8,.9,.24))
-	text_at(self,Vector2(1370,773),Vector2(110,27),"KM/H",18,muted,true)
+	labels.speed_unit=text_at(self,Vector2(1370,773),Vector2(110,27),"KM/H",18,muted,true)
+	labels.rpm_unit=text_at(self,Vector2(1340,639),Vector2(150,24),"RPM × 1000",16,muted,true)
 	labels.nitro = text_at(self,Vector2(1198,854),Vector2(160,25),"NITRO READY",17,Color("69e9b2"),true)
 	labels.drift = text_at(self, Vector2(575, 758), Vector2(500, 35), "", 23, accent, true)
 	labels.drift.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -118,13 +122,17 @@ func build() -> void:
 	self.add_child(nitro_liquid)
 	labels.countdown = text_at(self, Vector2(250, 310), Vector2(1100, 180), "3", 126, gold, true)
 	labels.countdown.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	labels.countdown.visible=false
 	labels.callout = text_at(self, Vector2(400, 225), Vector2(800, 65), "", 37, gold, true)
 	labels.callout.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	labels.launch = text_at(self,Vector2(380,517),Vector2(840,35),"TAP ACCELERATE ON THE FINAL BEAT FOR A LAUNCH BOOST",20,accent,true)
 	labels.launch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	camera_button=Button.new();camera_button.name="CameraView";camera_button.focus_mode=Control.FOCUS_NONE;camera_button.position=Vector2(1260,120);camera_button.size=Vector2(300,48);camera_button.add_theme_font_size_override("font_size",22);camera_button.pressed.connect(func():game.cycle_camera(slot));add_child(camera_button)
-	camera_hint=text_at(self,Vector2(1260,170),Vector2(300,30),"",16,muted);camera_hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;camera_hint.clip_text=true
 	camera_fade=ColorRect.new();camera_fade.mouse_filter=Control.MOUSE_FILTER_IGNORE;camera_fade.color=Color(0,0,0,0);camera_fade.z_index=20;add_child(camera_fade)
+	countdown_container=SubViewportContainer.new();countdown_container.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	countdown_container.hide();countdown_container.position=Vector2(400,300);countdown_container.size=Vector2(800,240);add_child(countdown_container)
+	countdown_view=SubViewport.new();countdown_view.size=Vector2i(800,240);countdown_view.transparent_bg=true;countdown_view.own_world_3d=true
+	countdown_view.render_target_update_mode=SubViewport.UPDATE_ALWAYS;countdown_container.add_child(countdown_view)
+	countdown_letters=load("res://scripts/CountdownLetters.cs").new();countdown_view.add_child(countdown_letters)
 	queue_redraw()
 
 func log_digits(reason: String) -> void:
@@ -133,20 +141,60 @@ func log_digits(reason: String) -> void:
 func layout() -> void:
 	var available: Vector2=get_parent().size if get_parent() is Control else get_viewport_rect().size
 	layout_extent=available
-	var factor:=minf(available.x/1600.,available.y/900.)
-	scale=Vector2.ONE*factor;size=Vector2(1600.,available.y/maxf(.01,factor));position=Vector2((available.x-1600.*factor)*.5,0)
+	view_layout=LeoCameraViews.effective(game.local_players[slot])
+	var design_width:=800. if game.human_count==2 else 1600.
+	var factor:=minf(available.x/design_width,available.y/900.)
+	scale=Vector2.ONE*factor;size=Vector2(design_width,available.y/maxf(.01,factor));position=Vector2((available.x-design_width*factor)*.5,0)
 	var extra:=size.y-900.
 	for child in get_children():
 		if not child is Control or not child.has_meta("design_position"):continue
+		child.visible=game.human_count==1
+		if child.has_meta("design_size"):child.size=child.get_meta("design_size")
 		var design: Vector2=child.get_meta("design_position");child.position=design+Vector2(0,extra if design.y>=450 else 0.)
 		if design.y>=836 and design.x<1100:child.visible=game.human_count==1
 		if child is Label:
-			var fs: int=child.get_meta("font_size",20);child.add_theme_font_size_override("font_size",maxi(fs,ceili(17./maxf(.01,factor))) if game.human_count==2 else fs)
+			var fs: int=child.get_meta("font_size",20);child.add_theme_font_size_override("font_size",fs)
 	speed_overlay.position=Vector2.ZERO;speed_overlay.size=size
 	recovery_overlay.position=Vector2.ZERO;recovery_overlay.size=size
 	camera_fade.size=size
 	if game.human_count==2:
-		labels.nitro.position=Vector2(1230,555+extra);labels.nitro.size=Vector2(330,40);labels.nitro.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		compact_label(labels.position,Vector2(34,20),Vector2(92,48),40)
+		compact_label(labels.lap,Vector2(140,22),Vector2(150,36),30)
+		compact_label(labels.timer,Vector2(140,61),Vector2(172,28),22)
+		compact_label(labels.brand,Vector2(330,22),Vector2(440,34),26)
+		compact_label(labels.track,Vector2(330,65),Vector2(440,28),20)
+		compact_label(labels.callout,Vector2(24,126),Vector2(752,40),24)
+		compact_label(labels.launch,Vector2(24,size.y-260),Vector2(752,32),18)
+		compact_label(labels.drift,Vector2(24,size.y-300),Vector2(752,32),20)
+		compact_label(labels.speed,Vector2(580,size.y-172),Vector2(180,65),62)
+		compact_label(labels.speed_unit,Vector2(627,size.y-97),Vector2(90,24),16)
+		compact_label(labels.rpm_unit,Vector2(604,size.y-196),Vector2(140,22),16)
+		compact_label(labels.nitro,Vector2(540,size.y-29),Vector2(235,25),18)
+		nitro_liquid.visible=true;nitro_liquid.position=Vector2(540,size.y-267);nitro_liquid.size=Vector2(260,260)
+		countdown_container.position=Vector2(0,245);countdown_container.size=Vector2(800,240)
+	else:
+		countdown_container.position=Vector2(400,300)
+	if view_layout=="cockpit":
+		for item in [labels.rpm_unit,nitro_liquid]:item.hide()
+		if game.human_count==2:
+			compact_label(labels.speed,Vector2(620,size.y-93),Vector2(150,56),46)
+			compact_label(labels.speed_unit,Vector2(650,size.y-35),Vector2(95,25),16)
+			compact_label(labels.nitro,Vector2(400,size.y-27),Vector2(215,25),18)
+		else:
+			for child in get_children():
+				if child is Control and child.has_meta("design_position") and child.get_meta("design_position").y>=450:child.hide()
+			compact_label(labels.speed,Vector2(1450,size.y-80),Vector2(110,50),40)
+			compact_label(labels.speed_unit,Vector2(1464,size.y-30),Vector2(100,24),16)
+			compact_label(labels.nitro,Vector2(1210,size.y-38),Vector2(220,28),18)
+			compact_label(labels.launch,Vector2(380,517),Vector2(840,35),20)
+			compact_label(labels.drift,Vector2(575,size.y-142),Vector2(500,35),23)
+	labels.countdown.visible=false
+	speed_overlay.visible=true;recovery_overlay.visible=true;camera_fade.visible=true
+
+func compact_label(label: Label,at: Vector2,extent: Vector2,font_size: int) -> void:
+	label.visible=true;label.position=at;label.size=extent;label.clip_text=true;label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+	label.add_theme_font_size_override("font_size",font_size)
+
 func rebuild_map() -> void:static_key="";queue_redraw()
 func instrument_kart() -> LeoKart:
 	return game.local_players[slot].kart if is_instance_valid(game.local_players[slot].kart) else null
@@ -157,19 +205,17 @@ func _process(dt: float) -> void:
 	if not game or not is_instance_valid(instrument_kart()):return
 	var began:=Time.get_ticks_usec()
 	var available: Vector2=get_parent().size if get_parent() is Control else get_viewport_rect().size
-	if available!=layout_extent:layout()
-	var key:=str(size)+String(game.chosen_track_id)+str(game.human_count)
+	if available!=layout_extent or view_layout!=LeoCameraViews.effective(game.local_players[slot]):layout()
+	var key:=str(size)+String(game.chosen_track_id)+str(game.human_count)+view_layout
 	if key!=static_key:
 		background_updates+=1
-		map_projection=LeoTelemetry.map_transform(game.circuit.points,Rect2(62,521+size.y-900.,203,269))
+		map_projection=LeoTelemetry.map_transform(game.circuit.points,Rect2(34,size.y-195,132,155) if game.human_count==2 else Rect2(62,521+size.y-900.,203,269))
 		static_key=key;static_view.size=Vector2i(size);static_canvas.size=size;static_image.size=size;static_canvas.queue_redraw();static_view.render_target_update_mode=SubViewport.UPDATE_ONCE
 	visible=not game.local_players[slot].photo
 	var visual_dt:=0. if game.paused else dt
 	time+=visual_dt;ready_flash=maxf(0.,ready_flash-visual_dt)
 	var local: LeoLocalPlayer=game.local_players[slot]
 	var p: LeoKart=local.kart
-	camera_button.text="Camera: "+LeoCameraViews.NAMES[LeoCameraViews.effective(local)]
-	camera_hint.text="Change view · "+game.input_router.players[slot].describe("change_camera")
 	local.camera_transition=maxf(0.,local.camera_transition-dt)
 	camera_fade.color.a=0. if game.reduced_motion else local.camera_transition/.16*.45
 	diagnostic_clock+=dt
@@ -189,6 +235,7 @@ func _process(dt: float) -> void:
 	labels.position.text = str(game.player_place(slot))
 	labels.lap.text = "%d / %d" % [p.lap,game.active_laps]
 	labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
+	display_rpm=lerpf(display_rpm,p.motor_audio.rpm if p.motor_audio else 900.,1.-exp(-visual_dt*12.))
 	display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-visual_dt*12))
 	display_nitro = lerpf(display_nitro,p.boost_fuel,1.0-exp(-visual_dt*10))
 	if is_instance_valid(nitro_liquid):
@@ -221,8 +268,14 @@ func _process(dt: float) -> void:
 	var bend_angle := atan2(approach.cross(bend).y,approach.dot(bend))
 	labels.corner.text = (("HARD " if absf(bend_angle)>.85 else "")+("RIGHT AHEAD" if bend_angle>0 else "LEFT AHEAD")) if p.active and actual_speed>4.0 and absf(bend_angle)>.3 else "FIND YOUR FLOW"
 	labels.launch.visible = game.state=="countdown"
+	labels.launch.text="REV NOW · TAP ON 1 FOR LAUNCH BOOST" if game.human_count==2 else "REV NOW · TAP ACCELERATE ON THE FINAL BEAT FOR A LAUNCH BOOST"
 	if game.state == "countdown": labels.countdown.text = str(clampi(int(ceil(game.countdown)),1,3))
 	else: labels.countdown.text = "GO!" if game.race_time < .85 else ""
+	var words:=str(clampi(int(ceil(game.countdown)),1,3)) if game.state=="countdown" and game.countdown<=3. else "GO!" if game.state=="race" and game.race_time<.9 else ""
+	countdown_container.visible=words!=""
+	countdown_letters.show_beat(words,game.reduced_motion,game.graphics.glow)
+	countdown_letters.process_mode=Node.PROCESS_MODE_DISABLED if game.paused else Node.PROCESS_MODE_INHERIT
+	countdown_view.render_target_update_mode=SubViewport.UPDATE_ALWAYS if words!="" else SubViewport.UPDATE_DISABLED
 	if not game.paused: announcement_time = maxf(0, announcement_time - dt)
 	labels.callout.text = local.announcement if local.announcement_time > 0 else announcement if announcement_time > 0 else ""
 	if local.wrong_way > 1.0: labels.callout.text = "WRONG WAY  /  TURN AROUND"

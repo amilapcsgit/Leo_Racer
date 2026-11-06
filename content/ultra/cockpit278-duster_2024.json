@@ -1,0 +1,23 @@
+{
+  "bounds": {
+    "position": [
+      -1.03300786018372,
+      -0.00139984488487244,
+      -2.16893100738525
+    ],
+    "size": [
+      2.0733859539032,
+      1.76547527313232,
+      4.34650135040283
+    ]
+  },
+  "id": "duster_2024",
+  "lods_generated": true,
+  "merged_static_meshes": 88,
+  "pack_sha256": "5f7844f9a1ca5eeaec31874b7d0b9ec366adea346facd67d952a3903178c7af7",
+  "scene_bytes": 11637700,
+  "status": "PASS",
+  "textures": 12,
+  "original_sha256": "b1945c391848ab09cdab06808f002b47a9099abf82482e6fa9098553a7d58db0",
+  "derivative_sha256": "5f7844f9a1ca5eeaec31874b7d0b9ec366adea346facd67d952a3903178c7af7"
+}

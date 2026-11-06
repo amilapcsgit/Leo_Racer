@@ -1,18 +1,27 @@
-# Leo Racer 2.7.8 candidate
+# Leo Racer 2.7.8
 
 - Hardened the digital speed readout with a prewarmed bundled raster font, unclipped labels and local display diagnostics.
 - New Graphics, Audio, Controls and Accessibility tabs. Added 720p/1080p/native rendering choices, timed display confirmation, AA/glow controls, optional world-only speed blur and Forward+ FSR 2 upscaling.
-- Camera View button and remappable action: Chase, Ghost and reviewed Bigster Cockpit. Camera preferences are independent per player. Ghost hides your car only in your viewport.
+- Settings-based camera selection and remappable action: Chase, Ghost and reviewed Bigster/Duster 2024 Cockpit. Camera preferences are independent per player. Ghost hides your car only in your viewport.
 - Reduced Motion retains gentle turn lean and braking/acceleration pitch while suppressing camera motion, impact jolts, bounce and motion blur.
 - Reviewed two-part Bigster/Duster collision hulls, inelastic contact/sliding, per-tick vehicle-pair resolution and protection against moving-platform launch impulses and contact-driven checkpoint gains.
 - Shared contact events drive material-specific effects, audio and rumble. Surface-aligned mesh skid marks work in both renderers; global effect budgets remain bounded.
 - Existing settings, custom bindings, historical records, portable vehicle files and source assets are preserved.
 
+## Final refinements
+
+- Corrected the driver-facing Bigster steering wheel, with animated steering and a shared fitted cockpit for Duster 2024. Live RPM/speed/gear/boost displays, track navigation and real rear/side mirrors work in both renderers. The right stick provides bounded cockpit head-look.
+- Standard controller A confirmation, controller-only menu operation and saved-binding diagrams while loading, using the user-supplied controller/keyboard/wheel SVG pack. Exactly one selected-device diagram per player uses live action labels, routed leaders, endpoint dots and highlights. Split-screen has a dedicated compact HUD layout. Stronger bounded rumble with a settings test.
+- Held throttle revs before GO and continues accelerating afterward. The analog instrument shows engine RPM; digital speed remains actual km/h.
+- Spoken female countdown, extruded 3D letters and Rokojori-sequenced effects, with restrained Reduced Motion presentation and separate Announcer volume.
+- Three licensed CC0 instrumental racing tracks with shuffle/crossfade, refreshed original engine/tire/boost layers and licensed impact sounds. All audio is bundled for offline use; see GameAssets/licenses/racing-audio-manifest.json.
+- Tire slip, hard braking and launch wheelspin leave ground-aligned skid marks that persist within the shared segment budget.
+
 ## Controls and display
 
-Press **C** or **right-stick click** to cycle cameras, or use the HUD button. Default look-back is now **V** or **left-stick click**. Shared-keyboard Player 2 uses **numpad 4** for camera view and **numpad 0** for look-back. Existing custom bindings are preserved; if a new default conflicts, bind Change Camera View in Controls.
+Press **C** or **right-stick click** to cycle cameras, or choose the view in Settings → Controls. Default look-back is now **V** or **left-stick click**. Shared-keyboard Player 2 uses **numpad 4** for camera view and **numpad 0** for look-back. Existing custom bindings are preserved; if a new default conflicts, bind Change Camera View in Controls.
 
-Cockpit is enabled only for reviewed interiors, initially Bigster. Unsupported cars fall back to Chase while retaining your saved Cockpit preference. Orbit and automatic reverse camera remain Chase features; Ghost/Cockpit support held look-back.
+Cockpit is enabled only for reviewed interiors, Bigster and Duster 2024. Unsupported cars fall back to Chase while retaining your saved Cockpit preference. Orbit and automatic reverse camera remain Chase features; Ghost/Cockpit support held look-back.
 
 In windowed mode, Resolution changes the window output size. Fullscreen keeps the monitor and HUD at native resolution and sets the 3D render target to the selected height. Upscaling further reduces internal 3D resolution. FSR 2 requires Forward+ and includes its own temporal anti-aliasing; the AA toggle controls MSAA. Compatibility uses native/bilinear scaling. Motion Blur is a restrained radial speed effect, off by default and suppressed by Reduced Motion. DLSS is not included.
 

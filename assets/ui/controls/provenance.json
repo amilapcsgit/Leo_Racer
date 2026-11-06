@@ -1,0 +1,9 @@
+{
+  "source": "User-supplied leo_racer_controls.zip, 2026-11-06",
+  "files": {
+    "controller.svg": "208a506c127dbeb0ec6e74fd9998e158f3cd7e5bcd2101e3d64f8b05566921ff",
+    "keyboard.svg": "621527915562c1dde8ec7aab7bef52f5613e705d58de1f1b3342f3d379deb36e",
+    "wheel.svg": "2a0f0bbd673484effca30b7e2a912c8451c971a0fd3ee05b488a0fbd4155017a",
+    "anchors.json": "e9c314a8f773d71f929c5f3043dee3c2b2ac965ece93bcb5513a48035c5a9a38"
+  }
+}

@@ -3,7 +3,7 @@ var screen: LeoLoadingScreen
 const TRACE=preload("res://scripts/content/boot_trace.gd")
 func _ready() -> void:
 	TRACE.mark("bootstrap_ready")
-	DisplayServer.window_set_title("Leo Racer — 2.7 Ultra")
+	DisplayServer.window_set_title("Leo Racer — 2.7.8")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
 	await begin()
@@ -61,7 +61,7 @@ func begin() -> void:
 		for argument in OS.get_cmdline_user_args():
 			if argument.begins_with("--ultra-check="):
 				var name:=argument.trim_prefix("--ultra-check=")
-				if name not in ["perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
+				if name not in ["loading","refinements","perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
 				screen.hide()
 				var trial: Node=load("res://tests/native270/"+name+".gd").new()
 				get_tree().root.add_child(trial);queue_free();return

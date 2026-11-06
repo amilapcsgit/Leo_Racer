@@ -42,6 +42,7 @@ static func prepare(game: Node3D) -> void:
 				representative.mesh=mesh;representative.material_override=node.available[0].material_override
 				var active_camera: Camera3D=game.local_players[mini(maxi(0,kart.local_slot),game.human_count-1)].camera
 				game.world.add_child(representative);representative.global_basis=active_camera.global_basis;representative.global_position=active_camera.global_position-active_camera.global_basis.z*3.;warm_meshes.append(representative)
+	for systems in game.find_children("LiveCockpit","Node3D",true,false):systems.warm()
 	for frame in 4:
 		await game.get_tree().process_frame
 		if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw

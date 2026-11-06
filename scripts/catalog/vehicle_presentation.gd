@@ -37,6 +37,9 @@ static func resolve(source: VehicleDefinition) -> VehicleDefinition:
 		resolved.model=null
 		resolved.model_path="res://ultra_vehicles/bigster/model.scn"
 		resolved.preview_scene=resolved.model_path
+	var cockpit_path:="res://cockpit278/"+String(source.id)+"/model.scn"
+	if source.official and ResourceLoader.exists(cockpit_path):
+		resolved.model=null;resolved.model_path=cockpit_path;resolved.preview_scene=cockpit_path
 	# Resource.duplicate copies exported fields, not runtime package classification.
 	resolved.official=source.official
 	resolved.content_folder=source.content_folder

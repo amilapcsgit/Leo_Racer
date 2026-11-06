@@ -95,7 +95,7 @@ func describe(action: String) -> String:
   var n := int(binding.get("index",0))
   match str(binding.get("type","")):
    "key": labels.append(("Left " if int(binding.get("location",0))==1 else "Right " if int(binding.get("location",0))==2 else "")+OS.get_keycode_string(n))
-   "button": labels.append({JOY_BUTTON_A:"A",JOY_BUTTON_B:"B",JOY_BUTTON_X:"X",JOY_BUTTON_Y:"Y",JOY_BUTTON_START:"Start",JOY_BUTTON_DPAD_LEFT:"D-pad Left",JOY_BUTTON_DPAD_UP:"D-pad Up",JOY_BUTTON_DPAD_DOWN:"D-pad Down",JOY_BUTTON_RIGHT_STICK:"Right Stick Click"}.get(n,"Button %d" % n))
+   "button": labels.append({JOY_BUTTON_A:"A",JOY_BUTTON_B:"B",JOY_BUTTON_X:"X",JOY_BUTTON_Y:"Y",JOY_BUTTON_START:"Start",JOY_BUTTON_DPAD_LEFT:"D-pad Left",JOY_BUTTON_DPAD_UP:"D-pad Up",JOY_BUTTON_DPAD_DOWN:"D-pad Down",JOY_BUTTON_LEFT_STICK:"Left Stick Click",JOY_BUTTON_LEFT_SHOULDER:"LB / L1",JOY_BUTTON_RIGHT_SHOULDER:"RB / R1",JOY_BUTTON_RIGHT_STICK:"Right Stick Click"}.get(n,"Button %d" % n))
    "axis":
     if kind=="gamepad":labels.append("RT" if n==JOY_AXIS_TRIGGER_RIGHT else "LT" if n==JOY_AXIS_TRIGGER_LEFT else "Left Stick ←" if action=="left" else "Left Stick →" if action=="right" else "Right Stick "+action.trim_prefix("camera_") if action.begins_with("camera_") else "Stick")
     else:labels.append("Steering Wheel" if action in ["left","right"] else "Accelerator" if action=="accelerate" else "Brake Pedal" if action=="brake" else "Wheel Axis")

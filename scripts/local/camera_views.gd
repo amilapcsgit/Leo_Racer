@@ -37,6 +37,10 @@ static func cycle(local: LeoLocalPlayer) -> void:
 
 static func tag(kart: LeoKart) -> void:
 	if not kart.is_player or kart.local_slot not in [0,1]:return
+	if not profile(kart.definition).is_empty():
+		var cabin:=OmniLight3D.new();cabin.name="CockpitReadabilityLight";cabin.position=Vector3(-.35,1.25,.15)
+		cabin.omni_range=1.8;cabin.light_energy=.4;cabin.light_color=Color("dce9ff");cabin.shadow_enabled=false
+		cabin.light_cull_mask=BODY_BITS[kart.local_slot];cabin.visible=false;kart.visual.add_child(cabin)
 	# Dedicated render layers change visibility only; physics remains shared.
 	for node in kart.visual.find_children("*","GeometryInstance3D",true,false):
 		if node.is_set_as_top_level():continue
@@ -44,10 +48,13 @@ static func tag(kart: LeoKart) -> void:
 		var driver:=is_instance_valid(kart.driver) and (kart.driver==node or kart.driver.is_ancestor_of(node))
 		node.layers=(original & (1<<16)) | (DRIVER_BITS[kart.local_slot] if driver else BODY_BITS[kart.local_slot])
 		node.set_meta("camera_source_layers",original)
+	LeoCockpitSystems.install(kart)
 
 static func visibility(local: LeoLocalPlayer) -> void:
 	var mode:=effective(local)
-	var mask: int=local.camera.cull_mask | BODY_BITS[local.slot] | DRIVER_BITS[local.slot]
-	if mode=="ghost":mask&=~(BODY_BITS[local.slot]|DRIVER_BITS[local.slot])
+	var mask: int=local.camera.cull_mask | BODY_BITS[local.slot] | DRIVER_BITS[local.slot] | LeoCockpitSystems.MIRROR_BITS[0] | LeoCockpitSystems.MIRROR_BITS[1]
+	if mode=="ghost":mask&=~(BODY_BITS[local.slot]|DRIVER_BITS[local.slot]|LeoCockpitSystems.MIRROR_BITS[local.slot])
 	elif mode=="cockpit":mask&=~DRIVER_BITS[local.slot]
+	var cabin:=local.kart.visual.get_node_or_null("CockpitReadabilityLight")
+	if cabin:cabin.visible=mode=="cockpit"
 	local.camera.cull_mask=mask & ~(1<<16) # Lighting receiver layer is never a visibility bypass.

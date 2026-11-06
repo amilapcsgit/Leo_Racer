@@ -99,6 +99,8 @@ var wheel_angles: Array[float] = []
 var damage: LeoCosmeticDamage
 var prepared_frame := -1
 var prepared_throttle := 0.0
+var rev_throttle := 0.0
+var tire_slipping := false
 var contact_this_tick := false
 var checkpoint_velocity := Vector3.ZERO
 var contact_clock:=0.0
@@ -187,9 +189,9 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		elif i == 1: spark_right = sparks
 	if is_player:
 		engine = sound("engine.ogg", -22, true)
-		skid = sound("skid.ogg", -50, true)
-		boost_sound = sound("boost.wav", -12, false)
-		impact = sound("impact.ogg", -14, false)
+		skid = sound("racing278/skid.ogg", -50, true)
+		boost_sound = sound("racing278/boost.ogg", -12, false)
+		impact = sound("racing278/impact.ogg", -14, false)
 		motor_audio=LeoVehicleAudio.new();add_child(motor_audio);motor_audio.setup(self)
 	ai_phase = float(id) * 1.73
 	ai_lane = [-3.8, 0.0, 3.8, -2.5, 2.5, 0.5][id % 6]
@@ -449,6 +451,7 @@ func prepare_motion(dt: float) -> void:
 	bump_cooldown = maxf(0, bump_cooldown - dt)
 	contact_clock+=dt
 	impact_feedback_cooldown = maxf(0,impact_feedback_cooldown-dt)
+	rev_throttle=control_input.value("accelerate") if is_player and control_input else 0.
 	var throttle := 0.0
 	var desired_steer := 0.0
 	var want_drift := false
@@ -576,8 +579,8 @@ func _physics_process(dt: float) -> void:
 	contact_recoil=Vector3.ZERO
 	visual.rotation.x=suspension_pitch
 	if is_player and engine:
-		if motor_audio:motor_audio.throttle=throttle;motor_audio.update(dt)
-		skid.volume_db = lerpf(skid.volume_db, -13.0 if drifting else -65.0, dt * 8)
+		if motor_audio:motor_audio.throttle=maxf(throttle,rev_throttle);motor_audio.update(dt)
+		skid.volume_db = lerpf(skid.volume_db, -13.0 if tire_slipping else -65.0, dt * 8)
 
 func _process(dt: float) -> void:
 	if not circuit or not visual: return

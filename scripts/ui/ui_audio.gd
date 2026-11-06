@@ -9,7 +9,7 @@ var quiet_until:=0
 var cue_counts: Dictionary={}
 const SYNTH=preload("res://scripts/ui/vendor/menu_kit_sounds.gd")
 var last_move := 0
-var levels := {"Music":.75,"Effects":1.,"UI":.7,"Voice":.8}
+var levels := {"Music":.75,"Effects":1.,"UI":.7,"Voice":.8,"Announcer":1.}
 var voice_enabled := true
 var last_voice: Dictionary={}
 func _ready() -> void:

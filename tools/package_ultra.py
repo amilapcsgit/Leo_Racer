@@ -13,7 +13,7 @@ def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='u
 def inject_checks(entries):
     # Release templates intentionally ignore --script. Opt-in bootstrap probes
     # adapt the same SceneTree tests to Nodes, without a second test implementation.
-    mapping={'perf278':'release278_performance','release278':'release278_test','finish':'ultra_finish_test','core':'ultra_core_test','visual':'ultra_visual_test','previews':'ultra_preview_test','physics':'ultra_physics_test','garage':'release260_runtime_test','contacts':'release260_collision_test','audit':'release260_collision_test','impact':'lighting_world_test'}
+    mapping={'loading':'loading_controls278_test','refinements':'refinements278_test','perf278':'release278_performance','release278':'release278_test','finish':'ultra_finish_test','core':'ultra_core_test','visual':'ultra_visual_test','previews':'ultra_preview_test','physics':'ultra_physics_test','garage':'release260_runtime_test','contacts':'release260_collision_test','audit':'release260_collision_test','impact':'lighting_world_test'}
     adapter='''extends Node
 var root: Window:
  get:return get_tree().root
@@ -38,6 +38,8 @@ def stage():
     source=ROOT/'build/content-baseline/GameAssets'
     for name in ['vehicles','tracks','environments','licenses']:
         shutil.copytree(source/name,BASE/'GameAssets'/name,dirs_exist_ok=True)
+    shutil.copytree(ROOT/'licenses',BASE/'GameAssets/licenses',dirs_exist_ok=True)
+    shutil.copy2(ROOT/'assets/audio/racing278/manifest.json',BASE/'GameAssets/licenses/racing-audio-manifest.json')
     shutil.copy2(ROOT/'LICENSE',BASE/'LICENSE.txt')
     (BASE/'CREDITS.txt').write_text(
         'Created by L.J. Amila Prasad Perera.\n\n'
@@ -52,6 +54,10 @@ def stage():
     derivative.parent.mkdir(exist_ok=True)
     shutil.copy2(ROOT/'content/ultra/bigster-trunk.pck',derivative)
     catalog['packs'].append({'id':'ultra/bigster-trunk','file':'ultra/bigster-trunk.pck','sha256':sha(derivative),'bytes':derivative.stat().st_size})
+    for key in ['bigster','duster_2024']:
+        derivative=BASE/('GameAssets/ultra/cockpit278-'+key+'.pck')
+        shutil.copy2(ROOT/('content/ultra/cockpit278-'+key+'.pck'),derivative)
+        catalog['packs'].append({'id':'ultra/cockpit278-'+key,'file':'ultra/'+derivative.name,'sha256':sha(derivative),'bytes':derivative.stat().st_size})
     neutral=BASE/'GameAssets/environments/dusk-neutral.pck'
     catalog['packs'].append({'id':'environments/dusk-neutral','file':'environments/dusk-neutral.pck','sha256':sha(neutral),'bytes':neutral.stat().st_size})
     dump(BASE/'GameAssets/catalog.json',catalog)
@@ -72,10 +78,10 @@ def stage():
     shutil.copy2(ROOT/'assets/config/default-roster-v1.json',BASE/'default-roster-v1.json')
     for source_name,destination in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:
         shutil.copy2(ROOT/'docs'/source_name,BASE/destination)
-    (BASE/'README.txt').write_text('LEO RACER 2.7.8 CANDIDATE\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, three tracks; 1–10 laps, default 3.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
+    (BASE/'README.txt').write_text('LEO RACER 2.7.8\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, three tracks; 1–10 laps, default 3.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
     for name,args in [('Play Compatibility.cmd','--rendering-method gl_compatibility --rendering-driver opengl3'),('Vehicle Workshop.cmd','-- --vehicle-workshop')]:
         (BASE/name).write_text('@echo off\r\ncd /d "%~dp0"\r\nstart "" "LeoRacer.exe" '+args+'\r\n',encoding='ascii')
-    dump(BASE/'release-build.json',{'version':VERSION,'label':'2.7.8 Candidate','core_sha256':sha(BASE/'LeoRacer.pck'),'default_vehicles':21,'tracks':3,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
+    dump(BASE/'release-build.json',{'version':VERSION,'label':'2.7.8','core_sha256':sha(BASE/'LeoRacer.pck'),'default_vehicles':21,'tracks':3,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
     dump(BASE/'required-payload.json',{'files':{p.relative_to(BASE).as_posix():sha(p) for p in files(BASE) if p.name!='required-payload.json' and not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')}})
     print('ULTRA_STAGED',flush=True)
 def refresh():
@@ -88,7 +94,7 @@ def refresh():
     inject_checks(entries)
     city_packs.write_pack(BASE/'LeoRacer.pck',engine,entries)
     for name,target in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:shutil.copy2(ROOT/'docs'/name,BASE/target)
-    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION+' Candidate','core_sha256':sha(BASE/'LeoRacer.pck'),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'default_vehicles':21,'tracks':3,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
+    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'default_vehicles':21,'tracks':3,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
     dump(BASE/'required-payload.json',{'files':{p.relative_to(BASE).as_posix():sha(p) for p in files(BASE) if p.name!='required-payload.json' and not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')}})
     print('CANDIDATE_REFRESHED',sha(BASE/'LeoRacer.pck'),flush=True)
 

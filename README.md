@@ -1,5 +1,5 @@
 <p align="center"><img src="assets/ui/icons/crest.svg" width="100" alt="Leo Racer crest"></p>
-<h1 align="center">Leo Racer · 2.7.1 Ultra</h1>
+<h1 align="center">Leo Racer · 2.7.8</h1>
 <p align="center"><strong>Your ride. Your coast. Your next best lap.</strong><br>A Windows arcade racer on stylized Sri Lankan roads.</p>
 
 <p align="center">
@@ -82,7 +82,7 @@ The Controls screen shows the actual bindings for each player, including shared-
 
 The included **Vehicle Workshop** supports custom imports. Use **Vehicle Workshop.cmd** in the game folder, or open the in-game content tools. The game generates matching transparent previews for future imports.
 
-For a showcase website or social post, download **LeoRacer-2.7.1-Media-Pack.zip** from the [latest release](https://github.com/amilapcsgit/Leo_Racer/releases/latest). It includes transparent cars, artwork, vectors, track outlines, real screenshots and attribution guidance. Promotional illustrations are labeled as artwork rather than gameplay.
+For a showcase website or social post, download **LeoRacer-2.7.1-Media-Pack.zip** from the [2.7.1 artwork release](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.7.1). It includes transparent cars, artwork, vectors, track outlines, real screenshots and attribution guidance. Promotional illustrations are labeled as artwork rather than gameplay.
 
 ## Feedback and known limits
 

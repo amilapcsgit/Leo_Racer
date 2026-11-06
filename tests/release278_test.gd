@@ -69,12 +69,9 @@ func run() -> void:
 	# Route a real root-viewport pointer event through each split container.
 	for slot in 2:
 		var local: LeoLocalPlayer=game.local_players[slot];local.camera_view="chase"
-		var button: Button=game.split_view.overlays[slot].camera_button
-		var container: SubViewportContainer=game.split_view.views[slot].get_parent()
-		var at: Vector2=container.get_global_transform_with_canvas()*(button.get_global_transform_with_canvas()*(button.size*.5))
-		for pressed in [true,false]:
-			var event:=InputEventMouseButton.new();event.position=at;event.global_position=at;event.button_index=MOUSE_BUTTON_LEFT;event.pressed=pressed;root.push_input(event,true);await settle(2)
-		check(local.camera_view=="ghost","Split-screen Camera View button receives pointer / P"+str(slot+1))
+		check(game.split_view.overlays[slot].find_child("CameraView",true,false)==null,"No camera selection on race HUD / P"+str(slot+1))
+		game._on_local_command(slot,"change_camera")
+		check(local.camera_view=="ghost","Camera action cycles view / P"+str(slot+1))
 	second.camera_view="chase"
 	first.camera_view="chase";game.cycle_camera(0)
 	check(first.camera_view=="ghost" and second.camera_view=="chase","Camera cycling is per player")

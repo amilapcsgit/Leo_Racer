@@ -3,6 +3,8 @@ from pathlib import Path
 import argparse, json, os, re, subprocess, time
 from stage_ultra_content import ROOT, sha
 TESTS={
+    'loading':('tests/loading_controls278_test.gd',None),
+    'refinements':('tests/refinements278_test.gd',None),
     'release278':('tests/release278_test.gd',None),
     'unit':('tests/release278_test.gd','--ultra-check=release278'),
     'capture':('tests/release260_collision_test.gd','--ultra-check=contacts'),
@@ -44,7 +46,7 @@ def run(kind,compat=False,export=None,extra=()):
         if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
         env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
         command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
-    render=kind in ['capture','release278','ui','polish','garage','visual','previews','impact','finish']
+    render=kind in ['loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
     command+=['--position','-3200,-3200'] if render else ['--headless']
     if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--tracks='+str(assets/'tracks'),'--qa-output='+str(out)]

@@ -17,6 +17,9 @@ func batch_static(root: Node3D, data: Dictionary) -> void:
 	# Keep every interaction path and all transparent surfaces independent.
 	if not root.find_children("*","AnimationPlayer",true,false).is_empty():return
 	var anchors: Array[Node]=[root];var protected: Array[Node]=[]
+	if data.get("ultra_cockpit",false):
+		for node in root.find_children("*","MeshInstance3D",true,false):
+			if "steering_wheel" in String(node.name) or "mirror" in String(node.name) or "gauges" in String(node.name) or "dash" in String(node.name):protected.append(node)
 	if data.get("ultra_trunk",false):
 		for node in root.find_children("*","MeshInstance3D",true,false):
 			if "tailgate" in String(node.name).to_lower() or ("rear_plate" in String(node.name).to_lower() or String(node.name)=="Bigster_Rear_EU_Band"):protected.append(node)
@@ -133,6 +136,23 @@ func warmup_scene(root: Node3D, disk: String) -> String:
 	var packed:=PackedScene.new();packed.pack(proxies)
 	var result:=ResourceSaver.save(packed,disk);proxies.free()
 	return vehicle_prefix+"shader_warmup.scn" if result==OK else ""
+func recess_cockpit_column(root: Node3D) -> int:
+	# Reviewed interior-only shroud: the supplied reversed wheel left its fixed
+	# column cover protruding in front of the now-correct driver-facing rim.
+	var changed:=0
+	for node in root.find_children("*","MeshInstance3D",true,false):
+		if String(node.name) not in ["dust25_dash","dust25_dash_003"]:continue
+		var pose:=relative_pose(node,root);var inverse:=pose.affine_inverse();var mesh:=ArrayMesh.new()
+		for surface in node.mesh.get_surface_count():
+			var arrays: Array=node.mesh.surface_get_arrays(surface);var points: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+			for n in points.size():
+				var p:=pose*points[n]
+				if p.x<-.49 or p.x>-.20 or p.y<.80 or p.y>1.13 or p.z<-.62 or p.z>-.30:continue
+				var weight:=smoothstep(-.62,-.58,p.z)
+				p.z-=.22*weight;points[n]=inverse*p;changed+=1
+			arrays[Mesh.ARRAY_VERTEX]=points;mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays);mesh.surface_set_material(surface,node.get_active_material(surface))
+		node.mesh=mesh
+	return changed
 func run() -> void:
 	var folder:="";var destination:=""
 	for arg in OS.get_cmdline_user_args():
@@ -142,11 +162,26 @@ func run() -> void:
 	var data: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(folder.path_join("vehicle.json")))
 	destination_folder=destination;vehicle_prefix="res://leo_vehicles/"+String(data.id)+"/"
 	if data.get("ultra_trunk",false):vehicle_prefix="res://ultra_vehicles/bigster/"
+	if data.get("ultra_cockpit",false):vehicle_prefix="res://cockpit278/"+String(data.id)+"/"
 	DirAccess.make_dir_recursive_absolute(destination.path_join("textures"))
 	var loaded:=LeoVehicleImporter.import_scene(folder.path_join(data.model))
 	if not loaded.scene:push_error(loaded.error);quit(2);return
 	var scene: PackedScene=loaded.scene
 	var root:=scene.instantiate() as Node3D
+	if data.get("ultra_cockpit",false) and data.id=="duster_2024":
+		var donor_scene:=LeoVehicleImporter.import_scene(ProjectSettings.globalize_path("res://assets/models/bigster/bigster_232.glb"))
+		if not donor_scene.scene:push_error(donor_scene.error);quit(2);return
+		var donor: Node3D=donor_scene.scene.instantiate()
+		var shared:=Node3D.new();shared.name="SharedCockpit";root.add_child(shared);shared.owner=root
+		var parts:=["dust25_carpet","dust25_dash","dust25_dash_001","dust25_dash_002","dust25_dash_003","dust25_gauges","dust25_seat_FL","dust25_seat_FR","dust25_seats_R","dust25_steering_wheel","dust25_steering_wheel_001"]
+		for node in root.find_children("*","MeshInstance3D",true,false):
+			if String(node.name).replace(".","_") in parts:node.get_parent().remove_child(node);node.free()
+		for node in donor.find_children("*","MeshInstance3D",true,false):
+			if String(node.name).replace(".","_") not in parts:continue
+			var part:=node.duplicate() as Node3D;part.transform=relative_pose(node,donor)
+			shared.add_child(part);part.owner=root;own_children(part,root)
+		donor.free()
+	if data.get("ultra_cockpit",false):data.column_repair_vertices=recess_cockpit_column(root)
 	preload("res://scripts/catalog/vehicle_finish.gd").install(root,String(data.get("visual_profile","")))
 	preload("res://scripts/catalog/vehicle_surface_profile.gd").install(root,String(data.id))
 	batch_static(root,data)

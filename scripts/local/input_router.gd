@@ -75,6 +75,17 @@ func ready_problem(slot: int) -> String:
  return ""
 func stop_feedback() -> void:
  if is_inside_tree():get_tree().call_group("haptics","stop_all")
+func sync_held() -> void:
+ for p in players:
+  for action in p.bindings:
+   for binding in p.bindings[action]:
+    var index:=int(binding.get("index",0))
+    match String(binding.get("type","")):
+     "key":p.keys[index]=Input.is_physical_key_pressed(index)
+     "button":p.buttons[index]=Input.is_joy_button_pressed(p.device,index) if p.device>=0 else false
+     "axis":
+      if p.device>=0:p.axes[index]=Input.get_joy_axis(p.device,index)
+
 func clear_all() -> void:
  stop_feedback()
  for p in players:
@@ -128,6 +139,13 @@ func menu_confirm(event: InputEvent) -> bool:
   if not pressed:menu_confirm_held.erase(key)
   get_viewport().set_input_as_handled();return true
  if gameplay_enabled:return false
+ # Xbox A always confirms menus, independently of gameplay bindings/assignment.
+ if event is InputEventJoypadButton and event.button_index==JOY_BUTTON_A:
+  if not event.pressed:return false
+  menu_confirm_held[key]={"type":"button","index":JOY_BUTTON_A}
+  var focused:=get_viewport().gui_get_focus_owner()
+  _confirm_focused.call_deferred(weakref(focused) if focused else null,event.device)
+  get_viewport().set_input_as_handled();return true
  for slot in active_slots:
   var p:=players[slot]
   if not p.accepts(event):continue
@@ -175,10 +193,7 @@ func _popup_input(event: InputEvent) -> void:
   if is_instance_valid(popup):popup.set_input_as_handled()
 
 func menu_confirm_label() -> String:
- var labels: Array[String]=[]
- for slot in active_slots:
-  if players[slot].kind!="keyboard":labels.append("P%d %s" % [slot+1,players[slot].describe("boost")])
- return " / ".join(labels) if not labels.is_empty() else "X"
+ return "A"
 func feed(event: InputEvent) -> void:
  if event is InputEventMouseButton or event is InputEventMouseMotion:
   var owner:=0
