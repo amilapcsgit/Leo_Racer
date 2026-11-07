@@ -47,7 +47,8 @@ func create_timer(seconds: float,always: bool=true,physics: bool=false,ignore_sc
 '''
     for name,source in mapping.items():
         script=(ROOT/'tests'/ (source+'.gd')).read_text(encoding='utf-8')
-        script=script.replace('extends SceneTree',adapter,1).replace(',self)',',get_tree())').replace('func _process(dt: float) -> bool:','func _process(dt: float) -> void:').replace('return false','return')
+        script=script.replace('extends SceneTree',adapter,1).replace(',self)',',get_tree())')
+        script=re.sub(r'(func _process\([^)]*\)\s*->\s*)bool:',r'\1void:',script).replace('return false','return')
         entries['tests/native270/'+name+'.gd']=script.expandtabs(4).encode('utf-8')
     key='scripts/content/bootstrap.gd';entries.pop(key+'.remap',None);entries[key]=(ROOT/key).read_bytes()
 def stage():
@@ -186,8 +187,10 @@ def package():
     with zipfile.ZipFile(evidence,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
         for file in sorted(QA.rglob('*')):
             parts=file.relative_to(QA).parts
-            if parts[0]=='benchmark-copies' or 'profile' in parts:continue
-            if file.is_file() and file.suffix in ['.json','.jsonl','.log','.png','.md','.mp4']:archive.write(file,file.relative_to(QA).as_posix())
+            if parts[0]=='benchmark-copies' or 'profile' in parts or 'native-copy' in parts:continue
+            if file.is_file() and file.suffix in ['.json','.jsonl','.log','.md']:archive.write(file,file.relative_to(QA).as_posix())
+        for file in sorted((ROOT/'docs/screenshots'/VERSION).glob('*')):
+            if file.is_file() and file.suffix in ['.png','.md']:archive.write(file,'screenshots/'+file.name)
     with zipfile.ZipFile(evidence) as archive:
         if not any(name.endswith('/process.log') for name in archive.namelist()):raise RuntimeError('Evidence archive must include raw process logs')
     for name in ['RELEASE_NOTES_'+REV+'.md','VALIDATION_'+REV+'.md']:shutil.copy2(ROOT/'docs'/name,OUT/('RELEASE_NOTES.md' if name.startswith('RELEASE') else 'TEST_REPORT.md'))

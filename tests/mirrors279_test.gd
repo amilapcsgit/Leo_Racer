@@ -19,7 +19,7 @@ func check(ok: bool, label: String) -> void:
 	if not ok: errors.append(label);push_error(label)
 func settle(frames: int = 12) -> void:
 	for frame in frames: await process_frame
-func _process(_dt: float) -> bool:
+func _process(dt: float) -> bool:
 	if animate:
 		var elapsed := (Time.get_ticks_usec() - animation_started) / 1000000.0
 		for index in probes.size():

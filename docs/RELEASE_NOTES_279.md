@@ -21,7 +21,7 @@ See the [three-cockpit comparison](../README.md#a-closer-seat-to-the-action) and
 
 ## Sri Lankan presentation
 
-- A shared **23-image loading gallery**, including five new location heroes: **Galle Fort, Hikkaduwa, Nine Arch Bridge, Sigiriya and Sri Dalada Maligawa**.
+- A shared **23-image loading gallery**, including five new AI-generated location illustrations: **Galle Fort, Hikkaduwa, Nine Arch Bridge, Sigiriya and Sri Dalada Maligawa**.
 - Artwork is shuffled between loading operations and stays steady during each one. Original images remain preserved; garage and billboard source art are excluded from the loading-hero set.
 - More consistent dry asphalt, restrained road reflections, terrain detail and additional roadside planting across the existing tracks.
 

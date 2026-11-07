@@ -41,7 +41,7 @@ Settings now has five tabs: **Graphics, Audio, Controls, Accessibility and Game 
 
 ## Sri Lanka, from coast to hill country
 
-More consistent dry asphalt, restrained surface reflections and additional roadside planting enrich the existing circuits. The shared **23-image loading gallery** includes five new location heroes: **Galle Fort, Hikkaduwa, Nine Arch Bridge, Sigiriya and Sri Dalada Maligawa**. A shuffle bag varies the artwork between loads and keeps one image steady throughout each operation.
+More consistent dry asphalt, restrained surface reflections and additional roadside planting enrich the existing circuits. The shared **23-image loading gallery** includes five new AI-generated location illustrations: **Galle Fort, Hikkaduwa, Nine Arch Bridge, Sigiriya and Sri Dalada Maligawa**. These are promotional loading artwork. A shuffle bag varies the artwork between loads and keeps one image steady throughout each operation.
 
 | Circuit | Character | Length |
 |---|---|---|
