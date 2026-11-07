@@ -21,6 +21,8 @@ var last_pad := false
 var prompt: Label
 var modal_title := ""
 var focus_graph := ""
+var result_reference_time:=0.
+var result_reference_session:=""
 func _ready() -> void:
  process_mode=Node.PROCESS_MODE_ALWAYS
  game.input_router.binding_changed.connect(update_devices)
@@ -90,7 +92,7 @@ func show_home() -> void:
  action(grid,"How to Play",show_guide)
  action(grid,"Content",game.show_content_manager)
  action(grid,"Credits",show_credits)
- label(left,"Pick your ride. Hit the road.",24,Color("ffc857"))
+ label(left,"Pick your ride. Hit the road.",22,Color("c5d3df"))
  prepare_home_neighbors()
  restore(go)
 func prepare_home_neighbors() -> void:
@@ -179,6 +181,7 @@ func start_selected() -> void:
  starting=true;audio.say("race");setup.sync(game)
  game.save_settings()
  await game.start_race()
+ result_reference_time=game.best_time;result_reference_session=game.session_id
  starting=false
 func open_garage(slot: int) -> void:
  setup.return_focus="Change Ride";game.selected_player_slot=slot
@@ -333,15 +336,29 @@ func show_records() -> void:
 func show_results() -> void:
  close_modal(false);game.input_router.gameplay_enabled=false;screen="results";hud.scene_mode="results"
  audio.say("finish")
- var box:=shell("WHAT A RIDE!","Great race!");hud.scene_mode="results"
+ var box:=shell("RACE COMPLETE",game.track_definition.display_name+"  ·  %d LAP%s"%[game.active_laps,"" if game.active_laps==1 else "S"]);hud.scene_mode="results"
+ var results:=HBoxContainer.new();results.add_theme_constant_override("separation",20);results.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(results)
  for slot in game.human_count:
   var local: LeoLocalPlayer=game.local_players[slot];var kart:=local.kart
-  label(box,"P%d · %s     %s     %s" % [slot+1,kart.racer_name,("#%d" % game.player_place(slot)) if kart.finished else "Didn't finish",game.format_time(kart.finish_time) if kart.finished else ""],36,Color("ffc857") if game.player_place(slot)==1 else Color("f5f7fa"))
-  label(box,"Best lap · "+(game.format_time(local.best_lap) if local.best_lap<99999 else "—"),24)
+  var summary:=card(results);summary.add_theme_constant_override("separation",14)
+  var result_panel:=summary.get_parent() as PanelContainer
+  var result_style:=StyleBoxFlat.new();result_style.bg_color=Color("0b151fee");result_style.border_color=Color("49616d");result_style.set_border_width_all(1);result_style.set_corner_radius_all(12);result_style.set_content_margin_all(24);result_panel.add_theme_stylebox_override("panel",result_style)
+  var identity:=label(summary,"P%d  ·  %s"%[slot+1,kart.racer_name],28,Color("69e4ed") if slot==0 else Color("ffd078"));identity.clip_text=true;identity.autowrap_mode=TextServer.AUTOWRAP_OFF;identity.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+  label(summary,("#%d FINISH"%game.player_place(slot)) if kart.finished else "DID NOT FINISH",36,Color("ffc857") if kart.finished and game.player_place(slot)==1 else Color("f5f7fa"))
+  label(summary,"RACE TIME",20,Color("b9c7d6"))
+  label(summary,game.format_time(kart.finish_time) if kart.finished else "—",48)
+  label(summary,"Best lap  ·  "+(game.format_time(local.best_lap) if local.best_lap<99999 else "—"),24)
+  var comparison:=result_comparison(slot,kart.finished,kart.finish_time)
+  if not comparison.is_empty():label(summary,comparison,24,Color("8fe1bc") if kart.finish_time<result_reference_time else Color("c5d3df"))
  label(box,game.ranking_message.replace("OFFLINE RANKINGS","Records").replace("MODIFIED RACE / RECORDS NOT SAVED","Modded race · official records aren't saved."),22,Color("b9c7d6"))
  var spacer:=Control.new();spacer.custom_minimum_size.y=8;box.add_child(spacer)
  action(box,"Race Again   →",start_selected,true).grab_focus()
  var row:=HBoxContainer.new();box.add_child(row);action(row,"Change Race",func():show_setup());action(row,"Home",game.return_menu)
+func result_comparison(slot: int,finished: bool,finish_time: float) -> String:
+ if slot!=0 or not finished or game.race_modified or result_reference_session!=game.session_id or result_reference_time<=0:return ""
+ var delta:=finish_time-result_reference_time
+ if absf(delta)<.001:return "PERSONAL BEST MATCHED"
+ return ("PERSONAL BEST  ·  −" if delta<0 else "FROM YOUR BEST  ·  +")+game.format_time(absf(delta))
 func update_prompt() -> void:
  if is_instance_valid(prompt):prompt.text="D-pad / Stick   Move     %s   OK     B   Back" % game.input_router.menu_confirm_label() if last_pad else "Arrows   Move     Enter   Select     Esc   Back"
 

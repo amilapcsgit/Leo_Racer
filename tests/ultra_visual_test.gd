@@ -39,7 +39,7 @@ func run() -> void:
 	root.size=Vector2i(900,900);DisplayServer.window_set_size(root.size);await settle()
 	game.hud.frontend.show_settings();await shot("settings-narrow")
 	var settings_tabs:=game.hud.modal_root.find_child("SettingsTabs",true,false) as TabContainer
-	check(settings_tabs!=null and settings_tabs.get_tab_count()==4,"Narrow settings keep four scrollable tabs")
+	check(settings_tabs!=null and settings_tabs.get_tab_count()==5,"Narrow settings keep five scrollable tabs including Game Logic")
 	root.size=Vector2i(1920,1080);DisplayServer.window_set_size(root.size);await settle()
 	check(settings_tabs.get_global_rect().end.x<=root.get_visible_rect().size.x,"Settings fit after live resize")
 	game.hud.frontend.close_modal()

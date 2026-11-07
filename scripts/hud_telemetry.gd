@@ -1,6 +1,12 @@
 class_name LeoTelemetry
 extends RefCounted
 ## Vector instruments stay crisp at every resolution; no baked text textures.
+const COCKPIT_TOP_STRIP=Rect2(24,12,1552,64)
+static func rpm_center(h: Control) -> Vector2:
+	return Vector2(670,h.size.y-135) if h.game.human_count==2 else Vector2(1400,720+h.size.y-900.)
+static func rpm_bounds(h: Control) -> Rect2:
+	var radius:=105. if h.game.human_count==2 else 155.
+	return Rect2(rpm_center(h)-Vector2.ONE*radius,Vector2.ONE*radius*2.)
 static func glass(h: Control, r: Rect2, cyan: Color, opacity: float=.28) -> void:
 	var p := r.position
 	var e := r.end
@@ -20,26 +26,26 @@ static func draw(h: Control, background: bool=false) -> void:
 	if h.game.human_count==2:
 		draw_split(h,kart,background);return
 	var slot: int=int(h.get("slot")) if h.get("slot")!=null else 0
-	if LeoCameraViews.effective(h.game.local_players[slot])=="cockpit":
-		if background:
-			for rectangle in [Rect2(42,36,230,142),Rect2(306,36,244,139),Rect2(574,28,600,120),Rect2(1193,30,365,96)]:glass(h,rectangle,Color("00e4ef"),.7)
-		return
+	var cockpit:=LeoCameraViews.effective(h.game.local_players[slot])=="cockpit"
 	var extra: float=h.size.y-900.
 	var cyan := Color("00f2fe")
 	var amber := Color("ff9000")
 	if background:
-		glass(h,Rect2(42,36,230,142),cyan)
-		glass(h,Rect2(306,36,244,139),cyan)
-		# Sunset sky can be nearly white; telemetry retains the same contrast as gauges.
-		glass(h,Rect2(574,28,600,120),cyan)
-		glass(h,Rect2(1193,30,365,96),cyan)
-		h.draw_polyline(PackedVector2Array([Vector2(574,36),Vector2(585,75),Vector2(1145,75),Vector2(1174,36)]),Color(cyan,.5),1.2,true)
-		h.draw_line(Vector2(638,81),Vector2(735,81),Color(amber,.8),2,true)
+		if cockpit:glass(h,COCKPIT_TOP_STRIP,cyan,.86)
+		else:
+			glass(h,Rect2(42,36,230,142),cyan)
+			glass(h,Rect2(306,36,244,139),cyan)
+			# Sunset sky can be nearly white; telemetry retains the same contrast as gauges.
+			glass(h,Rect2(574,28,600,120),cyan)
+			glass(h,Rect2(1193,30,365,96),cyan)
+			h.draw_polyline(PackedVector2Array([Vector2(574,36),Vector2(585,75),Vector2(1145,75),Vector2(1174,36)]),Color(cyan,.5),1.2,true)
+			h.draw_line(Vector2(638,81),Vector2(735,81),Color(amber,.8),2,true)
 		if h.game.human_count==1:glass(h,Rect2(42,836+extra,847,45),cyan)
 		# Position badge metallic edge.
-		h.draw_line(Vector2(46,52),Vector2(46,151),Color(amber,.8),3,true)
-		h.draw_line(Vector2(50,55),Vector2(50,146),Color("ffd796"),1,true)
-	var c := Vector2(1400,720+extra)
+		if not cockpit:
+			h.draw_line(Vector2(46,52),Vector2(46,151),Color(amber,.8),3,true)
+			h.draw_line(Vector2(50,55),Vector2(50,146),Color("ffd796"),1,true)
+	var c := rpm_center(h)
 	if background:
 		h.draw_circle(c,155,Color(.008,.02,.033,.28),true,-1,true)
 		for i in range(5):
@@ -65,6 +71,7 @@ static func draw(h: Control, background: bool=false) -> void:
 				var label_pos := c+v*103-Vector2(9,-5)
 				h.draw_string(h.heading_font,label_pos,str(i/6),HORIZONTAL_ALIGNMENT_LEFT,-1,16,Color("d6e8ea"))
 	if not background:
+		h.analog_rpm_draws+=1
 		var angle := deg_to_rad(135+value*270)
 		var needle := Vector2(cos(angle),sin(angle))
 		h.draw_line(c+needle*77,c+needle*130,Color(amber,.18),9,true)
@@ -109,20 +116,18 @@ static func draw(h: Control, background: bool=false) -> void:
 		glass(h,Rect2(600,805+extra,400,10),cyan)
 		h.draw_rect(Rect2(602,807+extra,396*minf(1,kart.drift_charge/2.5),6),amber)
 
-	if not background:
+	if not background and not cockpit:
 		var lap_fraction := fposmod(maxf(0.,kart.progress)/h.game.circuit.length,1.0)
 		h.draw_line(Vector2(595,136),Vector2(1156,136),Color(cyan,.15),3,true)
 		h.draw_line(Vector2(595,136),Vector2(595+561*lap_fraction,136),Color(cyan,.8),3,true)
 
 static func draw_split(h: Control,kart: LeoKart,background: bool) -> void:
 	var cyan:=Color("00e4ef");var amber:=Color("ffb94f")
-	var c:=Vector2(670,h.size.y-135)
-	var cockpit:=LeoCameraViews.effective(h.game.local_players[int(h.slot)])=="cockpit"
+	var c:=rpm_center(h)
 	if background:
 		glass(h,Rect2(24,16,752,94),cyan,.88)
 		h.draw_string(h.heading_font,Vector2(92,59),"/ 6",HORIZONTAL_ALIGNMENT_LEFT,-1,20,Color.WHITE)
 		h.draw_string(h.heading_font,Vector2(34,91),"POSITION",HORIZONTAL_ALIGNMENT_LEFT,-1,15,Color("b9d0d5"))
-		if cockpit:return
 		glass(h,Rect2(24,h.size.y-210,155,180),cyan,.6)
 		h.draw_circle(c,105,Color(.008,.02,.033,.65),true,-1,true)
 		h.draw_arc(c,100,deg_to_rad(135),deg_to_rad(405),64,Color(cyan,.35),3,true)
@@ -135,7 +140,7 @@ static func draw_split(h: Control,kart: LeoKart,background: bool) -> void:
 			var point: Vector3=h.game.circuit.points[i];line.append(h.map_projection*Vector2(point.x,point.z))
 		if line.size()>1:line.append(line[0]);h.draw_polyline(line,Color(cyan,.15),8,true);h.draw_polyline(line,cyan,2,true)
 	else:
-		if cockpit:return
+		h.analog_rpm_draws+=1
 		var rpm: float=kart.motor_audio.rpm if kart.motor_audio else 900.
 		var angle:=deg_to_rad(135+clampf(rpm/8000.,0.,1.)*270.)
 		var direction:=Vector2(cos(angle),sin(angle))

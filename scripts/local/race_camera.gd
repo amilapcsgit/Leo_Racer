@@ -58,6 +58,8 @@ func update(local: LeoLocalPlayer,view: Camera3D,kart: LeoKart,input: LeoPlayerI
 			var data:=LeoCameraViews.profile(kart.definition)
 			eye=LeoVehicleCodec.vector(data.eye)
 			rotation_degrees=LeoVehicleCodec.vector(data.get("rotation_degrees",[0,0,0]))
+		# View changes must not inherit garage zoom or chase-speed pullback.
+		view.fov=float(kart.get_parent().base_camera_fov)
 		var mouse:=input.orbit_delta()
 		if driving_view=="cockpit":
 			var target:=Vector2(input.value("camera_left")-input.value("camera_right"),input.value("camera_up")-input.value("camera_down"))*Vector2(deg_to_rad(75.),deg_to_rad(22.))

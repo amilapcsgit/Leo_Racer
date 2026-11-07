@@ -6,8 +6,9 @@ static func build(front: LeoFrontend) -> void:
 	var box:=front.dialog("SETTINGS","Make yourself comfortable.",func():graphics.revert_display();leave.call(),1160)
 	var tabs:=TabContainer.new();tabs.name="SettingsTabs";tabs.custom_minimum_size=Vector2(0,500);tabs.size_flags_horizontal=Control.SIZE_EXPAND_FILL;box.add_child(tabs)
 	var pages: Dictionary={}
-	for title in ["Graphics","Audio","Controls","Accessibility"]:
-		var scroll:=ScrollContainer.new();scroll.name=title;scroll.follow_focus=true;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;tabs.add_child(scroll)
+	for title in ["Graphics","Audio","Controls","Accessibility","Game Logic"]:
+		var scroll:=ScrollContainer.new();scroll.name="GameLogicTab" if title=="Game Logic" else title;scroll.follow_focus=true;scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;tabs.add_child(scroll)
+		if title=="Game Logic":tabs.set_tab_title(tabs.get_tab_count()-1,"Game Logic")
 		var margin:=MarginContainer.new();margin.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		for edge in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+edge,16)
 		scroll.add_child(margin)
@@ -78,7 +79,7 @@ static func build(front: LeoFrontend) -> void:
 		var camera:=choice(front,controls,"Player %d camera"%(slot+1),names,maxi(0,options.find(local.camera_view)))
 		camera.item_selected.connect(func(selected):
 			game.local_players[index].camera_view=options[selected];game.local_players[index].camera_rig.reset();game.local_players[index].camera_transition=.16;game.save_settings())
-		if not "cockpit" in options:front.label(controls,"Cockpit is available only on reviewed detailed interiors, including Bigster and Duster 2024.",20,Color("b9c7d6"))
+		if not "cockpit" in options:front.label(controls,"Cockpit view is available when your selected vehicle has a reviewed detailed interior.",20,Color("b9c7d6"))
 	var fov:=SpinBox.new();fov.min_value=55;fov.max_value=75;fov.step=1;fov.value=game.base_camera_fov
 	row(front,controls,"Field of view",fov);fov.value_changed.connect(game.set_camera_fov)
 	var access: VBoxContainer=pages.Accessibility
@@ -89,6 +90,11 @@ static func build(front: LeoFrontend) -> void:
 	front.add_slider(access,"Strength",game.haptics.intensity,func(value):game.haptics.intensity=value;game.save_settings())
 	front.action(access,"Test Rumble",func():
 		for slot in game.human_count:game.input_router.identify(slot))
+	var logic: VBoxContainer=pages["Game Logic"]
+	front.label(logic,"AI OPPONENTS",26,Color("67d6db"))
+	var bigster:=CheckButton.new();bigster.name="AllowAIBigster";bigster.text="Allow Bigster as an AI opponent";bigster.button_pressed=game.allow_ai_bigster;bigster.custom_minimum_size.y=44;logic.add_child(bigster)
+	bigster.toggled.connect(game.set_allow_ai_bigster)
+	front.label(logic,"Off by default. Changes apply when you start or restart a race. Bigster remains available to human players.",20,Color("b9c7d6"))
 	front.action(box,"Back",func():graphics.revert_display();leave.call()).grab_focus()
 	# Leaving through Escape or another modal also restores unconfirmed changes.
 	box.tree_exiting.connect(func():graphics.revert_display())

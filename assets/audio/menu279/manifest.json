@@ -1,0 +1,31 @@
+{
+  "title": "Ceylon Afterglow",
+  "version": "2.7.9",
+  "bpm": 128,
+  "bars": 48,
+  "seconds": 90.0,
+  "sample_rate": 48000,
+  "channels": 2,
+  "seed": 290,
+  "method": "Original deterministic synthesis and arrangement; no sampled recording",
+  "reference": "User supplied GAJAGA WANNAMA techno version.mp3: broad percussion/techno direction only; not redistributed",
+  "gain_db": 2.6499999999999986,
+  "pre_master_loudness": {
+    "input_i": "-20.65",
+    "input_tp": "-6.39",
+    "input_lra": "0.50",
+    "input_thresh": "-30.65",
+    "output_i": "-17.97",
+    "output_tp": "-3.77",
+    "output_lra": "0.50",
+    "output_thresh": "-27.97",
+    "normalization_type": "dynamic",
+    "target_offset": "-0.03"
+  },
+  "loop_boundary_delta": 0.004022728651762009,
+  "files": {
+    "Ceylon_Afterglow_128.wav": "e9005f1459ec4d5bd64b6ab54c6205dcec62553763178c3cf6da296b8045b4b5",
+    "ceylon_afterglow.ogg": "4eecf93e655531635f2e50e958a20f4eea15c5d3bafbad03e0572ec030741269"
+  },
+  "generator": "tools/compose_menu279.py"
+}

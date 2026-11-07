@@ -110,3 +110,8 @@ installer/Release271.nsi
 
 installer/release278-*.nsh
 installer/Release278.nsi
+
+# Reproducible 2.7.9 installer lists contain local staging paths.
+installer/release279-*.nsh
+installer/Release279.nsi
+docs/screenshots/2.7.9/*.import

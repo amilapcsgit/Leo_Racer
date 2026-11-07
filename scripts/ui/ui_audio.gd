@@ -12,6 +12,7 @@ var last_move := 0
 var levels := {"Music":.75,"Effects":1.,"UI":.7,"Voice":.8,"Announcer":1.}
 var voice_enabled := true
 var last_voice: Dictionary={}
+var shutting_down:=false
 func _ready() -> void:
  process_mode=Node.PROCESS_MODE_ALWAYS;add_to_group("ui_audio")
  for bus in levels:
@@ -26,6 +27,7 @@ func _ready() -> void:
  voice=AudioStreamPlayer.new();voice.bus="Voice";add_child(voice)
  load_preferences()
 func cue(key: String) -> void:
+ if shutting_down:return
  var now:=Time.get_ticks_msec()
  if key=="move":
   if now<quiet_until or now-last_move<85:return
@@ -42,6 +44,7 @@ func cue(key: String) -> void:
 func stop_effects() -> void:
  for player in players:player.stop()
 func say(key: String) -> void:
+ if shutting_down:return
  if not voice_enabled:return
  if Time.get_ticks_msec()-int(last_voice.get(key,-3000))<2000:return
  last_voice[key]=Time.get_ticks_msec()
@@ -68,3 +71,11 @@ func save_preferences() -> void:
  var cfg:=ConfigFile.new();cfg.load("user://leo_racer.cfg")
  for bus in levels:cfg.set_value("ui_audio",bus,levels[bus])
  cfg.set_value("ui_audio","voice_enabled",voice_enabled);cfg.save("user://leo_racer.cfg")
+func shutdown() -> void:
+ # Release procedural WAVs while the audio server can still finish its mix tick.
+ shutting_down=true;set_process(false)
+ for player in players:
+  if is_instance_valid(player):player.stop();player.stream=null
+ if is_instance_valid(voice):voice.stop();voice.stream=null
+ streams.clear()
+func _exit_tree() -> void:shutdown()

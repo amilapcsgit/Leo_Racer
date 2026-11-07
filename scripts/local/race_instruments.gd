@@ -42,6 +42,7 @@ var map_projection:=Transform2D.IDENTITY
 var profile_usec:=0
 var profile_frames:=0
 var background_updates:=0
+var analog_rpm_draws:=0
 func text_at(parent: Node,p: Vector2,extent: Vector2,words: String,fs: int=24,color: Color=Color.WHITE,heading: bool=false) -> Label:
 	var label:=Label.new();label.position=p;label.size=extent;label.text=words
 	label.add_theme_font_override("font",heading_font if heading else body_font);label.add_theme_font_size_override("font_size",fs);label.add_theme_color_override("font_color",color)
@@ -82,9 +83,10 @@ func build() -> void:
 	labels.progress = text_at(self,Vector2(595,106),Vector2(270,25),"LAP PROGRESS  0%",14,muted,true)
 	labels.corner = text_at(self,Vector2(858,106),Vector2(300,25),"",14,accent,true)
 	labels.corner.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	labels.brand=text_at(self,Vector2(1282,51),Vector2(280,55),"LEO RACER",37,Color("e7f5f7"),true)
+	labels.brand=text_at(self,Vector2(1220,51),Vector2(320,42),"PLAYER 1",24,Color("e7f5f7"),true)
 	labels.brand.clip_text=true;labels.brand.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	var lion := TextureRect.new()
+	lion.name="RaceBrandMark"
 	lion.texture = load("res://assets/art/neon_lion.svg")
 	lion.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	lion.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -164,8 +166,8 @@ func layout() -> void:
 		compact_label(labels.brand,Vector2(330,22),Vector2(440,34),26)
 		compact_label(labels.track,Vector2(330,65),Vector2(440,28),20)
 		compact_label(labels.callout,Vector2(24,126),Vector2(752,40),24)
-		compact_label(labels.launch,Vector2(24,size.y-260),Vector2(752,32),18)
-		compact_label(labels.drift,Vector2(24,size.y-300),Vector2(752,32),20)
+		compact_label(labels.launch,Vector2(24,176),Vector2(752,32),25)
+		compact_label(labels.drift,Vector2(24,176),Vector2(752,32),25)
 		compact_label(labels.speed,Vector2(580,size.y-172),Vector2(180,65),62)
 		compact_label(labels.speed_unit,Vector2(627,size.y-97),Vector2(90,24),16)
 		compact_label(labels.rpm_unit,Vector2(604,size.y-196),Vector2(140,22),16)
@@ -174,20 +176,20 @@ func layout() -> void:
 		countdown_container.position=Vector2(0,245);countdown_container.size=Vector2(800,240)
 	else:
 		countdown_container.position=Vector2(400,300)
-	if view_layout=="cockpit":
-		for item in [labels.rpm_unit,nitro_liquid]:item.hide()
-		if game.human_count==2:
-			compact_label(labels.speed,Vector2(620,size.y-93),Vector2(150,56),46)
-			compact_label(labels.speed_unit,Vector2(650,size.y-35),Vector2(95,25),16)
-			compact_label(labels.nitro,Vector2(400,size.y-27),Vector2(215,25),18)
-		else:
-			for child in get_children():
-				if child is Control and child.has_meta("design_position") and child.get_meta("design_position").y>=450:child.hide()
-			compact_label(labels.speed,Vector2(1450,size.y-80),Vector2(110,50),40)
-			compact_label(labels.speed_unit,Vector2(1464,size.y-30),Vector2(100,24),16)
-			compact_label(labels.nitro,Vector2(1210,size.y-38),Vector2(220,28),18)
-			compact_label(labels.launch,Vector2(380,517),Vector2(840,35),20)
-			compact_label(labels.drift,Vector2(575,size.y-142),Vector2(500,35),23)
+	if view_layout=="cockpit" and game.human_count==1:
+		# Compact the header only. The original analog/digital gauge below is shared
+		# unchanged by Chase, Ghost and Cockpit, including its raster speed font.
+		for child in get_children():
+			if child is Control and child.has_meta("design_position") and child.get_meta("design_position").y<450:child.hide()
+		compact_label(labels.position,Vector2(42,22),Vector2(138,42),30)
+		compact_label(labels.lap,Vector2(205,24),Vector2(185,38),28)
+		compact_label(labels.timer,Vector2(417,24),Vector2(220,38),28)
+		compact_label(labels.track,Vector2(672,26),Vector2(862,34),26)
+		compact_label(labels.callout,Vector2(320,100),Vector2(960,48),28)
+	# One upper message lane keeps launch and boost feedback away from instruments.
+	labels.launch.hide();labels.drift.hide()
+	var mark:=get_node_or_null("RaceBrandMark")
+	if mark:mark.hide()
 	labels.countdown.visible=false
 	speed_overlay.visible=true;recovery_overlay.visible=true;camera_fade.visible=true
 
@@ -232,8 +234,9 @@ func _process(dt: float) -> void:
 	(speed_overlay.material as ShaderMaterial).set_shader_parameter("animation_time",time)
 	var bindings: LeoPlayerInput=game.input_router.players[slot]
 	for i in binding_hints.size():binding_hints[i].text=bindings.describe(ACTIONS[i])
-	labels.position.text = str(game.player_place(slot))
-	labels.lap.text = "%d / %d" % [p.lap,game.active_laps]
+	var compact_cockpit: bool=view_layout=="cockpit" and game.human_count==1
+	labels.position.text = "#%d / 6"%game.player_place(slot) if compact_cockpit else str(game.player_place(slot))
+	labels.lap.text = ("LAP %d / %d" if compact_cockpit else "%d / %d") % [p.lap,game.active_laps]
 	labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
 	display_rpm=lerpf(display_rpm,p.motor_audio.rpm if p.motor_audio else 900.,1.-exp(-visual_dt*12.))
 	display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-visual_dt*12))
@@ -260,14 +263,15 @@ func _process(dt: float) -> void:
 	labels.nitro.text = "NITRO READY" if nitro_ready else "CHARGING %d%%"%int(p.boost_fuel*100)
 	labels.nitro.modulate = Color(1.0,1.0,1.0,1.0 if game.reduced_motion or ready_flash<=0 else .8+sin(time*12.0)*.2)
 	labels.sector.text = game.circuit.sector_name(p.last_s)
-	labels.track.text=game.track_definition.display_name.to_upper()
-	labels.brand.text="P%d / %s"%[slot+1,p.racer_name] if game.human_count==2 else "LEO RACER"
+	labels.track.text=game.track_definition.display_name.to_upper()+("  ·  "+game.circuit.sector_name(p.last_s).to_upper() if compact_cockpit else "")
+	labels.brand.text="P%d / %s"%[slot+1,p.racer_name]
 	labels.progress.text = "LAP PROGRESS  %02d%%" % int(fposmod(maxf(0.,p.progress)/game.circuit.length,1.0)*100.0)
 	var approach: Vector3 = game.circuit.direction(p.last_s+4.0)
 	var bend: Vector3 = game.circuit.direction(p.last_s+28.0+actual_speed*.35)
 	var bend_angle := atan2(approach.cross(bend).y,approach.dot(bend))
 	labels.corner.text = (("HARD " if absf(bend_angle)>.85 else "")+("RIGHT AHEAD" if bend_angle>0 else "LEFT AHEAD")) if p.active and actual_speed>4.0 and absf(bend_angle)>.3 else "FIND YOUR FLOW"
-	labels.launch.visible = game.state=="countdown"
+	labels.launch.visible = false
+	labels.drift.visible = false
 	labels.launch.text="REV NOW · TAP ON 1 FOR LAUNCH BOOST" if game.human_count==2 else "REV NOW · TAP ACCELERATE ON THE FINAL BEAT FOR A LAUNCH BOOST"
 	if game.state == "countdown": labels.countdown.text = str(clampi(int(ceil(game.countdown)),1,3))
 	else: labels.countdown.text = "GO!" if game.race_time < .85 else ""
@@ -278,6 +282,8 @@ func _process(dt: float) -> void:
 	countdown_view.render_target_update_mode=SubViewport.UPDATE_ALWAYS if words!="" else SubViewport.UPDATE_DISABLED
 	if not game.paused: announcement_time = maxf(0, announcement_time - dt)
 	labels.callout.text = local.announcement if local.announcement_time > 0 else announcement if announcement_time > 0 else ""
+	if labels.callout.text.is_empty() and drift_charged:labels.callout.text="DRIFT CHARGED · RELEASE FOR BOOST"
+	if game.state=="countdown":labels.callout.text="REV NOW · TAP ACCELERATE ON 1" if game.human_count==2 else "REV NOW · TAP ACCELERATE ON 1 FOR A LAUNCH BOOST"
 	if local.wrong_way > 1.0: labels.callout.text = "WRONG WAY  /  TURN AROUND"
 	if p.checkpoint_missed:labels.callout.text="CHECKPOINT MISSED / "+bindings.describe("recover")+" RECOVER"
 	queue_redraw()

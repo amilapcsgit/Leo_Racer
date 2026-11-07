@@ -51,6 +51,9 @@ var boost_count := 0
 var last_beep := -1
 var master_volume := .72
 var music_enabled := true
+const GameLogic279=preload("res://scripts/local/game_logic279.gd")
+var allow_ai_bigster := false
+var race_game_logic := GameLogic279.new()
 var music: LeoRaceAudio
 var click_sound: AudioStreamPlayer
 var countdown_sound: AudioStreamPlayer
@@ -198,7 +201,7 @@ func _ready() -> void:
 	go_sound = make_sound("go.wav", -12)
 	finish_sound = make_sound("finish.wav", -10)
 	ui_audio=LeoUIAudio.new();add_child(ui_audio)
-	music=LeoRaceAudio.new();add_child(music)
+	music=LeoRaceAudio.shared(get_tree());music.bind_game(self)
 	music.bus="Music"
 	for sound in [click_sound,countdown_sound,go_sound,finish_sound]:sound.bus="Effects"
 	var post: CanvasLayer=load("res://scripts/local/driving_post.gd").new();post.game=self;add_child(post)
@@ -544,9 +547,26 @@ func return_menu() -> void:
 	hud.show_menu()
 
 func default_ai_vehicle(index: int) -> VehicleDefinition:
-	var pool:=LeoDefaultRoster.ai_vehicles(catalog)
-	if pool.is_empty():return catalog.vehicle(LeoDefaultRoster.fallback(catalog))
-	return pool[(selected_kart+index*3)%pool.size()]
+	return race_game_logic.vehicle(index)
+
+func prepare_ai_roster() -> String:
+	return race_game_logic.prepare(catalog,human_count,selected_kart,allow_ai_bigster)
+
+func set_allow_ai_bigster(enabled: bool) -> void:
+	allow_ai_bigster=enabled;save_settings()
+
+func show_ai_roster_problem(message: String) -> void:
+	var front: LeoFrontend=hud.frontend
+	var leave: Callable=front.show_pause if paused else front.show_home
+	var box:=front.dialog("AI OPPONENTS UNAVAILABLE",message,leave)
+	front.action(box,"Game Logic Settings",func():
+		front.show_settings()
+		var tabs:=hud.modal_root.find_child("SettingsTabs",true,false) as TabContainer
+		if tabs:
+			for index in tabs.get_tab_count():
+				if tabs.get_tab_control(index).name=="GameLogicTab":tabs.current_tab=index;break)
+	if not paused:front.action(box,"Open Content",func():front.close_modal(false);return_menu();show_content_manager())
+	front.action(box,"Back",leave).grab_focus()
 
 func current_ruleset(course: LeoTrackDefinition=null) -> String:
 	if not course:course=track_definition
@@ -557,9 +577,11 @@ func set_race_variant(value: String) -> void:
 	save_settings()
 
 func start_race() -> void:
+	if catalog.vehicles.is_empty():show_content_manager();return
+	var roster_problem:=prepare_ai_roster()
+	if not roster_problem.is_empty():show_ai_roster_problem(roster_problem);return
 	active_laps=clampi(selected_laps,1,10)
 	if haptics:haptics.stop_all()
-	if catalog.vehicles.is_empty():show_content_manager();return
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · %d laps" % active_laps
 	loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition),"race")
@@ -971,6 +993,7 @@ func save_settings() -> void:
 	cfg.set_value("game","track_id",chosen_track_id)
 	cfg.set_value("game","race_variant",race_variant)
 	cfg.set_value("game","laps",selected_laps)
+	GameLogic279.write_preference(cfg,allow_ai_bigster)
 	if haptics:
 		cfg.set_value("controls","rumble",haptics.enabled)
 		cfg.set_value("controls","rumble_intensity",haptics.intensity)
@@ -993,7 +1016,9 @@ func save_settings() -> void:
 
 func load_settings() -> void:
 	var cfg := ConfigFile.new()
-	if cfg.load("user://leo_racer.cfg") == OK:
+	var settings_loaded:=cfg.load("user://leo_racer.cfg")
+	allow_ai_bigster=GameLogic279.read_preference(cfg) if settings_loaded==OK else false
+	if settings_loaded == OK:
 		master_volume = cfg.get_value("audio", "volume", .72)
 		music_enabled = cfg.get_value("audio", "music", true)
 		reduced_motion = cfg.get_value("display", "reduced_motion", false)
@@ -1040,8 +1065,15 @@ func quit_game(exit_code: int = 0) -> void:
 		if streamer:await streamer.stop()
 	while not LeoAssets._loading.is_empty() or LeoVehicleLibrary.discovering:await get_tree().process_frame
 	stop_all_audio()
+	if is_instance_valid(music):music.shutdown()
+	if is_instance_valid(ui_audio):ui_audio.shutdown()
+	for sound in [click_sound,countdown_sound,go_sound,finish_sound]:
+		if is_instance_valid(sound):sound.stream=null
 	if ranking_store:ranking_store.close_store()
 	set_process(false);set_physics_process(false);set_process_input(false);set_process_unhandled_input(false)
+	# Release playback references while the audio server is still running.
+	# Clearing during _exit_tree alone leaves the final mix block holding streams.
+	await get_tree().create_timer(.08,true,false,true).timeout
 	# Let SceneTree perform its normal ordered teardown. Manually queue-freeing
 	# the entire world before quit can destroy materials while renderer callbacks
 	# are pending (native release builds reported heap corruption on Colombo).
@@ -1344,6 +1376,7 @@ func select_track(id: String) -> bool:
 	loading.hide();save_settings();return_menu();return true
 
 func _exit_tree() -> void:
+	if is_instance_valid(music):music.unbind_game(self)
 	LeoPreviewStream.clear();LeoPreviewStream.shader_warmups.clear()
 	if ranking_store:ranking_store.close_store()
 	LeoAssets.cache.clear();LeoAssets._patched_meshes.clear()

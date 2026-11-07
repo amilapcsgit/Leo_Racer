@@ -29,7 +29,7 @@ func run() -> void:
 func audit() -> void:
 	check(LeoDefaultRoster.ids().size()==21,"Locked default roster contains twenty-one IDs")
 	check(game.catalog.vehicles.size()==21,"Fresh selected content has exactly twenty-one packages")
-	check(LeoDefaultRoster.ai_vehicles(game.catalog).size()==21,"All default AI choices come from roster")
+	check(LeoDefaultRoster.ai_vehicles(game.catalog,true).size()==21,"Opt-in AI pool retains every reviewed default vehicle")
 	check(LeoRaceRules.ID=="distinct_v4+contact_v278_static","Collision changes have a new record ruleset")
 	var missing:=LeoLocalPlayer.new(1);missing.restore({"vehicle":"excluded_temporarily"},game.catalog)
 	check(missing.vehicle_id==&"bigster" and missing.preferred_vehicle_id==&"excluded_temporarily","Unavailable saved car uses Bigster without losing preference")
@@ -133,7 +133,7 @@ func contacts() -> void:
 
 func addons() -> void:
 	check(game.catalog.vehicles.size()==21 and game.catalog.vehicle(&"blue")!=null,"Manual excluded package becomes selectable")
-	var pool:=LeoDefaultRoster.ai_vehicles(game.catalog)
+	var pool:=LeoDefaultRoster.ai_vehicles(game.catalog,true)
 	check(pool.size()==21 and not pool.any(func(v):return v.id==&"blue"),"Manual add-on is excluded from automatic grids")
 	var subject:=LeoKart.new();game.add_child(subject);subject.setup(game.circuit,0,false,"human","blue");subject.set_physics_process(false)
 	check(subject.damage.surfaces.is_empty(),"Unreviewed add-on receives no guessed damage surfaces")

@@ -4,11 +4,6 @@ var game: Node
 var fallback: LeoInputRouter
 var reduced_motion:=false
 var panels: Array[LeoControlMapPanel]=[]
-var images: Array[TextureRect]:
- get:
-  var result: Array[TextureRect]=[]
-  for panel in panels:result.append(panel.image)
-  return result
 var signature:=""
 func _ready() -> void:
  mouse_filter=MOUSE_FILTER_IGNORE;fallback=LeoInputRouter.new();fallback.load_profiles()

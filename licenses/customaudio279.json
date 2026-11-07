@@ -1,0 +1,384 @@
+{
+  "version": "2.7.9",
+  "method": "Offline resampling, conditional short circular seam blend, two-pass loudness normalization, and Ogg Vorbis encoding. No source MP3 or WAV is modified.",
+  "target_lufs": -18.0,
+  "maximum_true_peak_dbtp": -2.0,
+  "sample_rate": 48000,
+  "channels": 2,
+  "files": [
+    {
+      "id": "intro_main",
+      "title": "Leo Racer Intro",
+      "file": "assets/audio/custom279/intro_main.ogg",
+      "source_filename": "Leo Racer Intro menu garage continus loading audio.mp3",
+      "source_sha256": "787b16c37cf25e79b57b57f6a8d994acf6741df307611d32d49158bb875c73ee",
+      "sha256": "025027b7d9bb403adfba27a52ec93d1df59caa158ae7d12d46bc5aeaff02ad4d",
+      "credit": "User-supplied custom soundtrack",
+      "license_statement": "No CC0 dedication or new third-party license grant is asserted.",
+      "sample_rate": 48000,
+      "channels": 2,
+      "source_decoded_seconds": 124.76,
+      "seconds": 124.76,
+      "sample_count": 5988480,
+      "processing": "loudnorm=I=-18.0:TP=-2.3:LRA=50:measured_I=-14.29:measured_TP=-0.41:measured_LRA=3.40:measured_thresh=-24.41:offset=-0.65:linear=true",
+      "loop_preparation": {
+        "digital_silence_trim_start_samples": 0,
+        "digital_silence_trim_end_samples": 0,
+        "duration_policy": "Authored rests and full decoded duration retained, except the reported conditional seam overlap.",
+        "circular_crossfade_ms": 0.0,
+        "before_loop_preparation": {
+          "boundary_max_sample_delta": 0.00132484,
+          "head_50ms_rms_dbfs": -49.2984,
+          "tail_50ms_rms_dbfs": -64.6653
+        },
+        "prepared_loop": {
+          "boundary_max_sample_delta": 0.00132484,
+          "head_50ms_rms_dbfs": -49.2984,
+          "tail_50ms_rms_dbfs": -64.6653
+        }
+      },
+      "source_loudness": {
+        "input_i": "-14.29",
+        "input_tp": "-0.41",
+        "input_lra": "3.40",
+        "input_thresh": "-24.41",
+        "output_i": "-17.35",
+        "output_tp": "-2.30",
+        "output_lra": "3.10",
+        "output_thresh": "-27.41",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.65"
+      },
+      "encoded_loudness": {
+        "input_i": "-18.09",
+        "input_tp": "-4.12",
+        "input_lra": "3.40",
+        "input_thresh": "-28.21",
+        "output_i": "-17.35",
+        "output_tp": "-2.30",
+        "output_lra": "3.10",
+        "output_thresh": "-27.41",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.65"
+      },
+      "encoded_stream": {
+        "codec": "vorbis",
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "encoded_seam": {
+        "boundary_max_sample_delta": 0.00068933,
+        "head_50ms_rms_dbfs": -53.0625,
+        "tail_50ms_rms_dbfs": -68.9151
+      },
+      "validation": {
+        "complete_decode": true,
+        "actual_vorbis_48000_stereo": true,
+        "true_peak_at_most_minus_2_dbtp": true,
+        "integrated_loudness_within_half_lu": true,
+        "click_free_boundary": true,
+        "source_unchanged": true
+      }
+    },
+    {
+      "id": "intro_alt",
+      "title": "Colombo Grand Prix Intro",
+      "file": "assets/audio/custom279/intro_alt.ogg",
+      "source_filename": "additional intro to shuffle Colombo Grand Prix.mp3",
+      "source_sha256": "5f8f57f531a9e212de09f93c0680750a9db2157df6bed36ab1c8ee1d7ba7876d",
+      "sha256": "4710ab744767d70daf9df1eddeddcddd5da93539f9f192a9eafe72309601f630",
+      "credit": "User-supplied custom soundtrack",
+      "license_statement": "No CC0 dedication or new third-party license grant is asserted.",
+      "sample_rate": 48000,
+      "channels": 2,
+      "source_decoded_seconds": 137.0,
+      "seconds": 136.92,
+      "sample_count": 6572160,
+      "processing": "loudnorm=I=-18.0:TP=-2.3:LRA=50:measured_I=-14.36:measured_TP=-0.11:measured_LRA=2.50:measured_thresh=-24.40:offset=-0.53:linear=true",
+      "loop_preparation": {
+        "digital_silence_trim_start_samples": 0,
+        "digital_silence_trim_end_samples": 0,
+        "duration_policy": "Authored rests and full decoded duration retained, except the reported conditional seam overlap.",
+        "circular_crossfade_ms": 80.0,
+        "before_loop_preparation": {
+          "boundary_max_sample_delta": 0.07953455,
+          "head_50ms_rms_dbfs": -34.4194,
+          "tail_50ms_rms_dbfs": -21.2297
+        },
+        "prepared_loop": {
+          "boundary_max_sample_delta": 3.089e-05,
+          "head_50ms_rms_dbfs": -84.5756,
+          "tail_50ms_rms_dbfs": -38.6297
+        }
+      },
+      "source_loudness": {
+        "input_i": "-14.35",
+        "input_tp": "-0.11",
+        "input_lra": "2.70",
+        "input_thresh": "-24.40",
+        "output_i": "-17.47",
+        "output_tp": "-2.30",
+        "output_lra": "2.50",
+        "output_thresh": "-27.49",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.53"
+      },
+      "encoded_loudness": {
+        "input_i": "-18.07",
+        "input_tp": "-3.64",
+        "input_lra": "2.60",
+        "input_thresh": "-28.11",
+        "output_i": "-17.46",
+        "output_tp": "-2.30",
+        "output_lra": "2.50",
+        "output_thresh": "-27.48",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.54"
+      },
+      "encoded_stream": {
+        "codec": "vorbis",
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "encoded_seam": {
+        "boundary_max_sample_delta": 4.417e-05,
+        "head_50ms_rms_dbfs": -87.8969,
+        "tail_50ms_rms_dbfs": -42.5543
+      },
+      "validation": {
+        "complete_decode": true,
+        "actual_vorbis_48000_stereo": true,
+        "true_peak_at_most_minus_2_dbtp": true,
+        "integrated_loudness_within_half_lu": true,
+        "click_free_boundary": true,
+        "source_unchanged": true
+      }
+    },
+    {
+      "id": "kandy_race",
+      "title": "Kandy Soundtrack",
+      "file": "assets/audio/custom279/kandy_race.ogg",
+      "source_filename": "Kandy sound track.mp3",
+      "source_sha256": "53a04b1fb2fedf18d3f4689b762a4194038640735341462b10bc8f0474a2d2f2",
+      "sha256": "c9e4607319006b09582e132bbf9e17aab5bb6abe3ceba4718a6df8a1cc34921c",
+      "credit": "User-supplied custom soundtrack",
+      "license_statement": "No CC0 dedication or new third-party license grant is asserted.",
+      "sample_rate": 48000,
+      "channels": 2,
+      "source_decoded_seconds": 203.2,
+      "seconds": 203.2,
+      "sample_count": 9753600,
+      "processing": "loudnorm=I=-18.0:TP=-2.3:LRA=50:measured_I=-14.15:measured_TP=-0.30:measured_LRA=2.60:measured_thresh=-24.22:offset=-0.45:linear=true",
+      "loop_preparation": {
+        "digital_silence_trim_start_samples": 0,
+        "digital_silence_trim_end_samples": 0,
+        "duration_policy": "Authored rests and full decoded duration retained, except the reported conditional seam overlap.",
+        "circular_crossfade_ms": 0.0,
+        "before_loop_preparation": {
+          "boundary_max_sample_delta": 0.00409662,
+          "head_50ms_rms_dbfs": -53.5665,
+          "tail_50ms_rms_dbfs": -44.4119
+        },
+        "prepared_loop": {
+          "boundary_max_sample_delta": 0.00409662,
+          "head_50ms_rms_dbfs": -53.5665,
+          "tail_50ms_rms_dbfs": -44.4119
+        }
+      },
+      "source_loudness": {
+        "input_i": "-14.15",
+        "input_tp": "-0.30",
+        "input_lra": "2.60",
+        "input_thresh": "-24.22",
+        "output_i": "-17.55",
+        "output_tp": "-2.30",
+        "output_lra": "2.30",
+        "output_thresh": "-27.60",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.45"
+      },
+      "encoded_loudness": {
+        "input_i": "-18.10",
+        "input_tp": "-4.72",
+        "input_lra": "2.60",
+        "input_thresh": "-28.17",
+        "output_i": "-17.55",
+        "output_tp": "-2.30",
+        "output_lra": "2.30",
+        "output_thresh": "-27.60",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.45"
+      },
+      "encoded_stream": {
+        "codec": "vorbis",
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "encoded_seam": {
+        "boundary_max_sample_delta": 0.0024071,
+        "head_50ms_rms_dbfs": -57.7313,
+        "tail_50ms_rms_dbfs": -48.2772
+      },
+      "validation": {
+        "complete_decode": true,
+        "actual_vorbis_48000_stereo": true,
+        "true_peak_at_most_minus_2_dbtp": true,
+        "integrated_loudness_within_half_lu": true,
+        "click_free_boundary": true,
+        "source_unchanged": true
+      }
+    },
+    {
+      "id": "coast_race",
+      "title": "Astra Lotus Colombo Grand Prix",
+      "file": "assets/audio/custom279/coast_race.ogg",
+      "source_filename": "astra lotus Colombo Grand-prix.mp3",
+      "source_sha256": "1f37c08d4136ae69131591ac39cd6a293197eaf675f165be6203adf51ab2c770",
+      "sha256": "fc8b1b2c5fb0eecfd0c86cf64febe40b6b88e9e5a3831108ea26ea02026d1700",
+      "credit": "User-supplied custom soundtrack",
+      "license_statement": "No CC0 dedication or new third-party license grant is asserted.",
+      "sample_rate": 48000,
+      "channels": 2,
+      "source_decoded_seconds": 176.8,
+      "seconds": 176.8,
+      "sample_count": 8486400,
+      "processing": "loudnorm=I=-18.0:TP=-2.3:LRA=50:measured_I=-14.55:measured_TP=-0.49:measured_LRA=3.20:measured_thresh=-24.66:offset=-0.50:linear=true",
+      "loop_preparation": {
+        "digital_silence_trim_start_samples": 0,
+        "digital_silence_trim_end_samples": 0,
+        "duration_policy": "Authored rests and full decoded duration retained, except the reported conditional seam overlap.",
+        "circular_crossfade_ms": 0.0,
+        "before_loop_preparation": {
+          "boundary_max_sample_delta": 0.00727671,
+          "head_50ms_rms_dbfs": -61.3428,
+          "tail_50ms_rms_dbfs": -40.7021
+        },
+        "prepared_loop": {
+          "boundary_max_sample_delta": 0.00727671,
+          "head_50ms_rms_dbfs": -61.3428,
+          "tail_50ms_rms_dbfs": -40.7021
+        }
+      },
+      "source_loudness": {
+        "input_i": "-14.55",
+        "input_tp": "-0.49",
+        "input_lra": "3.20",
+        "input_thresh": "-24.66",
+        "output_i": "-17.50",
+        "output_tp": "-2.30",
+        "output_lra": "2.60",
+        "output_thresh": "-27.57",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.50"
+      },
+      "encoded_loudness": {
+        "input_i": "-18.08",
+        "input_tp": "-3.88",
+        "input_lra": "3.30",
+        "input_thresh": "-28.19",
+        "output_i": "-17.49",
+        "output_tp": "-2.30",
+        "output_lra": "2.60",
+        "output_thresh": "-27.56",
+        "normalization_type": "dynamic",
+        "target_offset": "-0.51"
+      },
+      "encoded_stream": {
+        "codec": "vorbis",
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "encoded_seam": {
+        "boundary_max_sample_delta": 0.00493229,
+        "head_50ms_rms_dbfs": -64.9546,
+        "tail_50ms_rms_dbfs": -44.2374
+      },
+      "validation": {
+        "complete_decode": true,
+        "actual_vorbis_48000_stereo": true,
+        "true_peak_at_most_minus_2_dbtp": true,
+        "integrated_loudness_within_half_lu": true,
+        "click_free_boundary": true,
+        "source_unchanged": true
+      }
+    },
+    {
+      "id": "island_original",
+      "title": "Island Music / Original Leo Racer",
+      "file": "assets/audio/custom279/island_original.ogg",
+      "source_filename": "island_music.wav",
+      "source_sha256": "9145144fadd78ed2e8e722bf0acd56924d95b7828c3dcb0679785b91c28ef707",
+      "sha256": "089ba2664f1485c90753357bb32daf26dbd6f85bded9167168d46d0a46e613bc",
+      "credit": "Existing Leo Racer project soundtrack",
+      "license_statement": "Existing project provenance retained; no new license asserted.",
+      "sample_rate": 48000,
+      "channels": 2,
+      "source_decoded_seconds": 15.483875,
+      "seconds": 15.483875,
+      "sample_count": 743226,
+      "processing": "loudnorm=I=-18.0:TP=-2.3:LRA=50:measured_I=-28.09:measured_TP=-11.84:measured_LRA=0.70:measured_thresh=-38.09:offset=0.16:linear=true",
+      "loop_preparation": {
+        "digital_silence_trim_start_samples": 0,
+        "digital_silence_trim_end_samples": 0,
+        "duration_policy": "Authored rests and full decoded duration retained, except the reported conditional seam overlap.",
+        "circular_crossfade_ms": 0.0,
+        "before_loop_preparation": {
+          "boundary_max_sample_delta": 0.00090633,
+          "head_50ms_rms_dbfs": -20.5998,
+          "tail_50ms_rms_dbfs": -66.2058
+        },
+        "prepared_loop": {
+          "boundary_max_sample_delta": 0.00090633,
+          "head_50ms_rms_dbfs": -20.5998,
+          "tail_50ms_rms_dbfs": -66.2058
+        }
+      },
+      "source_loudness": {
+        "input_i": "-28.09",
+        "input_tp": "-8.83",
+        "input_lra": "0.70",
+        "input_thresh": "-38.09",
+        "output_i": "-19.26",
+        "output_tp": "-2.30",
+        "output_lra": "0.40",
+        "output_thresh": "-29.26",
+        "normalization_type": "dynamic",
+        "target_offset": "1.26"
+      },
+      "encoded_loudness": {
+        "input_i": "-17.94",
+        "input_tp": "-2.19",
+        "input_lra": "0.60",
+        "input_thresh": "-27.94",
+        "output_i": "-18.02",
+        "output_tp": "-2.30",
+        "output_lra": "0.40",
+        "output_thresh": "-28.02",
+        "normalization_type": "dynamic",
+        "target_offset": "0.02"
+      },
+      "encoded_stream": {
+        "codec": "vorbis",
+        "sample_rate": 48000,
+        "channels": 2
+      },
+      "encoded_seam": {
+        "boundary_max_sample_delta": 0.00323263,
+        "head_50ms_rms_dbfs": -10.8671,
+        "tail_50ms_rms_dbfs": -55.9901
+      },
+      "validation": {
+        "complete_decode": true,
+        "actual_vorbis_48000_stereo": true,
+        "true_peak_at_most_minus_2_dbtp": true,
+        "integrated_loudness_within_half_lu": true,
+        "click_free_boundary": true,
+        "source_unchanged": true
+      }
+    }
+  ],
+  "retained_original_theme": {
+    "file": "assets/audio/menu279/ceylon_afterglow.ogg",
+    "sha256": "4eecf93e655531635f2e50e958a20f4eea15c5d3bafbad03e0572ec030741269"
+  }
+}

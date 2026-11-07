@@ -16,7 +16,7 @@ static func configure(label: Label) -> void:
 	label.set_meta("digit_rendering","bundled_raster_font")
 
 static func diagnostic(label: Label,reason: String,slot: int) -> Dictionary:
-	var report:={"time":Time.get_datetime_string_from_system(true),"reason":reason,"player":slot+1,"version":"2.7.8",
+	var report:={"time":Time.get_datetime_string_from_system(true),"reason":reason,"player":slot+1,"version":ProjectSettings.get_setting("application/config/version",""),
 		"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),
 		"window":str(DisplayServer.window_get_size()),"screen":str(DisplayServer.screen_get_size()),"mode":DisplayServer.window_get_mode(),
 		"text":label.text,"visible":label.is_visible_in_tree(),"rect":str(label.get_global_rect()),"font_size":label.get_theme_font_size("font_size"),

@@ -38,8 +38,8 @@ func run() -> void:
 		root.size=extent;await settle()
 		game.hud.frontend.show_settings();await settle()
 		var tabs:=game.hud.modal_root.find_child("SettingsTabs",true,false) as TabContainer
-		check(tabs!=null and tabs.get_tab_count()==4,"Four settings tabs / "+str(extent))
-		for tab in 4:
+		check(tabs!=null and tabs.get_tab_count()==5,"Five settings tabs including Game Logic / "+str(extent))
+		for tab in 5:
 			tabs.current_tab=tab;await shot("settings-%dx%d-%s"%[extent.x,extent.y,tabs.get_tab_title(tab)])
 		game.hud.frontend.close_modal()
 	game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[0].vehicle_id=&"bigster";game.human_count=2;game.local_players[1].vehicle_id=&"duster"
@@ -48,10 +48,18 @@ func run() -> void:
 	for kart in game.karts:kart.set_physics_process(false);kart.active=true
 	checkpoint_contacts()
 	check(LeoCameraViews.available(game.player.definition)==["chase","ghost","cockpit"],"Bigster has reviewed cockpit")
-	check(LeoCameraViews.available(game.local_players[1].kart.definition)==["chase","ghost"],"Unreviewed interior skips cockpit")
+	check(LeoCameraViews.available(game.local_players[1].kart.definition)==["chase","ghost","cockpit"],"Duster My 2014 now has a reviewed authored cockpit")
 	var first: LeoLocalPlayer=game.local_players[0];var second: LeoLocalPlayer=game.local_players[1]
 	second.camera_view="cockpit";game.update_local_camera(second,1./60.)
+	check(LeoCameraViews.effective(second)=="cockpit","Duster My 2014 selects its reviewed driver-eye view")
+	# Preserve the unsupported-add-on fallback coverage with an actual unreviewed
+	# definition rather than incorrectly classifying the newly reviewed Duster.
+	var reviewed_definition: VehicleDefinition=second.kart.definition
+	var unreviewed:=reviewed_definition.duplicate(true) as VehicleDefinition
+	unreviewed.id=&"qa_unreviewed_interior";unreviewed.official=false;unreviewed.camera_views={}
+	second.kart.definition=unreviewed;game.update_local_camera(second,1./60.)
 	check(LeoCameraViews.effective(second)=="chase" and second.camera_view=="cockpit","Unavailable cockpit retains saved preference")
+	second.kart.definition=reviewed_definition
 	second.camera_view="chase"
 	for view in ["ghost","cockpit"]:
 		first.camera_view=view;first.kart.boost_time=0.;first.feedback.play_boost_explicit("drift",1,1.6)

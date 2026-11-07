@@ -16,6 +16,7 @@ static func bounds(node: Node3D, pose: Transform3D=Transform3D.IDENTITY) -> AABB
 
 static func resolve(source: VehicleDefinition) -> VehicleDefinition:
 	if not source or source.has_meta("presentation_resolved"):return source
+	if LeoAssets.mount_editor_cockpits()!=OK:push_error("Cannot mount reviewed cockpit presentation")
 	var key:=source.get_instance_id()
 	if cache.has(key):return cache[key]
 	if profiles.is_empty():profiles=JSON.parse_string(FileAccess.get_file_as_string("res://assets/config/vehicle-presentation-v1.json"))
@@ -37,7 +38,8 @@ static func resolve(source: VehicleDefinition) -> VehicleDefinition:
 		resolved.model=null
 		resolved.model_path="res://ultra_vehicles/bigster/model.scn"
 		resolved.preview_scene=resolved.model_path
-	var cockpit_path:="res://cockpit278/"+String(source.id)+"/model.scn"
+	var cockpit_path:="res://cockpit279/"+String(source.id)+"/model.scn"
+	if not ResourceLoader.exists(cockpit_path):cockpit_path="res://cockpit278/"+String(source.id)+"/model.scn"
 	if source.official and ResourceLoader.exists(cockpit_path):
 		resolved.model=null;resolved.model_path=cockpit_path;resolved.preview_scene=cockpit_path
 	# Resource.duplicate copies exported fields, not runtime package classification.

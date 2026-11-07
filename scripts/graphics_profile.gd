@@ -25,12 +25,12 @@ static func apply(world: Node3D, environment: Environment, quality: int, split: 
 			# A nearer single cascade keeps Medium within the GLES draw budget; High retains four.
 			light.directional_shadow_max_distance=minf(light.directional_shadow_max_distance,65. if split else 80.)
 			light.directional_shadow_mode=DirectionalLight3D.SHADOW_ORTHOGONAL
+	for probe in world.find_children("*","ReflectionProbe",true,false):
+		probe.visible=tier>0
+		# Two GLES viewports otherwise repeat expensive local captures. Keep
+		# prefiltered sky reflections in split-screen; single-player keeps probes.
+		if not forward and split:probe.queue_free()
 	for probe in world.get_children():
-		if probe is ReflectionProbe and String(probe.name).begins_with("RaceReflection"):
-			probe.visible=tier>0
-			# Two GLES viewports otherwise repeat expensive local captures. Keep
-			# prefiltered sky reflections in split-screen; single-player keeps probes.
-			if not forward and split:probe.queue_free()
 		if probe is FogVolume and String(probe.name).begins_with("RaceMist"):probe.visible=forward and tier==2 and not showroom
 
 static func install_reflections(world: Node3D, circuit: LeoCircuit) -> void:

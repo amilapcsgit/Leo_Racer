@@ -1,0 +1,26 @@
+{
+  "version": "2.7.9",
+  "files": [
+    {
+      "file": "assets/ui/controls/keyboard-279.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": true,
+      "sha256": "17b7c0e1b5b011887f609e1d6fda83f26e772546f1d81574b324090c5e98fe71",
+      "brief": "Isolated premium realistic 3D black keyboard device, blank input labels, no logos or baked callouts; accurate bindings and leaders drawn by runtime."
+    },
+    {
+      "file": "assets/ui/controls/controller-279.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": true,
+      "sha256": "6a6995e612d37353100115e54cae39da59a52412ee8f723edde056a870ea9854",
+      "brief": "Isolated premium realistic 3D black controller device, blank input labels, no logos or baked callouts; accurate bindings and leaders drawn by runtime."
+    },
+    {
+      "file": "assets/ui/controls/wheel-279.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": true,
+      "sha256": "56d4031807e1eefe0c7b2c6d69661a0668c6bc0079b15141b596193a1a97f772",
+      "brief": "Isolated premium realistic 3D black wheel device, blank input labels, no logos or baked callouts; accurate bindings and leaders drawn by runtime."
+    }
+  ]
+}

@@ -19,13 +19,16 @@ func batch_static(root: Node3D, data: Dictionary) -> void:
 	var anchors: Array[Node]=[root];var protected: Array[Node]=[]
 	if data.get("ultra_cockpit",false):
 		for node in root.find_children("*","MeshInstance3D",true,false):
-			if "steering_wheel" in String(node.name) or "mirror" in String(node.name) or "gauges" in String(node.name) or "dash" in String(node.name):protected.append(node)
+			var label := String(node.name).to_lower()
+			if "steering_wheel" in label or "mirror" in label or "gauges" in label or "dash" in label or "_steer" in label or "needle_" in label or "stalk" in label or "ceiling" in label:protected.append(node)
 	if data.get("ultra_trunk",false):
 		for node in root.find_children("*","MeshInstance3D",true,false):
 			if "tailgate" in String(node.name).to_lower() or ("rear_plate" in String(node.name).to_lower() or String(node.name)=="Bigster_Rear_EU_Band"):protected.append(node)
 	for wheel in data.get("wheels",[]):
 		for path in wheel.get("rotating",[])+wheel.get("stationary",[]):
-			var node:=root.get_node_or_null(NodePath(path))
+			# Published bindings may name a group below an imported GLB root.
+			# Protect the same resolved group used by the runtime assembler.
+			var node:=VehicleAssembler.find_group(root,NodePath(path))
 			if node:anchors.append(node);protected.append(node)
 	for action in data.get("actions",[]):
 		for target in action.get("targets",[]):
@@ -185,6 +188,7 @@ func run() -> void:
 	destination_folder=destination;vehicle_prefix="res://leo_vehicles/"+String(data.id)+"/"
 	if data.get("ultra_trunk",false):vehicle_prefix="res://ultra_vehicles/bigster/"
 	if data.get("ultra_cockpit",false):vehicle_prefix="res://cockpit278/"+String(data.id)+"/"
+	if int(data.get("cockpit_revision",0))==279:vehicle_prefix="res://cockpit279/"+String(data.id)+"/"
 	DirAccess.make_dir_recursive_absolute(destination.path_join("textures"))
 	var loaded:=LeoVehicleImporter.import_scene(folder.path_join(data.model))
 	if not loaded.scene:push_error(loaded.error);quit(2);return

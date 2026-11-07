@@ -107,6 +107,7 @@ func _terrain() -> void:
 	var ground_mat := ShaderMaterial.new()
 	ground_mat.shader = load("res://shaders/astra_terrain.gdshader")
 	ground_mat.set_shader_parameter("sand_map",load("res://assets/materials/shore_AlbedoHeight.png"))
+	ground_mat.set_shader_parameter("sand_normal",load("res://assets/materials/shore_NormalRoughness.png"))
 	_mesh_node(ground.commit(),ground_mat,"SculptedAstraCoastAndGardenHills")
 	var water := ShaderMaterial.new()
 	water.shader = load("res://shaders/astra_water.gdshader")

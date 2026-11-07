@@ -7,9 +7,10 @@ static func data() -> Dictionary:
 	return _data
 static func ids() -> Array:
 	return data().vehicles.map(func(row):return String(row.id))
-static func ai_vehicles(catalog: GarageCatalog) -> Array[VehicleDefinition]:
+static func ai_vehicles(catalog: GarageCatalog, allow_bigster: bool=false) -> Array[VehicleDefinition]:
 	var result: Array[VehicleDefinition]=[]
 	for key in ids():
+		if key=="bigster" and not allow_bigster:continue
 		var vehicle:=catalog.vehicle(StringName(key))
 		if vehicle:result.append(vehicle)
 	return result

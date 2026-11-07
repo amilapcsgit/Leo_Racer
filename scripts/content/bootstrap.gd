@@ -3,11 +3,19 @@ var screen: LeoLoadingScreen
 const TRACE=preload("res://scripts/content/boot_trace.gd")
 func _ready() -> void:
 	TRACE.mark("bootstrap_ready")
-	DisplayServer.window_set_title("Leo Racer — 2.7.8")
+	DisplayServer.window_set_title("Leo Racer — 2.7.9")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
+	LeoRaceAudio.shared(get_tree())
 	await begin()
 func begin() -> void:
+	if "--verify-boot-audio" in OS.get_cmdline_user_args():
+		var music:=LeoRaceAudio.shared(get_tree())
+		await get_tree().process_frame;await get_tree().process_frame
+		var report:={"status":"PASS" if music.stream!=null and music.playing and music.last_track in LeoRaceAudio.MENU_TRACKS else "FAIL","before_asset_mount":true,"track":music.last_track,"single_controller":get_tree().root.find_children("LeoRaceMusic","AudioStreamPlayer",false,false).size()==1}
+		print("BOOT_AUDIO279 ",JSON.stringify(report))
+		music.shutdown();await get_tree().create_timer(.1).timeout
+		get_tree().quit(0 if report.status=="PASS" else 1);return
 	if "--vehicle-workshop" in OS.get_cmdline_user_args():
 		await begin_workshop();return
 	if "--verify-boot-art" in OS.get_cmdline_user_args():
@@ -61,7 +69,7 @@ func begin() -> void:
 		for argument in OS.get_cmdline_user_args():
 			if argument.begins_with("--ultra-check="):
 				var name:=argument.trim_prefix("--ultra-check=")
-				if name not in ["loading","refinements","perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
+				if name not in ["audio279","game_logic279","mirrors279","wheels279","cockpit279","world279","ui279","render279","gallery279","loading","refinements","perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
 				screen.hide()
 				var trial: Node=load("res://tests/native270/"+name+".gd").new()
 				get_tree().root.add_child(trial);queue_free();return

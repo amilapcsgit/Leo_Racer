@@ -41,11 +41,11 @@ func refresh() -> void:
  label.text=owner_button.text
  var box:=StyleBoxFlat.new();box.bg_color=Color("ffc857") if owner_button.primary else Color("101722ee");box.border_color=Color("43e7ef") if active else Color("526372");box.set_border_width_all(3 if active else 1);box.set_corner_radius_all(10 if owner_button.primary else 8);box.set_content_margin_all(12);box.shadow_color=Color(0,0,0,.4);box.shadow_size=5;surface.add_theme_stylebox_override("panel",box)
  label.modulate=Color("101722") if owner_button.primary else Color("f5f7fa");visual.modulate.a=.4 if owner_button.disabled else 1.
- halo.visible=not owner_button.disabled;halo.material.set_shader_parameter("tint",Color("ffc857") if owner_button.primary else Color("43e7ef"));halo.modulate.a=.35 if active else .08
- update_materials();glint.material.set_shader_parameter("enabled",active and not reduced_motion and not owner_button.disabled)
+ halo.visible=not owner_button.disabled and active;halo.material.set_shader_parameter("tint",Color("ffc857") if owner_button.primary else Color("43e7ef"));halo.modulate.a=.18 if active else 0.
+ update_materials();glint.material.set_shader_parameter("enabled",active and owner_button.primary and not reduced_motion and not owner_button.disabled)
 func set_active(value: bool) -> void:
  if active==value:return
- active=value;refresh();animate(1.05 if value else 1.,.15)
+ active=value;refresh();animate(1.015 if value else 1.,.15)
  if glow_motion:glow_motion.kill()
  if owner_button.primary:
   if value and not reduced_motion:

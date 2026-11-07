@@ -6,19 +6,19 @@
     "night_horizon": "293e63",
     "sun_yaw": -145,
     "transition_seconds": 1.5,
-    "night_sun_energy": 0.055,
-    "night_ambient_energy": 0.25,
+    "night_sun_energy": 0.22,
+    "night_ambient_energy": 0.38,
     "fixture_data": "",
     "street_lights": {
       "compatibility": [
         8,
-        16,
-        16
+        12,
+        12
       ],
       "forward_plus": [
-        12,
-        24,
-        32
+        8,
+        16,
+        24
       ],
       "range": 20,
       "angle": 30,
@@ -92,8 +92,8 @@
         }
       ]
     },
-    "night_ambient_color": "526785",
-    "night_sun_pitch": 8,
+    "night_ambient_color": "98a9be",
+    "night_sun_pitch": -32,
     "emission": {
       "lamp_color": "fff0c9",
       "lamp_energy": 1.8,

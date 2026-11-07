@@ -3,6 +3,15 @@ from pathlib import Path
 import argparse, json, os, re, subprocess, time, shutil
 from stage_ultra_content import ROOT, sha
 TESTS={
+    'audio279':('tests/audio279_test.gd',None),
+    'game_logic279':('tests/game_logic279_test.gd',None),
+    'mirrors279':('tests/mirrors279_test.gd',None),
+    'wheels279':('tests/wheels279_test.gd',None),
+    'cockpit279':('tools/check_cockpit279.gd',None),
+    'world279':('tests/render_world279_test.gd',None),
+    'ui279':('tests/ui279_test.gd',None),
+    'render279':('tests/render_polish279_test.gd',None),
+    'gallery279':('tests/gallery279_test.gd',None),
     'speedometer':('tests/release278_test.gd','--ultra-check=release278'),
     'loading':('tests/loading_controls278_test.gd',None),
     'refinements':('tests/refinements278_test.gd',None),
@@ -29,7 +38,7 @@ def run(kind,compat=False,export=None,extra=()):
     if export:export=Path(export).resolve()
     renderer='compatibility' if compat else 'forward'
     label=('export-' if export else 'source-')+kind+'-'+renderer
-    out=ROOT/'build/qa278'/label;out.mkdir(parents=True,exist_ok=True)
+    out=ROOT/'build/qa279'/label;out.mkdir(parents=True,exist_ok=True)
     profile=out/'profile';profile.mkdir(exist_ok=True)
     env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
     assets=Path(export)/'GameAssets' if export else ROOT/'build/content-baseline/GameAssets'
@@ -47,7 +56,7 @@ def run(kind,compat=False,export=None,extra=()):
         if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
         env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
         command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
-    render=kind in ['speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
+    render=kind in ['mirrors279','world279','cockpit279','ui279','speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
     command+=['--position','-3200,-3200'] if render else ['--headless']
     if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--tracks='+str(assets/'tracks'),'--qa-output='+str(out)]
@@ -72,7 +81,10 @@ def run(kind,compat=False,export=None,extra=()):
         actual=process.wait()
         if code is None:code=actual
     text=(out/'process.log').read_text(encoding='utf-8',errors='replace')
-    errors=[line for line in text.splitlines() if any(term in line for term in ['SCRIPT ERROR','Parse Error','Shader compilation failed','No loader found for resource','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
+    # Retain known engine texture cleanup diagnostics separately; all other
+    # ERROR lines are application failures, even when the test prints PASS.
+    engine_texture=lambda line: bool(re.match(r'ERROR: Texture with GL ID of \d+: leaked \d+ bytes\.',line))
+    errors=[line for line in text.splitlines() if not engine_texture(line) and any(term in line for term in ['ERROR:','SCRIPT ERROR','Parse Error','Shader compilation failed','No loader found for resource','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
     failed=bool(re.search(r'"status"\s*:\s*"FAIL"',text))
     if not re.search(r'"status"\s*:\s*"PASS"',text):errors.append('Expected test PASS report missing')
     warnings=[line for line in text.splitlines() if any(term in line for term in ['leaked','resources still in use','Pages in use'])]

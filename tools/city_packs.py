@@ -45,7 +45,9 @@ def write_pack(path,engine,entries):
     # An independent read verifies all offsets and hashes before delivery.
     assert read_pack(path)[1]==entries
 
-BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png','assets/art/neon_lion.svg'}
+BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png','assets/art/neon_lion.svg','assets/audio/custom279/intro_main.ogg','assets/audio/custom279/intro_alt.ogg'}
+_gallery=ROOT/'assets/config/loading-gallery-v279.json'
+if _gallery.exists():BOOT_ART.update(row['path'].removeprefix('res://') for row in json.loads(_gallery.read_text(encoding='utf-8'))['artworks'])
 
 def category(name):
     if name.removesuffix('.remap') in ['assets/materials/automotive_paint.tres','assets/materials/automotive_glass.tres']:return 'core'

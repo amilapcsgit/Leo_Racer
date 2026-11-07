@@ -19,7 +19,17 @@ func setup(owner_game: Node3D) -> void:
 	settings=profiles.get(game.chosen_track_id,{})
 	var tower: Node=game.world.get_node_or_null("AuthenticLotusTower")
 	if tower:bind_tower(tower)
-	if game.chosen_track_id=="astra_coast":return
+	var astra: bool=game.chosen_track_id=="astra_coast"
+	if astra:
+		# Match the existing procedural lamp hardware, without adding more poles.
+		for side in [-1.,1.]:
+			for index in int(game.circuit.length/36.):
+				var station:=float(index)*36.+6.
+				var tangent: Vector3=game.circuit.direction(station)
+				var yaw:=atan2(-tangent.x,-tangent.z)
+				var position: Vector3=game.circuit.sample(station,side*12.8)+Vector3.UP*6.7+Basis(Vector3.UP,yaw).x*1.55
+				var target: Vector3=game.circuit.sample(station,side*game.circuit.width_at(station)*.22)+Vector3.UP*.05
+				anchors.append({"position":[position.x,position.y,position.z],"target":[target.x,target.y,target.z],"yaw":yaw})
 	# A compiler emits exact hardware positions, including reserved-area exclusions.
 	var path: String=game.track_definition.folder.path_join(String(settings.get("fixture_data","illumination.json")))
 	if FileAccess.file_exists(path):
@@ -32,8 +42,9 @@ func setup(owner_game: Node3D) -> void:
 	var mesh:=BoxMesh.new();mesh.size=Vector3(1.45,.035,.34);mesh.material=material
 	var mm:=MultiMesh.new();mm.transform_format=MultiMesh.TRANSFORM_3D;mm.mesh=mesh;mm.instance_count=anchors.size()
 	for i in anchors.size():mm.set_instance_transform(i,Transform3D(Basis(Vector3.UP,float(anchors[i].get("yaw",0.))),LeoVehicleCodec.vector(anchors[i].position)-Vector3.UP*.08))
-	fixture_mesh=MultiMeshInstance3D.new();fixture_mesh.multimesh=mm;fixture_mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;add_child(fixture_mesh)
-	build_advertising()
+	if not astra:
+		fixture_mesh=MultiMeshInstance3D.new();fixture_mesh.multimesh=mm;fixture_mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;add_child(fixture_mesh)
+		build_advertising()
 	var compatible: bool=RenderingServer.get_current_rendering_method()=="gl_compatibility"
 	var tier: int=clampi(game.graphics_quality,0,2)
 	var light_settings: Dictionary=settings.get("street_lights",{})

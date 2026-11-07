@@ -19,7 +19,7 @@ func _ready() -> void:
  for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color","font_disabled_color"]:add_theme_color_override(state,Color.TRANSPARENT)
  fx=LeoButtonFX.new();add_child(fx);fx.build(self);visual=fx.visual;label=fx.label
  focus_entered.connect(enter);focus_exited.connect(leave);mouse_entered.connect(func():hovered=true;enter());mouse_exited.connect(func():hovered=false;leave())
- button_down.connect(func():fx.animate(.98,.07));button_up.connect(func():fx.animate(1.05 if active else 1.,.15))
+ button_down.connect(func():fx.animate(.99,.07));button_up.connect(func():fx.animate(1.015 if active else 1.,.15))
  # Feedback must precede callbacks which can replace this screen.
  var callbacks:=pressed.get_connections()
  for connection in callbacks:pressed.disconnect(connection.callable)
@@ -41,7 +41,7 @@ func enter() -> void:update_active()
 func leave() -> void:update_active()
 func activate_feedback() -> void:
  if disabled:return
- cue(sound_key);stars(18)
+ cue(sound_key)
 func cue(kind: String) -> void:
  var audio:=get_tree().get_first_node_in_group("ui_audio")
  if audio:audio.cue(kind)

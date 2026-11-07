@@ -3,11 +3,11 @@ $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 Push-Location $project
 try {
-    $qa=Join-Path $project 'build/qa278'
+    $qa=Join-Path $project 'build/qa279'
     New-Item -ItemType Directory -Force $qa | Out-Null
-    $env:APPDATA=Join-Path $project 'build/ultra-ci-profile-278'
+    $env:APPDATA=Join-Path $project 'build/ultra-ci-profile-279'
     $env:LOCALAPPDATA=$env:APPDATA
-    $env:TEMP=Join-Path $project 'build/export278-temp';$env:TMP=$env:TEMP
+    $env:TEMP=Join-Path $project 'build/export279-temp';$env:TMP=$env:TEMP
     New-Item -ItemType Directory -Force $env:TEMP | Out-Null
     New-Item -ItemType Directory -Force $env:APPDATA | Out-Null
     if (-not $SkipStage) {
@@ -25,7 +25,7 @@ try {
     $env:DOTNET_CLI_HOME=Join-Path $project '.tools/cli-home'
     $env:NUGET_PACKAGES=Join-Path $project '.tools/nuget'
     & "$sdk/dotnet.exe" build LeoRacer.csproj -c Debug -p:RestoreLockedMode=true *> "$qa/dotnet.log"
-    if ($LASTEXITCODE -ne 0) {throw '.NET build failed; see qa278/dotnet.log'}
+    if ($LASTEXITCODE -ne 0) {throw '.NET build failed; see qa279/dotnet.log'}
     & "$PSScriptRoot/run_godot.ps1" --headless --editor --import --log-file "$qa/import.log" *> "$qa/import-console.log"
     if ($LASTEXITCODE -ne 0) {throw 'Asset import failed'}
     & $Python tools/test_ultra_legacy.py
@@ -39,18 +39,20 @@ try {
         if ($LASTEXITCODE -ne 0 -or (Select-String -Path $log -Pattern 'SCRIPT ERROR|^FAIL |"status":\s*"FAIL"' -Quiet)) {throw "Failed $test; see $log"}
     }
     if ($Package) {
-        $output=Join-Path $project 'build/Release-2.7.8-Ultra/LeoRacer.exe'
+        $output=Join-Path $project 'build/Release-2.7.9-Ultra/LeoRacer.exe'
         if (Test-Path $output) {throw 'Preserve previous exports: archive the candidate before rebuilding this destination'}
         New-Item -ItemType Directory -Force (Split-Path $output) | Out-Null
         & "$PSScriptRoot/brand_template.ps1"
         & "$PSScriptRoot/run_godot.ps1" --headless --export-release 'Windows Desktop' $output *> "$qa/export.log"
-        if ($LASTEXITCODE -ne 0 -or (Select-String -Path "$qa/export.log" -Pattern 'SCRIPT ERROR|Export .NET Project: Failed|Safe save failed|Can.t open file from path' -Quiet)) {throw 'Export failed'}
-        & "$PSScriptRoot/run_godot.ps1" @('--headless','--script','res://tools/build_workshop_pack.gd','--',"--output=$project/build/Release-2.7.8-Ultra/Tools/VehicleWorkshop")
+        if ($LASTEXITCODE -ne 0 -or (Select-String -Path "$qa/export.log" -Pattern 'SCRIPT ERROR|ERROR: Export .NET Project:|Safe save failed|Can.t open file from path' -Quiet)) {throw 'Export failed'}
+        $assemblies=Get-ChildItem -LiteralPath (Split-Path $output) -Filter 'LeoRacer.dll' -Recurse -File
+        if (-not $assemblies) {throw 'Native .NET assemblies missing from exported payload'}
+        & "$PSScriptRoot/run_godot.ps1" @('--headless','--script','res://tools/build_workshop_pack.gd','--',"--output=$project/build/Release-2.7.9-Ultra/Tools/VehicleWorkshop")
         if ($LASTEXITCODE -ne 0) {throw 'Workshop package failed'}
         # Retain a real raw native run before the initial evidence archive is assembled.
         & $Python tools/package_ultra.py stage
         if ($LASTEXITCODE -ne 0) {throw 'Package staging failed'}
-        & $Python tools/run_ultra_checks.py core --export build/Release-2.7.8-Ultra
+        & $Python tools/run_ultra_checks.py core --export build/Release-2.7.9-Ultra
         if ($LASTEXITCODE -ne 0) {throw 'Native core validation failed'}
         & $Python tools/package_ultra.py installer
         if ($LASTEXITCODE -ne 0) {throw 'Installer compilation failed'}

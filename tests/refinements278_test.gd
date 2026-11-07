@@ -135,7 +135,9 @@ func run() -> void:
   systems.set_meta("next_mirror",0.)
   systems._process(.11)
   check(systems.mirrors[0].renders==1 and systems.mirrors[1].renders==0 and systems.mirrors[2].renders==0,"Forward view updates rear mirror only")
-  check(absf((game.player.global_transform.affine_inverse()*game.local_players[0].camera.global_position).x)<.05,"Default cockpit is centred on car")
+  var actual_eye: Vector3=game.player.global_transform.affine_inverse()*game.local_players[0].camera.global_position
+  var reviewed_eye: Vector3=LeoVehicleCodec.vector(LeoCameraViews.profile(game.player.definition).eye)
+  check(actual_eye.distance_to(reviewed_eye)<.005 and actual_eye.x<-.25,"Cockpit eye aligns with the authored LHD driver seat")
   var origin: Vector3=game.local_players[0].camera.global_position
   game.input_router.players[0].inject_test("camera_right",1.);game.update_local_camera(game.local_players[0],1.)
   check(origin.distance_to(game.local_players[0].camera.global_position)<.001,"Cockpit head-look keeps the driver-eye position inside the cabin")

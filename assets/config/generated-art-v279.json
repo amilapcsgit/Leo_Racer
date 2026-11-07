@@ -1,0 +1,48 @@
+{
+  "version": "2.7.9",
+  "type": "Generated artwork, not gameplay photography",
+  "files": [
+    {
+      "file": "assets/ui/boot/gallery279/galle.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": false,
+      "prompt": "Use case: stylized-concept. Create ONE finished 16:9 landscape full-screen hero background for Leo Racer, cinematic polished realistic game key art. Sri Lanka GALLE FORT: recognizable Dutch fort sea ramparts and Galle lighthouse, Indian Ocean, wind-shaped palms and warm old masonry, blue-hour twilight with subtle amber lamps, grounded natural proportions. Elegant AAA racing-title visual direction, restrained navy/cyan/warm-gold palette, physically plausible surfaces, beautiful soft lighting, detailed but calm composition. No racing track implied through heritage site. Keep lower-left 45% relatively quiet and darker for live controls; landmark on upper-right with generous sky. No cars, people, UI, words, letters, logos, watermarks, borders. Produce actual finished artwork, wide 16:9.",
+      "sha256": "78b84e2bd8d00b25774e8b0d5e9363baa396e62b53ef8ae5dc3e8fab0dc4acc5"
+    },
+    {
+      "file": "assets/ui/boot/gallery279/hikkaduwa.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": false,
+      "prompt": "Use case: stylized-concept. ONE finished 16:9 cinematic full-screen hero background for Leo Racer. Polished realistic AAA racing-title key art, grounded natural landmark proportions, beautiful physically plausible surfaces and atmospheric lighting, restrained navy/cyan/warm-gold harmony with lush natural colors. Keep lower-left45% quiet and somewhat darker for readable live controls. No people, cars, UI, text, letters, logos, watermarks or borders. Finished landscape artwork. Sri Lanka HIKKADUWA coast: inviting palm-lined tropical beach bay, turquoise Indian Ocean and gentle surf, low terracotta-roof coastal guesthouses, distant fishing boats, late sunset blue hour, soft warm lamps, ocean foreground sweeping toward village right. No invented giant landmarks.",
+      "sha256": "50aba03e50715fcc159efbd66afb52647c7ec1a889fde0c4def2f0d51cc3f810"
+    },
+    {
+      "file": "assets/ui/boot/gallery279/nine_arch.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": false,
+      "prompt": "Use case: stylized-concept. ONE finished 16:9 cinematic full-screen hero background for Leo Racer. Polished realistic AAA racing-title key art, grounded natural landmark proportions, beautiful physically plausible surfaces and atmospheric lighting, restrained navy/cyan/warm-gold harmony with lush natural colors. Keep lower-left45% quiet and somewhat darker for readable live controls. No people, cars, UI, text, letters, logos, watermarks or borders. Finished landscape artwork. Sri Lanka NINE ARCH BRIDGE at Ella: historically recognizable long curved nine-arch stone railway viaduct with all nine arches visibly plausible, lush tea hills and rainforest, early mist and warm sunrise rays, view from lush hillside showing elegant bridge across valley. Railway bridge only, no road or racing on it. Bridge occupies right two-thirds, soft mist valley lower left.",
+      "sha256": "f3bf01be7c0745506c6c48849e13e22e4684a1ff71a143596718589698075bde"
+    },
+    {
+      "file": "assets/ui/boot/gallery279/sigiriya.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": false,
+      "prompt": "Use case: stylized-concept. ONE finished 16:9 cinematic full-screen hero background for Leo Racer. Polished realistic AAA racing-title key art, grounded natural landmark proportions, beautiful physically plausible surfaces and atmospheric lighting, restrained navy/cyan/warm-gold harmony with lush natural colors. Keep lower-left45% quiet and somewhat darker for readable live controls. No people, cars, UI, text, letters, logos, watermarks or borders. Finished landscape artwork. Sri Lanka SIGIRIYA: iconic isolated massive Lion Rock with sheer reddish stone sides and green summit ruins above lush dry-zone forest, ancient water gardens and reflecting pools foreground, golden late-afternoon light through humid haze. Authentic recognizable rock shape, no invented castles or high buildings on summit. Rock upper-right with graceful reflection; water garden lower-left quiet.",
+      "sha256": "104048e366a25be9e83a9d41c7bad6aa6c32901f0fee718b0b5578cbfe480dcc"
+    },
+    {
+      "file": "assets/ui/boot/gallery279/dalada.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": false,
+      "prompt": "Use case: stylized-concept. ONE finished 16:9 cinematic full-screen hero background for Leo Racer. Polished realistic AAA racing-title key art, grounded natural landmark proportions, beautiful physically plausible surfaces and atmospheric lighting, restrained navy/cyan/warm-gold harmony with lush natural colors. Keep lower-left45% quiet and somewhat darker for readable live controls. No people, cars, UI, text, letters, logos, watermarks or borders. Finished landscape artwork. Sri Lanka SRI DALADA MALIGAWA, Temple of the Tooth in Kandy: recognizable white temple facade, golden roof and octagonal Pattirippuwa beside Kandy Lake, cloudy hill-country blue hour with subtle amber illumination, calm reflected architecture, respectful serene setting, no festival crowds or religious figures. Temple right half, lake and quiet sky on left.",
+      "sha256": "caa9e7444780f07b038f535aa0b484ee41aec5a239636e5685c7a09dcce1889c"
+    },
+    {
+      "file": "assets/art/scenery279/sri_lanka_surfaces.png",
+      "tool": "built-in image_gen.imagegen",
+      "transparent_background": false,
+      "prompt": "Generate ONE game-ready 2x2 MATERIAL TEXTURE ATLAS, square, exactly four equally-sized square panels filling frame with no borders, labels, gaps, text or objects. Each panel a straight-on orthographic macro surface texture, uniform neutral diffuse illumination, no baked shadows, no perspective. Top-left warm aged Sri Lankan lime plaster with subtle weathering; top-right terracotta clay tile surface with sparse grain; bottom-left richly woven teal/ochre handwoven awning cloth pattern; bottom-right weathered warm gray stone masonry. Realistic PBR basecolor quality, believable scale, restrained natural tones, seamless boundaries within each independent tile, no logos. This is a flat material texture atlas, not a scene.",
+      "sha256": "87dfebbf5eec678d0aa4cc3e600008c9a42dbba02db0eca59e8b14e7bd067725"
+    }
+  ]
+}

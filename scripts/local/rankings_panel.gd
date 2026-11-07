@@ -51,7 +51,7 @@ func _ready() -> void:
  var more:=Button.new();more.text="More Filters";more.custom_minimum_size.y=48;more.pressed.connect(func():advanced=not advanced;more.text="Fewer Filters" if advanced else "More Filters";for_filter_visibility());more.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  for filter in [track,revision,mode,performance,vehicle,metric]:filter.item_selected.connect(func(_i):refresh())
  status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(status)
- champion=HBoxContainer.new();champion.custom_minimum_size.y=110;box.add_child(champion)
+ champion=HBoxContainer.new();champion.custom_minimum_size.y=88;box.add_child(champion)
  var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
  entries=VBoxContainer.new();entries.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(entries)
  var legacy:=Label.new();legacy.text="Complete the selected number of laps without changing rides to set a record.\nEarlier personal best: %s" % (game.format_time(game.legacy_best_time) if game.legacy_best_time>0 else "No record yet");legacy.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;legacy.hide();box.add_child(legacy)
@@ -88,7 +88,7 @@ func refresh() -> void:
  if not game.ranking_store or not game.ranking_store.get_error().is_empty():
   status.text="We couldn't open your records. You can still race. Your earlier records are safe."
  if rows.is_empty():
-  var empty:=Label.new();empty.text="No records yet. Finish a race to set your first time!";empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;entries.add_child(empty)
+  var empty:=Label.new();empty.text="YOUR NEXT PERSONAL BEST STARTS HERE\nFinish a race to set a time for these filters.";empty.add_theme_font_size_override("font_size",24);empty.modulate=Color("d3dfe7");empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;entries.add_child(empty)
  for i in rows.size():
   var row: Dictionary=rows[i]
   var panel:=PanelContainer.new();entries.add_child(panel)
@@ -116,11 +116,11 @@ func close_panel() -> void:
 
 func update_champion(rows: Array) -> void:
  for child in champion.get_children():champion.remove_child(child);child.queue_free()
- var trophy:=TextureRect.new();trophy.texture=load("res://assets/ui/art/ultra/winner.png");trophy.custom_minimum_size=Vector2(110,110);trophy.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;trophy.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;champion.add_child(trophy)
+ champion.visible=not rows.is_empty()
+ if rows.is_empty():return
  var words:=VBoxContainer.new();words.size_flags_horizontal=Control.SIZE_EXPAND_FILL;champion.add_child(words)
  var heading:=Label.new();heading.text="TRACK CHAMPION" if not rows.is_empty() else "THE NEXT LEGEND COULD BE YOU";heading.add_theme_font_size_override("font_size",22);heading.modulate=Color("67d6db");words.add_child(heading)
- var winner:=Label.new();winner.add_theme_font_override("font",load("res://assets/fonts/BarlowCondensed-BoldItalic.ttf"));winner.add_theme_font_size_override("font_size",38);winner.modulate=Color("ffc857");winner.text=str(rows[0].name) if not rows.is_empty() else "YOUR NAME BELONGS HERE";winner.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;winner.clip_text=true;winner.tooltip_text=winner.text;words.add_child(winner)
+ var winner:=Label.new();winner.add_theme_font_override("font",load("res://assets/fonts/BarlowCondensed-BoldItalic.ttf"));winner.add_theme_font_size_override("font_size",32);winner.modulate=Color("ffc857");winner.text=str(rows[0].name);winner.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;winner.clip_text=true;winner.tooltip_text=winner.text;words.add_child(winner)
  var time:=Label.new();time.text=(game.format_time(float(rows[0].lap_ms if metric.selected==1 else rows[0].race_ms)/1000.)+"  /  "+vehicle_label(str(rows[0].vehicle))) if not rows.is_empty() else "Finish a clean race. Set the pace.";time.add_theme_font_size_override("font_size",24);time.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;words.add_child(time)
  if not game.reduced_motion and not rows.is_empty():
   var reveal:=champion.create_tween();champion.modulate.a=0.;reveal.tween_property(champion,"modulate:a",1.,.24)
-  var sheen:=winner.create_tween().set_loops();sheen.tween_interval(4.);sheen.tween_property(winner,"modulate",Color("fff3cc"),.5);sheen.tween_property(winner,"modulate",Color("ffc857"),.8)

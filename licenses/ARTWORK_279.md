@@ -1,0 +1,3 @@
+# Leo Racer 2.7.9 artwork
+
+Five new Sri Lankan location heroes and one four-panel scenery material atlas were created with built-in ImageGen. Final prompts, destination paths and SHA-256 hashes are in assets/config/generated-art-v279.json (also supplied with release provenance). Loading artwork is illustrative key art, not a representation of playable tracks. Existing and older artwork is preserved and credited by its original manifests; loading-gallery-v279.json inventories every selected full-screen original. Portrait promotional posters, UI icons and car thumbnails are not full-screen backgrounds.

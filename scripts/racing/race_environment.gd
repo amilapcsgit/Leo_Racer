@@ -74,7 +74,9 @@ func configure(target: Node3D, env: Environment, track_id: String, dynamic: bool
 	enforce_graphics()
 func collect(node: Node) -> void:
 	if node==illumination:return
-	if node is ReflectionProbe and String(node.name).begins_with("RaceReflection"):
+	# Authored worlds also contain unnamed one-shot probes. Every local capture
+	# would otherwise keep reflecting the daylight it captured before the race.
+	if node is ReflectionProbe:
 		probes[node]=node.visible;node.visible=false
 	if node is DirectionalLight3D and node!=sun:
 		extra_suns[node]=node.light_energy;node.light_energy=0.
@@ -88,7 +90,9 @@ func collect(node: Node) -> void:
 func on_node_added(node: Node) -> void:
 	if not enabled or not is_instance_valid(world) or not world.is_ancestor_of(node):return
 	if node==illumination or illumination.is_ancestor_of(node):return
-	if node is LightmapGI:
+	if node is ReflectionProbe:
+		probes[node]=node.visible;node.visible=false
+	elif node is LightmapGI:
 		var key:=String(node.get_parent().name)
 		if neutral.has(key):indirect[node]=node.light_data;node.light_data=neutral[key]
 	elif node is WorldEnvironment:

@@ -1,0 +1,34 @@
+{
+  "bounds": {
+    "position": [
+      -1.03300786018372,
+      0.0,
+      -2.20480465888977
+    ],
+    "size": [
+      2.0733859539032,
+      1.65061235427856,
+      4.56980466842651
+    ]
+  },
+  "id": "bigster",
+  "lods_generated": true,
+  "merged_static_meshes": 208,
+  "pack_sha256": "65b84e7374244d5b01f412f03105128f0d4db0f9787e75e834458d9896946312",
+  "scene_bytes": 11246693,
+  "status": "PASS",
+  "textures": 9,
+  "revision": "2.7.9",
+  "source_file": "publish\\Leo_Racer\\assets\\models\\bigster\\bigster_232.glb",
+  "original_sha256": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
+  "source_unchanged": true,
+  "derivative_sha256": "65b84e7374244d5b01f412f03105128f0d4db0f9787e75e834458d9896946312",
+  "virtual_scene": "res://cockpit279/bigster/model.scn",
+  "minimum_swept_clearance_m": 0.015,
+  "clearance_status": "PASS",
+  "animated_nodes_preserved": true,
+  "certified_clearance_lower_bound_m": 0.025849305619722304,
+  "clearance_method": "Continuous all-angle annular-band superset; exact projected triangle radial bounds, conservative triangle axial bounds",
+  "clearance_geometry_sha256": "bce4c61c4785e32588ed54ff03694cf6f4f79ac8087d23295c315cbbc0c025e5",
+  "cockpit_profile_sha256": "7a31020a50800e72a6920470b43df8aa28868adfc8cdc162258a27d32d13ddff"
+}
