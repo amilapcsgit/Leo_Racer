@@ -10,7 +10,11 @@ OUT=ROOT/('dist/release-'+VERSION)
 QA=ROOT/('build/qa'+REV)
 RELEASE_TRACKS=json.loads((ROOT/'content/releases'/('2.8.0.json' if VERSION=='2.8.0' else '2.3.2.json')).read_text(encoding='utf-8'))['tracks']
 TRACK_COUNT=len(RELEASE_TRACKS)
-def files(root):return sorted(p for p in root.rglob('*') if p.is_file() and not p.name.endswith('.log'))
+DIAGNOSTIC_REPORTS={'race-test.json','smoke-test.json'}
+def files(root):
+    return sorted(path for path in root.rglob('*') if path.is_file()
+                  and not path.name.endswith('.log')
+                  and not (root==BASE and path.parent==root and path.name in DIAGNOSTIC_REPORTS))
 def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
 def inject_checks(entries):
     # Keep the brand available before asset mounts, including refreshes of an
@@ -148,11 +152,9 @@ def payload(items):
     for file in items:
         relative=file.relative_to(BASE)
         digest=sha(file);short=ROOT/'build/nsis279'/digest;short.parent.mkdir(parents=True,exist_ok=True)
-        # A previous input can share an inode with a regenerated candidate.
+        # Snapshot the bytes so later test runs cannot change installer inputs.
         if short.exists() and sha(short)!=digest:short.unlink()
-        if not short.exists():
-            try:os.link(file,short)
-            except OSError:shutil.copy2(file,short)
+        if not short.exists():shutil.copy2(file,short)
         parent=str(relative.parent).replace('/','\\')
         lines+=['SetOutPath "$PLUGINSDIR\\payload'+('\\'+escape(parent) if parent!='.' else '')+'"','File "/oname='+escape(file.name)+'" "'+escape('..\\'+str(short.relative_to(ROOT)))+'"']
     return '\n'.join(lines)+'\n'
