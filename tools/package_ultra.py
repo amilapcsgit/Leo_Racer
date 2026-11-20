@@ -202,8 +202,8 @@ def package():
     with zipfile.ZipFile(evidence,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
         for file in sorted(QA.rglob('*')):
             parts=file.relative_to(QA).parts
-            if parts[0]=='benchmark-copies' or 'profile' in parts or 'native-copy' in parts:continue
-            if file.is_file() and file.suffix in ['.json','.jsonl','.log','.md']:archive.write(file,file.relative_to(QA).as_posix())
+            if parts[0]=='benchmark-copies' or parts[0].startswith(('camera-copy','emace-trial')) or 'profile' in parts or 'native-copy' in parts:continue
+            if file.is_file() and (file.suffix in ['.json','.jsonl','.log','.md'] or file.suffix=='.png' and parts[0].startswith('scenes-')):archive.write(file,file.relative_to(QA).as_posix())
         for file in sorted((ROOT/'docs/screenshots'/VERSION).glob('*')):
             if file.is_file() and file.suffix in ['.png','.md']:archive.write(file,'screenshots/'+file.name)
     with zipfile.ZipFile(evidence) as archive:
