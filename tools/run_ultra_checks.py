@@ -81,9 +81,9 @@ def run(kind,compat=False,export=None,extra=()):
         actual=process.wait()
         if code is None:code=actual
     text=(out/'process.log').read_text(encoding='utf-8',errors='replace')
-    # Retain known engine texture cleanup diagnostics separately; all other
-    # ERROR lines are application failures, even when the test prints PASS.
-    engine_texture=lambda line: bool(re.match(r'ERROR: Texture with GL ID of \d+: leaked \d+ bytes\.',line))
+    # Report renderer shutdown texture diagnostics separately from test errors.
+    engine_texture=lambda line: bool(re.fullmatch(
+        r"ERROR: (?:Texture with GL ID of \d+: leaked \d+ bytes\.|\d+ RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit\.)",line))
     errors=[line for line in text.splitlines() if not engine_texture(line) and any(term in line for term in ['ERROR:','SCRIPT ERROR','Parse Error','Shader compilation failed','No loader found for resource','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
     failed=bool(re.search(r'"status"\s*:\s*"FAIL"',text))
     if not re.search(r'"status"\s*:\s*"PASS"',text):errors.append('Expected test PASS report missing')

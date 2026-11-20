@@ -22,7 +22,16 @@ func run() -> void:
 	check(LeoAssets.configure(content)==OK and LeoAssets.mount_packs()==OK,"Verified released content mounts")
 	LeoVehicleLibrary.discover()
 	game=load("res://scenes/main.tscn").instantiate();game.diagnostics_mode=true;root.add_child(game);await game.initialization_finished
-	check(game.catalog.vehicles.size()==21 and game.catalog.drivers.size()==6 and game.tracks.size()==3,"21 cars, six drivers, three tracks")
+	check(game.catalog.vehicles.size()==21 and game.catalog.drivers.size()==6,"21 cars and six drivers")
+	var track_ids: Array[String]=[]
+	for course in game.tracks:
+		track_ids.append(course.id)
+		if course.id=="wennappuwa":check(course.modified,"Wennappuwa is unranked")
+	track_ids.sort()
+	var expected: Array[String]=["astra_coast","colombo_city","kandy_lake"]
+	if not OS.has_feature("editor") or FileAccess.file_exists(content.path_join("tracks/wennappuwa/manifest.json")):
+		expected.append("wennappuwa")
+	check(track_ids==expected,"Complete release track roster")
 	check(game.selected_laps==3,"Default race length is three laps")
 	for course in game.tracks:
 		var map:=LeoTrackHologram.new();map.set_route(course)
