@@ -3,6 +3,7 @@ render_mode cull_disabled;
 varying vec3 world;
 uniform bool landscaped=true;
 uniform bool coastal=false;
+uniform vec3 terrain_palette=vec3(1.);
 uniform sampler2D ground_albedo : source_color,filter_linear_mipmap,repeat_enable;
 uniform sampler2D ground_normal : hint_normal,filter_linear_mipmap,repeat_enable;
 float hash(vec2 cell){vec3 p=fract(vec3(cell.xyx)*.1031);p+=dot(p,p.yzx+33.33);return fract((p.x+p.y)*p.z);}
@@ -18,10 +19,10 @@ void fragment(){
  vec3 mineral=texture(ground_albedo,world.xz/2.4).rgb;
  vec3 soil=mix(vec3(.15,.12,.075),vec3(.29,.235,.15),patch);
  vec3 sand=mix(vec3(.34,.29,.20),vec3(.48,.42,.29),patch);
- vec3 vegetation=mix(grass,forest,canopy);
+ vec3 vegetation=mix(grass,forest,canopy)*terrain_palette;
  vec3 surface=mix(soil,vegetation,landscaped ? .92 : .62);
  if(coastal)surface=mix(surface,sand,smoothstep(.43,.75,patch)*.70);
- ALBEDO=surface*(1.-noise(world.xz*.7)*.10)*mix(.94,1.04,detail)*mix(vec3(1.),mineral*1.5,.12);
+ ALBEDO=surface*(1.-noise(world.xz*.7)*.10)*mix(.94,1.04,detail)*mix(vec3(1.),mineral*1.5,.26);
  NORMAL_MAP=texture(ground_normal,world.xz/2.4).rgb;
  NORMAL_MAP_DEPTH=(landscaped ? .13 : .24)*(1.-smoothstep(.08,.65,footprint));
  ROUGHNESS=.96;SPECULAR=.10;

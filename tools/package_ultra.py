@@ -8,6 +8,8 @@ REV=VERSION.replace('.','')
 BASE=ROOT/('build/Release-'+VERSION+'-Ultra')
 OUT=ROOT/('dist/release-'+VERSION)
 QA=ROOT/('build/qa'+REV)
+RELEASE_TRACKS=json.loads((ROOT/'content/releases'/('2.8.0.json' if VERSION=='2.8.0' else '2.3.2.json')).read_text(encoding='utf-8'))['tracks']
+TRACK_COUNT=len(RELEASE_TRACKS)
 def files(root):return sorted(p for p in root.rglob('*') if p.is_file() and not p.name.endswith('.log'))
 def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
 def inject_checks(entries):
@@ -59,6 +61,16 @@ def stage():
     source=ROOT/'build/content-baseline/GameAssets'
     for name in ['vehicles','tracks','environments','licenses']:
         shutil.copytree(source/name,BASE/'GameAssets'/name,dirs_exist_ok=True)
+    if VERSION == '2.8.0':
+        track_source=os.environ.get('LEO_RELEASE_TRACKS')
+        if not track_source:
+            raise RuntimeError('Set LEO_RELEASE_TRACKS to the verified 2.8 track staging directory')
+        for track in RELEASE_TRACKS:
+            folder=Path(track_source)/track['id']
+            if not (folder/'manifest.json').is_file():
+                raise RuntimeError(f"Missing staged track {track['id']}")
+            shutil.copytree(folder,BASE/'GameAssets/tracks'/track['id'],dirs_exist_ok=True)
+        shutil.copy2(ROOT/'assets/audio/vehicle280/manifest.json',BASE/'GameAssets/licenses/vehicle-audio-manifest.json')
     shutil.copytree(ROOT/'licenses',BASE/'GameAssets/licenses',dirs_exist_ok=True)
     shutil.copy2(ROOT/'assets/audio/racing278/manifest.json',BASE/'GameAssets/licenses/racing-audio-manifest.json')
     shutil.copy2(ROOT/'assets/audio/menu279/manifest.json',BASE/'GameAssets/licenses/menu-audio-manifest.json')
@@ -103,10 +115,10 @@ def stage():
     shutil.copy2(ROOT/'assets/config/default-roster-v1.json',BASE/'default-roster-v1.json')
     for source_name,destination in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:
         shutil.copy2(ROOT/'docs'/source_name,BASE/destination)
-    (BASE/'README.txt').write_text('LEO RACER '+VERSION+'\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, three tracks; 1–10 laps, default 3.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
+    (BASE/'README.txt').write_text('LEO RACER '+VERSION+'\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, '+str(TRACK_COUNT)+' tracks; 1–10 laps, default 3.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
     for name,args in [('Play Compatibility.cmd','--rendering-method gl_compatibility --rendering-driver opengl3'),('Vehicle Workshop.cmd','-- --vehicle-workshop')]:
         (BASE/name).write_text('@echo off\r\ncd /d "%~dp0"\r\nstart "" "LeoRacer.exe" '+args+'\r\n',encoding='ascii')
-    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'default_vehicles':21,'tracks':3,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
+    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'default_vehicles':21,'tracks':TRACK_COUNT,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
     dump(BASE/'required-payload.json',{'files':{p.relative_to(BASE).as_posix():sha(p) for p in files(BASE) if p.name!='required-payload.json' and not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')}})
     print('ULTRA_STAGED',flush=True)
 def refresh():
@@ -126,7 +138,7 @@ def refresh():
     inject_checks(entries)
     city_packs.write_pack(BASE/'LeoRacer.pck',engine,entries)
     for name,target in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:shutil.copy2(ROOT/'docs'/name,BASE/target)
-    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'default_vehicles':21,'tracks':3,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
+    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'default_vehicles':21,'tracks':TRACK_COUNT,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
     dump(BASE/'required-payload.json',{'files':{p.relative_to(BASE).as_posix():sha(p) for p in files(BASE) if p.name!='required-payload.json' and not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')}})
     print('CANDIDATE_REFRESHED',sha(BASE/'LeoRacer.pck'),flush=True)
 
@@ -162,8 +174,11 @@ def installer(build=True):
     if not compiler.exists():
         subprocess.run([shutil.which('pwsh') or 'powershell','-NoProfile','-ExecutionPolicy','Bypass','-File',str(ROOT/'tools/setup_ultra_nsis.ps1')],check=True)
     script=(ROOT/'installer/FocusedCars250.nsi').read_text(encoding='utf-8').replace('2.5.0',VERSION).replace('release250-','release'+REV+'-').replace('20 tested cars','21 tested cars').replace('20 cars','21 cars').replace('20 default cars','21 default cars').replace('selected 20 vehicles','selected 21 vehicles')
+    if TRACK_COUNT>3:
+        script=script.replace(' IntOp $0 $0 & ${SF_SELECTED}',
+                              ' SectionGetFlags ${TRACK_3} $3\n IntOp $0 $0 | $3\n IntOp $0 $0 & ${SF_SELECTED}',1)
     (ROOT/('installer/Release'+REV+'.nsi')).write_text(script,encoding='utf-8')
-    tracks=json.loads((ROOT/'content/releases/2.3.2.json').read_text(encoding='utf-8'))['tracks']
+    tracks=RELEASE_TRACKS
     for suffix in ['required','tracks','descriptions','selection']:
         if suffix=='required':text=payload([p for p in files(BASE) if not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')])
         elif suffix=='tracks':text='\n'.join('Section "'+row['name']+'" TRACK_'+str(i)+'\nSectionIn 1 2\n'+payload(files(BASE/'GameAssets/tracks'/row['id']))+'SectionEnd' for i,row in enumerate(tracks))
@@ -197,10 +212,12 @@ def package():
     artifacts=[target,evidence,OUT/'LeoRacer-Setup.exe',OUT/'RELEASE_NOTES.md',OUT/'TEST_REPORT.md']
     media=OUT/('LeoRacer-'+VERSION+'-Media-Pack.zip')
     if media.exists():artifacts.append(media)
+    kandy=OUT/'Kandy-Lake-Circuit-2.8-Upgrade.zip'
+    if kandy.exists():artifacts.append(kandy)
     rows=[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha(p)} for p in artifacts]
     (OUT/'SHA256SUMS.txt').write_text(''.join(r['sha256']+'  '+r['name']+'\n' for r in rows),encoding='ascii')
     rows.append({'name':'SHA256SUMS.txt','bytes':(OUT/'SHA256SUMS.txt').stat().st_size,'sha256':sha(OUT/'SHA256SUMS.txt')})
-    dump(OUT/'release-manifest.json',{'version':VERSION,'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cars':21,'tracks':3,'files':rows})
+    dump(OUT/'release-manifest.json',{'version':VERSION,'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cars':21,'tracks':TRACK_COUNT,'files':rows})
     print('ULTRA_PACKAGED',flush=True)
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('action',nargs='?',choices=['stage','refresh','installer-inputs','installer','package','all'],default='all');args=parser.parse_args()

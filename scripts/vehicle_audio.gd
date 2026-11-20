@@ -1,7 +1,11 @@
 class_name LeoVehicleAudio
 extends Node
 ## Offline-authored loop layers with a deterministic legacy fallback.
+const BANK := "res://assets/audio/vehicle280/"
 static var streams: Dictionary = {}
+static var bank: Dictionary = {}
+var engine_rows: Array = []
+var tire_layers: Array[AudioStreamPlayer] = []
 var kart: LeoKart
 var layers: Array[AudioStreamPlayer] = []
 var rpm := 900.0
@@ -26,7 +30,26 @@ static func profile(vehicle: VehicleDefinition) -> String:
 	if key in ["race_tuk","colombo_tuk","pony","aqua","pink","blue"] or group=="compact" or (group.is_empty() and not LeoRaceRules.balance().vehicles.has(key)):return "small"
 	return "sport"
 
+static func load_bank() -> void:
+	if bank.is_empty() and FileAccess.file_exists(BANK+"manifest.json"):
+		bank = JSON.parse_string(FileAccess.get_file_as_string(BANK+"manifest.json"))
+
+static func recorded_loop(file: String) -> AudioStream:
+	if not streams.has(file):
+		var stream := load(BANK+file) as AudioStreamWAV
+		if stream:
+			stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			stream.loop_begin = 0
+			stream.loop_end = roundi(stream.get_length() * stream.mix_rate)
+		streams[file] = stream
+	return streams[file]
+
 static func loop(kind: String, layer: int) -> AudioStream:
+	load_bank()
+	var rows: Array = bank.get("profiles",{}).get(kind,[])
+	if layer < 3 and not rows.is_empty():
+		var file: String = rows[mini(layer+1,rows.size()-1)].on
+		return recorded_loop(file)
 	var path:="res://assets/audio/racing278/"+kind+str(layer)+".ogg"
 	if ResourceLoader.exists(path):
 		var recorded:=load(path) as AudioStreamOggVorbis
@@ -61,6 +84,8 @@ static func legacy_loop(kind: String, layer: int) -> AudioStreamWAV:
 
 func setup(owner_kart: LeoKart) -> void:
 	kart=owner_kart
+	load_bank()
+	engine_rows = bank.get("profiles",{}).get(profile(kart.definition),[])
 	bus_name="Vehicle_"+str(get_instance_id())
 	AudioServer.add_bus();var index := AudioServer.bus_count-1
 	AudioServer.set_bus_name(index,bus_name);AudioServer.set_bus_send(index,"Effects")
@@ -75,6 +100,7 @@ func setup(owner_kart: LeoKart) -> void:
 
 func stop() -> void:
 	for player in layers:player.stop()
+	for player in tire_layers:player.stop()
 
 func update(dt: float) -> void:
 	if not is_instance_valid(kart):return
@@ -94,12 +120,19 @@ func update(dt: float) -> void:
 	var music: Variant=kart.get_parent().get("music")
 	if music is LeoRaceAudio and music.duck>0.:split_gain*=.4
 	panner.pan=(-.25 if kart.local_slot==0 else .25) if kart.get_parent().get("human_count")==2 else 0.
-	for i in 3:
-		var gain: float=mix[i]*(.35+.65*load_gain)*split_gain*(.65 if shift_time>0. else 1.)
-		layers[i].volume_db=linear_to_db(maxf(.0001,gain)) - 24.
-		layers[i].pitch_scale=.75+rev*.85
-	layers[3].volume_db=linear_to_db(maxf(.0001,ratio*ratio*split_gain))-23.
-	layers[4].volume_db=linear_to_db(maxf(.0001,ratio*(.8 if kart.tire_slipping else .12)*split_gain))-25.
+	if engine_rows.is_empty():
+		for i in 3:
+			var gain: float=mix[i]*(.35+.65*load_gain)*split_gain*(.65 if shift_time>0. else 1.)
+			layers[i].volume_db=linear_to_db(maxf(.0001,gain)) - 24.
+			layers[i].pitch_scale=.75+rev*.85
+	else:
+		var actual_rpm := lerpf(float(engine_rows.front().rpm), float(engine_rows.back().rpm), rev)
+		update_engine_samples(actual_rpm, split_gain)
+	layers[4].volume_db=linear_to_db(maxf(.0001,ratio*ratio*split_gain))-28.
+	if tire_layers.size()==2:
+		update_tires(dt,split_gain)
+	elif kart.skid:
+		kart.skid.volume_db=lerpf(kart.skid.volume_db,-23. if kart.tire_slipping else -70.,1.-exp(-dt*10.))
 	# Authored Area3D volumes are presentation-only and independent per player.
 	var room := 0.0
 	cover_timer-=dt
@@ -112,6 +145,50 @@ func update(dt: float) -> void:
 	for zone in get_tree().get_nodes_in_group("race_audio_zones"):
 		if zone is Area3D and zone.overlaps_body(kart):room=maxf(room,float(zone.get_meta("reverb",.4)))
 	room_gain=lerpf(room_gain,room,1.-exp(-dt*4.));reverb.wet=room_gain
+
+func update_engine_samples(actual_rpm: float, mix_gain: float) -> void:
+	var upper := 1
+	while upper < engine_rows.size()-1 and actual_rpm > float(engine_rows[upper].rpm):
+		upper += 1
+	var low: Dictionary = engine_rows[upper-1]
+	var high: Dictionary = engine_rows[upper]
+	var amount := clampf(inverse_lerp(low.rpm, high.rpm, actual_rpm),0.,1.)
+	var target := {}
+	for at in [low,high]:
+		var weight := (1.-amount) if at==low else amount
+		target[recorded_loop(at.on)] = Vector2(sqrt(weight*load_gain),at.rpm)
+		target[recorded_loop(at.off)] = Vector2(sqrt(weight*(1.-load_gain)),at.rpm)
+	for sample in target:
+		if not sample: continue
+		var channel: AudioStreamPlayer
+		for index in 4:
+			if layers[index].stream == sample: channel = layers[index]; break
+		if not channel:
+			for index in 4:
+				if not target.has(layers[index].stream):
+					channel = layers[index]
+					channel.stream = sample
+					channel.play()
+					break
+		if channel:
+			var values: Vector2 = target[sample]
+			channel.pitch_scale = clampf(actual_rpm/values.y,.63,1.52)
+			var shift := .50 if shift_time>.035 else 1.0
+			channel.volume_db = linear_to_db(maxf(.0001,values.x*mix_gain*shift))-18.
+
+func update_tires(dt: float, mix_gain: float) -> void:
+	var speed := absf(kart.wheel_motion_speed)
+	var side := absf(kart.velocity.dot(kart.global_basis.x))
+	var slip := clampf(side/6.0+absf(kart.steer)*smoothstep(5.,22.,speed)*.54,0.,1.)
+	if kart.tire_slipping: slip=maxf(slip,.42)
+	var road := clampf(1.-(absf(float(kart.circuit.project(kart.global_position).offset))-kart.circuit.width_at(kart.progress)*.5)*.7,0.,1.)
+	var sound_gain := smoothstep(1.,12.,speed)*mix_gain if kart.grounded and kart.active else 0.
+	var scrub := sound_gain*slip*(.8-.43*road)
+	var squeal := sound_gain*smoothstep(.25,.85,slip)*road
+	for index in tire_layers.size():
+		var volume := linear_to_db(maxf(.0001,scrub if index==0 else squeal))-19.
+		tire_layers[index].volume_db=lerpf(tire_layers[index].volume_db,volume,1.-exp(-dt*16.))
+		tire_layers[index].pitch_scale = lerpf(.81,1.13,smoothstep(6.,35.,speed))
 
 func _exit_tree() -> void:
 	var index := AudioServer.get_bus_index(bus_name)

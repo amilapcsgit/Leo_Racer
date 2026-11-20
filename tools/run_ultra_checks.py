@@ -38,7 +38,7 @@ def run(kind,compat=False,export=None,extra=()):
     if export:export=Path(export).resolve()
     renderer='compatibility' if compat else 'forward'
     label=('export-' if export else 'source-')+kind+'-'+renderer
-    out=ROOT/'build/qa279'/label;out.mkdir(parents=True,exist_ok=True)
+    out=ROOT/'build'/('qa280' if '2.8.0' in (ROOT/'project.godot').read_text(encoding='utf-8') else 'qa279')/label;out.mkdir(parents=True,exist_ok=True)
     profile=out/'profile';profile.mkdir(exist_ok=True)
     env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
     assets=Path(export)/'GameAssets' if export else ROOT/'build/content-baseline/GameAssets'

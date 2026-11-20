@@ -1,7 +1,7 @@
 """Exercise fresh install, replacement backup, uninstall and portable extraction."""
 import json, os, subprocess, uuid, zipfile
 from pathlib import Path
-from package_ultra import BASE, OUT, QA, ROOT, VERSION, REV, sha, dump
+from package_ultra import BASE, OUT, QA, ROOT, VERSION, REV, TRACK_COUNT, sha, dump
 from run_ultra_checks import run
 
 def verify():
@@ -22,7 +22,7 @@ def verify():
     assert (target/'GameAssets/licenses/AGPL-3.0-legacy.txt').is_file()
     assert (target/'GameAssets/licenses/LeoRacer-MIT.txt').is_file()
     assert len(list((target/'GameAssets/vehicles').glob('*/vehicle.json')))==21
-    assert len(list((target/'GameAssets/tracks').glob('*/manifest.json')))==3
+    assert len(list((target/'GameAssets/tracks').glob('*/manifest.json')))==TRACK_COUNT
     assert sha(target/'LeoRacer.pck')==sha(BASE/'LeoRacer.pck')
     assert run('core',export=target)
     custom=target/'GameAssets/vehicles/my-unmanaged-car/keep.txt';custom.parent.mkdir();custom.write_text('preserve custom content',encoding='utf-8')
@@ -44,7 +44,7 @@ def verify():
     assert (extracted/'GameAssets/licenses/LeoRacer-MIT.txt').is_file()
     assert sha(extracted/'LeoRacer.pck')==sha(BASE/'LeoRacer.pck')
     assert run('core',export=extracted)
-    dump(QA/'delivery.json',{'status':'PASS','cars':21,'tracks':3,'core_sha256':sha(BASE/'LeoRacer.pck'),'installer_sha256':sha(setup),'portable_sha256':sha(OUT/('LeoRacer-'+VERSION+'-win64.zip')),'fresh_install':True,'reinstall_backup':True,'uninstall_preservation':True,'portable_extraction':True,'sdk_removed':True})
+    dump(QA/'delivery.json',{'status':'PASS','cars':21,'tracks':TRACK_COUNT,'core_sha256':sha(BASE/'LeoRacer.pck'),'installer_sha256':sha(setup),'portable_sha256':sha(OUT/('LeoRacer-'+VERSION+'-win64.zip')),'fresh_install':True,'reinstall_backup':True,'uninstall_preservation':True,'portable_extraction':True,'sdk_removed':True})
     print('ULTRA_DELIVERY_PASS',flush=True)
 
 if __name__=='__main__':verify()

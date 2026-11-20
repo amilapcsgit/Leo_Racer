@@ -3,7 +3,7 @@ var screen: LeoLoadingScreen
 const TRACE=preload("res://scripts/content/boot_trace.gd")
 func _ready() -> void:
 	TRACE.mark("bootstrap_ready")
-	DisplayServer.window_set_title("Leo Racer — 2.7.9")
+	DisplayServer.window_set_title("Leo Racer — 2.8.0")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
 	LeoRaceAudio.shared(get_tree())

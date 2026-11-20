@@ -8,6 +8,7 @@ var glow := true
 var motion_blur := false
 var upscale := 0
 var custom := false
+var environment_detail := 0
 var pending := false
 var previous := {}
 var deadline := 0
@@ -25,15 +26,21 @@ func read(cfg: ConfigFile) -> void:
 	motion_blur=bool(cfg.get_value("graphics","motion_blur",false))
 	upscale=clampi(int(cfg.get_value("graphics","upscale",0)),0,2)
 	custom=bool(cfg.get_value("graphics","custom",false))
+	environment_detail=clampi(int(cfg.get_value("graphics","environment_detail",0)),0,3)
 	if DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_WINDOWED:DisplayServer.window_set_size(resolution)
 
 func write(cfg: ConfigFile) -> void:
-	for key in ["resolution","aa","glow","motion_blur","upscale","custom"]:
+	for key in ["resolution","aa","glow","motion_blur","upscale","custom","environment_detail"]:
 		cfg.set_value("graphics",key,previous.resolution if key=="resolution" and pending else get(key))
 
 func set_option(key: String,value: Variant) -> void:
 	if key not in ["aa","glow","motion_blur","upscale"]:return
 	set(key,value);custom=true;game.apply_graphics();game.save_settings()
+
+func set_environment_detail(value: int) -> void:
+	environment_detail=clampi(value,0,3)
+	game.apply_graphics()
+	game.save_settings()
 
 func preset(tier: int) -> void:
 	aa=true;glow=tier>0;motion_blur=false;upscale=0;custom=false

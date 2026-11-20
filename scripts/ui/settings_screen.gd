@@ -46,6 +46,8 @@ static func build(front: LeoFrontend) -> void:
 	var glow:=CheckButton.new();glow.text="Glow";glow.button_pressed=graphics.glow;display.add_child(glow)
 	var blur:=CheckButton.new();blur.text="Motion Blur";blur.button_pressed=graphics.motion_blur;blur.disabled=game.reduced_motion;display.add_child(blur)
 	front.label(display,"Motion blur is subtle, affects the world only, and is disabled by Reduced Motion.",20,Color("b9c7d6"))
+	var environment_detail:=choice(front,display,"Environment Detail",["Auto","Low","Medium","High"],graphics.environment_detail)
+	environment_detail.item_selected.connect(graphics.set_environment_detail)
 	var upscaling:=choice(front,display,"Upscaling",["Native / Bilinear","FSR 2 · Quality","FSR 2 · Balanced"],graphics.upscale if graphics.supported_upscaling() else 0)
 	upscaling.disabled=not graphics.supported_upscaling()
 	if not graphics.supported_upscaling():front.label(display,"FSR 2 requires Forward+. Compatibility uses native/bilinear scaling.",20,Color("b9c7d6"))

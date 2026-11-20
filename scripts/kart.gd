@@ -189,7 +189,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		elif i == 1: spark_right = sparks
 	if is_player:
 		engine = sound("engine.ogg", -22, true)
-		skid = sound("racing278/skid.ogg", -50, true)
+		if not FileAccess.file_exists("res://assets/audio/vehicle280/tire_squeal.wav") and not ResourceLoader.exists("res://assets/audio/vehicle280/tire_squeal.wav"): skid = sound("racing278/skid.ogg", -70, true)
 		boost_sound = sound("racing278/boost.ogg", -12, false)
 		impact = sound("racing278/impact.ogg", -14, false)
 		motor_audio=LeoVehicleAudio.new();add_child(motor_audio);motor_audio.setup(self)
@@ -578,9 +578,8 @@ func _physics_process(dt: float) -> void:
 	visual.rotation.y = 0. if reduced else lerp_angle(visual.rotation.y, -drift_direction * .32 if drifting else 0.0, dt * 6)
 	contact_recoil=Vector3.ZERO
 	visual.rotation.x=suspension_pitch
-	if is_player and engine:
+	if is_player and motor_audio:
 		if motor_audio:motor_audio.throttle=maxf(throttle,rev_throttle);motor_audio.update(dt)
-		skid.volume_db = lerpf(skid.volume_db, -13.0 if tire_slipping else -65.0, dt * 8)
 
 func _process(dt: float) -> void:
 	if not circuit or not visual: return

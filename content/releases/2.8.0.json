@@ -1,0 +1,9 @@
+{
+  "version": "2.8.0",
+  "tracks": [
+    {"id": "astra_coast", "name": "Astra Lotus Coast"},
+    {"id": "colombo_city", "name": "Colombo City Grand Prix"},
+    {"id": "kandy_lake", "name": "Kandy Lake Circuit"},
+    {"id": "wennappuwa", "name": "Wennappuwa Street Circuit"}
+  ]
+}

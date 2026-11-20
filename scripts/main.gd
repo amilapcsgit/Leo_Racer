@@ -77,6 +77,7 @@ var art_profile: LeoArtProfile = preload("res://assets/config/astra.tres")
 var feedback: Node
 var graphics: LeoGraphicsSettings
 var graphics_quality := 1
+var track_environment: LeoTrackEnvironment
 var base_camera_fov := 63.0
 var opponent_audio: LeoOpponentAudio
 var reduced_motion := false
@@ -389,6 +390,9 @@ func build_world() -> void:
 			world.add_child(tent)
 	LeoAssets.apply_overrides(world)
 	LeoTrackPolish.install(world,circuit)
+	track_environment = LeoTrackEnvironment.new()
+	track_environment.configure(self)
+	world.add_child(track_environment)
 	LeoTrackContact.install(world,circuit)
 	LeoGraphics.install_reflections(world,circuit)
 	apply_graphics()
@@ -501,6 +505,8 @@ func apply_graphics() -> void:
 	if world.find_children("RaceReflection*","ReflectionProbe",false,false).is_empty() and (human_count==1 or RenderingServer.get_current_rendering_method()=="forward_plus"):
 		LeoGraphics.install_reflections(world,circuit)
 	LeoGraphics.apply(world,environment,graphics_quality,human_count==2,state=="garage")
+	if is_instance_valid(track_environment):
+		track_environment.set_quality(graphics.environment_detail, graphics_quality, human_count == 2)
 	race_environment.enforce_graphics()
 	if graphics:graphics.apply()
 
