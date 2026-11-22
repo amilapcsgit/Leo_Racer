@@ -6,6 +6,8 @@ var definition: LeoTrackDefinition
 var widths: Array = []
 var bounds := AABB()
 var _cells: Dictionary = {}
+var _projection_cells: Dictionary = {}
+var _all_segments: Array = []
 var points: PackedVector3Array
 var length: float
 var step: float
@@ -71,9 +73,19 @@ func project(p: Vector3, hint: int = -1) -> Dictionary:
 		for j in range(hint-18,hint+18):candidates.append(posmod(j,points.size()))
 	else:
 		var key:=Vector2i(floori(p.x/64.),floori(p.z/64.))
-		for x in range(-1,2):
-			for y in range(-1,2):candidates.append_array(_cells.get(key+Vector2i(x,y),[]))
-		if candidates.is_empty():candidates=range(points.size())
+		if not _projection_cells.has(key):
+			var seen := {}
+			for x in range(-1,2):
+				for y in range(-1,2):
+					for segment in _cells.get(key+Vector2i(x,y),[]):
+						if not seen.has(segment):
+							seen[segment] = true
+							candidates.append(segment)
+			if not candidates.is_empty(): _projection_cells[key] = candidates
+		else: candidates = _projection_cells[key]
+		if candidates.is_empty():
+			if _all_segments.is_empty(): _all_segments = range(points.size())
+			candidates = _all_segments
 	for i in candidates:
 		var a := points[i]
 		var ab := points[(i + 1) % points.size()] - a

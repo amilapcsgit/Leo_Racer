@@ -1,7 +1,7 @@
 """Exercise fresh install, replacement backup, uninstall and portable extraction."""
 import json, os, subprocess, uuid, zipfile
 from pathlib import Path
-from package_ultra import BASE, OUT, QA, ROOT, VERSION, REV, TRACK_COUNT, sha, dump
+from package_ultra import BASE, OUT, QA, ROOT, RELEASE_LABEL, REV, TRACK_COUNT, sha, dump
 from run_ultra_checks import run
 
 def verify():
@@ -36,7 +36,7 @@ def verify():
     assert not (target/'LeoRacer.exe').exists() and custom.read_text(encoding='utf-8')=='preserve custom content' and note.read_text(encoding='utf-8')=='keep on uninstall'
     portable=ROOT/'build'/('portable'+REV+'-verified-'+run_id)
     assert not portable.exists(), 'Preserve prior portable tests'
-    with zipfile.ZipFile(OUT/('LeoRacer-'+VERSION+'-win64.zip')) as archive:archive.extractall(portable)
+    with zipfile.ZipFile(OUT/('LeoRacer-'+RELEASE_LABEL+'-win64.zip')) as archive:archive.extractall(portable)
     extracted=portable/'LeoRacer'
     assert (extracted/'LICENSE.txt').read_text(encoding='utf-8')==(ROOT/'LICENSE').read_text(encoding='utf-8')
     assert 'Shaven Leo' in (extracted/'CREDITS.txt').read_text(encoding='utf-8')
@@ -44,7 +44,7 @@ def verify():
     assert (extracted/'GameAssets/licenses/LeoRacer-MIT.txt').is_file()
     assert sha(extracted/'LeoRacer.pck')==sha(BASE/'LeoRacer.pck')
     assert run('core',export=extracted)
-    dump(QA/'delivery.json',{'status':'PASS','cars':21,'tracks':TRACK_COUNT,'core_sha256':sha(BASE/'LeoRacer.pck'),'installer_sha256':sha(setup),'portable_sha256':sha(OUT/('LeoRacer-'+VERSION+'-win64.zip')),'fresh_install':True,'reinstall_backup':True,'uninstall_preservation':True,'portable_extraction':True,'sdk_removed':True})
+    dump(QA/'delivery.json',{'status':'PASS','cars':21,'tracks':TRACK_COUNT,'core_sha256':sha(BASE/'LeoRacer.pck'),'installer_sha256':sha(setup),'portable_sha256':sha(OUT/('LeoRacer-'+RELEASE_LABEL+'-win64.zip')),'fresh_install':True,'reinstall_backup':True,'uninstall_preservation':True,'portable_extraction':True,'sdk_removed':True})
     print('ULTRA_DELIVERY_PASS',flush=True)
 
 if __name__=='__main__':verify()

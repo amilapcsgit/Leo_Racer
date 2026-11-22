@@ -9,6 +9,9 @@ func _initialize() -> void:run.call_deferred()
 func check(ok: bool, message: String) -> void:
 	checks+=1
 	if not ok:errors.append(message);push_error(message)
+func half_extent(kart: LeoKart, axis: Vector3) -> float:
+	var size := kart.definition.collision_size*.5
+	return absf(axis.dot(kart.global_basis.x))*size.x+absf(axis.dot(kart.global_basis.y))*size.y+absf(axis.dot(kart.global_basis.z))*size.z
 func run() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
@@ -30,7 +33,7 @@ func audit() -> void:
 	check(LeoDefaultRoster.ids().size()==21,"Locked default roster contains twenty-one IDs")
 	check(game.catalog.vehicles.size()==21,"Fresh selected content has exactly twenty-one packages")
 	check(LeoDefaultRoster.ai_vehicles(game.catalog,true).size()==21,"Opt-in AI pool retains every reviewed default vehicle")
-	check(LeoRaceRules.ID=="distinct_v4+contact_v278_static","Collision changes have a new record ruleset")
+	check(LeoRaceRules.ID=="distinct_v4+contact_v280_arcade_static","Collision changes have a new record ruleset")
 	var missing:=LeoLocalPlayer.new(1);missing.restore({"vehicle":"excluded_temporarily"},game.catalog)
 	check(missing.vehicle_id==&"bigster" and missing.preferred_vehicle_id==&"excluded_temporarily","Unavailable saved car uses Bigster without losing preference")
 	var rows: Array=[]
@@ -115,17 +118,28 @@ func contacts() -> void:
 			var station: float=game.circuit.length*.1
 			var separation: float=(subject.definition.collision_size.z+other.definition.collision_size.z)*.5+.2
 			subject.place(station,0.);other.place(station+separation,0.)
-			subject.speed=speed;other.speed=0.
-			if kind=="head_on":other.rotation.y+=PI;other.speed=speed
+			if kind=="head_on":other.rotation.y+=PI
 			if kind=="side":
-				subject.place(station,-2.1);other.place(station,0.)
+				subject.place(station,0.);other.place(station,0.)
 				var right: Vector3=game.circuit.frame_at(station).x
 				subject.rotation.y=atan2(-right.x,-right.z)
+				var center_shift: float=(subject.global_basis*subject.definition.collision_position-other.global_basis*other.definition.collision_position).dot(right)
+				var gap: float=half_extent(subject,right)+half_extent(other,right)+.2+center_shift
+				subject.position=game.circuit.sample(station,-gap)+Vector3.UP*.12
+				subject.road_offset=-gap
+			# place() resets speed; assign incoming motion after every pose change.
+			subject.speed=speed;other.speed=speed if kind=="head_on" else 0.
+			for car in [subject,other]:car.velocity=-car.global_basis.z*car.speed
 			var before:=subject.next_gate
+			var touched_peer:=false
 			for tick in 20:
 				await physics_frame
 				subject._physics_process(1./60.);other._physics_process(1./60.)
-				check(subject.velocity.length()<speed+2. and other.velocity.length()<speed+2.,"Pair contact has no artificial velocity spike / "+kind)
+				for car in [subject,other]:
+					for hit in car.get_slide_collision_count():
+						if car.get_slide_collision(hit).get_collider() in [subject,other]:touched_peer=true
+				check(subject.velocity.length()<speed+2. and other.velocity.length()<speed+2.,"Pair contact has no artificial velocity spike / %s / %.1f / tick %d / %s / %s" % [kind,speed,tick,subject.velocity,other.velocity])
+			check(touched_peer,"Pair fixture produces physical contact / %s / %.1f" % [kind,speed])
 			check(subject.next_gate==before,"Pair contact cannot award checkpoint / "+kind)
 			check(subject.position.is_finite() and other.position.is_finite(),"Pair contact remains finite / "+kind)
 			rows.append({"kind":kind,"speed":speed,"after_a":subject.speed,"after_b":other.speed,"separation":subject.position.distance_to(other.position)})

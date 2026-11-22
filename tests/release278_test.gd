@@ -127,8 +127,37 @@ func run() -> void:
 	print("RELEASE278_TEST ",JSON.stringify(report));await game.quit_game(0 if errors.is_empty() else 1)
 
 func settings() -> void:
+	check(game.handling_preset == LeoRaceRules.Handling.STANDARD, "Old settings default to Standard handling")
+	game.set_handling_preset(LeoRaceRules.Handling.EASY)
+	var handling_cfg := ConfigFile.new()
+	handling_cfg.set_value("game_logic", "handling", game.handling_preset)
+	handling_cfg.save("user://leo_racer.cfg")
+	game.handling_preset = LeoRaceRules.Handling.STANDARD
+	game.load_settings()
+	check(game.handling_preset == LeoRaceRules.Handling.EASY and game.active_handling == LeoRaceRules.Handling.STANDARD, "Saved Easy handling loads without changing the active race")
+	var kart := LeoKart.new()
+	kart.definition = game.catalog.vehicle(&"bigster")
+	var rules := LeoRaceRules.resolve(kart.definition)
+	for preset in [LeoRaceRules.Handling.EASY, LeoRaceRules.Handling.ASSISTED, LeoRaceRules.Handling.STANDARD]:
+		LeoRaceRules.apply(kart, preset)
+		var speed_scale: float = [0.70, 0.85, 1.0][preset]
+		check(is_equal_approx(kart.max_speed, rules.max_speed * speed_scale) and is_equal_approx(kart.boosted_ceiling(), rules.boosted_speed * speed_scale), "Handling scales both speed ceilings at preset %d" % preset)
+		check(is_equal_approx(kart.acceleration, rules.acceleration * lerpf(0.75, 1.0, float(preset) / 2.0)), "Handling scales launch acceleration at preset %d" % preset)
+	kart.free()
+	check(LeoRaceRules.handling_suffix(2).is_empty() and LeoRaceRules.handling_suffix(0) != LeoRaceRules.handling_suffix(1), "Handling modes get separate records and Standard preserves its key")
+	game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
+	handling_cfg.set_value("game_logic", "handling", game.handling_preset)
+	handling_cfg.save("user://leo_racer.cfg")
 	var cfg:=ConfigFile.new();cfg.set_value("game","best_time_astra",123.);cfg.set_value("unknown","keep","unchanged")
 	game.graphics.read(cfg);game.graphics.write(cfg)
+	check(game.graphics.draw_distance==1,"Older profiles default to Standard draw distance")
+	cfg.set_value("graphics","draw_distance",3)
+	game.graphics.read(cfg)
+	game.graphics.write(cfg)
+	check(game.graphics.draw_distance==3 and cfg.get_value("graphics","draw_distance")==3,"Very Far draw distance survives a settings round trip")
+	cfg.set_value("graphics","draw_distance",99)
+	game.graphics.read(cfg)
+	check(game.graphics.draw_distance==3,"Out-of-range draw distance is clamped")
 	check(cfg.get_value("game","best_time_astra")==123. and cfg.get_value("unknown","keep")=="unchanged","Settings retain legacy records and unknown keys")
 	var before: Vector2i=game.graphics.resolution
 	game.graphics.preview_display(Vector2i(1280,720),false)
@@ -154,10 +183,17 @@ func inputs() -> void:
 	check(keyboard.bindings.look_back[0].index==KEY_C and keyboard.bindings.change_camera.is_empty(),"Custom bindings remain intact when C is occupied")
 
 func contacts() -> void:
+	var frames := {}
+	check(LeoContactSolver.fresh_contact(frames, 17, 10), "First contact permits a hop")
+	check(not LeoContactSolver.fresh_contact(frames, 17, 11), "Continuous contact suppresses another hop")
+	check(not LeoContactSolver.fresh_contact(frames, 17, 13), "Contact latch allows a brief solver gap")
+	check(LeoContactSolver.fresh_contact(frames, 17, 16), "Recontact after separation permits a hop")
+	check(LeoContactSolver.hop_speed(7.9)==0.,"Glancing impacts do not lift the car")
+	check(LeoContactSolver.hop_speed(16.)>0. and LeoContactSolver.hop_speed(100.)==2.,"Strong impacts produce a bounded hop")
 	for closing in [0.,1.,2.,10.,50.]:
 		var incoming:=Vector3(-closing,0,12.)
 		var response:=LeoContactSolver.barrier_response(incoming,Vector3.RIGHT)
-		check(response.x>=0. and response.x<=3. and is_equal_approx(response.z,12.),"Barrier rebound is bounded and preserves tangent")
+		check(response.x>=0. and response.x<=4. and is_equal_approx(response.z,12.),"Barrier rebound is bounded and preserves tangent")
 		check(response.length_squared()<=incoming.length_squared()+.001,"Barrier rebound cannot add energy")
 		check(LeoContactSolver.barrier_response(incoming,Vector3.RIGHT,false).x==0.,"Sustained contact does not repeatedly rebound")
 	var max_energy_delta:=0.
@@ -181,7 +217,7 @@ func contacts() -> void:
 	check(not LeoContactBudget.marks.any(func(item):return item.get_ref()==old_mark),"Detached race effects release their global budget immediately")
 	old_mark.free();new_mark.free()
 	measurements.max_pair_energy_delta=max_energy_delta
-	check(LeoRaceRules.ID.begins_with("distinct_v4+contact_v278"),"Changed contacts have a separate record identity")
+	check(LeoRaceRules.ID.begins_with("distinct_v4+contact_v280_arcade"),"Changed contacts have a separate record identity")
 
 func free_space_reference() -> void:
 	await game.hud.garage_selector.scheduler.pause_for_race()

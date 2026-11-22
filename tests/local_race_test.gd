@@ -63,7 +63,18 @@ func run() -> void:
  game.toggle_pause();game.hud.show_garage("pause");game.input_router.players[1].device=-1;game.diagnostics_mode=false
  check(not game.swap_player_vehicle(&"mario",&"duster","MISSING DEVICE") and game.paused,"Car change cannot bypass mandatory device reassignment")
  game.diagnostics_mode=true
+ game.set_handling_preset(LeoRaceRules.Handling.EASY)
+ check(game.active_handling == LeoRaceRules.Handling.STANDARD, "Changing handling in pause preserves current race rules")
+ await game.start_race()
+ check(game.active_handling == LeoRaceRules.Handling.EASY and game.current_ruleset().ends_with("+handling_easy_v1"), "Restart captures Easy and uses its record rules")
+ for racer in game.karts:
+  var base_speed: float = LeoRaceRules.resolve(racer.definition).max_speed
+  check(is_equal_approx(racer.max_speed, base_speed * .7), "Easy speed applies to racer %s" % racer.racer_name)
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
- FileAccess.open("res://build/qa-ui/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/race"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("race.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RACE_TEST ",report)
  await game.quit_game(0 if errors.is_empty() else 1)

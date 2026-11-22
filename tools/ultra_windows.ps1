@@ -3,11 +3,14 @@ $ErrorActionPreference='Stop'
 $project=Split-Path $PSScriptRoot -Parent
 Push-Location $project
 try {
-    $qa=Join-Path $project 'build/qa280'
+    $version=([regex]::Match((Get-Content project.godot -Raw),'config/version="([^"]+)"')).Groups[1].Value
+    $revision=$version.Replace('.','')
+    $release="build/Release-$version-Ultra"
+    $qa=Join-Path $project "build/qa$revision"
     New-Item -ItemType Directory -Force $qa | Out-Null
-    $env:APPDATA=Join-Path $project 'build/ultra-ci-profile-280'
+    $env:APPDATA=Join-Path $project "build/ultra-ci-profile-$revision"
     $env:LOCALAPPDATA=$env:APPDATA
-    $env:TEMP=Join-Path $project 'build/export280-temp';$env:TMP=$env:TEMP
+    $env:TEMP=Join-Path $project "build/export$revision-temp";$env:TMP=$env:TEMP
     New-Item -ItemType Directory -Force $env:TEMP | Out-Null
     New-Item -ItemType Directory -Force $env:APPDATA | Out-Null
     if (-not $SkipStage) {
@@ -43,7 +46,7 @@ try {
         if ($LASTEXITCODE -ne 0 -or (Select-String -Path $log -Pattern 'SCRIPT ERROR|^FAIL |"status":\s*"FAIL"' -Quiet)) {throw "Failed $test; see $log"}
     }
     if ($Package) {
-        $output=Join-Path $project 'build/Release-2.8.0-Ultra/LeoRacer.exe'
+        $output=Join-Path $project "$release/LeoRacer.exe"
         if (Test-Path $output) {throw 'Preserve previous exports: archive the candidate before rebuilding this destination'}
         New-Item -ItemType Directory -Force (Split-Path $output) | Out-Null
         & "$PSScriptRoot/brand_template.ps1"
@@ -51,12 +54,12 @@ try {
         if ($LASTEXITCODE -ne 0 -or (Select-String -Path "$qa/export.log" -Pattern 'SCRIPT ERROR|ERROR: Export .NET Project:|Safe save failed|Can.t open file from path' -Quiet)) {throw 'Export failed'}
         $assemblies=Get-ChildItem -LiteralPath (Split-Path $output) -Filter 'LeoRacer.dll' -Recurse -File
         if (-not $assemblies) {throw 'Native .NET assemblies missing from exported payload'}
-        & "$PSScriptRoot/run_godot.ps1" @('--headless','--script','res://tools/build_workshop_pack.gd','--',"--output=$project/build/Release-2.8.0-Ultra/Tools/VehicleWorkshop")
+        & "$PSScriptRoot/run_godot.ps1" @('--headless','--script','res://tools/build_workshop_pack.gd','--',"--output=$project/$release/Tools/VehicleWorkshop")
         if ($LASTEXITCODE -ne 0) {throw 'Workshop package failed'}
         # Retain a real raw native run before the initial evidence archive is assembled.
         & $Python tools/package_ultra.py stage
         if ($LASTEXITCODE -ne 0) {throw 'Package staging failed'}
-        & $Python tools/run_ultra_checks.py core --export build/Release-2.8.0-Ultra
+        & $Python tools/run_ultra_checks.py core --export $release
         if ($LASTEXITCODE -ne 0) {throw 'Native core validation failed'}
         & $Python tools/package_ultra.py installer
         if ($LASTEXITCODE -ne 0) {throw 'Installer compilation failed'}

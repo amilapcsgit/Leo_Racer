@@ -22,11 +22,16 @@ var race_ai_lateral_acceleration := -1.
 var active := false
 var finished := false
 var finish_time := 0.0
+var finish_order := -1
 var progress := -10.0
 var next_gate := 0
 var lap_count := 3
 var grounded := false
 var airborne_time := 0.
+var impact_hop := false
+var trace_road_impacts := false
+var trace_next_tick := 0
+
 var landing_suppression := .25
 var dynamics := LeoArcadeDynamics.new()
 signal surface_feedback(kind: String,strength: float)
@@ -40,6 +45,7 @@ var speed := 0.0
 var max_speed := 33.0
 var acceleration := 18.0
 var handling := 1.0
+var steering_assist := 0.0
 var steer := 0.0
 var drift_charge := 0.0
 var drifting := false
@@ -189,7 +195,7 @@ func setup(track: LeoCircuit, id: int, player: bool, animal: String, kart_color:
 		elif i == 1: spark_right = sparks
 	if is_player:
 		engine = sound("engine.ogg", -22, true)
-		if not FileAccess.file_exists("res://assets/audio/vehicle280/tire_squeal.wav") and not ResourceLoader.exists("res://assets/audio/vehicle280/tire_squeal.wav"): skid = sound("racing278/skid.ogg", -70, true)
+		skid = sound("racing278/skid.ogg", -70, true)
 		boost_sound = sound("racing278/boost.ogg", -12, false)
 		impact = sound("racing278/impact.ogg", -14, false)
 		motor_audio=LeoVehicleAudio.new();add_child(motor_audio);motor_audio.setup(self)
@@ -408,6 +414,9 @@ func recover() -> void:
 	recovered.emit(self)
 
 func reset_suspension() -> void:
+	trace_road_impacts = "--trace-road-impacts" in OS.get_cmdline_user_args()
+	impact_hop=false
+	impact_contact_frames.clear()
 	dynamics.reset();grounded=false;airborne_time=0.;landing_suppression=.25
 	suspension_ready=false;suspension_roll=0.;suspension_pitch=0.;drafting=false
 
@@ -469,7 +478,13 @@ func prepare_motion(dt: float) -> void:
 			throttle=command.throttle;desired_steer=command.steer;want_drift=command.drift
 			if command.boost and boost_fuel>=1.:
 				boost_fuel=0.;boost(1.6,"HYBRID E-BOOST" if definition.electric_boost else "NITRO BOOST")
-	steer = lerpf(steer, desired_steer, minf(1, dt * 8))
+	var steering_rate := 8.0
+	if is_player and not auto_drive and steering_assist > 0.0:
+		var assisted_rate := 4.5
+		if steer * desired_steer < 0.0:
+			assisted_rate = 3.5
+		steering_rate = lerpf(steering_rate, assisted_rate, steering_assist)
+	steer = lerpf(steer, desired_steer, minf(1, dt * steering_rate))
 	if throttle < -.1:
 		boost_time = 0
 		if active and speed>5 and definition.braking_regeneration>0:
@@ -510,12 +525,12 @@ func prepare_motion(dt: float) -> void:
 	var lateral_grip := (3.0 if drifting else 10.0)*(1. if grounded else LeoArcadeDynamics.AIR_GRIP)
 	velocity.x = lerpf(velocity.x, target_vel.x, minf(1, dt * lateral_grip))
 	velocity.z = lerpf(velocity.z, target_vel.z, minf(1, dt * lateral_grip))
-	if circuit.elevated and is_on_floor():
+	if circuit.elevated and is_on_floor() and not impact_hop:
 		var up:=get_floor_normal()
 		velocity.y=-(velocity.x*up.x+velocity.z*up.z)/maxf(up.y,.5)
 	landing_suppression=maxf(0.,landing_suppression-dt)
 	floor_snap_length=LeoArcadeDynamics.SNAP if velocity.y<=0. and grounded else 0.
-	velocity.y -= LeoArcadeDynamics.GRAVITY * dt
+	velocity.y -= (9.81 if impact_hop else LeoArcadeDynamics.GRAVITY) * dt
 	var own_fraction:=minf(1.,absf(speed)/maxf(.0001,Vector2(velocity.x,velocity.z).length()))
 	checkpoint_velocity=velocity*own_fraction
 	prepared_throttle=throttle
@@ -532,6 +547,7 @@ func _physics_process(dt: float) -> void:
 	move_and_slide()
 	grounded=is_on_floor()
 	if grounded:
+		impact_hop=false
 		var normal_speed:=maxf(0.,-contact_velocity.dot(get_floor_normal()))
 		if not was_grounded and airborne_time>.035 and landing_suppression<=0. and normal_speed>LeoArcadeDynamics.LANDING_THRESHOLD:
 			var strength:=clampf(normal_speed/10.,0.,1.)
@@ -542,6 +558,9 @@ func _physics_process(dt: float) -> void:
 		airborne_time=0.
 	else:airborne_time+=dt
 	LeoContactSolver.solve(self,contact_velocity)
+	if trace_road_impacts and is_player and active:
+		trace_road_motion(contact_velocity, motion_origin, dt, throttle)
+
 	# Soft continuous barrier response avoids gaps between modular rail meshes.
 	var projection := circuit.project(position, nearest_index)
 	nearest_index = projection.index
@@ -597,7 +616,34 @@ func emit_impact_feedback(point: Vector3,normal: Vector3) -> void:
 	impact_feedback_cooldown = .35
 	impacted.emit(self,point,normal,clampf(absf(speed)/42.0,0,1))
 
-var barrier_frames: Dictionary={}
+func trace_road_motion(incoming: Vector3, origin: Vector3, dt: float, throttle: float) -> void:
+	var tick := Engine.get_physics_frames()
+	if tick < trace_next_tick:return
+	var incoming_horizontal := Vector2(incoming.x,incoming.z).length()
+	var moved := position-origin
+	var actual_horizontal := Vector2(moved.x,moved.z).length()/dt
+	if incoming_horizontal < 4. or (actual_horizontal > incoming_horizontal*.6 and absf(speed) > incoming_horizontal*.6):
+		return
+	var contacts: Array[Dictionary] = []
+	for index in get_slide_collision_count():
+		var hit := get_slide_collision(index)
+		var collider := hit.get_collider() as Node
+		contacts.append({"node":str(collider.get_path()) if collider else "",
+			"normal":str(hit.get_normal()),"position":str(hit.get_position()),"shape":hit.get_collider_shape_index()})
+	var station: Dictionary = circuit.project(position,nearest_index)
+	var report := {"track":circuit.definition.id if circuit.definition else "legacy","vehicle":vehicle_key,"slot":local_slot,
+		"percent":100.*float(station.distance)/circuit.length,"offset_m":station.offset,
+		"position":str(position),"incoming_mps":incoming_horizontal,"moved_mps":actual_horizontal,
+		"controller_mps":speed,"throttle":throttle,"contacts":contacts}
+	trace_next_tick=tick+12
+	var file := FileAccess.open("user://road-impacts.jsonl",FileAccess.READ_WRITE)
+	if not file:file=FileAccess.open("user://road-impacts.jsonl",FileAccess.WRITE)
+	if file:
+		file.seek_end()
+		file.store_line(JSON.stringify(report))
+	print("ROAD_IMPACT ",JSON.stringify(report))
+
+var impact_contact_frames: Dictionary = {}
 
 func report_contact(point: Vector3, normal: Vector3, relative: Vector3, other: LeoKart, surface: String) -> void:
 	var closing:=maxf(0.,-relative.dot(normal))

@@ -4,6 +4,10 @@ extends Node3D
 const TILE := 24.0
 const RADII := [42.0, 66.0, 90.0]
 const COUNTS := [44, 100, 190]
+const BUILD_BUDGET_US := 2000
+const SPARSE_RADII := [30.0, 42.0, 54.0]
+const SPARSE_COUNTS := [24, 40, 64]
+var grass_probe := "current"
 const WATER := preload("res://shaders/environment_water.gdshader")
 const GRASS := preload("res://shaders/environment_grass.gdshader")
 
@@ -28,9 +32,18 @@ var pending: Array[Vector2i] = []
 var wanted := {}
 var last_centers: Array[Vector3] = []
 var last_frame_us := 0
+var qa_tile_count := 0
+var qa_tile_us := 0
+var qa_tile_peak_us := 0
+var qa_slice_peak_us := 0
+var tile_job: Dictionary = {}
 
 func configure(owner_game: Node3D) -> void:
 	game = owner_game
+	if game.diagnostics_mode:
+		for arg in OS.get_cmdline_user_args():
+			if arg.begins_with("--qa-grass="):
+				grass_probe = arg.trim_prefix("--qa-grass=")
 	circuit = game.circuit
 	track_id = String(game.track_definition.id)
 	name = "TrackEnvironment"
@@ -65,7 +78,8 @@ func register(node: MeshInstance3D) -> void:
 	var material := node.get_active_material(0) as ShaderMaterial if node.mesh.get_surface_count() else null
 	var code := material.shader.code if material and material.shader else ""
 	var box := node.global_transform * node.get_aabb()
-	if role == "water" or name_text in ["IndianOcean", "LotusLagoon", "BeiraInspiredLake", "KandyLakeColomboWater"] or (code.contains("uniform bool ocean") and code.contains("lake_radius")):
+	# Authored roles take precedence; names/shader text support untagged legacy content.
+	if role == "water" or (role.is_empty() and (name_text in ["IndianOcean", "LotusLagoon", "BeiraInspiredLake", "KandyLakeColomboWater"] or (code.contains("uniform bool ocean") and code.contains("lake_radius")))):
 		var updated := ShaderMaterial.new()
 		updated.shader = WATER
 		var ocean: bool = name_text == "IndianOcean" or (material and material.get_shader_parameter("ocean") == true)
@@ -86,7 +100,7 @@ func register(node: MeshInstance3D) -> void:
 		updated.set_shader_parameter("detail", tier)
 		node.material_override = updated
 		water[id] = {"material": updated, "bounds": box, "faces": node.mesh.get_faces(), "pose": node.global_transform, "plane": node.mesh is PlaneMesh}
-	elif role in ["terrain_verge","terrain_detail","terrain_backdrop"] or name_text.begins_with("SculptedAstra") or code.contains("hint_normal") and (code.contains("ground_normal") or code.contains("uv=world.xz*.45")):
+	elif role in ["terrain_verge","terrain_detail","terrain_backdrop"] or (role.is_empty() and (name_text.begins_with("SculptedAstra") or code.contains("hint_normal") and (code.contains("ground_normal") or code.contains("uv=world.xz*.45")))):
 		if role != "terrain_backdrop":
 			sources[id] = {"node": node, "bounds": box}
 		if code.contains("uniform sampler2D ground_albedo"):
@@ -99,10 +113,11 @@ func register(node: MeshInstance3D) -> void:
 		sources.erase(id)
 		blockers.erase(id)
 		water.erase(id)
-		if role.begins_with("terrain_"): invalidate(box), CONNECT_ONE_SHOT)
-	if sources.has(id): invalidate(box)
+		invalidate(box), CONNECT_ONE_SHOT)
+	invalidate(box)
 
 func invalidate(box: AABB) -> void:
+	if not tile_job.is_empty() and box.intersects(tile_job.area): tile_job.stale = true
 	for key in tiles.keys():
 		if covers(box.grow(TILE*.6), center(key)):
 			tiles[key].queue_free()
@@ -127,7 +142,7 @@ func change_tier(value: int) -> void:
 	grass_material.set_shader_parameter("detail", tier)
 	for entry in water.values(): entry.material.set_shader_parameter("detail",tier)
 	for tile in tiles.values():
-		tile.multimesh.visible_instance_count = mini(tile.multimesh.instance_count, COUNTS[tier])
+		tile.multimesh.visible_instance_count = mini(tile.multimesh.instance_count, blade_counts()[tier])
 		tile.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if tier == 2 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	refresh_wanted()
 
@@ -167,9 +182,12 @@ func _process(dt: float) -> void:
 	if elapsed > .32:
 		elapsed = 0.
 		refresh_wanted()
-	if not pending.is_empty():
+	if not tile_job.is_empty() and (not wanted.has(tile_job.key) or tile_job.stale):
+		tile_job.clear()
+	if tile_job.is_empty() and not pending.is_empty():
 		var key: Vector2i = pending.pop_front()
-		if wanted.has(key) and not tiles.has(key): build_tile(key)
+		if wanted.has(key) and not tiles.has(key): tile_job = begin_tile(key)
+	if not tile_job.is_empty() and advance_tile(tile_job, BUILD_BUDGET_US): tile_job.clear()
 
 func center(key: Vector2i) -> Vector3:
 	return Vector3((key.x+.5)*TILE,0.,(key.y+.5)*TILE)
@@ -177,15 +195,18 @@ func center(key: Vector2i) -> Vector3:
 func covers(box: AABB, point: Vector3) -> bool:
 	return point.x >= box.position.x and point.x <= box.end.x and point.z >= box.position.z and point.z <= box.end.z
 
+func blade_counts() -> Array:
+	return SPARSE_COUNTS if grass_probe == "sparse" else COUNTS
+
 func refresh_wanted() -> void:
-	if not is_inside_tree(): return
+	if not is_inside_tree() or grass_probe == "off": return
 	last_centers.clear()
 	for slot in game.human_count:
 		if slot >= game.local_players.size(): break
 		var kart: Variant = game.local_players[slot].kart
-		if is_instance_valid(kart): last_centers.append(kart.global_position)
+		if is_instance_valid(kart) and kart.is_inside_tree(): last_centers.append(kart.global_position)
 	if last_centers.is_empty(): last_centers.append(circuit.sample(0.))
-	var radius: float = RADII[tier]
+	var radius: float = SPARSE_RADII[tier] if grass_probe == "sparse" else RADII[tier]
 	wanted.clear()
 	for eye in last_centers:
 		var middle := Vector2i(floori(eye.x/TILE),floori(eye.z/TILE))
@@ -197,55 +218,89 @@ func refresh_wanted() -> void:
 				var distance := Vector2(eye.x-at.x,eye.z-at.z).length()
 				if distance < radius: wanted[key] = minf(distance,wanted.get(key,INF))
 	for key in tiles.keys():
+		if grass_probe == "sparse":
+			tiles[key].visible = wanted.has(key)
 		if not wanted.has(key):
-			tiles[key].queue_free()
-			tiles.erase(key)
+			var at := center(key)
+			var reusable := grass_probe == "sparse" and last_centers.any(
+				func(eye: Vector3) -> bool: return Vector2(eye.x-at.x,eye.z-at.z).length() < radius+TILE*2.)
+			if not reusable:
+				tiles[key].queue_free()
+				tiles.erase(key)
 	pending.clear()
 	for key in wanted:
 		if not tiles.has(key): pending.append(key)
 	pending.sort_custom(func(a,b):return wanted[a]<wanted[b])
 
-func build_tile(key: Vector2i) -> void:
+func begin_tile(key: Vector2i) -> Dictionary:
 	var at := center(key)
 	var area := AABB(at - Vector3(TILE*.5,1000.,TILE*.5),Vector3(TILE,2000.,TILE))
-	var supports: Array = []
-	for entry in sources.values():
-		if not entry.bounds.intersects(area): continue
+	var exclusions: Array = []
+	for box in blockers.values():
+		if box.intersects(area): exclusions.append(box)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(Vector3i(key.x, track_id.hash(), key.y))
+	return {"key":key,"at":at,"area":area,"sources":sources.values(),"source_index":0,"face_index":0,
+		"supports":[],"exclusions":exclusions,"rng":rng,"transforms":[],"attempts":0,
+		"stale":false,"work_us":0}
+
+func build_tile(key: Vector2i) -> void:
+	# Synchronous entry point for deterministic geometry probes; gameplay uses slices.
+	advance_tile(begin_tile(key), 0)
+
+func advance_tile(job: Dictionary, budget_us: int) -> bool:
+	var began := Time.get_ticks_usec()
+	var area: AABB = job.area
+	var supports: Array = job.supports
+	while job.source_index < job.sources.size():
+		var entry: Dictionary = job.sources[job.source_index]
+		if not entry.bounds.intersects(area) or not is_instance_valid(entry.node):
+			job.source_index += 1
+			job.face_index = 0
+			continue
 		if not entry.has("faces"):
 			var node: MeshInstance3D = entry.node
 			entry.faces = node.mesh.get_faces()
 			entry.pose = node.global_transform
 		var faces: PackedVector3Array = entry.faces
 		var pose: Transform3D = entry.pose
-		for i in range(0,faces.size(),3):
+		while job.face_index < faces.size():
+			var i: int = job.face_index
 			var a := pose * faces[i]
 			var b := pose * faces[i+1]
 			var c := pose * faces[i+2]
-			if minf(a.x,minf(b.x,c.x)) > area.end.x or maxf(a.x,maxf(b.x,c.x)) < area.position.x or minf(a.z,minf(b.z,c.z)) > area.end.z or maxf(a.z,maxf(b.z,c.z)) < area.position.z: continue
-			var normal := (b-a).cross(c-a).normalized()
-			if absf(normal.y) > .83: supports.append([a,b,c])
-	var exclusions: Array = []
-	for box in blockers.values():
-		if box.intersects(area): exclusions.append(box)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = hash(Vector3i(key.x, track_id.hash(), key.y))
-	var transforms: Array[Transform3D] = []
-	if not supports.is_empty():
-		for i in 320:
-			if transforms.size() >= COUNTS[2]: break
-			var horizontal := Vector3(at.x+rng.randf_range(-TILE*.5,TILE*.5), 0., at.z+rng.randf_range(-TILE*.5,TILE*.5))
-			var height := -INF
-			for face in supports:
-				var hit: Variant = Geometry3D.segment_intersects_triangle(horizontal+Vector3.UP*800.,horizontal-Vector3.UP*30.,face[0],face[1],face[2])
-				if hit is Vector3: height = maxf(height,hit.y)
-			if not is_finite(height): continue
+			job.face_index += 3
+			if not (minf(a.x,minf(b.x,c.x)) > area.end.x or maxf(a.x,maxf(b.x,c.x)) < area.position.x or minf(a.z,minf(b.z,c.z)) > area.end.z or maxf(a.z,maxf(b.z,c.z)) < area.position.z):
+				var normal := (b-a).cross(c-a).normalized()
+				if absf(normal.y) > .83: supports.append([a,b,c])
+			if budget_us > 0 and Time.get_ticks_usec()-began >= budget_us:
+				record_tile_slice(job, began)
+				return false
+		job.source_index += 1
+		job.face_index = 0
+	var transforms: Array = job.transforms
+	var rng: RandomNumberGenerator = job.rng
+	var at: Vector3 = job.at
+	var blade_limit: int = blade_counts()[2]
+	var attempt_limit := 140 if grass_probe == "sparse" else 320
+	while not supports.is_empty() and job.attempts < attempt_limit and transforms.size() < blade_limit:
+		job.attempts += 1
+		var horizontal := Vector3(at.x+rng.randf_range(-TILE*.5,TILE*.5), 0., at.z+rng.randf_range(-TILE*.5,TILE*.5))
+		var height := -INF
+		for face in supports:
+			var hit: Variant = Geometry3D.segment_intersects_triangle(horizontal+Vector3.UP*800.,horizontal-Vector3.UP*30.,face[0],face[1],face[2])
+			if hit is Vector3: height = maxf(height,hit.y)
+		if is_finite(height):
 			horizontal.y = height
 			var lane := circuit.project(horizontal)
 			var setback := absf(float(lane.offset))-circuit.width_at(float(lane.distance))*.5
 			var verge := 8.3 if track_id in ["kandy_lake","colombo_city"] else 2.4
-			if setback < verge or setback > 125. or occupied(horizontal,exclusions): continue
-			var size := rng.randf_range(.62,1.45)
-			transforms.append(Transform3D(Basis(Vector3.UP,rng.randf()*TAU).scaled(Vector3.ONE*size),horizontal-Vector3.UP*.025))
+			if setback >= verge and setback <= 125. and not occupied(horizontal,job.exclusions):
+				var size := rng.randf_range(.62,1.45)
+				transforms.append(Transform3D(Basis(Vector3.UP,rng.randf()*TAU).scaled(Vector3.ONE*size),horizontal-Vector3.UP*.025))
+		if budget_us > 0 and Time.get_ticks_usec()-began >= budget_us:
+			record_tile_slice(job, began)
+			return false
 	var batch := MultiMeshInstance3D.new()
 	batch.multimesh = MultiMesh.new()
 	batch.multimesh.transform_format = MultiMesh.TRANSFORM_3D
@@ -257,10 +312,22 @@ func build_tile(key: Vector2i) -> void:
 		var bounds := AABB(transforms[0].origin, Vector3.ZERO)
 		for transform in transforms: bounds = bounds.expand(transform.origin)
 		batch.multimesh.custom_aabb = bounds.grow(1.3)
-	batch.multimesh.visible_instance_count = mini(transforms.size(), COUNTS[tier])
+	batch.multimesh.visible_instance_count = mini(transforms.size(), blade_counts()[tier])
 	batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if tier == 2 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(batch)
-	tiles[key] = batch
+	tiles[job.key] = batch
+	record_tile_slice(job, began)
+	if game.diagnostics_mode:
+		var duration: int = job.work_us
+		qa_tile_count += 1
+		qa_tile_us += duration
+		qa_tile_peak_us = maxi(qa_tile_peak_us, duration)
+	return true
+
+func record_tile_slice(job: Dictionary, began: int) -> void:
+	var duration := Time.get_ticks_usec()-began
+	job.work_us += duration
+	if game.diagnostics_mode: qa_slice_peak_us = maxi(qa_slice_peak_us, duration)
 
 func occupied(point: Vector3, exclusions: Array) -> bool:
 	for box in exclusions:

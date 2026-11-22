@@ -96,6 +96,23 @@ func setup(owner_kart: LeoKart) -> void:
 		var player := AudioStreamPlayer.new();player.bus=bus_name
 		player.stream=loop(profile(kart.definition),i);player.volume_db=-70.
 		add_child(player);layers.append(player);player.play()
+	var tire_streams: Array[AudioStream] = []
+	for kind in ["scrub", "squeal"]:
+		var file: String = bank.get("tire", {}).get(kind, "")
+		if file.is_empty() or not ResourceLoader.exists(BANK + file): break
+		var stream := recorded_loop(file)
+		if not stream: break
+		tire_streams.append(stream)
+	if tire_streams.size() == 2:
+		for stream in tire_streams:
+			var player := AudioStreamPlayer.new()
+			player.bus = bus_name
+			player.stream = stream
+			player.volume_db = -70.
+			add_child(player)
+			tire_layers.append(player)
+			player.play()
+		if kart.skid: kart.skid.stop()
 	if kart.engine:kart.engine.stop()
 
 func stop() -> void:
@@ -132,7 +149,7 @@ func update(dt: float) -> void:
 	if tire_layers.size()==2:
 		update_tires(dt,split_gain)
 	elif kart.skid:
-		kart.skid.volume_db=lerpf(kart.skid.volume_db,-23. if kart.tire_slipping else -70.,1.-exp(-dt*10.))
+		kart.skid.volume_db=lerpf(kart.skid.volume_db,-23. if kart.tire_slipping and kart.active and kart.grounded else -70.,1.-exp(-dt*10.))
 	# Authored Area3D volumes are presentation-only and independent per player.
 	var room := 0.0
 	cover_timer-=dt

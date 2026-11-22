@@ -34,10 +34,10 @@ void fragment(){
 	float weathering=noise(wp.xz*.037+vec2(19.0,7.0));
 	float damp=wetness*smoothstep(.46,.72,patch);
 	ALBEDO = base*vec3(base_albedo_gain)*mix(.92,1.06,weathering)*(.96+grain*.08)*mix(1.0,.73,damp);
-	float dry_roughness=clamp(base_roughness+(patch-.5)*.07+(texture(rough_map,uv).r-.5)*.10,.64,.91);
+	float dry_roughness=clamp(base_roughness+(patch-.5)*.07+(texture(rough_map,uv).r-.5)*.10,.53,.86);
 	ROUGHNESS = mix(dry_roughness,.24,damp);
 	NORMAL_MAP=texture(normal_map,uv).rgb;
 	NORMAL_MAP_DEPTH=detail_strength*(1.0-smoothstep(.08,.65,footprint))*mix(1.0,.35,damp);
 	METALLIC=0.0;
-	SPECULAR=mix(.16,.32,damp);
+	SPECULAR=mix(.26,.36,damp);
 }

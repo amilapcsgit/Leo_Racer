@@ -48,6 +48,9 @@ static func build(front: LeoFrontend) -> void:
 	front.label(display,"Motion blur is subtle, affects the world only, and is disabled by Reduced Motion.",20,Color("b9c7d6"))
 	var environment_detail:=choice(front,display,"Environment Detail",["Auto","Low","Medium","High"],graphics.environment_detail)
 	environment_detail.item_selected.connect(graphics.set_environment_detail)
+	var draw_distance:=choice(front,display,"Draw Distance",["Near","Standard","Far","Very Far"],graphics.draw_distance)
+	draw_distance.item_selected.connect(graphics.set_draw_distance)
+	front.label(display,"Higher settings preload scenery farther ahead and use more memory.",20,Color("b9c7d6"))
 	var upscaling:=choice(front,display,"Upscaling",["Native / Bilinear","FSR 2 · Quality","FSR 2 · Balanced"],graphics.upscale if graphics.supported_upscaling() else 0)
 	upscaling.disabled=not graphics.supported_upscaling()
 	if not graphics.supported_upscaling():front.label(display,"FSR 2 requires Forward+. Compatibility uses native/bilinear scaling.",20,Color("b9c7d6"))
@@ -93,6 +96,9 @@ static func build(front: LeoFrontend) -> void:
 	front.action(access,"Test Rumble",func():
 		for slot in game.human_count:game.input_router.identify(slot))
 	var logic: VBoxContainer=pages["Game Logic"]
+	var handling := choice(front, logic, "Handling", LeoRaceRules.HANDLING_NAMES, game.handling_preset)
+	handling.item_selected.connect(game.set_handling_preset)
+	front.label(logic,"Easy lowers top speed by 30% and smooths steering. Changes apply when you start or restart a race.",20,Color("b9c7d6"))
 	front.label(logic,"AI OPPONENTS",26,Color("67d6db"))
 	var bigster:=CheckButton.new();bigster.name="AllowAIBigster";bigster.text="Allow Bigster as an AI opponent";bigster.button_pressed=game.allow_ai_bigster;bigster.custom_minimum_size.y=44;logic.add_child(bigster)
 	bigster.toggled.connect(game.set_allow_ai_bigster)

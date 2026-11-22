@@ -106,7 +106,9 @@ func run():
     if group.name.begins_with("Landu_Kelae_"):
      var original:=stock.get_node_or_null("_"+str(group.name).trim_prefix("Landu_Kelae_"))
      if original:original.free()
-    if group.name in ["Roof_fort_apartments","Roof__Node3D_4477"]:continue
+    if group.name.begins_with("Roof_"):
+     var building:=stock.get_node_or_null(str(group.name).trim_prefix("Roof_")) as Node3D
+     if not building or dress.has_stock_roof(building):continue
     apply_group(stock,group)
    cell.scene=baker.pack(stock,name)
    changed+=1
@@ -123,7 +125,7 @@ func run():
   quit(2)
   return
  manifest.packs.append({"file":"ceylon-scenery.pck","sha256":FileAccess.get_sha256(stage.path_join("ceylon-scenery.pck"))})
- manifest.version="1.2.0"
+ manifest.version="1.2.1"
  manifest.lighting.sun_angles=[-24,-120,0]
  manifest.lighting.sun_color="ffe1ba"
  manifest.lighting.sun_energy=1.1

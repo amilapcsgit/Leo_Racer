@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]
 REPO='amilapcsgit/Leo_Racer'
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True);p.add_argument('--notes',type=Path,required=True);p.add_argument('--publish',action='store_true');p.add_argument('--title');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--manifest',type=Path,required=True);p.add_argument('--notes',type=Path,required=True);p.add_argument('--publish',action='store_true');p.add_argument('--title');p.add_argument('--prerelease',action='store_true');a=p.parse_args()
     manifest=json.loads(a.manifest.read_text(encoding='utf-8'));version=manifest['version'];tag='v'+version;commit=manifest['commit'];files=[]
     for row in manifest['files']:
         assert Path(row['name']).name==row['name']
@@ -13,6 +13,8 @@ def main():
         with file.open('rb') as stream:assert hashlib.file_digest(stream,'sha256').hexdigest()==row['sha256']
         files.append((file,row))
     assert files and len(commit)==40
+    if a.prerelease and '-rc.' not in version:
+        p.error('--prerelease requires a release-candidate version in the manifest')
     if not a.publish:print('RELEASE_MANIFEST_VERIFIED',tag,len(files));return
     remote=subprocess.check_output(['git','remote','get-url','origin'],cwd=ROOT,text=True).strip();assert REPO in remote
     os.environ['GIT_TERMINAL_PROMPT']='0';os.environ['GCM_INTERACTIVE']='never'
@@ -40,9 +42,10 @@ def main():
         drafts=[row for row in api('/releases?per_page=100') if row.get('draft') and row.get('tag_name')==tag]
         if len(drafts)>1:raise RuntimeError('Multiple drafts for '+tag+'; resolve them before publishing')
         if drafts:release=drafts[0]
-    if not release:release=api('/releases','POST',{'tag_name':tag,'target_commitish':commit,'name':a.title or 'Leo Racer '+version+' — Modular Content','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':False})
+    if not release:release=api('/releases','POST',{'tag_name':tag,'target_commitish':commit,'name':a.title or 'Leo Racer '+version+' — Modular Content','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':a.prerelease})
     existing={row['name']:row for row in release['assets']}
     if not release['draft']:
+        assert release['prerelease']==a.prerelease,'Existing release has different prerelease status'
         assert all(row['name'] in existing and existing[row['name']]['size']==row['bytes'] and existing[row['name']].get('digest')=='sha256:'+row['sha256'] for _,row in files),'Public release differs; refusing replacement'
         print('RELEASE_ALREADY_PUBLIC',release['html_url']);return
     for file,row in files:
@@ -65,7 +68,8 @@ def main():
         print('UPLOAD_VERIFIED',file.name,flush=True)
     uploaded=api('/releases/'+str(release['id']));assets={row['name']:row for row in uploaded['assets']}
     assert all(assets[row['name']].get('digest')=='sha256:'+row['sha256'] for _,row in files)
-    release=api('/releases/'+str(release['id']),'PATCH',{'draft':False,'prerelease':False,'make_latest':'true','body':a.notes.read_text(encoding='utf-8')})
-    assert not release['draft'] and api('/releases/latest')['tag_name']==tag
+    release=api('/releases/'+str(release['id']),'PATCH',{'draft':False,'prerelease':a.prerelease,'make_latest':'false' if a.prerelease else 'true','body':a.notes.read_text(encoding='utf-8')})
+    assert not release['draft'] and release['prerelease']==a.prerelease
+    if not a.prerelease:assert api('/releases/latest')['tag_name']==tag
     print('RELEASE_PUBLISHED',release['html_url'])
 if __name__=='__main__':main()

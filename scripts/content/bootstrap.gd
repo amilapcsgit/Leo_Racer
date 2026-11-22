@@ -69,7 +69,7 @@ func begin() -> void:
 		for argument in OS.get_cmdline_user_args():
 			if argument.begins_with("--ultra-check="):
 				var name:=argument.trim_prefix("--ultra-check=")
-				if name not in ["audio279","game_logic279","mirrors279","wheels279","cockpit279","world279","ui279","render279","gallery279","loading","refinements","perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
+				if name not in ["teardown280","environment280","tire280","finish_order280","swap_width280","core280_profile","road_corridor280","input","ranking","race","audio279","game_logic279","mirrors279","wheels279","cockpit279","world279","ui279","render279","gallery279","loading","refinements","perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
 				screen.hide()
 				var trial: Node=load("res://tests/native270/"+name+".gd").new()
 				get_tree().root.add_child(trial);queue_free();return

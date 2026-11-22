@@ -40,7 +40,11 @@ func run() -> void:
  game.save_ranking_results();check(game.rankings_written and game.ranking_store==null and (game.ranking_message.begins_with("DIAGNOSTIC") or game.ranking_message.begins_with("MODIFIED")),"Main race excludes diagnostic and imported-grid writes")
  game.hud.show_rankings();await process_frame;check(game.hud.modal_root.get_child_count()==1,"Rankings screen handles unavailable database")
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
- FileAccess.open("res://build/qa-ui/rankings.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/ranking"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("rankings.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RANKING_TEST ",report)
  store.close_store()
  for suffix in ["","-shm","-wal",".corrupt"]:DirAccess.remove_absolute(path+suffix)

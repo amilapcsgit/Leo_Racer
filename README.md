@@ -1,5 +1,5 @@
 <p align="center"><img src="assets/ui/icons/crest.svg" width="100" alt="Leo Racer crest"></p>
-<h1 align="center">Leo Racer · 2.7.9</h1>
+<h1 align="center">Leo Racer · 2.8.1</h1>
 <p align="center"><strong>Your ride. Your coast. Your next best lap.</strong><br>A Windows arcade racer on stylized Sri Lankan roads.</p>
 
 <p align="center">
@@ -11,9 +11,18 @@
 
 *Actual solo loading interface over illustrated Colombo City gallery artwork.*
 
-**21 cars · 6 drivers · 3 tracks · 1–2 local players · 1–10 laps · Offline play**
+**21 cars · 6 drivers · 4 tracks · 1–2 local players · 1–10 laps · Offline play**
+
+Version 2.8 adds adaptive grass and water, Auto environment detail, refreshed Kandy scenery and recorded vehicle audio. Wennappuwa Street Circuit is bundled as an unranked fourth circuit. See the [2.8 release notes](docs/RELEASE_NOTES_280.md) and [release validation](docs/VALIDATION_280.md); the older screenshots below retain their original version labels.
 
 Race five AI rivals, or share the screen with someone next to you. Charge a drift, catch a slipstream, and spend your nitro on the next straight. Pick a driver and car in the showroom, find your line, and chase your personal best. No account or developer tools are required to play.
+
+## Play on Windows
+
+Extract the entire portable ZIP and run `LeoRacer.exe` for Forward+. Use the included Compatibility launcher for the alternate renderer.
+
+- **Settings → Game Logic → Handling** offers Easy, Assisted, and Standard. Easy lowers normal and boosted top speeds by 30% for the whole field and smooths human steering. Assisted blends Easy and Standard. Changes apply at the next race start or restart. Each preset has its own records, and existing records remain saved.
+- **Settings → Graphics → Draw Distance** offers Near, Standard, Far, and Very Far. Higher settings preload scenery farther ahead and use more memory.
 
 ## A closer seat to the action
 
@@ -49,6 +58,8 @@ More consistent dry asphalt, restrained surface reflections and additional roads
 | Colombo City Grand Prix | A longer city circuit through Colombo | 5.5 km |
 | Kandy Lake Circuit | Lakeside corners in Sri Lanka’s hill country | 2.8 km |
 
+Wennappuwa Street Circuit is also included for unranked solo and split-screen racing.
+
 Choose **1–10 laps**, default **3**, and a lighting preset including dusk-to-night progression. Records keep lap counts and driving rulesets separate; historical filters retain access to older times.
 
 | Bigster on the coast | Duster My 2014 on the coast |
@@ -61,7 +72,7 @@ Choose **1–10 laps**, default **3**, and a lighting preset including dusk-to-n
 
 Two custom intro tracks accompany boot, loading, menus and the garage without restarting at every screen change. Kandy and the coastal circuits have their own race openers, followed by a varied **six-track pool**: four user-supplied custom tracks, **Ceylon Afterglow**, and the original **Island Music**. Smooth transitions keep the music moving between the garage and the race. Everything is bundled for offline play.
 
-The custom recordings retain their [source credits and provenance](licenses/customaudio279.md). See the [2.7.9 release notes](docs/RELEASE_NOTES_279.md), [cockpit details](docs/COCKPITS_279.md) and [measured validation](docs/VALIDATION_279.md) for the changes and current limits.
+The custom recordings retain their [source credits and provenance](licenses/customaudio279.md). The [2.7.9 release notes](docs/RELEASE_NOTES_279.md), [cockpit details](docs/COCKPITS_279.md) and [historical validation](docs/VALIDATION_279.md) document the inherited cockpit and soundtrack work.
 
 ## Download and play
 

@@ -83,7 +83,7 @@ static func road_material(original: ShaderMaterial, profile: Dictionary, world: 
 	if cache.has(key):return cache[key]
 	var material:=original.duplicate() as ShaderMaterial
 	material.shader=partition_shader(original.shader,world)
-	material.set_shader_parameter("base_roughness",maxf(.68,float(profile.get("road_roughness",.72))))
+	material.set_shader_parameter("base_roughness",clampf(float(profile.get("road_roughness",.72))-.10,.56,.78))
 	material.set_shader_parameter("base_albedo_gain",float(profile.get("road_albedo_gain",.43)))
 	material.set_shader_parameter("wetness",clampf(float(profile.get("road_wetness",0.)),0.,1.))
 	material.set_shader_parameter("detail_strength",.28)

@@ -3,6 +3,15 @@ from pathlib import Path
 import argparse, json, os, re, subprocess, time, shutil
 from stage_ultra_content import ROOT, sha
 TESTS={
+    'road_corridor280':('tests/road_corridor280_probe.gd',None),
+    'streamer_lifecycle280':('tests/streamer_lifecycle280_test.gd',None),
+    'teardown280':('tests/teardown280_test.gd',None),
+    'ai280':('tests/ai280_test.gd',None),
+    'environment280':('tests/environment280_test.gd',None),
+    'tire280':('tests/tire280_test.gd',None),
+    'finish_order280':('tests/finish_order280_test.gd',None),
+    'swap_width280':('tests/swap_width280_test.gd',None),
+    'tile280_profile':('tests/tile280_profile.gd',None),
     'audio279':('tests/audio279_test.gd',None),
     'game_logic279':('tests/game_logic279_test.gd',None),
     'mirrors279':('tests/mirrors279_test.gd',None),
@@ -34,16 +43,36 @@ TESTS={
     'contacts':('tests/release260_collision_test.gd',None),
     'audit':('tests/release260_collision_test.gd',None),
 }
+CORE280_VALIDATION_KINDS = ['tile280_profile', 'ai280', 'tire280', 'finish_order280', 'swap_width280',
+                          'core', 'physics', 'contacts', 'input', 'ranking', 'race', 'finish', 'audio279', 'teardown280']
+CORE280_NATIVE_VALIDATION_KINDS = ['tire280', 'finish_order280', 'swap_width280', 'core', 'physics',
+                                 'contacts', 'input', 'ranking', 'race', 'finish', 'audio279', 'teardown280']
 def run(kind,compat=False,export=None,extra=()):
     if export:export=Path(export).resolve()
     renderer='compatibility' if compat else 'forward'
     label=('export-' if export else 'source-')+kind+'-'+renderer
-    out=ROOT/'build'/('qa280' if '2.8.0' in (ROOT/'project.godot').read_text(encoding='utf-8') else 'qa279')/label;out.mkdir(parents=True,exist_ok=True)
+    out=ROOT/'build'/('qa'+re.search(r'config/version="([^"]+)"',(ROOT/'project.godot').read_text(encoding='utf-8')).group(1).replace('.',''))/label;out.mkdir(parents=True,exist_ok=True)
     profile=out/'profile';profile.mkdir(exist_ok=True)
     env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
     assets=Path(export)/'GameAssets' if export else ROOT/'build/content-baseline/GameAssets'
     env['LEO_ASSET_ROOT']=str(assets)
     script,switch=TESTS[kind]
+    if kind=='ai280' and not export:
+        original_ai=subprocess.check_output(['git','show','954733d:scripts/local/race_ai.gd'],cwd=ROOT,text=True)
+        original_ai=original_ai.replace('class_name LeoRaceAI\n','',1).replace('extends RefCounted\n','extends RefCounted\nvar qa_obstacle_queries := 0\n',1)
+        original_ai=original_ai.replace('func obstacle_distance(kart: LeoKart, candidate: float) -> float:\n','func obstacle_distance(kart: LeoKart, candidate: float) -> float:\n\tqa_obstacle_queries += 1\n',1)
+        ai_fixture=out/'original_ai.gd.txt'
+        ai_fixture.write_text(original_ai,encoding='utf-8')
+        extra=tuple(extra)+('--qa-baseline-ai='+str(ai_fixture),)
+    if kind=='tile280_profile' and not export:
+        original=subprocess.check_output(['git','show','954733d:scripts/racing/track_environment.gd'],cwd=ROOT,text=True)
+        fixture=out/'original_track_environment.gd.txt'
+        fixture.write_text(original.replace('class_name LeoTrackEnvironment\n','',1),encoding='utf-8')
+        extra=tuple(extra)+('--qa-baseline-script='+str(fixture),)
+        original_circuit=subprocess.check_output(['git','show','954733d:scripts/circuit.gd'],cwd=ROOT,text=True)
+        circuit_fixture=out/'original_circuit.gd.txt'
+        circuit_fixture.write_text(original_circuit.replace('class_name LeoCircuit\n','',1),encoding='utf-8')
+        extra=tuple(extra)+('--qa-baseline-circuit='+str(circuit_fixture),)
     if export:
         command=[str(Path(export)/'LeoRacer.console.exe')]
         env['DOTNET_ROOT']=str(profile/'no-sdk')
@@ -56,7 +85,7 @@ def run(kind,compat=False,export=None,extra=()):
         if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
         env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
         command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
-    render=kind in ['mirrors279','world279','cockpit279','ui279','speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
+    render=kind in ['physics','contacts','race','teardown280','tire280','environment280','mirrors279','world279','cockpit279','ui279','speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
     command+=['--position','-3200,-3200'] if render else ['--headless']
     if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
     command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--tracks='+str(assets/'tracks'),'--qa-output='+str(out)]
@@ -86,9 +115,15 @@ def run(kind,compat=False,export=None,extra=()):
         r"ERROR: (?:Texture with GL ID of \d+: leaked \d+ bytes\.|\d+ RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit\.)",line))
     errors=[line for line in text.splitlines() if not engine_texture(line) and any(term in line for term in ['ERROR:','SCRIPT ERROR','Parse Error','Shader compilation failed','No loader found for resource','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
     failed=bool(re.search(r'"status"\s*:\s*"FAIL"',text))
-    if not re.search(r'"status"\s*:\s*"PASS"',text):errors.append('Expected test PASS report missing')
+    if kind=='environment280':
+        result_path=out/'environment280.json'
+        if not result_path.exists() or json.loads(result_path.read_text(encoding='utf-8')).get('errors'):
+            errors.append('Expected environment report missing or contains failures')
+    elif not re.search(r'"status"\s*:\s*"PASS"',text):errors.append('Expected test PASS report missing')
     warnings=[line for line in text.splitlines() if any(term in line for term in ['leaked','resources still in use','Pages in use'])]
-    report={'status':'PASS' if code==0 and not errors and not failed else 'FAIL','exit_code':code,'seconds':round(time.monotonic()-started,2),'errors':errors,'shutdown_warnings':warnings,'sdk_removed':bool(export)}
+    error_count=len(errors)
+    errors=list(dict.fromkeys(errors))
+    report={'status':'PASS' if code==0 and not errors and not failed else 'FAIL','exit_code':code,'seconds':round(time.monotonic()-started,2),'errors':errors,'error_count':error_count,'shutdown_warnings':list(dict.fromkeys(warnings)),'sdk_removed':bool(export)}
     if export:report['core_sha256']=sha(Path(export)/'LeoRacer.pck')
     if kind=='speedometer':
         launch=next((str(arg).split('=',1)[1] for arg in extra if str(arg).startswith('--launch=')),'1')

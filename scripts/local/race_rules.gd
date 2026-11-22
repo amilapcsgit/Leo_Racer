@@ -1,6 +1,8 @@
 class_name LeoRaceRules
 extends RefCounted
-const ID := "distinct_v4+contact_v278_static"
+const ID := "distinct_v4+contact_v280_arcade_static"
+enum Handling { EASY, ASSISTED, STANDARD }
+const HANDLING_NAMES := ["Easy", "Assisted", "Standard"]
 const CLASS := "arcade_v2"
 static var _balance: Dictionary = {}
 
@@ -19,6 +21,16 @@ static func resolve(vehicle: VehicleDefinition) -> Dictionary:
 		"acceleration":float(profile[2]),"handling":float(profile[3]),
 		"class_id":CLASS if vehicle.official else "modded",
 		"ai_lateral_acceleration":13.5*float(profile[3])}
-static func apply(kart: LeoKart) -> void:
-	var rules:=resolve(kart.definition)
-	kart.max_speed=rules.max_speed;kart.acceleration=rules.acceleration;kart.handling=rules.handling;kart.race_boost_ceiling=rules.boosted_speed;kart.race_ai_lateral_acceleration=rules.ai_lateral_acceleration
+static func handling_suffix(preset: int) -> String:
+	return ["+handling_easy_v1", "+handling_assisted_v1", ""][preset]
+
+static func apply(kart: LeoKart, preset: int = Handling.STANDARD) -> void:
+	var rules := resolve(kart.definition)
+	var assist := 1.0 - float(preset) / float(Handling.STANDARD)
+	var speed_scale := lerpf(1.0, 0.7, assist)
+	kart.max_speed = rules.max_speed * speed_scale
+	kart.race_boost_ceiling = rules.boosted_speed * speed_scale
+	kart.acceleration = rules.acceleration * lerpf(1.0, 0.75, assist)
+	kart.handling = rules.handling
+	kart.race_ai_lateral_acceleration = rules.ai_lateral_acceleration
+	kart.steering_assist = assist

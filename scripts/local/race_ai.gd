@@ -13,6 +13,7 @@ var target_speed := 0.0
 var clear_distance := 1000.0
 var initialized := false
 var obstacles: Dictionary = {}
+var qa_obstacle_queries := 0
 
 func reset(seed_value: int, initial_lane: float) -> void:
 	var rng := RandomNumberGenerator.new();rng.seed=seed_value
@@ -47,6 +48,7 @@ func corridor(kart: LeoKart, candidate: float, peers: Array) -> Dictionary:
 
 func obstacle_distance(kart: LeoKart, candidate: float) -> float:
 	if not kart.is_inside_tree():return 1000.
+	if kart.get_parent().get("diagnostics_mode") == true: qa_obstacle_queries += 1
 	var space := kart.get_world_3d().direct_space_state
 	var stride := maxf(12.,absf(kart.speed)*.45)
 	var margin := kart.definition.collision_size.x*.42
@@ -85,7 +87,10 @@ func commands(kart: LeoKart, dt: float) -> Dictionary:
 		decision_left=.15
 		var chosen := lane
 		var best := -INF
+		var evaluated := {}
 		for candidate: float in [-minf(3.8,bound),0.,minf(3.8,bound),lane]:
+			if evaluated.has(candidate): continue
+			evaluated[candidate] = true
 			obstacles[candidate]=obstacle_distance(kart,candidate)
 			var path := corridor(kart,candidate,peers)
 			if path.blocked and absf(candidate-lane)>.25:continue

@@ -5,10 +5,13 @@ import city_packs
 from stage_ultra_content import ROOT, sha
 VERSION=re.search(r'config/version="([^"]+)"',(ROOT/'project.godot').read_text(encoding='utf-8')).group(1)
 REV=VERSION.replace('.','')
+RELEASE_LABEL=os.environ.get('LEO_RELEASE_LABEL',VERSION)
+if RELEASE_LABEL != VERSION and not re.fullmatch(re.escape(VERSION)+r'-rc\.[1-9][0-9]*',RELEASE_LABEL):
+    raise ValueError('Release label must match the game version or its release candidate')
 BASE=ROOT/('build/Release-'+VERSION+'-Ultra')
 OUT=ROOT/('dist/release-'+VERSION)
 QA=ROOT/('build/qa'+REV)
-RELEASE_TRACKS=json.loads((ROOT/'content/releases'/('2.8.0.json' if VERSION=='2.8.0' else '2.3.2.json')).read_text(encoding='utf-8'))['tracks']
+RELEASE_TRACKS=json.loads((ROOT/'content/releases'/(VERSION+'.json' if VERSION.startswith('2.8.') else '2.3.2.json')).read_text(encoding='utf-8'))['tracks']
 TRACK_COUNT=len(RELEASE_TRACKS)
 DIAGNOSTIC_REPORTS={'race-test.json','smoke-test.json'}
 def files(root):
@@ -47,14 +50,17 @@ func _ready() -> void:_initialize()
 func quit(code: int=0) -> void:
  var music:=root.get_node_or_null("LeoRaceMusic")
  if music:
-  music.shutdown();await get_tree().create_timer(.1,true,false,true).timeout
+  music.shutdown();await get_tree().create_timer(.5,true,false,true).timeout
  get_tree().quit(code)
 func create_timer(seconds: float,always: bool=true,physics: bool=false,ignore_scale: bool=false) -> SceneTreeTimer:return get_tree().create_timer(seconds,always,physics,ignore_scale)
 '''
+    mapping.update(teardown280='teardown280_test', environment280='environment280_test', tire280='tire280_test', finish_order280='finish_order280_test', swap_width280='swap_width280_test',
+                   core280_profile='core280_profile', road_corridor280='road_corridor280_probe', input='local_input_test', ranking='local_ranking_test', race='local_race_test')
     for name,source in mapping.items():
         script=(ROOT/'tests'/ (source+'.gd')).read_text(encoding='utf-8')
         script=script.replace('extends SceneTree',adapter,1).replace(',self)',',get_tree())')
-        script=re.sub(r'(func _process\([^)]*\)\s*->\s*)bool:',r'\1void:',script).replace('return false','return')
+        if name != 'road_corridor280':
+            script=re.sub(r'(func _process\([^)]*\)\s*->\s*)bool:',r'\1void:',script).replace('return false','return')
         entries['tests/native270/'+name+'.gd']=script.expandtabs(4).encode('utf-8')
     key='scripts/content/bootstrap.gd';entries.pop(key+'.remap',None);entries[key]=(ROOT/key).read_bytes()
 def stage():
@@ -65,7 +71,7 @@ def stage():
     source=ROOT/'build/content-baseline/GameAssets'
     for name in ['vehicles','tracks','environments','licenses']:
         shutil.copytree(source/name,BASE/'GameAssets'/name,dirs_exist_ok=True)
-    if VERSION == '2.8.0':
+    if VERSION.startswith('2.8.'):
         track_source=os.environ.get('LEO_RELEASE_TRACKS')
         if not track_source:
             raise RuntimeError('Set LEO_RELEASE_TRACKS to the verified 2.8 track staging directory')
@@ -193,13 +199,18 @@ def installer(build=True):
     with (QA/'installer-build.log').open('w',encoding='utf-8') as log:
         subprocess.run([str(compiler),'/V3','installer/Release'+REV+'.nsi'],cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=1800)
     print('ULTRA_INSTALLER_BUILT',flush=True)
-def package():
+def portable():
     OUT.mkdir(parents=True,exist_ok=True)
-    target=OUT/('LeoRacer-'+VERSION+'-win64.zip')
+    target=OUT/('LeoRacer-'+RELEASE_LABEL+'-win64.zip')
     with zipfile.ZipFile(target,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
         for file in files(BASE):archive.write(file,'LeoRacer/'+file.relative_to(BASE).as_posix())
     with zipfile.ZipFile(target) as archive:
         if archive.testzip():raise RuntimeError('Portable archive failed CRC validation')
+    print('PORTABLE_READY', target, sha(target), flush=True)
+    return target
+
+def package():
+    target=portable()
     evidence=OUT/('LeoRacer-'+VERSION+'-Evidence.zip')
     with zipfile.ZipFile(evidence,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
         for file in sorted(QA.rglob('*')):
@@ -219,8 +230,8 @@ def package():
     rows=[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha(p)} for p in artifacts]
     (OUT/'SHA256SUMS.txt').write_text(''.join(r['sha256']+'  '+r['name']+'\n' for r in rows),encoding='ascii')
     rows.append({'name':'SHA256SUMS.txt','bytes':(OUT/'SHA256SUMS.txt').stat().st_size,'sha256':sha(OUT/'SHA256SUMS.txt')})
-    dump(OUT/'release-manifest.json',{'version':VERSION,'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cars':21,'tracks':TRACK_COUNT,'files':rows})
+    dump(OUT/'release-manifest.json',{'version':RELEASE_LABEL,'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cars':21,'tracks':TRACK_COUNT,'files':rows})
     print('ULTRA_PACKAGED',flush=True)
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('action',nargs='?',choices=['stage','refresh','installer-inputs','installer','package','all'],default='all');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('action',nargs='?',choices=['stage','refresh','installer-inputs','installer','portable','package','all'],default='all');args=parser.parse_args()
     for action in ([stage,installer,package] if args.action=='all' else [lambda:installer(False)] if args.action=='installer-inputs' else [globals()[args.action]]):action()

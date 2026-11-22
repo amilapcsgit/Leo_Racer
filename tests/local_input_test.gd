@@ -73,6 +73,10 @@ func run() -> void:
  panel.free()
  var report:={"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"errors":failures,"physical_wheel":"unverified / hardware unavailable"}
  DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://build/qa-ui"))
- FileAccess.open("res://build/qa-ui/input.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/input"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("input.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_INPUT_TEST ",report)
  router.free();quit(0 if failures.is_empty() else 1)

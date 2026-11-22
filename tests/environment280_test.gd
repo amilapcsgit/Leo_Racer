@@ -16,12 +16,18 @@ func run() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--qa-output="): output = arg.trim_prefix("--qa-output=")
 		if arg.begins_with("--qa-track="): selected_tracks = [arg.trim_prefix("--qa-track=")]
+		if arg.begins_with("--qa-resolution="):
+			var size := arg.trim_prefix("--qa-resolution=").split("x")
+			if size.size() != 2 or not size[0].is_valid_int() or not size[1].is_valid_int(): quit(2); return
+			root.size = Vector2i(int(size[0]),int(size[1]))
+			if root.size.x < 640 or root.size.y < 480: quit(2); return
 	if output.is_empty(): quit(2); return
 	DirAccess.make_dir_recursive_absolute(output)
 	var game: Node3D = load("res://scenes/main.tscn").instantiate()
 	root.add_child(game)
 	await game.initialization_finished
 	game.diagnostics_mode = true
+	game.graphics.resolution = root.size
 	game.graphics_quality = 2
 	game.selected_laps = 1
 	for track in selected_tracks:
@@ -74,7 +80,7 @@ func run() -> void:
 					root.get_texture().get_image().save_png(output.path_join(track+".png"))
 			await game.return_menu()
 	var report := {"renderer":RenderingServer.get_current_rendering_method(),"gpu":RenderingServer.get_video_adapter_name(),
-		"errors":errors,"measurements":reports}
+		"resolution":root.size,"errors":errors,"measurements":reports}
 	var file := FileAccess.open(output.path_join("environment280.json"),FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  "))
 	file.close()

@@ -260,6 +260,11 @@ func roof(parent: Node3D, id: String, center: Vector3, width: float, depth: floa
  for i in count:
   place(gable,VV+"VV-RoofTile0.fbx","Ridge_%02d"%i,Vector3(-width*.5+span*(i+.5),depth*.5*tan(pitch)+.1,0),Vector3(span+.018,.17,.32))
 
+func has_stock_roof(building: Node3D) -> bool:
+ for mesh in building.find_children("module_*","MeshInstance3D",true,false):
+  if mesh.name in ["module_34","module_48"]:return true
+ return false
+
 func town(cell: Node3D, id: String):
  var serial:=0
  for original in cell.get_children():
@@ -269,7 +274,7 @@ func town(cell: Node3D, id: String):
   var b:=bounds(original)
   if b.size.x<5.5 or b.size.z<5.5 or b.size.x>25. or b.size.z>23. or b.size.y<4. or b.size.y>16.:continue
   serial+=1
-  if serial%3!=1:continue
+  if serial%3!=1 or has_stock_roof(original):continue
   var local:=bounds(original,original.transform.affine_inverse())
   var container:=scenery_group(cell,"Roof_"+str(original.name))
   container.transform=original.transform
