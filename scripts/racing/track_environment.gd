@@ -54,10 +54,7 @@ func configure(owner_game: Node3D) -> void:
 				grass_probe = arg.trim_prefix("--qa-grass=")
 	circuit = game.circuit
 	track_id = String(game.track_definition.id)
-	var track_pack_matches: bool = track_id == "wennappuwa" and game.track_definition.metadata.get("packs", []).any(
-		func(pack): return pack.get("sha256") == "30705142ead02d8751592f5403753a5657958dddbcb47e076e0ac82f13d4b728"
-	)
-	if grass_probe == "field" and ((game.track_definition.modified and not track_pack_matches) or not ResourceLoader.exists(GRASS_BAKE_PATTERN % track_id)):
+	if grass_probe == "field" and not matches_grass_atlas(game.track_definition):
 		grass_probe = "current"
 	name = "TrackEnvironment"
 	grass_material = ShaderMaterial.new()
@@ -72,6 +69,17 @@ func configure(owner_game: Node3D) -> void:
 	grass_material.set_shader_parameter("high_color", Color(palette[1]))
 	grass_mesh = blades(float(palette[2]))
 	grass_mesh.surface_set_material(0, grass_material)
+
+func matches_grass_atlas(course: LeoTrackDefinition) -> bool:
+	if not ResourceLoader.exists(GRASS_BAKE_PATTERN % track_id):
+		return false
+	var registry: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/config/grass-atlases.json"))
+	var expected: Dictionary = registry.get(track_id, {})
+	var route_path := course.folder.path_join(String(course.metadata.get("route", "")))
+	if FileAccess.get_sha256(route_path) != expected.get("route"):
+		return false
+	var packs: Array = course.metadata.get("packs", [])
+	return packs.map(func(pack): return pack.get("sha256","")) == expected.get("packs", [])
 
 func prepare_grass_field() -> void:
 	if grass_probe != "field":

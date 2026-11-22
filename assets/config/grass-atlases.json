@@ -1,0 +1,29 @@
+{
+  "astra_coast": {
+    "route": "2c12a1ce95b03853031de69fb94336d435600d29541410de8efbff54673828ec",
+    "packs": [
+      "faf746dda91ad7088168a9a24ad66a1deb2a3c0524967413e8d1ebb72345050a"
+    ]
+  },
+  "colombo_city": {
+    "route": "9684ffdc1c49dcc127774231d66fa98a0a72207c0760d5c086202f5642ff9aa9",
+    "packs": [
+      "8ab7006b0e8c7434ecbc14dee2db0ae75e2950aa3e27a100e96f7a279b9e2f83",
+      "2a0b93bea6d9d1c636a135536cad34c2a6e9c71960ca005ab29a34d9053767c7"
+    ]
+  },
+  "kandy_lake": {
+    "route": "5990016e9ce654a4b510a485d4c178bb327ce5183234fcf631e244dc3b177631",
+    "packs": [
+      "cf3cec461be76b93951769285a7d7793ca563586023e6cd840f36cade79ff198",
+      "ee1a9cdc9141bd0542dcdacbd2dc1b2bd0fba95744f8b94f2a11e44559a5e55a",
+      "d136f012f9d78ec389e79ebf662409633edbfde31c3418e771e18d1d8555111b"
+    ]
+  },
+  "wennappuwa": {
+    "route": "7d5921a1f3041cfe786ec63199541db9a1a12dbad7cd08e172b0ded213494e49",
+    "packs": [
+      "30705142ead02d8751592f5403753a5657958dddbcb47e076e0ac82f13d4b728"
+    ]
+  }
+}
