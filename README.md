@@ -24,7 +24,7 @@ Extract the entire portable ZIP and run `LeoRacer.exe` for Forward+. Use the inc
 - **Settings → Game Logic → Handling** offers Easy, Assisted, and Standard. Easy lowers normal and boosted top speeds by 30% for the whole field and smooths human steering. Assisted blends Easy and Standard. Changes apply at the next race start or restart. Each preset has its own records, and existing records remain saved.
 - **Settings → Graphics → Draw Distance** offers Near, Standard, Far, and Very Far. Higher settings preload scenery farther ahead and use more memory.
 
-New profiles start with **Assisted handling**, **Astra Lotus Coast**, and **two laps**. Boost pads are smaller and alternate sides on all four tracks. Earlier records are available in the rankings filters.
+New profiles start with **Assisted handling**, **Astra Lotus Coast**, and **two laps**. Boost pads are smaller and alternate sides on all four tracks. Earlier records are available in the rankings filters. GrassField draws low-poly blades close to each player, with stylized grass material extending into the distance. Wennappuwa has a new track icon and separate day and dusk loading illustrations.
 
 ## A closer seat to the action
 
