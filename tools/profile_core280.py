@@ -56,22 +56,44 @@ def run(renderer, phase, track=None, players=None, repeats=3, export=None, grass
         _fields_ = [('cb', ctypes.c_ulong), ('PageFaultCount', ctypes.c_ulong)] + [(name, ctypes.c_size_t) for name in
             ['PeakWorkingSetSize', 'WorkingSetSize', 'QuotaPeakPagedPoolUsage', 'QuotaPagedPoolUsage',
              'QuotaPeakNonPagedPoolUsage', 'QuotaNonPagedPoolUsage', 'PagefileUsage', 'PeakPagefileUsage']]
+    game_handle = None
+    game_pid = None
+    if os.name == 'nt':
+        kernel = ctypes.windll.kernel32
+        kernel.OpenProcess.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_uint32]
+        kernel.OpenProcess.restype = ctypes.c_void_p
+        kernel.CloseHandle.argtypes = [ctypes.c_void_p]
     with (out / 'process.log').open('w', encoding='utf-8') as log:
         process = subprocess.Popen(command, cwd=Path(export) if export else ROOT, env=env,
                                    stdout=log, stderr=subprocess.STDOUT,
                                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         while process.poll() is None:
             time.sleep(2)
+            text = (out / 'process.log').read_text(encoding='utf-8', errors='replace')
             if os.name == 'nt':
+                if game_handle is None:
+                    match = re.search(r'^CORE280_GAME_PID (\d+)', text, re.MULTILINE)
+                    if match:
+                        game_pid = int(match.group(1))
+                        game_handle = kernel.OpenProcess(0x0410, False, game_pid)
                 counters = MemoryCounters()
                 counters.cb = ctypes.sizeof(counters)
-                if ctypes.windll.psapi.GetProcessMemoryInfo(ctypes.c_void_p(int(process._handle)), ctypes.byref(counters), counters.cb):
-                    peak_working_set = max(peak_working_set, counters.PeakWorkingSetSize)
-            text = (out / 'process.log').read_text(encoding='utf-8', errors='replace')
+                handle = game_handle or int(process._handle)
+                if ctypes.windll.psapi.GetProcessMemoryInfo(ctypes.c_void_p(handle), ctypes.byref(counters), counters.cb):
+                    if game_handle:
+                        memory_row = {'pid': game_pid, 'working_set_bytes': counters.WorkingSetSize,
+                                      'peak_working_set_bytes': counters.PeakWorkingSetSize}
+                        matrix = ROOT / 'build' / 'qa280' / ('profile-' + phase)
+                        with (matrix / 'memory.jsonl').open('a', encoding='utf-8') as memory:
+                            memory.write(json.dumps(memory_row) + chr(10))
+                    else:
+                        peak_working_set = max(peak_working_set, counters.PeakWorkingSetSize)
             if any(term in text for term in ['SCRIPT ERROR', 'Parse Error', 'Shader compilation failed']) or time.monotonic()-started > 14400:
                 process.kill()
                 break
         code = process.wait()
+        if game_handle:
+            kernel.CloseHandle(game_handle)
     text = (out / 'process.log').read_text(encoding='utf-8', errors='replace')
     texture_shutdown = re.compile(r"ERROR: (?:Texture with GL ID of \d+: leaked \d+ bytes\.|\d+ RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit\.)")
     errors = [line for line in text.splitlines() if line.startswith('ERROR:') and not texture_shutdown.fullmatch(line)]
@@ -95,7 +117,7 @@ if __name__ == '__main__':
     parser.add_argument('--players', type=int, choices=[1, 2])
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--export', type=Path)
-    parser.add_argument('--grass', choices=['current','off','sparse'], default='current')
+    parser.add_argument('--grass', choices=['current','off','sparse','field'], default='current')
     args = parser.parse_args()
     renderers = ['forward', 'compatibility'] if args.renderer == 'both' else [args.renderer]
     ok = True

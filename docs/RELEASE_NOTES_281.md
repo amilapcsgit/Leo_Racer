@@ -7,3 +7,5 @@ The Handling setting under Game Logic applies at race start or restart. Easy low
 Draw Distance under Graphics controls how far ahead scenery loads. The Wennappuwa road collision fix addresses the false impact near 65% of the lap. This build also includes the rebuilt Kandy scenery pack.
 
 The 1080p Astra Coast solo Compatibility check completed all three measured races after warm-up. Its worst measured p95 was 17.01 ms against the 16.67 ms target. The largest measured frame was 1.33 seconds. The full 1080p matrix is pending for this playtest build. Both renderers passed the split-screen race checks and emitted texture diagnostics at shutdown.
+
+The final candidate defaults to Assisted handling, Astra Lotus Coast and two laps for new profiles. Smaller boost pads alternate sides across all four tracks. New pad layouts use their own record rules. Wennappuwa has illustrated day and dusk loading art and a new track icon.

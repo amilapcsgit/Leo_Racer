@@ -3,6 +3,8 @@ from pathlib import Path
 import argparse, json, os, re, subprocess, time, shutil
 from stage_ultra_content import ROOT, sha
 TESTS={
+    'grass_bake':('tools/bake_astra_grass.gd',None),
+    'grass_pilot':('tests/grass_pilot.gd',None),
     'road_corridor280':('tests/road_corridor280_probe.gd',None),
     'streamer_lifecycle280':('tests/streamer_lifecycle280_test.gd',None),
     'teardown280':('tests/teardown280_test.gd',None),
@@ -51,6 +53,11 @@ def run(kind,compat=False,export=None,extra=()):
     if export:export=Path(export).resolve()
     renderer='compatibility' if compat else 'forward'
     label=('export-' if export else 'source-')+kind+'-'+renderer
+    if kind == 'grass_bake':
+        track = next((arg.split('=', 1)[1] for arg in extra if arg.startswith('--track=')), 'astra_coast')
+        if track not in ('astra_coast', 'colombo_city', 'kandy_lake', 'wennappuwa'):
+            raise ValueError('Unsupported grass bake track')
+        label += '-' + track
     out=ROOT/'build'/('qa'+re.search(r'config/version="([^"]+)"',(ROOT/'project.godot').read_text(encoding='utf-8')).group(1).replace('.',''))/label;out.mkdir(parents=True,exist_ok=True)
     profile=out/'profile';profile.mkdir(exist_ok=True)
     env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
@@ -85,10 +92,12 @@ def run(kind,compat=False,export=None,extra=()):
         if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
         env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
         command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
-    render=kind in ['physics','contacts','race','teardown280','tire280','environment280','mirrors279','world279','cockpit279','ui279','speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
+    render=kind in ['grass_pilot','physics','contacts','race','teardown280','tire280','environment280','mirrors279','world279','cockpit279','ui279','speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
     command+=['--position','-3200,-3200'] if render else ['--headless']
     if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
-    command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--tracks='+str(assets/'tracks'),'--qa-output='+str(out)]
+    command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--qa-output='+str(out)]
+    if not any(arg.startswith('--tracks=') for arg in extra):
+        command.append('--tracks='+str(assets/'tracks'))
     if export:command.append(switch if switch else '--ultra-check='+kind)
     if kind in ['contacts','audit']:command.append('--quality25-mode='+kind)
     if kind=='capture':command.append('--quality25-mode=capture')

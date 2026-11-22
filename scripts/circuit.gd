@@ -26,6 +26,8 @@ func _init(track: LeoTrackDefinition = null) -> void:
 	length=float(data.length)
 	for p in data.points:points.append(Vector3(p[0],p[1],p[2]))
 	step=length/points.size();boosts=data.get("boosts",[]);sectors=data.get("sectors",[]);features=data.get("features",{})
+	if boosts.is_empty() and track and track.id == "wennappuwa":
+		boosts = [.075, .205, .335, .465, .61, .755, .895]
 	widths=data.get("widths",[])
 	if widths.size()!=points.size():widths.resize(points.size());widths.fill(float(data.get("width",18.)))
 	bounds=AABB(points[0],Vector3.ZERO)
@@ -40,6 +42,22 @@ func _init(track: LeoTrackDefinition = null) -> void:
 				var key:=Vector2i(x,y)
 				if not _cells.has(key):_cells[key]=[]
 				_cells[key].append(i)
+
+const BOOST_WIDTH := 6.0
+const BOOST_LENGTH := 5.0
+
+func boost_lane(index: int) -> float:
+	var station := float(boosts[index]) * length
+	var half_road := width_at(station) * 0.5
+	var offset := maxf(0.0, half_road - BOOST_WIDTH * 0.5 - 0.5)
+	return offset if index % 2 == 0 else -offset
+
+func on_boost_pad(distance: float, lane: float) -> bool:
+	for index in boosts.size():
+		var station := float(boosts[index]) * length
+		if absf(delta_distance(distance, station)) <= BOOST_LENGTH * 0.5 and absf(lane - boost_lane(index)) <= BOOST_WIDTH * 0.5:
+			return true
+	return false
 
 func width_at(distance: float) -> float:
 	var f:=fposmod(distance,length)/step;var i:=int(f)

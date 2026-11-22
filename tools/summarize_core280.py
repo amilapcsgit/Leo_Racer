@@ -49,9 +49,9 @@ def main():
     before,after=read_phase(args.before),read_phase(args.after)
     lines=['# Leo Racer 2.8 moving-race performance','',
            'Native QA candidates, RTX A1000 6 GB Laptop GPU, 1920×1080 output, 1× real time, Auto environment detail, highest graphics preset, Chase camera, Bigster P1/Duster P2, six racers. One complete one-lap warm-up followed by three measured one-lap races per track/player/renderer combination. Physics, HUD and audio remain active. VSync is disabled and FPS is uncapped.','',
-           'Each range below contains the minimum and maximum per-race p95 across the three measured races; the target passes only when all three complete and their worst p95 is at most 16.67 ms. Loading is excluded from frame samples and retained separately in raw JSON. The first native baseline already includes the tire fix; it predates the core ordering/placement fixes and performance optimizations.','',
-           '| Renderer | Track | Players | Before p95 ms | After p95 ms | After p50 / p99 median ms | Target |',
-           '|---|---|---:|---:|---:|---:|---|']
+           'Each range below contains the minimum and maximum per-race p95 across the three measured races; the target passes only when all three complete and their worst p95 is at most 16.67 ms. Loading is excluded from frame samples and retained separately in raw JSON.','',
+           '| Renderer | Track | Players | Before p95 ms | After p95 ms | After p50 / p99 median ms | Before / after longest frame ms | Target |',
+           '|---|---|---:|---:|---:|---:|---:|---|']
     summary=[]
     for renderer in ['forward','compatibility']:
         for track in ['astra_coast','colombo_city','kandy_lake','wennappuwa']:
@@ -63,7 +63,9 @@ def main():
                     return f"{min(r['p95_ms'] for r in rows):.2f}–{max(r['p95_ms'] for r in rows):.2f}" if valid(rows) else 'incomplete'
                 goal='PASS' if valid(new) and max(r['p95_ms'] for r in new)<=16.67 else ('MISS' if valid(new) else 'INCOMPLETE')
                 middle=f"{statistics.median(r['p50_ms'] for r in new):.2f} / {statistics.median(r['p99_ms'] for r in new):.2f}" if valid(new) else '—'
-                lines.append(f'| {renderer} | {track} | {players} | {spread(old)} | {spread(new)} | {middle} | {goal} |')
+                def stall(rows):
+                    return f"{max(r['peak_ms'] for r in rows):.2f}" if valid(rows) else 'incomplete'
+                lines.append(f'| {renderer} | {track} | {players} | {spread(old)} | {spread(new)} | {middle} | {stall(old)} / {stall(new)} | {goal} |')
                 summary.append({'renderer':renderer,'track':track,'players':players,'before':old,'after':new,'target':goal})
     lines += ['', '## Loading, resolution and Auto detail', '',
               'Race-start loading is the median of the three measured starts in milliseconds, separate from racing. Tier percentages count sampled frames (0=Low, 1=Medium, 2=High). View dimensions are actual render viewports; 3D scale is reported separately.', '',

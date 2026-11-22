@@ -22,7 +22,7 @@ var tracks: Array[LeoTrackDefinition] = []
 var track_definition: LeoTrackDefinition
 var race_variant := "static"
 var race_environment := LeoRaceEnvironment.new()
-var chosen_track_id := "colombo_city"
+var chosen_track_id := "astra_coast"
 var circuit: LeoCircuit
 var world: Node3D
 var karts: Array[LeoKart] = []
@@ -38,7 +38,7 @@ var selected_kart := 0
 var custom_player_name := ""
 var garage_from_pause := false
 var race_modified := false
-var selected_laps := 3
+var selected_laps := 2
 var active_laps := 3
 var haptics: LeoHaptics
 var countdown := 3.6
@@ -52,7 +52,7 @@ var last_beep := -1
 var master_volume := .72
 var music_enabled := true
 const GameLogic279=preload("res://scripts/local/game_logic279.gd")
-var handling_preset := LeoRaceRules.Handling.STANDARD
+var handling_preset := LeoRaceRules.Handling.ASSISTED
 var active_handling := LeoRaceRules.Handling.STANDARD
 var allow_ai_bigster := false
 var race_game_logic := GameLogic279.new()
@@ -530,6 +530,7 @@ func select_kart(index: int) -> void:
 	save_settings()
 
 func remove_racers() -> void:
+	if is_instance_valid(track_environment):track_environment.remove_grass_field()
 	if opponent_audio:opponent_audio.stop()
 	if split_view:split_view.activate(false)
 	if feedback: feedback.reset_feedback()
@@ -584,10 +585,11 @@ func set_handling_preset(value: int) -> void:
 	handling_preset = clampi(value, LeoRaceRules.Handling.EASY, LeoRaceRules.Handling.STANDARD)
 	save_settings()
 
-func current_ruleset(course: LeoTrackDefinition=null) -> String:
+func current_ruleset(course: LeoTrackDefinition=null, record_preset: int=-1, legacy_pads: bool=false) -> String:
 	var preset := handling_preset if course else active_handling
+	if record_preset >= 0: preset = record_preset
 	if not course:course=track_definition
-	return (LeoRaceRules.ID.trim_suffix("_static")+"_dusk_night" if race_variant=="dusk_night" else LeoRaceRules.ID)+("+arcade_elevation_v1" if course.elevated() else "")+LeoRaceRules.handling_suffix(preset)
+	return (LeoRaceRules.ID.trim_suffix("_static")+"_dusk_night" if race_variant=="dusk_night" else LeoRaceRules.ID)+("+arcade_elevation_v1" if course.elevated() else "")+LeoRaceRules.handling_suffix(preset)+("" if legacy_pads else "+offset_pads_v1")
 
 func set_race_variant(value: String) -> void:
 	race_variant=value if value in ["static","dusk_night"] else "static"
@@ -602,7 +604,7 @@ func start_race() -> void:
 	if haptics:haptics.stop_all()
 	input_router.configure_keyboards(human_count);input_router.assignment_locked=true;input_router.gameplay_enabled=false
 	loading.race_summary=track_definition.display_name+" · "+str(human_count)+(" player" if human_count==1 else " players")+" · %d laps" % active_laps
-	loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition),"race")
+	loading.begin_load(LeoLoadingBackdrops.new_operation("race"),chosen_track_id,loading_preview(track_definition),"race",race_variant=="dusk_night")
 	state="loading";loading.stage("Preparing racers…",15)
 	if is_instance_valid(hud.garage_selector):
 		hud.garage_selector.home_preview=false;await hud.garage_selector.scheduler.pause_for_race();hud.garage_selector.assembly=null;hud.garage_selector.sync_visibility()
@@ -681,6 +683,7 @@ func start_race() -> void:
 		local_players[slot].camera_rig.reset();local_players[slot].heading=local_players[slot].kart.rotation.y
 		update_local_camera(local_players[slot],1.)
 	loading.stage("Warming up the race view…",95)
+	track_environment.prepare_grass_field()
 	hud.show_race();input_router.gameplay_enabled=false
 	await LeoRaceWarmup.prepare(self)
 	state="countdown";countdown=3.6
@@ -688,6 +691,7 @@ func start_race() -> void:
 	input_router.gameplay_enabled=true;input_router.clear_all();input_router.sync_held()
 
 func connect_racer_feedback(kart: LeoKart) -> void:
+	if is_instance_valid(track_environment):track_environment.register_grass_wheels(kart)
 	kart.surface_feedback.connect(func(kind: String,strength: float):
 		if kart.control_input and kart.control_input.kind=="gamepad":haptics.play(kart.control_input.device,kind,strength))
 	kart.contact_reported.connect(func(contact: Dictionary):
@@ -753,7 +757,6 @@ func finish_race() -> void:
 	if test_mode:
 		check(player.lap == active_laps, "Autonomous racer completes all three laps")
 		check(player.next_gate == LeoCircuit.GATES*active_laps+1, "Finish requires all 24 ordered sectors after the start gate")
-		check(boost_count >= 4*active_laps, "Boost pads activate across all three laps")
 		for kart in karts:
 			if not kart.is_player: check(kart.finished, "AI %s completes all three laps without stalling" % kart.racer_name)
 	state = "results"
@@ -1043,7 +1046,7 @@ func save_settings() -> void:
 func load_settings() -> void:
 	var cfg := ConfigFile.new()
 	var settings_loaded:=cfg.load("user://leo_racer.cfg")
-	handling_preset = clampi(int(cfg.get_value("game_logic", "handling", LeoRaceRules.Handling.STANDARD)), LeoRaceRules.Handling.EASY, LeoRaceRules.Handling.STANDARD)
+	handling_preset = clampi(int(cfg.get_value("game_logic", "handling", LeoRaceRules.Handling.ASSISTED)), LeoRaceRules.Handling.EASY, LeoRaceRules.Handling.STANDARD)
 	allow_ai_bigster=GameLogic279.read_preference(cfg) if settings_loaded==OK else false
 	if settings_loaded == OK:
 		master_volume = cfg.get_value("audio", "volume", .72)
@@ -1055,9 +1058,9 @@ func load_settings() -> void:
 		selected_driver = selection.x
 		selected_kart = selection.y
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
-		chosen_track_id=cfg.get_value("game","track_id","colombo_city")
+		chosen_track_id=cfg.get_value("game","track_id","astra_coast")
 		race_variant=cfg.get_value("game","race_variant","static")
-		selected_laps=clampi(int(cfg.get_value("game","laps",3)),1,10)
+		selected_laps=clampi(int(cfg.get_value("game","laps",2)),1,10)
 		if haptics:
 			haptics.enabled=bool(cfg.get_value("controls","rumble",true))
 			haptics.intensity=clampf(float(cfg.get_value("controls","rumble_intensity",1.)),0.,1.)
@@ -1387,7 +1390,7 @@ func select_track(id: String) -> bool:
 	for candidate in tracks:
 		if candidate.id==id:target=candidate;break
 	if not target:return false
-	loading.begin_load(LeoLoadingBackdrops.new_operation("track"),id,loading_preview(target))
+	loading.begin_load(LeoLoadingBackdrops.new_operation("track"),id,loading_preview(target),"general",race_variant=="dusk_night")
 	loading.stage("Checking "+target.display_name+"…",10)
 	await get_tree().process_frame
 	if not target.mount():

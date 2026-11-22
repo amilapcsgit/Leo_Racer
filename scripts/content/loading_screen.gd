@@ -29,7 +29,7 @@ func _ready() -> void:
  layer=100;process_mode=Node.PROCESS_MODE_ALWAYS
  panel=Control.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.theme=load("res://assets/ui/theme.tres");add_child(panel)
  var saved:=ConfigFile.new();saved.load("user://leo_racer.cfg");reduced_motion=bool(saved.get_value("display","reduced_motion",false))
- backdrop_path=LeoLoadingBackdrops.begin_load(operation_id,String(saved.get_value("game","track_id","colombo_city")))
+ backdrop_path=LeoLoadingBackdrops.begin_load(operation_id,String(saved.get_value("game","track_id","astra_coast")),"",saved.get_value("game","race_variant","static")=="dusk_night")
  artwork=TextureRect.new();artwork.texture=load(backdrop_path);artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);artwork.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;artwork.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED;artwork.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(artwork)
  var shade:=ColorRect.new();shade.color=Color(.01,.025,.04,.16);shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);shade.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(shade)
  design=Control.new();design.size=Vector2(1600,900);design.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(design)
@@ -76,11 +76,11 @@ func show_failure(message: String,again: Callable,leave: Callable) -> void:
  diagram.hide();player_badge.hide();spinner.text="A / ENTER Confirm     B / ESC Back"
  caption.text="LET'S TRY THAT AGAIN";summary.text=message;summary.clip_text=true;detail.text="Choose an option to continue.";bar.hide();percentage.hide()
  retry.show();back.show();retry.pressed.connect(again,CONNECT_ONE_SHOT);back.pressed.connect(leave,CONNECT_ONE_SHOT);retry.grab_focus()
-func begin_load(id: String,track_id: String="",preview: String="",context: String="general") -> void:
+func begin_load(id: String,track_id: String="",preview: String="",context: String="general",dusk: bool=false) -> void:
  race_loading=context=="race"
  if diagram:diagram.visible=race_loading;player_badge.visible=race_loading
  if spinner:spinner.text=""
- operation_id=id;backdrop_path=LeoLoadingBackdrops.begin_load(id,track_id,preview)
+ operation_id=id;backdrop_path=LeoLoadingBackdrops.begin_load(id,track_id,preview,dusk)
  if artwork:artwork.texture=load(backdrop_path) if backdrop_path.begins_with("res://") else LeoAssets.texture(backdrop_path)
  if place_caption:place_caption.text=LeoLoadingBackdrops.caption(backdrop_path)
 func _input(event: InputEvent) -> void:

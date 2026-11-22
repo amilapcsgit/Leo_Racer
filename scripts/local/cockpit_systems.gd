@@ -93,7 +93,7 @@ func mirror(title: String,at: Vector3,extent: Vector2,normal: Vector3,eye: Vecto
  var view:=SubViewport.new();view.name=title+"MirrorView";view.size=Vector2i(128,64);view.world_3d=kart.get_world_3d();view.render_target_update_mode=SubViewport.UPDATE_DISABLED
  view.positional_shadow_atlas_size=0;view.msaa_3d=Viewport.MSAA_DISABLED;view.screen_space_aa=Viewport.SCREEN_SPACE_AA_DISABLED;view.gui_disable_input=true;add_child(view)
  var camera:=Camera3D.new();camera.fov=62.;camera.near=.06;camera.far=80.;camera.current=true;view.mesh_lod_threshold=5.
- camera.cull_mask=((1<<20)-1)&~(MIRROR_BITS[0]|MIRROR_BITS[1]|(1<<16)|LeoCameraViews.BODY_BITS[kart.local_slot]|LeoCameraViews.DRIVER_BITS[kart.local_slot])
+ camera.cull_mask=((1<<20)-1)&~(MIRROR_BITS[0]|MIRROR_BITS[1]|(1<<16)|LeoTrackEnvironment.GRASS_VIEW_LAYERS|LeoCameraViews.BODY_BITS[kart.local_slot]|LeoCameraViews.DRIVER_BITS[kart.local_slot])
  var source: Environment=kart.get_parent().get("environment")
  if source:
   camera.environment=source.duplicate();camera.environment.glow_enabled=false;camera.environment.ssao_enabled=false;camera.environment.ssil_enabled=false;camera.environment.ssr_enabled=false;camera.environment.volumetric_fog_enabled=false

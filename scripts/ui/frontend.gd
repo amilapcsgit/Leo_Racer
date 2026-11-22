@@ -310,7 +310,7 @@ func show_tracks() -> void:
   if not official_art:path="res://assets/ui/art/"+course.id+".png"
   if not ResourceLoader.exists(path):path="res://assets/ui/art/lighting-skyline.png"
   if not official_art and course.metadata.has("preview") and LeoVehicleLibrary.safe_relative(String(course.metadata.preview)) and FileAccess.file_exists(course.folder.path_join(String(course.metadata.preview))):path=ProjectSettings.globalize_path(course.folder.path_join(String(course.metadata.preview)))
-  picture(row,path,Vector2(260,145))
+  picture(row,path,Vector2(145,145) if course.id=="wennappuwa" else Vector2(260,145))
   var route:=LeoTrackHologram.new();route.reduced_motion=game.reduced_motion;route.set_route(course);var route_path:="res://assets/ui/icons/track_"+course.id+".svg"
   route.custom_minimum_size=Vector2(140,130);route.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;route.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(route)
   var details:=VBoxContainer.new();details.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(details)

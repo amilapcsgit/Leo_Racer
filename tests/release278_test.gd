@@ -127,7 +127,18 @@ func run() -> void:
 	print("RELEASE278_TEST ",JSON.stringify(report));await game.quit_game(0 if errors.is_empty() else 1)
 
 func settings() -> void:
-	check(game.handling_preset == LeoRaceRules.Handling.STANDARD, "Old settings default to Standard handling")
+	var stored_settings := ConfigFile.new()
+	stored_settings.load("user://leo_racer.cfg")
+	ConfigFile.new().save("user://leo_racer.cfg")
+	game.load_settings()
+	for track_definition in game.tracks:
+		var course := LeoCircuit.new(track_definition)
+		for index in course.boosts.size():
+			var station := float(course.boosts[index]) * course.length
+			var lane := course.boost_lane(index)
+			check(course.on_boost_pad(station, lane), "Boost pad center registers")
+			check(not course.on_boost_pad(station, lane + 3.1), "Passing alongside a pad grants no boost")
+	check(game.handling_preset == LeoRaceRules.Handling.ASSISTED, "Missing settings default to Assisted handling")
 	game.set_handling_preset(LeoRaceRules.Handling.EASY)
 	var handling_cfg := ConfigFile.new()
 	handling_cfg.set_value("game_logic", "handling", game.handling_preset)
@@ -146,8 +157,7 @@ func settings() -> void:
 	kart.free()
 	check(LeoRaceRules.handling_suffix(2).is_empty() and LeoRaceRules.handling_suffix(0) != LeoRaceRules.handling_suffix(1), "Handling modes get separate records and Standard preserves its key")
 	game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
-	handling_cfg.set_value("game_logic", "handling", game.handling_preset)
-	handling_cfg.save("user://leo_racer.cfg")
+	stored_settings.save("user://leo_racer.cfg")
 	var cfg:=ConfigFile.new();cfg.set_value("game","best_time_astra",123.);cfg.set_value("unknown","keep","unchanged")
 	game.graphics.read(cfg);game.graphics.write(cfg)
 	check(game.graphics.draw_distance==1,"Older profiles default to Standard draw distance")

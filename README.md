@@ -3,7 +3,7 @@
 <p align="center"><strong>Your ride. Your coast. Your next best lap.</strong><br>A Windows arcade racer on stylized Sri Lankan roads.</p>
 
 <p align="center">
-  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest/download/LeoRacer-Setup.exe"><img src="docs/media/download-windows.svg" alt="Download for Windows — full installer" width="340"></a><br>
+  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest"><img src="docs/media/download-windows.svg" alt="Download for Windows" width="340"></a><br>
   <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest">Release notes, portable ZIP &amp; SHA256 checksums</a>
 </p>
 
@@ -23,6 +23,8 @@ Extract the entire portable ZIP and run `LeoRacer.exe` for Forward+. Use the inc
 
 - **Settings → Game Logic → Handling** offers Easy, Assisted, and Standard. Easy lowers normal and boosted top speeds by 30% for the whole field and smooths human steering. Assisted blends Easy and Standard. Changes apply at the next race start or restart. Each preset has its own records, and existing records remain saved.
 - **Settings → Graphics → Draw Distance** offers Near, Standard, Far, and Very Far. Higher settings preload scenery farther ahead and use more memory.
+
+New profiles start with **Assisted handling**, **Astra Lotus Coast**, and **two laps**. Boost pads are smaller and alternate sides on all four tracks. Earlier records are available in the rankings filters.
 
 ## A closer seat to the action
 
@@ -139,7 +141,7 @@ Build with Godot **4.7.2 .NET** and the pinned tools. See [setup instructions](d
 
 <p align="center">
   <strong>Pick your ride. Find your line. One more lap.</strong><br><br>
-  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest/download/LeoRacer-Setup.exe">Download Leo Racer</a>
+  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest">Download Leo Racer</a>
   &nbsp; · &nbsp;
   <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest">Release notes &amp; checksums</a>
 </p>

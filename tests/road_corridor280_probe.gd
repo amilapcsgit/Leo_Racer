@@ -47,6 +47,9 @@ func run() -> void:
 		if "--road-replay" in OS.get_cmdline_user_args():
 			replay_ok=(await replay_sector(game)) and replay_ok
 			continue
+		if "--road-boost-pads" in OS.get_cmdline_user_args():
+			replay_ok=(await replay_boost_pads(game)) and replay_ok
+			continue
 		var course: LeoCircuit = game.circuit
 		var space := game.get_world_3d().direct_space_state
 		for vehicle_id in VEHICLES:
@@ -95,6 +98,7 @@ func fits_road(course: LeoCircuit, transform: Transform3D, size: Vector3, statio
 	return true
 
 func replay_sector(game: Node3D) -> bool:
+	game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
 	await game.start_race()
 	game.state = "race"
 	var car: LeoKart = game.player
@@ -127,4 +131,34 @@ func replay_sector(game: Node3D) -> bool:
 		var cleared := car.last_s/course.length > .70
 		passed = passed and cleared
 		print("ROAD_REPLAY_END ",lane," ",car.last_s/course.length," ",car.speed," cleared=",cleared)
+	return passed
+
+func replay_boost_pads(game: Node3D) -> bool:
+	game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
+	await game.start_race()
+	game.state = "race"
+	var car: LeoKart = game.player
+	for other in game.karts:
+		if other != car:
+			other.collision_layer = 0
+			other.active = false
+	var course: LeoCircuit = game.circuit
+	var passed := not course.boosts.is_empty()
+	for index in course.boosts.size():
+		var station := float(course.boosts[index]) * course.length
+		var lane := course.boost_lane(index)
+		var outside := lane - signf(lane) * (LeoCircuit.BOOST_WIDTH * 0.5 + 0.8)
+		for target in [lane, outside]:
+			car.place(station - 3.5, target)
+			car.active = true
+			car.boost_cooldown = 0.0
+			car.boost_time = 0.0
+			car.speed = 22.0
+			car.velocity = course.direction(station - 3.5) * car.speed
+			for frame in 26:
+				await physics_frame
+			var triggered := car.boost_time > 0.0
+			var matched: bool = triggered == (target == lane)
+			print("BOOST_REPLAY ", course.definition.id, " ", index, " ", target, " triggered=", triggered, " matched=", matched)
+			passed = passed and matched
 	return passed

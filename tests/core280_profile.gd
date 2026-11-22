@@ -24,6 +24,7 @@ func save_report(initialization_ms: float) -> void:
 	FileAccess.open(output.path_join("profile.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 
 func run() -> void:
+	print("CORE280_GAME_PID ", OS.get_process_id())
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--qa-output="): output=arg.trim_prefix("--qa-output=")
 		if arg.begins_with("--qa-track="): selected_tracks=[arg.trim_prefix("--qa-track=")]
@@ -50,6 +51,7 @@ func run() -> void:
 	game.selected_laps=1
 	game.selected_kart=game.catalog.vehicle_index(&"bigster")
 	game.local_players[1].vehicle_id=&"duster"
+	game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
 	for track in selected_tracks:
 		var track_began := Time.get_ticks_usec()
 		await game.select_track(track)

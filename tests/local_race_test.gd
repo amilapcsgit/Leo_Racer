@@ -10,6 +10,8 @@ func ticks(n: int) -> void:
 func run() -> void:
  var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
  game.diagnostics_mode=true;game.human_count=2
+ game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
+ game.selected_laps=3
  game.input_router.assign(1,"gamepad",17,false)
  game.selected_kart=game.catalog.vehicle_index(&"bigster")
  game.local_players[1].vehicle_id=&"duster";game.local_players[1].player_name="SECOND PILOT"
@@ -66,7 +68,7 @@ func run() -> void:
  game.set_handling_preset(LeoRaceRules.Handling.EASY)
  check(game.active_handling == LeoRaceRules.Handling.STANDARD, "Changing handling in pause preserves current race rules")
  await game.start_race()
- check(game.active_handling == LeoRaceRules.Handling.EASY and game.current_ruleset().ends_with("+handling_easy_v1"), "Restart captures Easy and uses its record rules")
+ check(game.active_handling == LeoRaceRules.Handling.EASY and game.current_ruleset().ends_with("+handling_easy_v1+offset_pads_v1"), "Restart captures Easy and uses its record rules")
  for racer in game.karts:
   var base_speed: float = LeoRaceRules.resolve(racer.definition).max_speed
   check(is_equal_approx(racer.max_speed, base_speed * .7), "Easy speed applies to racer %s" % racer.racer_name)

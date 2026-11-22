@@ -10,6 +10,13 @@ const SPARSE_COUNTS := [24, 40, 64]
 var grass_probe := "current"
 const WATER := preload("res://shaders/environment_water.gdshader")
 const GRASS := preload("res://shaders/environment_grass.gdshader")
+const GRASS_BAKE_PATTERN := "res://assets/tracks/grass_%s.res"
+const GRASS_VIEW_LAYERS := (1 << 10) | (1 << 11)
+const PilotField := preload("res://addons/grass_field/grass_field.gd")
+const PilotBake := preload("res://addons/grass_field/grass_bake.gd")
+const PilotProvider := preload("res://addons/grass_field/grass_baked_provider.gd")
+const PilotWheel := preload("res://addons/grass_field/grass_interactor.gd")
+var grass_field: PilotField
 
 var game: Node3D
 var circuit: LeoCircuit
@@ -40,12 +47,18 @@ var tile_job: Dictionary = {}
 
 func configure(owner_game: Node3D) -> void:
 	game = owner_game
+	grass_probe = "current" if "--legacy-grass" in OS.get_cmdline_user_args() else "field"
 	if game.diagnostics_mode:
 		for arg in OS.get_cmdline_user_args():
 			if arg.begins_with("--qa-grass="):
 				grass_probe = arg.trim_prefix("--qa-grass=")
 	circuit = game.circuit
 	track_id = String(game.track_definition.id)
+	var track_pack_matches: bool = track_id == "wennappuwa" and game.track_definition.metadata.get("packs", []).any(
+		func(pack): return pack.get("sha256") == "30705142ead02d8751592f5403753a5657958dddbcb47e076e0ac82f13d4b728"
+	)
+	if grass_probe == "field" and ((game.track_definition.modified and not track_pack_matches) or not ResourceLoader.exists(GRASS_BAKE_PATTERN % track_id)):
+		grass_probe = "current"
 	name = "TrackEnvironment"
 	grass_material = ShaderMaterial.new()
 	grass_material.shader = GRASS
@@ -59,6 +72,41 @@ func configure(owner_game: Node3D) -> void:
 	grass_material.set_shader_parameter("high_color", Color(palette[1]))
 	grass_mesh = blades(float(palette[2]))
 	grass_mesh.surface_set_material(0, grass_material)
+
+func prepare_grass_field() -> void:
+	if grass_probe != "field":
+		return
+	var baked := PilotProvider.new()
+	baked.atlas = load(GRASS_BAKE_PATTERN % track_id) as PilotBake
+	if not baked.atlas or not baked.atlas.samples:
+		baked.free()
+		grass_probe = "current"
+		return
+	grass_field = PilotField.new()
+	grass_field.name = "GrassField"
+	grass_field.provider = baked
+	grass_field.add_child(baked)
+	for slot in game.human_count:
+		grass_field.cameras.append(game.local_players[slot].camera)
+	apply_grass_field_quality()
+	add_child(grass_field)
+
+func apply_grass_field_quality() -> void:
+	if is_instance_valid(grass_field):
+		grass_field.set_detail(RADII[tier], float(COUNTS[tier]) / float(COUNTS[2]))
+
+func remove_grass_field() -> void:
+	if is_instance_valid(grass_field):
+		grass_field.free()
+	grass_field = null
+
+func register_grass_wheels(kart: LeoKart) -> void:
+	if grass_probe != "field":
+		return
+	for wheel in kart.wheel_spin_pivots:
+		var contact := PilotWheel.new()
+		contact.radius = 0.45
+		wheel.add_child(contact)
 
 func _ready() -> void:
 	for node in get_parent().find_children("*", "MeshInstance3D", true, false):
@@ -139,6 +187,7 @@ func set_quality(setting: int, preset: int, split: bool) -> void:
 
 func change_tier(value: int) -> void:
 	tier = value
+	apply_grass_field_quality()
 	grass_material.set_shader_parameter("detail", tier)
 	for entry in water.values(): entry.material.set_shader_parameter("detail",tier)
 	for tile in tiles.values():
@@ -199,7 +248,7 @@ func blade_counts() -> Array:
 	return SPARSE_COUNTS if grass_probe == "sparse" else COUNTS
 
 func refresh_wanted() -> void:
-	if not is_inside_tree() or grass_probe == "off": return
+	if not is_inside_tree() or grass_probe in ["off", "field"]: return
 	last_centers.clear()
 	for slot in game.human_count:
 		if slot >= game.local_players.size(): break

@@ -56,6 +56,7 @@ func create_timer(seconds: float,always: bool=true,physics: bool=false,ignore_sc
 '''
     mapping.update(teardown280='teardown280_test', environment280='environment280_test', tire280='tire280_test', finish_order280='finish_order280_test', swap_width280='swap_width280_test',
                    core280_profile='core280_profile', road_corridor280='road_corridor280_probe', input='local_input_test', ranking='local_ranking_test', race='local_race_test')
+    mapping['grass_pilot']='grass_pilot'
     for name,source in mapping.items():
         script=(ROOT/'tests'/ (source+'.gd')).read_text(encoding='utf-8')
         script=script.replace('extends SceneTree',adapter,1).replace(',self)',',get_tree())')
@@ -88,6 +89,7 @@ def stage():
     shutil.copy2(ROOT/'assets/config/loading-gallery-v279.json',BASE/'GameAssets/licenses/loading-gallery-v279.json')
     shutil.copy2(ROOT/'assets/config/generated-art-v279.json',BASE/'GameAssets/licenses/generated-art-v279.json')
     shutil.copy2(ROOT/'LICENSE',BASE/'LICENSE.txt')
+    shutil.copy2(ROOT/'addons/grass_field/LICENSE',BASE/'GameAssets/licenses/grass-field.txt')
     (BASE/'CREDITS.txt').write_text(
         'Created by L.J. Amila Prasad Perera.\n\n'
         'I made Leo Racer for my son, Shaven Leo, who is six years old.\n\n'
@@ -125,7 +127,7 @@ def stage():
     shutil.copy2(ROOT/'assets/config/default-roster-v1.json',BASE/'default-roster-v1.json')
     for source_name,destination in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:
         shutil.copy2(ROOT/'docs'/source_name,BASE/destination)
-    (BASE/'README.txt').write_text('LEO RACER '+VERSION+'\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, '+str(TRACK_COUNT)+' tracks; 1–10 laps, default 3.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
+    (BASE/'README.txt').write_text('LEO RACER '+VERSION+'\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, '+str(TRACK_COUNT)+' tracks; 1–10 laps. New profiles start with Assisted handling and two laps on Astra Lotus Coast.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
     for name,args in [('Play Compatibility.cmd','--rendering-method gl_compatibility --rendering-driver opengl3'),('Vehicle Workshop.cmd','-- --vehicle-workshop')]:
         (BASE/name).write_text('@echo off\r\ncd /d "%~dp0"\r\nstart "" "LeoRacer.exe" '+args+'\r\n',encoding='ascii')
     dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'default_vehicles':21,'tracks':TRACK_COUNT,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})

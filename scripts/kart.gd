@@ -580,11 +580,9 @@ func _physics_process(dt: float) -> void:
 		if stuck_time>3.0: recover(); return
 	else: stuck_time = 0
 	advance_checkpoints(projection,global_position-motion_origin,dt)
-	if active and boost_cooldown <= 0:
-		for fraction in circuit.boosts:
-			if absf(circuit.delta_distance(projection.distance, float(fraction) * circuit.length)) < 2.5 and absf(offset) < 6.5:
-				boost(1.5, "BOOST PAD","pad")
-				boost_cooldown = 2.0
+	if active and boost_cooldown <= 0 and circuit.on_boost_pad(projection.distance, offset):
+		boost(1.5, "BOOST PAD","pad")
+		boost_cooldown = 2.0
 	# Keep the RC's body response; Reduced Motion suppresses presentation offsets.
 	var reduced:=bool(get_parent().get("reduced_motion")) if get_parent().get("reduced_motion")!=null else false
 	air_hop = move_toward(air_hop, 0, dt * .8)

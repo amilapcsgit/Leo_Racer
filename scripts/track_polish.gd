@@ -2,7 +2,7 @@ class_name LeoTrackPolish
 extends RefCounted
 ## Runtime instance overrides; authored geometry, baked lights and sources survive.
 static var profiles: Dictionary={}
-const REVISION := 279
+const REVISION := 281
 const ROAD_SHADER := preload("res://shaders/road_premium.gdshader")
 static func install(world: Node3D, circuit: LeoCircuit) -> void:
 	if profiles.is_empty():profiles=JSON.parse_string(FileAccess.get_file_as_string("res://assets/config/track-polish-v1.json"))
@@ -58,11 +58,19 @@ static func apply_node(node: GeometryInstance3D, world: Node3D) -> void:
 			material=road_material(old,profile,world)
 			node.set_meta("road_surface279",true)
 			if not node.has_meta("street_receiver"):node.set_meta("street_receiver",true)
-		elif String(node.get_meta("surface_role","")) in ["terrain_verge","terrain_detail","terrain_backdrop"]:
-			material=old.duplicate() as ShaderMaterial;material.shader=preload("res://shaders/ground_premium.gdshader")
-			if old.get_shader_parameter("ground_albedo")==null:material.set_shader_parameter("ground_albedo",preload("res://assets/materials/Concrete034_2K-JPG_Color.jpg"))
-			if old.get_shader_parameter("ground_normal")==null:material.set_shader_parameter("ground_normal",preload("res://assets/materials/Concrete034_2K-JPG_NormalGL.jpg"))
-			material.set_shader_parameter("coastal",String(world.get_meta("polish_track_id",""))=="astra_coast")
+		elif String(node.get_meta("surface_role","")) in ["terrain_verge","terrain_detail","terrain_backdrop"] or old.shader.resource_path.ends_with("/astra_terrain.gdshader"):
+			var astra: bool = old.shader.resource_path.ends_with("/astra_terrain.gdshader")
+			material=old.duplicate() as ShaderMaterial;material.shader=old.shader if astra else preload("res://shaders/ground_premium.gdshader")
+			if not astra and old.get_shader_parameter("ground_albedo")==null:material.set_shader_parameter("ground_albedo",preload("res://assets/materials/Concrete034_2K-JPG_Color.jpg"))
+			if not astra and old.get_shader_parameter("ground_normal")==null:material.set_shader_parameter("ground_normal",preload("res://assets/materials/Concrete034_2K-JPG_NormalGL.jpg"))
+			material.set_shader_parameter("grass_albedo",preload("res://assets/materials/stylized_grass/basecolor.jpg"))
+			material.set_shader_parameter("grass_normal",preload("res://assets/materials/stylized_grass/normal.jpg"))
+			material.set_shader_parameter("grass_roughness",preload("res://assets/materials/stylized_grass/roughness.jpg"))
+			material.set_shader_parameter("grass_ao",preload("res://assets/materials/stylized_grass/ambientOcclusion.jpg"))
+			material.set_shader_parameter("grass_height",preload("res://assets/materials/stylized_grass/height.png"))
+			var plane := node.mesh as PlaneMesh
+			material.set_shader_parameter("grass_displacement",astra or (node.get_meta("surface_role","") == "terrain_detail" or (plane != null and plane.subdivide_width >= 32 and plane.subdivide_depth >= 32)))
+			if not astra:material.set_shader_parameter("coastal",String(world.get_meta("polish_track_id",""))=="astra_coast")
 		elif String(node.get_meta("surface_role",""))=="water" or node.name=="KandyLakeColomboWater":
 			material=old.duplicate() as ShaderMaterial
 			material.set_shader_parameter("deep_color",Color(profile.get("water_deep","1e5057")))

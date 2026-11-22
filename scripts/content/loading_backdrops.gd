@@ -2,6 +2,7 @@ class_name LeoLoadingBackdrops
 extends RefCounted
 const DAY="res://assets/art/menu.png"
 const NIGHT="res://assets/ui/art/home.png"
+const WENNAPPUWA=["res://assets/ui/boot/tracks/wennappuwa/day.png","res://assets/ui/boot/tracks/wennappuwa/dusk.png"]
 const TRACKS=["astra_coast","colombo_city","kandy_lake"]
 const REGISTRY="res://assets/config/loading-gallery-v279.json"
 static var operation: String=""
@@ -17,6 +18,7 @@ static func inventory() -> Array:
   if data is Dictionary and data.get("artworks") is Array:entries=data.artworks
  return entries
 static func caption(path: String) -> String:
+ if path in WENNAPPUWA:return "Wennappuwa Street Circuit"
  for row in inventory():
   if row.path==path:return String(row.get("caption","Sri Lanka · Leo Racer artwork"))
  return "Sri Lanka · Leo Racer artwork"
@@ -30,8 +32,13 @@ static func paths(_track_id: String="",preview: String="") -> Array[String]:
   for path in [DAY,NIGHT]:
    if ResourceLoader.exists(path):result.append(path)
  return result
-static func begin_load(operation_id: String,track_id: String="",preview: String="") -> String:
+static func begin_load(operation_id: String,track_id: String="",preview: String="",dusk: bool=false) -> String:
  if operation_id==operation and not selected.is_empty():return selected
+ if track_id=="wennappuwa":
+  var backdrop: String=WENNAPPUWA[int(dusk)]
+  if ResourceLoader.exists(backdrop):
+   operation=operation_id;operation_track=track_id;selected=backdrop
+   return selected
  var choices:=paths(track_id,preview)
  if choices.is_empty():return ""
  var remaining: Array=bags.get("gallery",[])
