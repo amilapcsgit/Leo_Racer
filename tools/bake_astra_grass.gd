@@ -24,7 +24,7 @@ func run() -> void:
 		push_error("Track support geometry unavailable")
 		await game.quit_game(1)
 		return
-	spacing = 1.0 if scenery.track_id == "astra_coast" else 2.0
+	spacing = 1.0 if scenery.track_id in ["astra_coast", "colombo_city"] else 2.0
 	var atlas := bake(scenery)
 	var output := "res://assets/tracks/grass_%s.res" % scenery.track_id
 	var result := ResourceSaver.save(atlas, output, ResourceSaver.FLAG_COMPRESS)

@@ -49,6 +49,7 @@ func run() -> void:
 			continue
 		if "--road-boost-pads" in OS.get_cmdline_user_args():
 			replay_ok=(await replay_boost_pads(game)) and replay_ok
+			game.return_menu()
 			continue
 		var course: LeoCircuit = game.circuit
 		var space := game.get_world_3d().direct_space_state
