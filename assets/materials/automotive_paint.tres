@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3]
+[resource]
+resource_name = "Leo automotive paint PBR"
+metallic = 0.55
+metallic_specular = 0.5
+roughness = 0.27
+clearcoat_enabled = true
+clearcoat = 1.0
+clearcoat_roughness = 0.14

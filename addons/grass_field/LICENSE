@@ -1,0 +1,75 @@
+LEO RACER CUSTOM NON-COMMERCIAL LICENSE
+Version 1.0 — 29 October 2026
+
+Copyright (c) 2026 L.J. Amila Prasad Perera
+All rights reserved except as expressly granted below.
+
+1. SCOPE AND PRIOR LICENSES
+This license applies only to original Leo Racer software, documentation and
+assets for which L.J. Amila Prasad Perera holds the necessary rights (the
+"Software"), as distributed under this license from this revision onward.
+It does not replace third-party licenses or revoke rights already granted
+under earlier licenses, including AGPL-3.0. Earlier releases and copies
+remain subject to the licenses under which they were supplied. The prior
+AGPL-3.0 text is retained in licenses/AGPL-3.0-legacy.txt for reference.
+Material owned by others, and contributions not authorized for relicensing,
+remain governed by their applicable licenses. Those terms prevail for that
+material; this license does not grant rights the author does not own.
+
+2. PERMITTED PRIVATE USE
+Permission is granted, free of charge, to obtain authorized copies, install,
+run, study and privately modify the Software solely for personal,
+non-commercial use. Necessary installation and backup copies for that use
+are permitted. Modified copies must remain private. All other rights are
+reserved, subject to rights that cannot be restricted by applicable law.
+
+3. NO COMMERCIAL USE
+Without prior explicit written permission from the copyright holder, you
+may not sell, rent, sublicense, commercially exploit, or include the
+Software or any part of it in a commercial product or service. Business
+use, including internal business use, requires that permission.
+
+4. NO REDISTRIBUTION
+Without prior explicit written consent from the copyright holder, you may
+not redistribute, publish, upload, mirror, bundle or otherwise supply the
+Software, in whole or in part, in source or binary form, whether modified
+or unmodified and whether free or paid. Share a link to the author's
+official download page instead of sharing copies.
+This restriction does not override permissions independently granted by
+applicable third-party licenses, prior licenses, mandatory law, or the
+hosting platform's applicable terms (including GitHub's public-repository
+viewing and forking permissions).
+
+5. ATTRIBUTION
+Retain this license and all applicable copyright and third-party notices.
+Include clear, visible credit wherever documentation, README files or an
+application About/credits screen is provided:
+"Author: L.J. Amila Prasad Perera"
+Attribution alone does not authorize commercial use or redistribution.
+
+6. INDEPENDENT INDIE PROJECT; THIRD-PARTY RIGHTS
+Leo Racer is an independent indie project. All third-party trademarks,
+service marks, trade names, logos, character names and vehicle names are
+the property of their respective owners. Their appearance or mention does
+not imply affiliation with, sponsorship by, approval by or endorsement
+from those owners. No rights in third-party trademarks, characters,
+vehicle designs or other protected material are granted by this license.
+Third-party software and assets retain their own licenses, attribution
+requirements and notices; see licenses/ and individual component notices.
+This statement is not a substitute for any required third-party permission.
+
+7. NO WARRANTY; LIMITATION OF LIABILITY
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED
+"AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. NOTHING HERE EXCLUDES LIABILITY THAT CANNOT LAWFULLY BE EXCLUDED.
+
+8. SPECIAL PERMISSIONS
+For commercial licensing, business use, redistribution rights or other
+permissions, contact L.J. Amila Prasad Perera directly through the official
+repository owner's profile: https://github.com/amilapcsgit
+Permission must be expressly granted in writing; silence is not consent.

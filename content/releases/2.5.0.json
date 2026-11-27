@@ -1,0 +1,40 @@
+{
+  "version": "2.5.0",
+  "branch": "release/2.5.0",
+  "ruleset": "distinct_v4",
+  "roster_manifest": "assets/config/default-roster-v1.json",
+  "default_vehicles": [
+    "bigster",
+    "byd_yangwang_u8",
+    "colombo_tuk",
+    "cyberpunk",
+    "duster",
+    "formula_blue",
+    "hover",
+    "import_1968_volkswagen_beetle",
+    "import_1985_delorean_dmc_12_time_machine_bttf",
+    "import_2013_equipped_jeep_wrangler_unlimited_rubicon",
+    "import_2019_ford_mustang_rtr_spec5_10th_anniversary",
+    "import_2020_ferrari_roma",
+    "import_2020_jeep_gladiator",
+    "import_2020_lbworks_toyota_supra_a90_ver_2",
+    "import_2021_pininfarina_teorema_concept",
+    "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit",
+    "import_2022_mclaren_765lt",
+    "import_2024_byd_atto_2",
+    "import_future_car",
+    "mclaren"
+  ],
+  "tracks": [
+    "astra_coast",
+    "colombo_city",
+    "kandy_lake"
+  ],
+  "imports_remain_unranked": true,
+  "existing_addons_preserved": true,
+  "redistribution_confirmation": {
+    "date": "2026-10-27",
+    "scope": "Selected twenty-car installer and portable release",
+    "statement": "User explicitly requested publication with these tested twenty cars. Prior imported-car permission confirmation is retained from content/releases/2.3.1.json; original individual licenses and attribution remain applicable."
+  }
+}

@@ -1,5 +1,8 @@
 class_name LeoFrontend
 extends Node
+var home_art: String=""
+var previous_home_art: String=""
+const HOME_ART=["res://assets/ui/art/home-bigster-v26.png","res://assets/ui/art/home-duster-v26.png","res://assets/ui/art/home-pair-v26.png"]
 var game: Node3D
 var hud: LeoHUD
 var audio: LeoUIAudio
@@ -18,6 +21,8 @@ var last_pad := false
 var prompt: Label
 var modal_title := ""
 var focus_graph := ""
+var result_reference_time:=0.
+var result_reference_session:=""
 func _ready() -> void:
  process_mode=Node.PROCESS_MODE_ALWAYS
  game.input_router.binding_changed.connect(update_devices)
@@ -44,30 +49,34 @@ func shell(title: String,subtitle: String="") -> VBoxContainer:
  game.input_router.gameplay_enabled=false;game.input_router.assignment_locked=false;game.input_router.controls_testing=false;game.input_router.clear_all()
  hud.clear(hud.menu_root);hud.clear(hud.hud_root);hud.hud_root.hide();hud.speed_overlay.hide();hud.menu_root.show()
  hud.menu_root.theme=load("res://assets/ui/theme.tres")
- var art:=picture(hud.menu_root,"res://assets/ui/art/home.png",Vector2.ZERO);art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);hud.cover_viewport(art)
- var dim:=ColorRect.new();dim.color=Color(0.025,.04,.07,.35 if screen=="home" else .78);dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);dim.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.menu_root.add_child(dim);hud.cover_viewport(dim)
- if screen=="home":
+ var backdrop: String=home_art if screen=="home" else "res://assets/ui/art/garage-skyline-v26.png"
+ var art:=picture(hud.menu_root,backdrop,Vector2.ZERO);art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);hud.cover_viewport(art)
+ var dim:=ColorRect.new();dim.color=Color(0.025,.04,.07,.12 if screen=="home" else .78);dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);dim.mouse_filter=Control.MOUSE_FILTER_IGNORE;hud.menu_root.add_child(dim);hud.cover_viewport(dim)
+ if screen=="setup":
   var atmosphere:=LeoBackdropFX.new();atmosphere.art=art;atmosphere.reduced_motion=game.reduced_motion;hud.menu_root.add_child(atmosphere)
  var margin:=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
  for side in ["left","right"]:margin.add_theme_constant_override("margin_"+side,48)
- for side in ["top","bottom"]:margin.add_theme_constant_override("margin_"+side,36)
+ for side in ["top","bottom"]:margin.add_theme_constant_override("margin_"+side,24 if screen=="setup" else 36)
  hud.menu_root.add_child(margin)
- var box:=VBoxContainer.new();box.add_theme_constant_override("separation",24);margin.add_child(box)
- var header:=HBoxContainer.new();header.custom_minimum_size.y=72;box.add_child(header)
- var heading:=label(header,title,56);heading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ var box:=VBoxContainer.new();box.add_theme_constant_override("separation",12 if screen=="setup" else 24);margin.add_child(box)
+ var header:=HBoxContainer.new();header.custom_minimum_size.y=56 if screen=="setup" else 72;box.add_child(header)
+ var heading:=label(header,title,48 if screen=="setup" else 56);heading.size_flags_horizontal=Control.SIZE_EXPAND_FILL
  var corner:=action(header,"Back",back_screen) if screen!="home" else action(header,"Quit",func():confirm("Quit Leo Racer?","Your choices are saved.",game.quit_game,show_home))
  corner.custom_minimum_size.x=160;corner.size_flags_horizontal=Control.SIZE_SHRINK_END
  if not subtitle.is_empty():label(box,subtitle,24,Color("b9c7d6"))
  var content:=VBoxContainer.new();content.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(content)
- prompt=label(box,"",20,Color("b9c7d6"));prompt.custom_minimum_size.y=52;update_prompt()
+ prompt=label(box,"",20,Color("b9c7d6"));prompt.custom_minimum_size.y=28 if screen=="setup" else 52;update_prompt()
+ if is_instance_valid(hud.garage_selector) and screen!="home":hud.garage_selector.home_preview=false;hud.garage_selector.sync_visibility()
  if transition:transition.kill()
  margin.modulate.a=0.
  transition=create_tween().set_parallel(true);transition.tween_property(margin,"modulate:a",1.,.12 if game.reduced_motion else .18)
- if not game.reduced_motion:transition.tween_property(margin,"position",Vector2.ZERO,.18).from(Vector2(16,0))
+ # Fade the screen without moving pointer targets during input.
  return content
 func show_home() -> void:
  game.input_router.assignment_locked=false;game.input_router.resolve_automatic(game.human_count)
  screen="home";hud.scene_mode="menu"
+ var choices: Array=HOME_ART.filter(func(path):return path!=previous_home_art)
+ home_art=choices.pick_random();previous_home_art=home_art
  var body:=shell("LEO RACER","COLOMBO AFTER DARK")
  var row:=HBoxContainer.new();row.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(row)
  var left:=VBoxContainer.new();left.custom_minimum_size.x=480;left.add_theme_constant_override("separation",16);row.add_child(left)
@@ -82,39 +91,73 @@ func show_home() -> void:
  action(grid,"Settings",show_settings)
  action(grid,"How to Play",show_guide)
  action(grid,"Content",game.show_content_manager)
- label(left,"Pick your ride. Hit the road.",24,Color("ffc857"))
+ action(grid,"Credits",show_credits)
+ label(left,"Pick your ride. Hit the road.",22,Color("c5d3df"))
+ prepare_home_neighbors()
  restore(go)
+func prepare_home_neighbors() -> void:
+ if not is_instance_valid(hud.garage_selector):return
+ var selector:=hud.garage_selector
+ selector.home_preview=false;selector.hide();selector.sync_visibility()
+ selector.scheduler.suspended=false
+ var local: LeoLocalPlayer=game.local_players[0]
+ selector.scheduler.anticipate(local.driver_id,local.vehicle_id)
 func show_setup(count: int=-1) -> void:
  if count>0:game.human_count=count
  game.state="lobby" if game.human_count==2 else "menu"
  setup.sync(game);screen="setup";hud.scene_mode="lobby"
  game.input_router.assignment_locked=false;game.input_router.resolve_automatic(game.human_count)
- var body:=shell("LET'S RACE","Pick your ride. Hit the road.")
- var top:=HBoxContainer.new();body.add_child(top)
+ var body:=shell("LET'S RACE","YOUR CREW. YOUR COAST. YOUR NEXT WIN.")
+ var top:=HBoxContainer.new();top.add_theme_constant_override("separation",16);body.add_child(top)
  for n in [1,2]:
   var number: int=n
-  action(top,("✓ " if game.human_count==n else "")+("1 Player" if n==1 else "2 Players"),func():show_setup(number)).custom_minimum_size.x=210
- var track_button:=action(top,game.track_definition.display_name+"  ·  Change Track",show_tracks);track_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
- var row:=HBoxContainer.new();row.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(row)
+  var choice:=action(top,("✓ " if game.human_count==n else "")+("SOLO" if n==1 else "SPLIT SCREEN"),func():show_setup(number),game.human_count==n)
+  choice.custom_minimum_size=Vector2(210,52)
+ var space:=Control.new();space.size_flags_horizontal=Control.SIZE_EXPAND_FILL;top.add_child(space)
+ label(top,"LAPS",24,Color("67d6db")).custom_minimum_size.x=64
+ var laps:=SpinBox.new();laps.name="RaceLaps";laps.min_value=1;laps.max_value=10;laps.step=1;laps.update_on_text_changed=true;laps.value=game.selected_laps;laps.custom_minimum_size=Vector2(110,48);top.add_child(laps)
+ laps.value_changed.connect(func(value):
+  game.selected_laps=int(value);setup.sync(game);game.save_settings()
+  if is_instance_valid(start_button):start_button.text=race_cta();start_button.refresh())
+ var lighting:=OptionButton.new();lighting.add_item("Static lighting");lighting.add_item("Dusk to Night");lighting.select(1 if game.race_variant=="dusk_night" else 0);lighting.item_selected.connect(func(i):game.set_race_variant("dusk_night" if i==1 else "static"));top.add_child(lighting)
+ var track_row:=HBoxContainer.new();track_row.custom_minimum_size.y=68;body.add_child(track_row)
+ var map:=LeoTrackHologram.new();map.reduced_motion=game.reduced_motion;map.set_route(game.track_definition);map.custom_minimum_size=Vector2(120,68);track_row.add_child(map)
+ var track_button:=action(track_row,game.track_definition.display_name.to_upper()+"  ·  CHANGE TRACK",show_tracks);track_button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+ label(track_row,"%.1f KM / 6 RACERS" % (game.circuit.length/1000.),22,Color("b9c7d6")).custom_minimum_size.x=210
+ var row:=HBoxContainer.new();row.alignment=BoxContainer.ALIGNMENT_CENTER;row.add_theme_constant_override("separation",20);row.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(row)
  for slot in game.human_count:
   var index: int=slot;var local: LeoLocalPlayer=game.local_players[slot]
-  var box:=card(row)
-  var header:=HBoxContainer.new();box.add_child(header)
-  var portrait:=TextureRect.new();portrait.texture=game.catalog.driver(local.driver_id).portrait;portrait.custom_minimum_size=Vector2(96,96);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;header.add_child(portrait)
-  var words:=VBoxContainer.new();words.size_flags_horizontal=Control.SIZE_EXPAND_FILL;header.add_child(words)
-  label(words,"PLAYER %d" % (slot+1),20,Color("43e7ef") if slot==0 else Color("ffc857"))
-  label(words,local.player_name if not local.player_name.is_empty() else game.catalog.driver(local.driver_id).display_name,32)
-  label(box,game.catalog.vehicle(local.vehicle_id).display_name,28)
-  var vehicle_image:=TextureRect.new();vehicle_image.texture=game.catalog.vehicle(local.vehicle_id).thumbnail;vehicle_image.custom_minimum_size=Vector2(160,96);vehicle_image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;vehicle_image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;header.add_child(vehicle_image)
+  var accent:=Color("43e7ef") if slot==0 else Color("ffc857")
+  var box:=card(row);box.add_theme_constant_override("separation",8)
+  var panel:=box.get_parent() as PanelContainer;panel.name="PlayerCard%d" % (slot+1)
+  if game.human_count==1:panel.custom_minimum_size.x=900;panel.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
+  var border:=StyleBoxFlat.new();border.bg_color=Color("0b131de8");border.border_color=Color(accent,.6);border.set_border_width_all(1);border.set_corner_radius_all(16);border.set_content_margin_all(18);panel.add_theme_stylebox_override("panel",border)
+  var identity:=HBoxContainer.new();box.add_child(identity)
+  var portrait:=TextureRect.new();portrait.texture=game.catalog.driver(local.driver_id).portrait;portrait.custom_minimum_size=Vector2(64,64);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;identity.add_child(portrait)
+  var words:=VBoxContainer.new();words.size_flags_horizontal=Control.SIZE_EXPAND_FILL;identity.add_child(words)
+  label(words,"PLAYER %d / DRIVER" % (slot+1),20,accent)
+  var name_label:=label(words,local.player_name if not local.player_name.is_empty() else game.catalog.driver(local.driver_id).display_name,32);name_label.autowrap_mode=TextServer.AUTOWRAP_OFF;name_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;name_label.tooltip_text=name_label.text;name_label.clip_text=true
+  var vehicle_image:=TextureRect.new();vehicle_image.texture=LeoPreviewArt.texture(game.catalog.vehicle(local.vehicle_id));vehicle_image.custom_minimum_size=Vector2(320,155);vehicle_image.size_flags_vertical=Control.SIZE_EXPAND_FILL;vehicle_image.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;vehicle_image.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;box.add_child(vehicle_image)
+  var vehicle_name:=label(box,LeoPreviewArt.name_for(game.catalog.vehicle(local.vehicle_id)).to_upper(),28);vehicle_name.autowrap_mode=TextServer.AUTOWRAP_OFF;vehicle_name.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;vehicle_name.clip_text=true;vehicle_name.tooltip_text=vehicle_name.text
   var chip: HBoxContainer=load("res://scenes/ui/DeviceChip.tscn").instantiate();box.add_child(chip)
-  var status_label:=chip.get_node("Caption") as Label;status_label.add_theme_font_size_override("font_size",24);status_label.custom_minimum_size.y=64;player_status.append(status_label)
-  var spacer:=Control.new();spacer.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(spacer)
-  var actions:=HBoxContainer.new();box.add_child(actions)
-  action(actions,"Change Ride",func():open_garage(index)).set_meta("focus_key","ride_%d" % slot)
-  action(actions,"Controls",func():show_controls(index)).set_meta("focus_key","controls_%d" % slot)
- start_button=action(body,"Start Race   →",start_selected,true);start_button.custom_minimum_size.y=88
+  var status_label:=chip.get_node("Caption") as Label;status_label.add_theme_font_size_override("font_size",22);status_label.custom_minimum_size.y=52;player_status.append(status_label)
+  var controls:=HBoxContainer.new();box.add_child(controls)
+  action(controls,"Assign Pad",func():game.input_router.begin_claim(index)).custom_minimum_size.y=44
+  action(controls,"Identify",func():
+   game.input_router.identify(index)
+   if not game.reduced_motion:
+    var flash:=panel.create_tween();flash.tween_property(panel,"modulate",accent,.1);flash.tween_property(panel,"modulate",Color.WHITE,.35)).custom_minimum_size.y=44
+  var actions:=controls
+  var ride:=action(actions,"Change Ride",func():open_garage(index));ride.set_meta("focus_key","ride_%d" % slot)
+  ride.focus_entered.connect(func():hud.garage_selector.scheduler.suspended=false;hud.garage_selector.scheduler.anticipate(local.driver_id,local.vehicle_id))
+  var bindings:=action(actions,"Controls",func():show_controls(index));bindings.set_meta("focus_key","controls_%d" % slot)
+  actions.move_child(ride,0);actions.move_child(bindings,1)
+  for control in actions.get_children():control.custom_minimum_size.y=52
+ start_button=action(body,race_cta(),start_selected,true);start_button.custom_minimum_size.y=64
  update_devices();restore(start_button)
  if count>0:audio.say("ready")
+
+func race_cta() -> String:return "START RACE   →   /   %d LAP%s" % [game.selected_laps,"" if game.selected_laps==1 else "S"]
 func update_devices() -> void:
  if game.paused and modal_title=="TAKE A BREATHER":
   show_pause.call_deferred();return
@@ -122,13 +165,15 @@ func update_devices() -> void:
  var valid:=true
  for slot in mini(player_status.size(),game.human_count):
   var p: LeoPlayerInput=game.input_router.players[slot]
-  var description:="Keyboard · "+("WASD" if slot==0 else "Arrows") if p.kind=="keyboard" and game.human_count==2 and game.input_router.players[1-slot].kind=="keyboard" else "Keyboard · WASD / Arrows" if p.kind=="keyboard" else Input.get_joy_name(p.device) if p.device>=0 else "Reconnect your controller"
+  var description: String="Keyboard · "+("WASD" if slot==0 else "Arrows") if p.kind=="keyboard" and game.human_count==2 and game.input_router.players[1-slot].kind=="keyboard" else "Keyboard · WASD / Arrows" if p.kind=="keyboard" else game.input_router.device_label(p.device) if p.device>=0 else "Reconnect your controller"
   var icon:=player_status[slot].get_parent().get_node("Icon") as TextureRect
   icon.texture=load("res://assets/ui/icons/"+("keyboard" if p.kind=="keyboard" else "wheel" if p.kind=="wheel" else "controller")+".svg")
   var problem: String=game.input_router.ready_problem(slot)
+  if game.input_router.claim_slot==slot:
+   icon.texture=load("res://assets/ui/icons/controller.svg");player_status[slot].text="PRESS A ON YOUR PAD\nB / Esc cancels";valid=false;continue
   player_status[slot].text=("Auto · " if p.preference=="auto" else "")+description+("\n"+problem if not problem.is_empty() else "\nReady to roll!")
   valid=valid and problem.is_empty()
- start_button.disabled=not valid;start_button.refresh()
+ start_button.disabled=not valid or game.input_router.claim_slot>=0;start_button.refresh()
 func start_selected() -> void:
  if starting:return
  for slot in game.human_count:
@@ -136,6 +181,7 @@ func start_selected() -> void:
  starting=true;audio.say("race");setup.sync(game)
  game.save_settings()
  await game.start_race()
+ result_reference_time=game.best_time;result_reference_session=game.session_id
  starting=false
 func open_garage(slot: int) -> void:
  setup.return_focus="Change Ride";game.selected_player_slot=slot
@@ -148,7 +194,7 @@ func restore(default_control: Control) -> void:
  default_control.grab_focus()
 func back_screen() -> void:
  if screen=="setup":game.return_menu()
- else:show_home()
+ else:game.return_menu()
 func suspend_controls() -> void:
  suspended.clear()
  for parent in [hud.menu_root,hud.modal_root]:
@@ -216,24 +262,23 @@ func show_pause() -> void:
  action(box,"How to Play",show_guide)
  action(box,"Leave Race",func():confirm("Leave this race?","This race's progress will be lost.",game.return_menu,show_pause))
 func show_settings() -> void:
- var leave: Callable=show_pause if game.paused else close_modal
- var box:=dialog("SETTINGS","Make it feel right.",leave,960)
- var scroll:=ScrollContainer.new();scroll.follow_focus=true;scroll.custom_minimum_size.y=420;box.add_child(scroll)
- var content:=VBoxContainer.new();content.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(content)
- add_slider(content,"Master volume",game.master_volume,game.set_volume)
- for bus in ["Music","Effects","UI","Voice"]:
-  var name: String=bus
-  add_slider(content,bus+" volume",float(audio.levels[bus]),func(value):audio.set_level(name,value))
- add_toggle(content,"Spoken cheers",audio.voice_enabled,audio.set_voice)
- add_toggle(content,"Fullscreen",DisplayServer.window_get_mode()==DisplayServer.WINDOW_MODE_FULLSCREEN,game.set_fullscreen)
- add_toggle(content,"Music",game.music_enabled,game.set_music)
- add_toggle(content,"Reduced Motion",game.reduced_motion,game.set_reduced_motion)
- action(box,"Back",leave).grab_focus()
+ load("res://scripts/ui/settings_screen.gd").build(self)
+
 func add_slider(parent: Node,words: String,value: float,changed: Callable) -> void:
- var row:=HBoxContainer.new();parent.add_child(row);label(row,words).custom_minimum_size.x=260
- var slider:=HSlider.new();slider.max_value=1.;slider.step=.01;slider.value=value;slider.custom_minimum_size=Vector2(400,42);slider.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(slider);slider.value_changed.connect(changed)
+ var row:=HBoxContainer.new();parent.add_child(row);label(row,words,22).custom_minimum_size.x=130
+ var slider:=HSlider.new();slider.max_value=1.;slider.step=.01;slider.value=value;slider.custom_minimum_size=Vector2(150,36);slider.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(slider)
+ var amount:=label(row,"%d%%" % roundi(value*100.),20,Color("ffc857"));amount.custom_minimum_size.x=54
+ slider.value_changed.connect(func(v):amount.text="%d%%" % roundi(v*100.);changed.call(v))
+
 func add_toggle(parent: Node,words: String,value: bool,changed: Callable) -> void:
- var toggle:=CheckButton.new();toggle.text=words;toggle.button_pressed=value;toggle.custom_minimum_size.y=52;parent.add_child(toggle);toggle.toggled.connect(changed)
+ var toggle:=CheckButton.new();toggle.text=words;toggle.button_pressed=value;toggle.custom_minimum_size.y=38;parent.add_child(toggle);toggle.toggled.connect(changed)
+func show_credits() -> void:
+ var box:=dialog("CREDITS","An independent indie project",close_modal,960)
+ label(box,"Created by L.J. Amila Prasad Perera",28,Color("ffc857"))
+ label(box,"I made Leo Racer for my son, Shaven Leo, who is six years old.",25)
+ label(box,"Built with Godot and contributions from Kenney, Rokojori and other creators. See GameAssets/licenses for full credits and license terms.",22)
+ label(box,"All third-party trademarks, names, logos and characters belong to their respective owners. No affiliation or endorsement is implied.",22)
+ action(box,"Back",close_modal,true).grab_focus()
 func show_guide() -> void:
  var leave: Callable=show_pause if game.paused else close_modal
  var box:=dialog("HOW TO PLAY","A little sideways. A lot faster.",leave,960)
@@ -260,17 +305,17 @@ func show_tracks() -> void:
  for track in game.tracks:
   var course: LeoTrackDefinition=track
   var row: HBoxContainer=load("res://scenes/ui/TrackCard.tscn").instantiate();list.add_child(row)
-  var path:="res://assets/ui/art/"+course.id+".png"
-  if not ResourceLoader.exists(path):path="res://assets/ui/art/home.png"
-  if course.metadata.has("preview") and LeoVehicleLibrary.safe_relative(String(course.metadata.preview)) and FileAccess.file_exists(course.folder.path_join(String(course.metadata.preview))):path=ProjectSettings.globalize_path(course.folder.path_join(String(course.metadata.preview)))
-  picture(row,path,Vector2(260,145))
-  var route:=LeoTrackHologram.new();route.reduced_motion=game.reduced_motion;var route_path:="res://assets/ui/icons/track_"+course.id+".svg"
-  if ResourceLoader.exists(route_path):route.texture=load(route_path)
-  elif FileAccess.file_exists(course.folder.path_join("route.svg")):route.texture=LeoAssets.texture(ProjectSettings.globalize_path(course.folder.path_join("route.svg")))
+  var path:="res://assets/ui/boot/tracks/"+course.id+"/02.png"
+  var official_art:=ResourceLoader.exists(path)
+  if not official_art:path="res://assets/ui/art/"+course.id+".png"
+  if not ResourceLoader.exists(path):path="res://assets/ui/art/lighting-skyline.png"
+  if not official_art and course.metadata.has("preview") and LeoVehicleLibrary.safe_relative(String(course.metadata.preview)) and FileAccess.file_exists(course.folder.path_join(String(course.metadata.preview))):path=ProjectSettings.globalize_path(course.folder.path_join(String(course.metadata.preview)))
+  picture(row,path,Vector2(145,145) if course.id=="wennappuwa" else Vector2(260,145))
+  var route:=LeoTrackHologram.new();route.reduced_motion=game.reduced_motion;route.set_route(course);var route_path:="res://assets/ui/icons/track_"+course.id+".svg"
   route.custom_minimum_size=Vector2(140,130);route.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;route.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;row.add_child(route)
   var details:=VBoxContainer.new();details.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(details)
   action(details,("✓ " if course.id==game.chosen_track_id else "")+course.display_name,func():choose_track(course))
-  label(details,"%.1f km · 3 laps · 6 racers" % (float(course.route.get("length",0.))/1000.),22,Color("b9c7d6"))
+  label(details,"%.1f km · %d laps · 6 racers" % [float(course.route.get("length",0.))/1000.,game.selected_laps],22,Color("b9c7d6"))
  label(box,"Map reference: © OpenStreetMap contributors / ODbL",20,Color("b9c7d6"))
  action(box,"Back",close_modal).grab_focus()
 func choose_track(track: LeoTrackDefinition) -> void:
@@ -291,17 +336,31 @@ func show_records() -> void:
 func show_results() -> void:
  close_modal(false);game.input_router.gameplay_enabled=false;screen="results";hud.scene_mode="results"
  audio.say("finish")
- var box:=shell("WHAT A RIDE!","Great race!");hud.scene_mode="results"
+ var box:=shell("RACE COMPLETE",game.track_definition.display_name+"  ·  %d LAP%s"%[game.active_laps,"" if game.active_laps==1 else "S"]);hud.scene_mode="results"
+ var results:=HBoxContainer.new();results.add_theme_constant_override("separation",20);results.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(results)
  for slot in game.human_count:
   var local: LeoLocalPlayer=game.local_players[slot];var kart:=local.kart
-  label(box,"P%d · %s     %s     %s" % [slot+1,kart.racer_name,("#%d" % game.player_place(slot)) if kart.finished else "Didn't finish",game.format_time(kart.finish_time) if kart.finished else ""],36,Color("ffc857") if game.player_place(slot)==1 else Color("f5f7fa"))
-  label(box,"Best lap · "+(game.format_time(local.best_lap) if local.best_lap<99999 else "—"),24)
+  var summary:=card(results);summary.add_theme_constant_override("separation",14)
+  var result_panel:=summary.get_parent() as PanelContainer
+  var result_style:=StyleBoxFlat.new();result_style.bg_color=Color("0b151fee");result_style.border_color=Color("49616d");result_style.set_border_width_all(1);result_style.set_corner_radius_all(12);result_style.set_content_margin_all(24);result_panel.add_theme_stylebox_override("panel",result_style)
+  var identity:=label(summary,"P%d  ·  %s"%[slot+1,kart.racer_name],28,Color("69e4ed") if slot==0 else Color("ffd078"));identity.clip_text=true;identity.autowrap_mode=TextServer.AUTOWRAP_OFF;identity.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+  label(summary,("#%d FINISH"%game.player_place(slot)) if kart.finished else "DID NOT FINISH",36,Color("ffc857") if kart.finished and game.player_place(slot)==1 else Color("f5f7fa"))
+  label(summary,"RACE TIME",20,Color("b9c7d6"))
+  label(summary,game.format_time(kart.finish_time) if kart.finished else "—",48)
+  label(summary,"Best lap  ·  "+(game.format_time(local.best_lap) if local.best_lap<99999 else "—"),24)
+  var comparison:=result_comparison(slot,kart.finished,kart.finish_time)
+  if not comparison.is_empty():label(summary,comparison,24,Color("8fe1bc") if kart.finish_time<result_reference_time else Color("c5d3df"))
  label(box,game.ranking_message.replace("OFFLINE RANKINGS","Records").replace("MODIFIED RACE / RECORDS NOT SAVED","Modded race · official records aren't saved."),22,Color("b9c7d6"))
- var spacer:=Control.new();spacer.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(spacer)
+ var spacer:=Control.new();spacer.custom_minimum_size.y=8;box.add_child(spacer)
  action(box,"Race Again   →",start_selected,true).grab_focus()
  var row:=HBoxContainer.new();box.add_child(row);action(row,"Change Race",func():show_setup());action(row,"Home",game.return_menu)
+func result_comparison(slot: int,finished: bool,finish_time: float) -> String:
+ if slot!=0 or not finished or game.race_modified or result_reference_session!=game.session_id or result_reference_time<=0:return ""
+ var delta:=finish_time-result_reference_time
+ if absf(delta)<.001:return "PERSONAL BEST MATCHED"
+ return ("PERSONAL BEST  ·  −" if delta<0 else "FROM YOUR BEST  ·  +")+game.format_time(absf(delta))
 func update_prompt() -> void:
- if is_instance_valid(prompt):prompt.text="D-pad / Stick   Move     A   Select     B   Back" if last_pad else "Arrows   Move     Enter   Select     Esc   Back"
+ if is_instance_valid(prompt):prompt.text="D-pad / Stick   Move     %s   OK     B   Back" % game.input_router.menu_confirm_label() if last_pad else "Arrows   Move     Enter   Select     Esc   Back"
 
 func verify_preview() -> void:
  var errors: Array[String]=[]
@@ -336,10 +395,13 @@ func verify_preview() -> void:
  print("UI_PACKAGE_SMOKE ",JSON.stringify(report))
  await game.quit_game(0 if errors.is_empty() else 1)
 func _input(event: InputEvent) -> void:
+ if game.input_router.claim_slot>=0 or (event is InputEventJoypadButton and game.input_router.claimed_releases.has(event.device)):
+  game.input_router.claim_event(event);return
+ if game.input_router.menu_confirm(event):last_pad=true;update_prompt();return
  if is_instance_valid(game.content_panel):return
  if is_instance_valid(game.loading) and game.loading.visible:return
  if event is InputEventJoypadButton or event is InputEventJoypadMotion:last_pad=true;update_prompt()
- elif event is InputEventKey or event is InputEventMouseMotion:last_pad=false;update_prompt()
+ elif (event is InputEventKey and not event.has_meta("controller_confirm")) or event is InputEventMouseMotion:last_pad=false;update_prompt()
  if not game.input_router.pending_binding.is_empty():
   if event.is_action_pressed("ui_cancel"):
    game.input_router.resolve_conflict("cancel")
@@ -356,7 +418,7 @@ func _input(event: InputEvent) -> void:
  if event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_START and screen=="setup" and hud.modal_root.get_child_count()==0:
   if is_instance_valid(start_button) and not start_button.disabled:start_selected()
   get_viewport().set_input_as_handled();return
- if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE):
+ if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_B):
   if modal_back.is_valid():audio.cue("back");modal_back.call()
   elif screen!="home":audio.cue("back");back_screen()
   get_viewport().set_input_as_handled()

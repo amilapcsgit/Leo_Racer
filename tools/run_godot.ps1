@@ -9,6 +9,13 @@ if (-not (Test-Path $engine) -or -not (Test-Path $sdk)) {throw 'Run Setup Colomb
 $env:DOTNET_ROOT=Split-Path $sdk -Parent
 $env:PATH=$env:DOTNET_ROOT+';'+$env:PATH
 $env:DOTNET_CLI_TELEMETRY_OPTOUT='1'
+# PowerShell consumes a literal -- when this script is called directly.
+# Recover the documented game-argument boundary for diagnostic invocations.
+if (($GameArguments -contains '--drive-test') -and -not ($GameArguments -contains '--')) {
+    $boundary=[Array]::IndexOf($GameArguments,'--drive-test')
+    $before=@();if($boundary -gt 0){$before=@($GameArguments[0..($boundary-1)])}
+    $GameArguments=@($before)+@('--')+@($GameArguments[$boundary..($GameArguments.Length-1)])
+}
 if ($GameArguments -contains '--drive-test') {
     # Diagnostics must be writable and never share the player's actual profile.
     $env:APPDATA=Join-Path $project 'build/test-userdata'

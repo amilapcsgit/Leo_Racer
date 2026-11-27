@@ -4,7 +4,7 @@ var checks:=0
 var game: Node3D
 var out := ""
 var root: Window:
- get:return get_tree().root
+	get:return get_tree().root
 func check(ok: bool,message: String) -> void:
 	checks+=1
 	if not ok:errors.append(message);push_error(message)
@@ -24,6 +24,8 @@ func run() -> void:
 		game.return_menu()
 		var selected: bool=await game.select_track(track)
 		check(selected and game.track_definition.id==track,"Requested track loads: "+track)
+		for light in game.world.find_children("*","DirectionalLight3D",true,false):
+			if light.name=="BakeSun":check(not light.shadow_enabled,"Authored baked precinct shadow state retained")
 		for humans in [1,2]:
 			game.human_count=humans;game.selected_kart=game.catalog.vehicle_index(&"bigster");game.local_players[1].vehicle_id=&"bigster"
 			await game.start_race();game.state="race";game.input_router.gameplay_enabled=true

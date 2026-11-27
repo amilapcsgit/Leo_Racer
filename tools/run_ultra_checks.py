@@ -1,0 +1,147 @@
+"""Run source/export checks with isolated profiles, real exits, and retained logs."""
+from pathlib import Path
+import argparse, json, os, re, subprocess, time, shutil
+from stage_ultra_content import ROOT, sha
+TESTS={
+    'grass_bake':('tools/bake_astra_grass.gd',None),
+    'grass_pilot':('tests/grass_pilot.gd',None),
+    'road_corridor280':('tests/road_corridor280_probe.gd',None),
+    'streamer_lifecycle280':('tests/streamer_lifecycle280_test.gd',None),
+    'teardown280':('tests/teardown280_test.gd',None),
+    'ai280':('tests/ai280_test.gd',None),
+    'environment280':('tests/environment280_test.gd',None),
+    'tire280':('tests/tire280_test.gd',None),
+    'finish_order280':('tests/finish_order280_test.gd',None),
+    'swap_width280':('tests/swap_width280_test.gd',None),
+    'tile280_profile':('tests/tile280_profile.gd',None),
+    'audio279':('tests/audio279_test.gd',None),
+    'game_logic279':('tests/game_logic279_test.gd',None),
+    'mirrors279':('tests/mirrors279_test.gd',None),
+    'wheels279':('tests/wheels279_test.gd',None),
+    'cockpit279':('tools/check_cockpit279.gd',None),
+    'world279':('tests/render_world279_test.gd',None),
+    'ui279':('tests/ui279_test.gd',None),
+    'render279':('tests/render_polish279_test.gd',None),
+    'gallery279':('tests/gallery279_test.gd',None),
+    'speedometer':('tests/release278_test.gd','--ultra-check=release278'),
+    'loading':('tests/loading_controls278_test.gd',None),
+    'refinements':('tests/refinements278_test.gd',None),
+    'release278':('tests/release278_test.gd',None),
+    'unit':('tests/release278_test.gd','--ultra-check=release278'),
+    'capture':('tests/release260_collision_test.gd','--ultra-check=contacts'),
+    'input':('tests/local_input_test.gd',None),
+    'ranking':('tests/local_ranking_test.gd',None),
+    'race':('tests/local_race_test.gd',None),
+    'finish':('tests/ultra_finish_test.gd',None),
+    'ui':('tests/release26_ui_test.gd','--release-ui-check'),
+    'polish':('tests/release26_polish_test.gd','--release-polish-check'),
+    'content':('tests/release260_content_test.gd','--release-content-check'),
+    'garage':('tests/release260_runtime_test.gd',None),
+    'previews':('tests/ultra_preview_test.gd',None),
+    'impact':('tests/lighting_world_test.gd',None),
+    'core':('tests/ultra_core_test.gd',None),
+    'visual':('tests/ultra_visual_test.gd',None),
+    'physics':('tests/ultra_physics_test.gd',None),
+    'contacts':('tests/release260_collision_test.gd',None),
+    'audit':('tests/release260_collision_test.gd',None),
+}
+CORE280_VALIDATION_KINDS = ['tile280_profile', 'ai280', 'tire280', 'finish_order280', 'swap_width280',
+                          'core', 'physics', 'contacts', 'input', 'ranking', 'race', 'finish', 'audio279', 'teardown280']
+CORE280_NATIVE_VALIDATION_KINDS = ['tire280', 'finish_order280', 'swap_width280', 'core', 'physics',
+                                 'contacts', 'input', 'ranking', 'race', 'finish', 'audio279', 'teardown280']
+def run(kind,compat=False,export=None,extra=()):
+    if export:export=Path(export).resolve()
+    renderer='compatibility' if compat else 'forward'
+    label=('export-' if export else 'source-')+kind+'-'+renderer
+    if kind == 'grass_bake':
+        track = next((arg.split('=', 1)[1] for arg in extra if arg.startswith('--track=')), 'astra_coast')
+        if track not in ('astra_coast', 'colombo_city', 'kandy_lake', 'wennappuwa'):
+            raise ValueError('Unsupported grass bake track')
+        label += '-' + track
+    out=ROOT/'build'/('qa'+re.search(r'config/version="([^"]+)"',(ROOT/'project.godot').read_text(encoding='utf-8')).group(1).replace('.',''))/label;out.mkdir(parents=True,exist_ok=True)
+    profile=out/'profile';profile.mkdir(exist_ok=True)
+    env=os.environ.copy();env.update(APPDATA=str(profile),LOCALAPPDATA=str(profile))
+    assets=Path(export)/'GameAssets' if export else ROOT/'build/content-baseline/GameAssets'
+    env['LEO_ASSET_ROOT']=str(assets)
+    script,switch=TESTS[kind]
+    if kind=='ai280' and not export:
+        original_ai=subprocess.check_output(['git','show','954733d:scripts/local/race_ai.gd'],cwd=ROOT,text=True)
+        original_ai=original_ai.replace('class_name LeoRaceAI\n','',1).replace('extends RefCounted\n','extends RefCounted\nvar qa_obstacle_queries := 0\n',1)
+        original_ai=original_ai.replace('func obstacle_distance(kart: LeoKart, candidate: float) -> float:\n','func obstacle_distance(kart: LeoKart, candidate: float) -> float:\n\tqa_obstacle_queries += 1\n',1)
+        ai_fixture=out/'original_ai.gd.txt'
+        ai_fixture.write_text(original_ai,encoding='utf-8')
+        extra=tuple(extra)+('--qa-baseline-ai='+str(ai_fixture),)
+    if kind=='tile280_profile' and not export:
+        original=subprocess.check_output(['git','show','954733d:scripts/racing/track_environment.gd'],cwd=ROOT,text=True)
+        fixture=out/'original_track_environment.gd.txt'
+        fixture.write_text(original.replace('class_name LeoTrackEnvironment\n','',1),encoding='utf-8')
+        extra=tuple(extra)+('--qa-baseline-script='+str(fixture),)
+        original_circuit=subprocess.check_output(['git','show','954733d:scripts/circuit.gd'],cwd=ROOT,text=True)
+        circuit_fixture=out/'original_circuit.gd.txt'
+        circuit_fixture.write_text(original_circuit.replace('class_name LeoCircuit\n','',1),encoding='utf-8')
+        extra=tuple(extra)+('--qa-baseline-circuit='+str(circuit_fixture),)
+    if export:
+        command=[str(Path(export)/'LeoRacer.console.exe')]
+        env['DOTNET_ROOT']=str(profile/'no-sdk')
+        env['PATH']=os.pathsep.join(p for p in env['PATH'].split(os.pathsep) if not any(word in p.lower() for word in ['dotnet','.tools']))
+        # Native template probes enter through the opt-in bootstrap path.
+    else:
+        engine=ROOT/'.tools/godot/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe'
+        if not engine.exists():engine=ROOT.parent.parent/'tools/godot-net/Godot_v4.7.2-stable_mono_win64/Godot_v4.7.2-stable_mono_win64_console.exe'
+        sdk=ROOT/'.tools/dotnet'
+        if not sdk.exists():sdk=ROOT.parent.parent/'tools/dotnet'
+        env['DOTNET_ROOT']=str(sdk);env['PATH']=str(sdk)+os.pathsep+env['PATH']
+        command=[str(engine),'--path',str(ROOT),'--script','res://'+script]
+    render=kind in ['grass_pilot','physics','contacts','race','teardown280','tire280','environment280','mirrors279','world279','cockpit279','ui279','speedometer','loading','refinements','capture','release278','ui','polish','garage','visual','previews','impact','finish']
+    command+=['--position','-3200,-3200'] if render else ['--headless']
+    if compat:command+=['--rendering-method','gl_compatibility','--rendering-driver','opengl3']
+    command+=['--','--drive-test','--track=astra_coast','--vehicles='+str(assets/'vehicles'),'--qa-output='+str(out)]
+    if not any(arg.startswith('--tracks=') for arg in extra):
+        command.append('--tracks='+str(assets/'tracks'))
+    if export:command.append(switch if switch else '--ultra-check='+kind)
+    if kind in ['contacts','audit']:command.append('--quality25-mode='+kind)
+    if kind=='capture':command.append('--quality25-mode=capture')
+    if kind=='speedometer':command+=['--speedometer-only','--hud-diagnostics']
+    if kind=='unit':command.append('--unit-only')
+    if kind=='garage':command.append('--no-captures')
+    if kind=='impact':command.append('--impact-only')
+    command.extend(extra)
+    started=time.monotonic()
+    with (out/'process.log').open('w',encoding='utf-8') as log:
+        process=subprocess.Popen(command,cwd=Path(export) if export else ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+        code=None
+        while process.poll() is None:
+            time.sleep(.5)
+            current=(out/'process.log').read_text(encoding='utf-8',errors='replace')
+            if any(term in current for term in ['SCRIPT ERROR','Parse Error','Corrupted header']) or time.monotonic()-started>1800:
+                process.kill()
+                code=-998;break
+        actual=process.wait()
+        if code is None:code=actual
+    text=(out/'process.log').read_text(encoding='utf-8',errors='replace')
+    # Report renderer shutdown texture diagnostics separately from test errors.
+    engine_texture=lambda line: bool(re.fullmatch(
+        r"ERROR: (?:Texture with GL ID of \d+: leaked \d+ bytes\.|\d+ RID allocations of type 'PN13RendererDummy14TextureStorage12DummyTextureE' were leaked at exit\.)",line))
+    errors=[line for line in text.splitlines() if not engine_texture(line) and any(term in line for term in ['ERROR:','SCRIPT ERROR','Parse Error','Shader compilation failed','No loader found for resource','CONTENT_VALIDATION_FAILED','CrashHandlerException','Corrupted header',"Couldn't load project data"])]
+    failed=bool(re.search(r'"status"\s*:\s*"FAIL"',text))
+    if kind=='environment280':
+        result_path=out/'environment280.json'
+        if not result_path.exists() or json.loads(result_path.read_text(encoding='utf-8')).get('errors'):
+            errors.append('Expected environment report missing or contains failures')
+    elif not re.search(r'"status"\s*:\s*"PASS"',text):errors.append('Expected test PASS report missing')
+    warnings=[line for line in text.splitlines() if any(term in line for term in ['leaked','resources still in use','Pages in use'])]
+    error_count=len(errors)
+    errors=list(dict.fromkeys(errors))
+    report={'status':'PASS' if code==0 and not errors and not failed else 'FAIL','exit_code':code,'seconds':round(time.monotonic()-started,2),'errors':errors,'error_count':error_count,'shutdown_warnings':list(dict.fromkeys(warnings)),'sdk_removed':bool(export)}
+    if export:report['core_sha256']=sha(Path(export)/'LeoRacer.pck')
+    if kind=='speedometer':
+        launch=next((str(arg).split('=',1)[1] for arg in extra if str(arg).startswith('--launch=')),'1')
+        for diagnostic in profile.rglob('speedometer-diagnostics.jsonl'):
+            shutil.copy2(diagnostic,out/('launch-'+launch+'-display-diagnostics.jsonl'))
+    (out/'process.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+    print('ULTRA_CHECK',label,json.dumps(report),flush=True)
+    if report['status']!='PASS':print('\n'.join(text.splitlines()[-25:]),flush=True)
+    return report['status']=='PASS'
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('kind',choices=TESTS);parser.add_argument('--compatibility',action='store_true');parser.add_argument('--export',type=Path);args,extra=parser.parse_known_args()
+    raise SystemExit(0 if run(args.kind,args.compatibility,args.export,extra) else 1)

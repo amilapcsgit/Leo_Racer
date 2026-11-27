@@ -8,7 +8,8 @@ var target := 0.
 var reduced_motion := false
 var motion: Tween
 func _ready() -> void:
- custom_minimum_size=Vector2(200,18);mouse_filter=MOUSE_FILTER_IGNORE;add_to_group("ui_fx_tick")
+ if custom_minimum_size==Vector2.ZERO:custom_minimum_size=Vector2(200,18)
+ mouse_filter=MOUSE_FILTER_IGNORE;add_to_group("ui_fx_tick")
 func set_value(value: float) -> void:
  var next:=clampf(value,0.,1.)
  if is_equal_approx(target,next):return

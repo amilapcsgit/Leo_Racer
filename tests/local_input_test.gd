@@ -17,7 +17,8 @@ func run() -> void:
  check(router.assign(1,"keyboard",-1,false),"Shared keyboard assignment is allowed")
  router.assign(1,"gamepad",18,false)
  check(router.assign(0,"gamepad",17,false),"First controller assignment")
- check(not router.assign(1,"gamepad",17,false),"No duplicate device ownership")
+ check(router.assign(1,"gamepad",17,false) and router.players[0].device!=17,"Occupied device transfers ownership without duplicates")
+ router.assign(1,"gamepad",18,false);router.assign(0,"gamepad",17,false)
  router.feed(axis(17,JOY_AXIS_LEFT_X,.9));check(router.players[0].steering()>.8 and router.players[1].steering()==0.,"P1 steering isolation")
  router.feed(axis(18,JOY_AXIS_TRIGGER_RIGHT,.8));check(router.players[1].throttle()>.7 and router.players[0].throttle()==0.,"P2 throttle isolation")
  router.feed(axis(19,JOY_AXIS_TRIGGER_RIGHT,1.));check(router.players[0].throttle()==0.,"Unassigned pad ignored")
@@ -72,6 +73,10 @@ func run() -> void:
  panel.free()
  var report:={"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"errors":failures,"physical_wheel":"unverified / hardware unavailable"}
  DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://build/qa-ui"))
- FileAccess.open("res://build/qa-ui/input.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/input"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("input.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_INPUT_TEST ",report)
  router.free();quit(0 if failures.is_empty() else 1)

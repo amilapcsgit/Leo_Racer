@@ -1,0 +1,283 @@
+{
+  "aqua": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "bigster": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "blue": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "byd_yangwang_u8": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "colombo_tuk": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "coral": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "cyberpunk": {
+    "decision": "repair",
+    "reason": "Reviewed matte body or opaque/metallic/frosted window surface",
+    "targets": [
+      {
+        "node": "Body_gameasset_GL_basic_Glass material_0_part_1",
+        "surface": 0,
+        "material": "GL_basic_Glass_material",
+        "role": "glass"
+      }
+    ]
+  },
+  "duster": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "formula_blue": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "formula_red": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "hover": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_1937_auto_union_type_c_streamliner": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_1968_volkswagen_beetle": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_1985_delorean_dmc_12_time_machine_bttf": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_1989_lamborghini_countach_25th_anniversary": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_1999_nissan_skyline_gtr_r34_c_west_2f2f": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2004_porsche_carrera_gt": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2013_chevrolet_corvette_z06": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2013_equipped_jeep_wrangler_unlimited_rubicon": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2019_ford_mustang_rtr_spec5_10th_anniversary": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2020_ferrari_roma": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2020_jeep_gladiator": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2020_lbworks_toyota_supra_a90_ver_2": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2021_pininfarina_teorema_concept": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2022_bmw_g82_m4_adro_carbon_fiber_widebody_kit": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2022_mclaren_765lt": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2023_ferrari_sf90_xx_stradale": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2024_byd_atto_2": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2024_byd_atto_3": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_2024_byd_seal": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_chevrolet_cruze_ltz": {
+    "decision": "repair",
+    "reason": "Reviewed matte body or opaque/metallic/frosted window surface",
+    "targets": [
+      {
+        "node": "CustomCar/Body",
+        "surface": 8,
+        "material": "cruze_window",
+        "role": "glass"
+      },
+      {
+        "node": "CustomCar/Body",
+        "surface": 9,
+        "material": "cruze_glass",
+        "role": "glass"
+      }
+    ]
+  },
+  "import_dacia_duster_low_poly": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_dacia_duster_widebody_highpoly": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_escapamento_carro_da_barbie_1956": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_fiat_500_x_outlaw": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_future_car": {
+    "decision": "repair",
+    "reason": "Reviewed matte body or opaque/metallic/frosted window surface",
+    "targets": [
+      {
+        "node": "Body",
+        "surface": 1,
+        "material": "glass",
+        "role": "glass"
+      }
+    ]
+  },
+  "import_hiluxbf": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_mclaren_f1_1993_by_alex_ka": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_pininfarina_h2_speed": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_toyota_kijang_innova_zenix_2023_highpoly": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "import_toyota_landcruiser_v8_2022": {
+    "decision": "repair",
+    "reason": "Reviewed matte body or opaque/metallic/frosted window surface",
+    "targets": [
+      {
+        "node": "Body",
+        "surface": 22,
+        "material": "White",
+        "role": "paint"
+      }
+    ]
+  },
+  "import_valentines_day_car": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "mclaren": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "pink": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "pony": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "race_bus": {
+    "decision": "repair",
+    "reason": "Reviewed matte body or opaque/metallic/frosted window surface",
+    "targets": [
+      {
+        "node": "body",
+        "surface": 2,
+        "material": "glass",
+        "role": "glass"
+      }
+    ]
+  },
+  "race_tuk": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  },
+  "roadster_gold": {
+    "decision": "preserve",
+    "reason": "Preserve authored PBR/textured or intentional stylized surfaces",
+    "targets": []
+  }
+}

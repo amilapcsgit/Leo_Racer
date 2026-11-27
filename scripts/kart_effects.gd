@@ -5,16 +5,28 @@ var kart: LeoKart
 var smoke: Array[GPUParticles3D] = []
 var impact_sparks: GPUParticles3D
 var heat: Array[MeshInstance3D] = []
-var marks: Array[MeshInstance3D] = []
+var marks: Array[Node3D] = []
+var decal_backend := false
+var wind: LeoDraftingWind
 var mark_cursor := 0
 var mark_timer := 0.0
 var previous := Vector3.ZERO
 var elapsed := 0.0
 var ribbons: Array[GPUParticles3D] = []
+var contact_audio
+var scrape_audio
+var scrape_level:=0.0
+var contact_shadows: Array[MeshInstance3D]=[]
+var ground_contacts: Array[Dictionary]=[]
+var shadow_timer:=0.0
+var contact_ramps: Dictionary={}
 var trace_material: StandardMaterial3D
 
 func setup(owner_kart: LeoKart) -> void:
 	kart = owner_kart
+	decal_backend=false # Surface-aligned meshes work consistently in both renderers.
+	if kart.is_player:
+		wind=LeoDraftingWind.new();add_child(wind);wind.setup(kart)
 	for slot in kart.exhaust_positions.size():
 		var ribbon := GPUParticles3D.new()
 		ribbon.amount = 6
@@ -117,27 +129,51 @@ func setup(owner_kart: LeoKart) -> void:
 	impact_sparks.explosiveness = 1.0
 	impact_sparks.lifetime = .35
 	impact_sparks.local_coords = false
-	kart.impacted.connect(_impact)
+	impact_sparks.top_level=true
+	for surface in ["paint","concrete","dirt"]:
+		var tint:=Color("ffcc75") if surface=="paint" else (Color("856448") if surface=="dirt" else Color("c0b3a0"))
+		var gradient:=Gradient.new();gradient.set_color(0,Color(tint,1.));gradient.set_color(1,Color(tint,0.))
+		var ramp:=GradientTexture1D.new();ramp.gradient=gradient;contact_ramps[surface]=ramp
+	kart.contact_reported.connect(_contact)
+	# Local impacts share the existing per-player panner/reverb bus and stay
+	# audible when the split-screen cameras are far apart. Rivals remain spatial.
+	scrape_audio=AudioStreamPlayer.new() if kart.is_player else AudioStreamPlayer3D.new()
+	contact_audio=AudioStreamPlayer.new() if kart.is_player else AudioStreamPlayer3D.new()
+	scrape_audio.stream=load("res://assets/audio/racing278/scrape.ogg");contact_audio.stream=load("res://assets/audio/racing278/impact.ogg")
+	var bus:=kart.motor_audio.bus_name if kart.motor_audio else "Effects"
+	scrape_audio.bus=bus;contact_audio.bus=bus;scrape_audio.volume_db=-70.
+	if not kart.is_player:
+		for player in [scrape_audio,contact_audio]:player.max_distance=45.;player.unit_size=4.
+	add_child(scrape_audio);add_child(contact_audio)
 	kart.recovered.connect(_recover)
 	var material := StandardMaterial3D.new()
-	material.albedo_color = Color("217b83")
-	material.emission_enabled = true
+	material.albedo_color = Color("141917")
+	material.emission_enabled = false
 	material.emission = Color("00b5c5")
 	material.emission_energy_multiplier = 1.4
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	trace_material = material
-	for i in range(64 if kart.is_player else 20):
-		var mark := MeshInstance3D.new()
-		var mesh := BoxMesh.new()
-		mesh.size = Vector3(.13,.006,.8)
-		mark.mesh = mesh
-		mark.material_override = material
-		mark.top_level = true
-		mark.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-		mark.visible = false
-		mark.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(mark)
-		marks.append(mark)
+	var mark_image:=Image.create(16,64,false,Image.FORMAT_RGBA8)
+	mark_image.fill(Color(0,0,0,0))
+	for x in range(2,14):
+		for y in range(2,62):mark_image.set_pixel(x,y,Color(.035,.04,.035,.65 if x>3 and x<12 else .25))
+	var mark_texture:=ImageTexture.create_from_image(mark_image)
+	for i in range(42):
+		var mark: Node3D
+		if decal_backend:
+			var decal:=Decal.new();decal.texture_albedo=mark_texture;decal.size=Vector3(.16,.05,.8)
+			decal.albedo_mix=1.;decal.normal_fade=.6;decal.distance_fade_enabled=true;decal.distance_fade_begin=35.;decal.distance_fade_length=10.;mark=decal
+		else:
+			var mesh_mark:=MeshInstance3D.new();var mesh:=BoxMesh.new();mesh.size=Vector3(.22,.008,.8)
+			mesh_mark.mesh=mesh;mesh_mark.material_override=material;mesh_mark.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;mark=mesh_mark
+		mark.top_level=true;mark.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;mark.visible=false
+		if not LeoContactBudget.reserve_mark(mark):mark.free();break
+		add_child(mark);marks.append(mark)
+	for wheel in kart.wheel_steering_pivots:
+		var shadow:=MeshInstance3D.new();var quad:=QuadMesh.new();quad.size=Vector2(.7,1.05)
+		shadow.mesh=quad;shadow.top_level=true;shadow.physics_interpolation_mode=Node.PHYSICS_INTERPOLATION_MODE_OFF;shadow.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var shade:=ShaderMaterial.new();shade.shader=preload("res://shaders/tire_contact_shadow.gdshader");shadow.material_override=shade
+		add_child(shadow);contact_shadows.append(shadow);ground_contacts.append({})
 	previous = kart.global_position
 	for flame in kart.flames:
 		var cone := CylinderMesh.new()
@@ -156,20 +192,54 @@ func setup(owner_kart: LeoKart) -> void:
 func _process(dt: float) -> void:
 	if not is_instance_valid(kart): return
 	elapsed += dt
+	scrape_level=move_toward(scrape_level,0.,dt*5.)
+	if scrape_audio.stream:
+		scrape_audio.volume_db=linear_to_db(maxf(.0001,scrape_level)) - 18.
+		if scrape_level>.01 and not scrape_audio.playing:scrape_audio.play()
+		elif scrape_level<=.01:scrape_audio.stop()
 	previous = kart.global_position
+	shadow_timer-=dt
+	for i in contact_shadows.size():
+		var origin:=kart.wheel_steering_pivots[i].global_position
+		if shadow_timer<=0.:
+			var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*.8,origin-Vector3.UP*2.5,1)
+			ground_contacts[i]=kart.get_world_3d().direct_space_state.intersect_ray(query)
+		var hit: Dictionary=ground_contacts[i];var shadow:=contact_shadows[i]
+		shadow.visible=not hit.is_empty() and absf((origin-hit.position).dot(hit.normal))<1.5
+		if shadow.visible:
+			var normal: Vector3=hit.normal
+			var position_on_ground: Vector3=origin-normal*(origin-hit.position).dot(normal)+normal*.009
+			var x:=kart.global_basis.x.slide(normal).normalized()
+			shadow.global_transform=Transform3D(Basis(x,normal.cross(x).normalized(),normal),position_on_ground)
+	if shadow_timer<=0.:shadow_timer=.1
 	# The displacement-derived physics speed stays stable between rendered frames.
-	var moving := absf(kart.wheel_motion_speed)>4.0
+	var moving := absf(kart.wheel_motion_speed)>1.0
+	var braking:=((kart.control_input.value("brake")>.6 and kart.wheel_motion_speed>4.) or (kart.control_input.value("accelerate")>.6 and kart.wheel_motion_speed< -4.)) if kart.control_input else kart.prepared_throttle<-.6 and kart.wheel_motion_speed>4.
+	var lateral_slip:=absf(kart.velocity.dot(kart.global_basis.x))>2.2 or (absf(kart.steer)>.38 and absf(kart.wheel_motion_speed)>13.)
+	var wheelspin:=kart.rev_throttle>.7 and absf(kart.wheel_motion_speed)>.4 and absf(kart.wheel_motion_speed)<5.
+	var slipping:=(kart.drifting and moving) or (braking and moving) or lateral_slip or wheelspin
+	kart.tire_slipping=slipping and kart.grounded and kart.active
 	var camera:=get_viewport().get_camera_3d()
 	var near := kart.is_player or (is_instance_valid(camera) and camera.global_position.distance_to(kart.global_position)<55)
-	for emitter in smoke: emitter.emitting = kart.drifting and moving and kart.active and near
+	for i in smoke.size():
+		var emitter:=smoke[i]
+		var origin:=kart.visual.global_transform*kart.rear_tire_positions[i]
+		var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*.8,origin-Vector3.UP*2.,1)
+		var hit:=kart.get_world_3d().direct_space_state.intersect_ray(query)
+		emitter.emitting=kart.grounded and slipping and kart.active and near and not hit.is_empty()
+		if not hit.is_empty():
+			var normal: Vector3=hit.normal
+			var forward:=(-kart.global_basis.z).slide(normal).normalized()
+			emitter.global_transform=Transform3D(Basis.looking_at(forward,normal),hit.position+normal*.04)
 	var charge_color := Color("00b9d4").lerp(Color("ffae36"),smoothstep(.65,2.5,kart.drift_charge))
 	trace_material.emission = charge_color
 	for spark in kart.tire_sparks:
-		spark.emitting = kart.drifting and moving and kart.active and near and kart.drift_charge>.3
+		spark.emitting = kart.grounded and kart.drifting and moving and kart.active and near and kart.drift_charge>.3
 		(spark.draw_pass_1.material as StandardMaterial3D).emission = charge_color
 	var gain := 1.0 if kart.boost_time>0 and kart.active else 0.0
 	if kart.is_player and kart.get_parent().get("feedback"):
-		gain = kart.get_parent().feedback.get_boost_gain() if kart.active else 0.0
+		var feedback=kart.get_parent().local_players[kart.local_slot].feedback
+		gain = feedback.get_boost_gain() if feedback and kart.active else 0.0
 	for item in heat:
 		item.visible = gain>0 and near
 		item.material_override.set_shader_parameter("gain",gain)
@@ -182,27 +252,56 @@ func _process(dt: float) -> void:
 		material.emission = Color("9effdd").lerp(Color("00e4ff"),.5+.4*sin(elapsed*22)) if electric else Color("ffad38").lerp(Color("20dfff"),.55+.35*sin(elapsed*18))
 		if electric: flame.scale.z=.55+gain*.35
 	mark_timer -= dt
-	if kart.drifting and moving and kart.active and near and mark_timer<=0:
+	if not marks.is_empty() and kart.grounded and slipping and kart.active and near and mark_timer<=0:
 		mark_timer = .045
 		for tire in kart.rear_tire_positions:
 			var mark := marks[mark_cursor]
 			mark_cursor = (mark_cursor+1)%marks.size()
-			mark.global_position = kart.visual.global_transform*tire
-			mark.global_position.y = .075
-			mark.rotation = Vector3(0,kart.rotation.y+kart.visual.rotation.y,0)
-			(mark.mesh as BoxMesh).size.z = maxf(.8,absf(kart.wheel_motion_speed)*.065)
-			mark.set_meta("expires",elapsed+.9)
+			var origin:=kart.visual.global_transform*tire
+			var query:=PhysicsRayQueryParameters3D.create(origin+Vector3.UP*1.5,origin-Vector3.UP*3.,1)
+			var hit:=kart.get_world_3d().direct_space_state.intersect_ray(query)
+			if hit.is_empty():mark.visible=false;continue
+			var up: Vector3=hit.normal
+			var forward:=(-kart.global_basis.z).slide(up).normalized()
+			mark.global_transform=Transform3D(Basis.looking_at(forward,up),hit.position+up*.012)
+			if mark is Decal:mark.size.z=maxf(.8,absf(kart.wheel_motion_speed)*.065)
+			else:(mark.mesh as BoxMesh).size.z=maxf(.8,absf(kart.wheel_motion_speed)*.065)
+			mark.set_meta("expires",elapsed+24.)
 			mark.visible = true
 	for mark in marks:
 		if mark.visible and elapsed>float(mark.get_meta("expires",0)): mark.visible = false
 
-func _impact(_kart: LeoKart, point: Vector3, _normal: Vector3, _strength: float) -> void:
-	impact_sparks.global_position = point+Vector3.UP*.35
-	impact_sparks.restart()
+func _contact(event: Dictionary) -> void:
+	if event.phase=="scrape":scrape_level=clampf(event.tangent_speed/35.,0.,.65)
+	if event.phase!="impact" and event.tangent_speed<5.:return
+	if event.phase=="scrape" and impact_sparks.emitting:return
+	var strength:=clampf(event.normal_speed/35.,.1,1.)
+	impact_sparks.global_position=event.point+event.normal*.03
+	var process:=impact_sparks.process_material as ParticleProcessMaterial
+	process.direction=event.normal
+	process.initial_velocity_min=1.+strength*2.;process.initial_velocity_max=3.+strength*7.
+	var paint: bool=event.surface in ["paint","metal"]
+	process.color=Color("ffcc75") if paint else (Color("856448") if event.surface in ["dirt","grass"] else Color("c0b3a0"))
+	process.scale_min=.4 if paint else 2.;process.scale_max=.9 if paint else 5.
+	process.color_ramp=contact_ramps["paint" if paint else ("dirt" if event.surface in ["dirt","grass"] else "concrete")];process.color=Color.WHITE
+	var material: StandardMaterial3D=impact_sparks.draw_pass_1.material
+	material.emission_energy_multiplier=2.4 if paint else 0.
+	process.gravity=Vector3(0,-7.,0) if paint else Vector3(0,.3,0)
+	impact_sparks.amount_ratio=strength
+	LeoContactBudget.emit(impact_sparks)
+	if event.phase=="impact":
+		contact_audio.volume_db=-22.+strength*10.;contact_audio.play()
 
 func _recover(_kart: LeoKart) -> void:
+	if wind:wind.reset()
+	stop_contact_audio()
 	for mark in marks: mark.visible = false
 	for emitter in smoke: emitter.restart(); emitter.emitting=false
 	for trail in kart.exhaust_trails: trail.restart(); trail.emitting=false
 	for ribbon in ribbons: ribbon.restart(); ribbon.emitting=false
 	previous = kart.global_position
+
+func stop_contact_audio() -> void:
+	scrape_level=0.
+	if scrape_audio:scrape_audio.stop()
+	if contact_audio:contact_audio.stop()

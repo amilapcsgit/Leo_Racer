@@ -8,6 +8,8 @@ var refresh_button: Button
 var refreshing := false
 var refreshed_at := ""
 var browser: FileDialog
+var browser_open := false
+var browser_dismissed_until := 0
 var returning := false
 
 func _ready() -> void:
@@ -17,9 +19,9 @@ func _ready() -> void:
 	var margin:=MarginContainer.new();margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+side,32)
 	panel.add_child(margin);var box:=VBoxContainer.new();margin.add_child(box)
-	var title:=Label.new();title.text="CONTENT / VEHICLES";title.add_theme_font_size_override("font_size",38);box.add_child(title)
+	var title:=Label.new();title.text="CONTENT / VEHICLES";title.add_theme_font_size_override("font_size",44);box.add_child(title)
 	status=Label.new();status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;box.add_child(status)
-	var buttons:=HBoxContainer.new();box.add_child(buttons)
+	var buttons:=HFlowContainer.new();box.add_child(buttons)
 	refresh_button=button(buttons,"Refresh Content",refresh);refresh_button.grab_focus()
 	button(buttons,"Import GLB…",browse_glb)
 	button(buttons,"Vehicle Workshop",func():launch_workshop(""))
@@ -28,11 +30,21 @@ func _ready() -> void:
 	var scroll:=ScrollContainer.new();scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL;box.add_child(scroll)
 	list=VBoxContainer.new();list.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(list)
 	populate()
-	browser=FileDialog.new();browser.title="Import vehicle GLB";browser.access=FileDialog.ACCESS_FILESYSTEM;browser.file_mode=FileDialog.FILE_MODE_OPEN_FILE;browser.filters=PackedStringArray(["*.glb ; glTF binary model"]);browser.use_native_dialog=true;browser.file_selected.connect(setup_glb);add_child(browser)
+	browser=FileDialog.new();browser.theme=panel.theme;browser.title="Import vehicle GLB";browser.access=FileDialog.ACCESS_FILESYSTEM;browser.file_mode=FileDialog.FILE_MODE_OPEN_FILE;browser.filters=PackedStringArray(["*.glb ; glTF binary model"]);browser.use_native_dialog=true;add_child(browser)
+	browser.file_selected.connect(func(path: String):dismiss_browser();setup_glb(path))
+	browser.canceled.connect(dismiss_browser)
 
 func browse_glb() -> void:
 	if refreshing:return
+	browser_open=true
 	browser.popup_centered_ratio(.8)
+
+func dismiss_browser() -> void:
+	browser_open=false
+	# Native dialogs do not reliably set Window.visible, and Windows may deliver
+	# the closing Escape to the owner after its cancellation callback.
+	browser_dismissed_until=Time.get_ticks_msec()+250
+	refresh_button.grab_focus()
 
 func close() -> void:
 	if returning:return
@@ -44,7 +56,7 @@ func close() -> void:
 	else:game.quit_game()
 
 func _input(event: InputEvent) -> void:
-	if not visible or returning or (browser and browser.visible):return
+	if not visible or returning or browser_open or Time.get_ticks_msec()<browser_dismissed_until or (browser and browser.visible):return
 	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.physical_keycode==KEY_ESCAPE):
 		get_viewport().set_input_as_handled();close()
 
@@ -57,10 +69,10 @@ func populate() -> void:
 	status.text+="\nVehicles folder: "+LeoVehicleLibrary.default_root()+("\nRefreshed "+refreshed_at if not refreshed_at.is_empty() else "")
 	for entry in LeoVehicleLibrary.entries:
 		var row:=HBoxContainer.new();list.add_child(row)
-		var text:=Label.new();text.text=entry.display_name+(" / official" if entry.official else " / modded");text.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(text)
+		var text:=Label.new();text.text=entry.display_name+(" / official" if entry.official else " / modded");text.size_flags_horizontal=Control.SIZE_EXPAND_FILL;text.custom_minimum_size=Vector2(240,48);text.clip_text=true;text.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;row.add_child(text)
 		button(row,"Set Up Vehicle",func():edit_vehicle(entry))
 	for path in LeoVehicleLibrary.pending:
-		var row:=HBoxContainer.new();list.add_child(row);var text:=Label.new();text.text=path.get_file()+" / Needs Setup";text.size_flags_horizontal=Control.SIZE_EXPAND_FILL;row.add_child(text)
+		var row:=HBoxContainer.new();list.add_child(row);var text:=Label.new();text.text=path.get_file()+" / Needs Setup";text.size_flags_horizontal=Control.SIZE_EXPAND_FILL;text.custom_minimum_size=Vector2(240,48);text.clip_text=true;text.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;row.add_child(text)
 		button(row,"Set Up Vehicle",func():setup_glb(path))
 	for item in LeoVehicleLibrary.unavailable:
 		var text:=Label.new();text.text=item.folder+" / "+item.reason;text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;list.add_child(text)

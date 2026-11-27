@@ -6,9 +6,9 @@ varying vec3 world;
 void vertex(){world=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;}
 void fragment(){
  vec2 uv=world.xz/1.5;
- ALBEDO=texture(color_map,uv).rgb*.42;
- ROUGHNESS=clamp(texture(rough_map,uv).r*.3+.5,.65,.85);
+ ALBEDO=texture(color_map,uv).rgb*.58;
+ ROUGHNESS=clamp(texture(rough_map,uv).r*.3+.45,.55,.80);
  NORMAL_MAP=texture(normal_map,uv).rgb;
  NORMAL_MAP_DEPTH=.25;
- SPECULAR=.15;
+ SPECULAR=.30;
 }

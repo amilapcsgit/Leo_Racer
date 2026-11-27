@@ -65,15 +65,15 @@ func _ready() -> void:
 	var floor_node:=MeshInstance3D.new();var floor_mesh:=PlaneMesh.new();floor_mesh.size=Vector2(250,250);floor_node.mesh=floor_mesh;studio.add_child(floor_node)
 	var floor_material:=StandardMaterial3D.new();floor_material.albedo_color=Color("273e4c");floor_node.material_override=floor_material
 	var ground:=StaticBody3D.new();var shape:=CollisionShape3D.new();var slab:=BoxShape3D.new();slab.size=Vector3(250,1,250);shape.shape=slab;shape.position.y=-.5;ground.add_child(shape);studio.add_child(ground)
-	var controls:=HBoxContainer.new();right.add_child(controls)
+	var controls:=HFlowContainer.new();right.add_child(controls)
 	button(controls,"Orbit ◀",func():yaw-=.35;position_camera());button(controls,"Orbit ▶",func():yaw+=.35;position_camera())
 	var spin_toggle:=CheckButton.new();spin_toggle.text="Spin";spin_toggle.toggled.connect(func(value):spin=value);controls.add_child(spin_toggle)
 	var steer_toggle:=CheckButton.new();steer_toggle.text="Steer";steer_toggle.toggled.connect(func(value):steering=value);controls.add_child(steer_toggle)
 	meshes=ItemList.new();meshes.select_mode=ItemList.SELECT_MULTI;meshes.custom_minimum_size.y=100;right.add_child(meshes)
-	label(right,"Select nodes above; bind them to the chosen wheel.").add_theme_font_size_override("font_size",16)
-	var bind:=HBoxContainer.new();right.add_child(bind)
+	label(right,"Select nodes above; bind them to the chosen wheel.").add_theme_font_size_override("font_size",20)
+	var bind:=HFlowContainer.new();right.add_child(bind)
 	button(bind,"Bind rotating",func():bind_selected("rotating"));button(bind,"Bind calipers",func():bind_selected("stationary"));button(bind,"Center pivot",center_pivot)
-	var footer:=HBoxContainer.new();box.add_child(footer)
+	var footer:=HFlowContainer.new();box.add_child(footer)
 	button(footer,"Validate",validate_report);button(footer,"Private Test Drive",test_drive);button(footer,"Finish Test Drive",end_trial);button(footer,"Save Vehicle Folder",save_vehicle)
 	if not source_path.is_empty():await load_model()
 
@@ -95,7 +95,7 @@ static func slug(value: String) -> String:
 	return ("vehicle_"+result).left(64) if result.is_empty() or not result.substr(0,1).is_valid_identifier() else result.left(64)
 
 func button(parent: Node,words: String,action: Callable) -> Button:
-	var node:=Button.new();node.text=words;node.custom_minimum_size=Vector2(130,46);node.pressed.connect(action);parent.add_child(node);return node
+	var node:=Button.new();node.text=words;node.custom_minimum_size=Vector2(130,48);node.pressed.connect(action);parent.add_child(node);return node
 func label(parent: Node,words: String) -> Label:
 	var node:=Label.new();node.text=words;node.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;parent.add_child(node);return node
 func heading(words: String) -> void:
@@ -191,10 +191,9 @@ func build_fields() -> void:
 	heading("Camera and performance")
 	vector_field(fields,"Preview camera target",data.preview_target,func(value):data.preview_target=value;changed())
 	scalar("Preview distance (m)","preview_distance",1.,1.,60.)
-	scalar("Top speed (km/h)","max_speed",3.6,1.,360.)
-	scalar("Boost speed (km/h)","boosted_speed",3.6,1.,450.)
-	scalar("Acceleration (m/s²)","acceleration",1.,.1,60.)
-	scalar("Handling multiplier","handling",1.,.1,3.)
+	var race_profile := LeoRaceRules.resolve(candidate())
+	label(fields,"Race performance: %d km/h · %d km/h boost · %.1f launch · %.2f handling" % [roundi(race_profile.max_speed*3.6),roundi(race_profile.boosted_speed*3.6),race_profile.acceleration,race_profile.handling])
+	label(fields,"Your vehicle's race class sets its performance. New imports use the Compact class.")
 	scalar("Driving camera height offset","camera_height",1.,-2.,5.)
 	label(fields,"Custom content and tuning cannot set official records.")
 	var feature_editor:=preload("res://scripts/content/vehicle_feature_editor.gd").new()
@@ -280,11 +279,9 @@ func test_drive() -> void:
 		var angle:=TAU*float(i)/128.;points.append([50.*cos(angle),0.,50.*sin(angle)])
 	route.route={"points":points,"length":TAU*50.,"width":18.}
 	var circuit:=LeoCircuit.new(route)
-	# setup normally resolves catalog IDs. Temporarily register only this editor
-	# definition during setup, never change a race roster or persistent selection.
-	var vehicle:=candidate();vehicle.id=&"workshop_trial"
-	var catalog:=GarageCatalog.shared();catalog.vehicles.append(vehicle)
-	trial=LeoKart.new();studio.add_child(trial);trial.setup(circuit,0,true,driver_id,String(vehicle.id));catalog.vehicles.erase(vehicle)
+	# Pass the unsaved definition directly, retaining its race profile identity.
+	var vehicle:=candidate()
+	trial=LeoKart.new();studio.add_child(trial);trial.setup(circuit,0,true,driver_id,String(vehicle.id),vehicle)
 	trial_time=0.;trial_start=circuit.sample(0)
 	trial_input=LeoPlayerInput.new();trial_input.restore(game.input_router.players[0].serialize());trial_input.device=game.input_router.players[0].device
 	trial.control_input=trial_input;trial.active=true;trial.place(0,0);LeoRaceRules.apply(trial)
@@ -317,11 +314,12 @@ func save_vehicle() -> void:
 	if DirAccess.rename_absolute(temporary,folder.path_join("vehicle.json"))!=OK:status.text="Cannot replace vehicle definition.";saving=false;return
 	if not FileAccess.file_exists(folder.path_join("LICENSE.txt")):FileAccess.open(folder.path_join("LICENSE.txt"),FileAccess.WRITE).store_string(String(data.get("attribution","Author must supply redistribution terms."))+"\n")
 	if DisplayServer.get_name()=="headless":
-		var image:=Image.create(256,144,false,Image.FORMAT_RGB8);image.fill(Color("102733"));image.save_png(folder.path_join("thumbnail.png"))
+		var image:=Image.create(256,144,false,Image.FORMAT_RGBA8);image.fill(Color.TRANSPARENT);image.save_png(folder.path_join("thumbnail.png"))
 	else:
 		collision_hint.hide();await get_tree().process_frame;await RenderingServer.frame_post_draw
 		if not is_inside_tree():return
-		viewport.get_texture().get_image().save_png(folder.path_join("thumbnail.png"));collision_hint.show()
+		var cutout:=await LeoPreviewArt.capture_model(studio,viewport,get_tree())
+		cutout.save_png(folder.path_join("thumbnail.png"));collision_hint.show()
 	saved_folder=folder;saving=false;status.text="Saved "+String(data.id)+". Back → Refresh Content makes it selectable. Share this complete folder."
 
 func _process(dt: float) -> void:

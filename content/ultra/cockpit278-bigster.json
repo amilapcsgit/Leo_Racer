@@ -1,0 +1,25 @@
+{
+  "bounds": {
+    "position": [
+      -1.03300786018372,
+      0.0,
+      -2.20480465888977
+    ],
+    "size": [
+      2.0733859539032,
+      1.65061235427856,
+      4.56980466842651
+    ]
+  },
+  "id": "bigster",
+  "lods_generated": true,
+  "merged_static_meshes": 212,
+  "pack_sha256": "4058e66fc63f8435d909addfbc3eb231533e1e13b56c201fa2c43206f4064264",
+  "scene_bytes": 11228192,
+  "status": "PASS",
+  "textures": 9,
+  "removed_stalk_triangles": 2026,
+  "column_repair_vertices": 2439,
+  "original_sha256": "c38710ec2d9ba01a83aec0957bc0bab635aa1660e957bf6738cfbe91c20f8d62",
+  "derivative_sha256": "4058e66fc63f8435d909addfbc3eb231533e1e13b56c201fa2c43206f4064264"
+}

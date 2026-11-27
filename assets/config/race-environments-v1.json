@@ -1,0 +1,192 @@
+{
+  "astra_coast": {
+    "dusk_top": "586990",
+    "dusk_horizon": "e9a77b",
+    "night_top": "0b122b",
+    "night_horizon": "293e63",
+    "sun_yaw": -145,
+    "transition_seconds": 1.5,
+    "night_sun_energy": 0.22,
+    "night_ambient_energy": 0.38,
+    "fixture_data": "",
+    "street_lights": {
+      "compatibility": [
+        8,
+        12,
+        12
+      ],
+      "forward_plus": [
+        8,
+        16,
+        24
+      ],
+      "range": 20,
+      "angle": 30,
+      "fade_begin": 65,
+      "fade_end": 95,
+      "shadow_enabled": false,
+      "color": "ffdeb0",
+      "energy": 3.4
+    },
+    "landmark_led": {
+      "period_seconds": 12,
+      "stem": "53d9d5",
+      "petals": "ff19b6",
+      "antenna": "ffce65",
+      "reduced_motion": "static",
+      "materials": [
+        {
+          "name": "Petals",
+          "color": "ff19b6",
+          "pattern": 1
+        },
+        {
+          "name": "Petal_interior",
+          "color": "ff19b6",
+          "pattern": 1
+        },
+        {
+          "name": "Stem1",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Stem2",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Top_light_blue",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Material.004",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Material.001",
+          "color": "53d9d5",
+          "pattern": 0
+        },
+        {
+          "name": "Antenna",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Spire",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Yellow",
+          "color": "ffce65",
+          "pattern": 0
+        },
+        {
+          "name": "Gold",
+          "color": "ffce65",
+          "pattern": 0
+        }
+      ]
+    },
+    "night_ambient_color": "98a9be",
+    "night_sun_pitch": -32,
+    "emission": {
+      "lamp_color": "fff0c9",
+      "lamp_energy": 1.8,
+      "billboard_energy": 1.2
+    }
+  },
+  "colombo_city": {
+    "dusk_top": "686e96",
+    "dusk_horizon": "e5a387",
+    "night_top": "101b34",
+    "night_horizon": "37486b",
+    "sun_yaw": -112,
+    "transition_seconds": 1.5,
+    "night_sun_energy": 0.22,
+    "night_ambient_energy": 0.34,
+    "fixture_data": "illumination.json",
+    "street_lights": {
+      "compatibility": [
+        8,
+        16,
+        16
+      ],
+      "forward_plus": [
+        12,
+        24,
+        32
+      ],
+      "range": 20,
+      "angle": 30,
+      "fade_begin": 65,
+      "fade_end": 95,
+      "shadow_enabled": false,
+      "color": "ffdeb0",
+      "energy": 3.4
+    },
+    "landmark_led": {
+      "period_seconds": 12,
+      "stem": "53d9d5",
+      "petals": "ff19b6",
+      "antenna": "ffce65",
+      "reduced_motion": "static"
+    },
+    "night_ambient_color": "98a9be",
+    "night_sun_pitch": -38,
+    "emission": {
+      "lamp_color": "fff0c9",
+      "lamp_energy": 1.8,
+      "billboard_energy": 1.2
+    }
+  },
+  "kandy_lake": {
+    "dusk_top": "63738c",
+    "dusk_horizon": "d7ad91",
+    "night_top": "101b32",
+    "night_horizon": "30475d",
+    "sun_yaw": -155,
+    "neutral_manifest": "res://leo_environments/kandy_lake/manifest.json",
+    "transition_seconds": 1.5,
+    "night_sun_energy": 0.22,
+    "night_ambient_energy": 0.34,
+    "fixture_data": "illumination.json",
+    "street_lights": {
+      "compatibility": [
+        8,
+        16,
+        16
+      ],
+      "forward_plus": [
+        12,
+        24,
+        32
+      ],
+      "range": 20,
+      "angle": 30,
+      "fade_begin": 65,
+      "fade_end": 95,
+      "shadow_enabled": false,
+      "color": "ffdeb0",
+      "energy": 3.4
+    },
+    "landmark_led": {
+      "period_seconds": 12,
+      "stem": "53d9d5",
+      "petals": "ff19b6",
+      "antenna": "ffce65",
+      "reduced_motion": "static"
+    },
+    "night_ambient_color": "98a9be",
+    "night_sun_pitch": -38,
+    "emission": {
+      "lamp_color": "fff0c9",
+      "lamp_energy": 1.8,
+      "billboard_energy": 1.2
+    }
+  }
+}

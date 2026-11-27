@@ -45,9 +45,12 @@ def write_pack(path,engine,entries):
     # An independent read verifies all offsets and hashes before delivery.
     assert read_pack(path)[1]==entries
 
-BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png'}
+BOOT_ART={'assets/art/menu.png','assets/ui/art/home.png','assets/art/neon_lion.svg','assets/audio/custom279/intro_main.ogg','assets/audio/custom279/intro_alt.ogg'}
+_gallery=ROOT/'assets/config/loading-gallery-v279.json'
+if _gallery.exists():BOOT_ART.update(row['path'].removeprefix('res://') for row in json.loads(_gallery.read_text(encoding='utf-8'))['artworks'])
 
 def category(name):
+    if name.removesuffix('.remap') in ['assets/materials/automotive_paint.tres','assets/materials/automotive_glass.tres']:return 'core'
     if name.split('/')[0] in ['i230','j230','iui','k0','k1','k2','k3','p0']:return 'authoring-only-source'
     if name.startswith("assets/art/kandy/"):return "authoring-only-source"
     if name.removesuffix('.import') in BOOT_ART:return 'core'
@@ -152,7 +155,7 @@ def split(folder,loose_vehicles=False):
         (root/'tracks'/track.name/'manifest.json').write_text(json.dumps(metadata,indent=2)+'\n',encoding='utf-8')
     import shutil
     shutil.copytree(ROOT/'licenses',root/'licenses',dirs_exist_ok=True)
-    if loose_vehicles:shutil.copy2(ROOT/'LICENSE',root/'licenses/LeoRacer-AGPL-3.0.txt')
+    if loose_vehicles:shutil.copy2(ROOT/'LICENSE',root/'licenses/LeoRacer-Custom-License.txt')
     (root/'README.txt').write_text('Optimized game content. Install complete compatible track folders under tracks/.\nRegistered cosmetic GLB/PNG/SVG overrides are listed in catalog.json overrides.\nEach override has id (resource path), file (relative GameAssets path), affects_rules (boolean).\nRoute/handling modifications cannot set official records. Keep settings and rankings in user data.\n',encoding='utf-8')
     report={'exe_bytes':(folder/'LeoRacer.exe').stat().st_size,'core_bytes':source.stat().st_size,'packs':packs,
             'installed_bytes':sum(p.stat().st_size for p in folder.rglob('*') if p.is_file()),

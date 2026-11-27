@@ -2,6 +2,7 @@ class_name LeoDriverCarousel
 extends Control
 signal driver_selected(driver_id: StringName)
 var catalog: GarageCatalog
+var compact := false
 var selected := 0
 var reduced_motion := false
 var cards: Array[Button]=[]
@@ -22,6 +23,8 @@ func _ready() -> void:
   var portrait:=TextureRect.new();portrait.texture=catalog.drivers[i].portrait;portrait.mouse_filter=MOUSE_FILTER_IGNORE;portrait.set_anchors_and_offsets_preset(PRESET_FULL_RECT);portrait.offset_left=10;portrait.offset_right=-10;portrait.offset_top=12;portrait.offset_bottom=-14;portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.use_parent_material=true;face.add_child(portrait)
   card.pressed.connect(func():
    if index==selected:return
+   if compact:
+    selected=index;layout_cards(false);grab_focus();driver_selected.emit(catalog.drivers[selected].id);return
    var effects:=get_tree().get_first_node_in_group("ui_effects")
    if effects:effects.burst(card)
    step(-1 if index==posmod(selected-1,cards.size()) else 1))
@@ -41,6 +44,15 @@ func step(direction: int) -> void:
  if audio:audio.cue("carousel")
  driver_selected.emit(catalog.drivers[selected].id)
 func layout_cards(animate: bool) -> void:
+ if compact:
+  custom_minimum_size=Vector2(432,114);size=custom_minimum_size
+  if left:left.hide()
+  if right:right.hide()
+  for i in cards.size():
+   var card:=cards[i];card.show();card.position=Vector2(i*72,0);card.size=Vector2(66,78);card.modulate=Color.WHITE if i==selected else Color(.65,.73,.8,.84)
+   (card.get_node("PortraitFrame") as TextureRect).texture=preload("res://assets/ui/icons/hex_selected.svg") if i==selected else preload("res://assets/ui/icons/hex_frame.svg")
+   materials[i].set_shader_parameter("yaw",0.)
+  driver_name.position=Vector2(0,84);driver_name.size=Vector2(432,28);driver_name.horizontal_alignment=HORIZONTAL_ALIGNMENT_LEFT;driver_name.add_theme_font_size_override("font_size",21);driver_name.text=catalog.drivers[selected].display_name;queue_redraw();return
  for i in cards.size():
   var card:=cards[i]
   if moves.has(i):moves[i].kill()
@@ -63,6 +75,9 @@ func _gui_input(event: InputEvent) -> void:
  if event.is_action_pressed("ui_left"):step(-1);accept_event()
  elif event.is_action_pressed("ui_right"):step(1);accept_event()
 func _draw() -> void:
+ if compact:
+  if has_focus():draw_style_box(focus_box(),Rect2(Vector2(selected*72,0),Vector2(66,78)))
+  return
  draw_line(Vector2(196,174),Vector2(236,174),Color("ffc857"),3.,true)
  if has_focus():draw_style_box(focus_box(),Rect2(134,0,164,174))
 func focus_box() -> StyleBoxFlat:

@@ -1,0 +1,565 @@
+{
+  "profiles": {
+    "small": [
+      {
+        "rpm": 900,
+        "on": "small_900_on.wav",
+        "off": "small_900_off.wav"
+      },
+      {
+        "rpm": 1900,
+        "on": "small_1900_on.wav",
+        "off": "small_1900_off.wav"
+      },
+      {
+        "rpm": 3100,
+        "on": "small_3100_on.wav",
+        "off": "small_3100_off.wav"
+      },
+      {
+        "rpm": 4500,
+        "on": "small_4500_on.wav",
+        "off": "small_4500_off.wav"
+      },
+      {
+        "rpm": 5900,
+        "on": "small_5900_on.wav",
+        "off": "small_5900_off.wav"
+      }
+    ],
+    "suv": [
+      {
+        "rpm": 900,
+        "on": "suv_900_on.wav",
+        "off": "suv_900_off.wav"
+      },
+      {
+        "rpm": 1800,
+        "on": "suv_1800_on.wav",
+        "off": "suv_1800_off.wav"
+      },
+      {
+        "rpm": 2850,
+        "on": "suv_2850_on.wav",
+        "off": "suv_2850_off.wav"
+      },
+      {
+        "rpm": 4050,
+        "on": "suv_4050_on.wav",
+        "off": "suv_4050_off.wav"
+      },
+      {
+        "rpm": 5500,
+        "on": "suv_5500_on.wav",
+        "off": "suv_5500_off.wav"
+      }
+    ],
+    "sport": [
+      {
+        "rpm": 950,
+        "on": "sport_950_on.wav",
+        "off": "sport_950_off.wav"
+      },
+      {
+        "rpm": 2200,
+        "on": "sport_2200_on.wav",
+        "off": "sport_2200_off.wav"
+      },
+      {
+        "rpm": 3400,
+        "on": "sport_3400_on.wav",
+        "off": "sport_3400_off.wav"
+      },
+      {
+        "rpm": 5000,
+        "on": "sport_5000_on.wav",
+        "off": "sport_5000_off.wav"
+      },
+      {
+        "rpm": 6500,
+        "on": "sport_6500_on.wav",
+        "off": "sport_6500_off.wav"
+      }
+    ],
+    "bus": [
+      {
+        "rpm": 820,
+        "on": "bus_820_on.wav",
+        "off": "bus_820_off.wav"
+      },
+      {
+        "rpm": 1450,
+        "on": "bus_1450_on.wav",
+        "off": "bus_1450_off.wav"
+      },
+      {
+        "rpm": 2300,
+        "on": "bus_2300_on.wav",
+        "off": "bus_2300_off.wav"
+      },
+      {
+        "rpm": 3050,
+        "on": "bus_3050_on.wav",
+        "off": "bus_3050_off.wav"
+      },
+      {
+        "rpm": 3900,
+        "on": "bus_3900_on.wav",
+        "off": "bus_3900_off.wav"
+      }
+    ]
+  },
+  "recordings": {
+    "small_900_on.wav": {
+      "source": [
+        "engine/CJX_ENG/1054.wav",
+        "engine/CJX_EXH/1076.wav"
+      ],
+      "source_sha256": [
+        "d636c0cc1c5b9458f25561e36ed06b813d26436f241ee0a5cc9fb6d0234614b9",
+        "5b59a8c7079bb5110b145359e00c23676db38370b4008a4fdd7a4560a82471f8"
+      ],
+      "sha256": "26f4e57e16125de6ad4ab1953275f01a075d86e6ecb6d7daaa6c9fa4273109b1"
+    },
+    "small_900_off.wav": {
+      "source": [
+        "engine/CJX_ENG/1933o.wav",
+        "engine/CJX_EXH/1318o.wav"
+      ],
+      "source_sha256": [
+        "f4955a6ba84521054055eb1122864d30a304de539bfaca7083f6a12f6a3f372f",
+        "0e0f31c9481154bb9165f38a2b22f643f8eb3f3de945f98330a609152bd806fa"
+      ],
+      "sha256": "ac5e87bcb248d45e58c6969a44b56421e84fa659e4787eefcb208862c128845b"
+    },
+    "small_1900_on.wav": {
+      "source": [
+        "engine/CJX_ENG/2016.wav",
+        "engine/CJX_EXH/2416.wav"
+      ],
+      "source_sha256": [
+        "eaca6e889abc1a2c6720dad6b8199370d4f787836db63d7fd41e11247edfc385",
+        "3834dce715470281bc9ef7a1f066b25ea2fc4b789ac503b3991c2bb44ef56e88"
+      ],
+      "sha256": "a4a49a2701a17e77252be4905e1bf38135c14d6393c414ffc9232ca53a17291f"
+    },
+    "small_1900_off.wav": {
+      "source": [
+        "engine/CJX_ENG/1933o.wav",
+        "engine/CJX_EXH/1791o.wav"
+      ],
+      "source_sha256": [
+        "f4955a6ba84521054055eb1122864d30a304de539bfaca7083f6a12f6a3f372f",
+        "081cf5ef72160349bbd1aab447d1772eca41197a6b38da3d93e2e7555dae5c31"
+      ],
+      "sha256": "f4e9f2f6336a5a205970c87eb282264f8b6b574f773b6742fb3a4ecd02c58df2"
+    },
+    "small_3100_on.wav": {
+      "source": [
+        "engine/CJX_ENG/3339.wav",
+        "engine/CJX_EXH/3062.wav"
+      ],
+      "source_sha256": [
+        "27bab26e843461b780a003cd0caea60cfdc7b0570f3e333d027cfaa02fdffe1b",
+        "fbca3f38a76e967dc1c723ee79d4f2ba6437261b4b38361cbe8cb1eaecec6848"
+      ],
+      "sha256": "25bd402ac4a6797083be71b64db0e840a3cf6414cd17e4733a62b66c08025dcf"
+    },
+    "small_3100_off.wav": {
+      "source": [
+        "engine/CJX_ENG/3120o.wav",
+        "engine/CJX_EXH/2900o.wav"
+      ],
+      "source_sha256": [
+        "7063a5f79c0cd567a857876e8195f950df1e7fcfae260e8ea450c248866e3363",
+        "f574d62ef8223eddfb6ec470743d8b088ffb11c9f87c1890f76063fab76d2692"
+      ],
+      "sha256": "028759c4b8386eeb47d9b261e21b234e5a1ff4d1f311df93ef3c88477db33e8b"
+    },
+    "small_4500_on.wav": {
+      "source": [
+        "engine/CJX_ENG/4192.wav",
+        "engine/CJX_EXH/4452.wav"
+      ],
+      "source_sha256": [
+        "1114dfad5567e381f33f74963db6cd76a99cbed3c1164902f5f4251eccc86c4d",
+        "2f2a1c84144b52178c3a81fcd3227ecd08dc85b6166dc2dca4610e0beb62a0c3"
+      ],
+      "sha256": "f86d39b7d4b854702f64fc2553eb0b2f5e3b4c693bc0141028f9896eb6e1f978"
+    },
+    "small_4500_off.wav": {
+      "source": [
+        "engine/CJX_ENG/4514o.wav",
+        "engine/CJX_EXH/4218o.wav"
+      ],
+      "source_sha256": [
+        "264e95b33614ef058fcb1c0e2eb6802e2cc548e8ec01b855e778756e64fc0756",
+        "cf4909fa0eb29d8e258b060462fadeef98dc9ac22c48cef5a1f5f4251702f317"
+      ],
+      "sha256": "19240a9626f7cac17bbdd7830963632335ac7a2829f40e2815e0bf471a538efe"
+    },
+    "small_5900_on.wav": {
+      "source": [
+        "engine/CJX_ENG/5363.wav",
+        "engine/CJX_EXH/6000.wav"
+      ],
+      "source_sha256": [
+        "edf8a42b27738abe5e23fcdf94f46e2a6b290a1cc7f7c330f2906551faf01283",
+        "75b30157b583ca8c391d054681fc834056a883bce2f217b603f1f301a4ec5487"
+      ],
+      "sha256": "8623dd38aa578b5cf522fb44776a8e79e74e57c8d36193f92b8d88f68e3bdc67"
+    },
+    "small_5900_off.wav": {
+      "source": [
+        "engine/CJX_ENG/5976o.wav",
+        "engine/CJX_EXH/5910o.wav"
+      ],
+      "source_sha256": [
+        "ee18a69f9e606856a3861dbe39b9dc5a611823b5adfa43956bc2c05164a5ca12",
+        "3bc798a218d69e2db02bbee4cc2567f97c6f6aa8268bde678e6f0f4059aab993"
+      ],
+      "sha256": "888dbe4afdd89b1a02cce7d451d39a9b2fabcba2de293bb08b84d5e1c28c2643"
+    },
+    "suv_900_on.wav": {
+      "source": [
+        "engine/FSI_ENG/1000.wav",
+        "engine/FSI_EXH/1000.wav"
+      ],
+      "source_sha256": [
+        "b3d6e9f276f810a4b2afdd964bd9b63641f41c532f193f7ca1a866bb0d9eaf62",
+        "b7d4147cc45c1266cf4b88501357e439dda0e33d223874d0eb9e47d38328290a"
+      ],
+      "sha256": "d5c8264ea48dd61c2f7fecfcf8cfdd253cf677422f260bbb6ded4f5c8c8ce3bb"
+    },
+    "suv_900_off.wav": {
+      "source": [
+        "engine/FSI_ENG/1494o.wav",
+        "engine/FSI_EXH/1494o.wav"
+      ],
+      "source_sha256": [
+        "142f08463e8a058c5686b0bc1d68730b866431340da2542f05afefc0fd7b0f93",
+        "9e020e3b2ddb3141176c4059be9e99b6e4cc4f092e0c40c7efc052c4d7089359"
+      ],
+      "sha256": "483fe36d694060e15ce6147d91db95b52db993ee41ffa8ff8efa65724a9a39b3"
+    },
+    "suv_1800_on.wav": {
+      "source": [
+        "engine/FSI_ENG/2166.wav",
+        "engine/FSI_EXH/2166.wav"
+      ],
+      "source_sha256": [
+        "95fcac65fe7a2179c60d722974c933a21100bd9deb53ea3044dd416882e79060",
+        "54e0ac3c3b7fa8796625456234b33a310139a7aba4c8b1f3b76e0ced5de156e6"
+      ],
+      "sha256": "eed6e6236b972f06160c0d6ccea769e0434f6f7bb6705a6785316fdcfceb1a2c"
+    },
+    "suv_1800_off.wav": {
+      "source": [
+        "engine/FSI_ENG/2087o.wav",
+        "engine/FSI_EXH/2087o.wav"
+      ],
+      "source_sha256": [
+        "9f205fc5a724622fa1b0740c3e2258ed6418c54c5f8eb7aa703b480453e1f622",
+        "f81579c8b64da0daf362b3f2761d577bcece79ba73a8312e921d719c9c90ee67"
+      ],
+      "sha256": "efaa76b8d0a2d91531cc8868b719994b2beba3f8a269959dc375cc8f142d49e2"
+    },
+    "suv_2850_on.wav": {
+      "source": [
+        "engine/FSI_ENG/2878.wav",
+        "engine/FSI_EXH/2878.wav"
+      ],
+      "source_sha256": [
+        "03bc27e1a93b40bc6ad97e9ed4c8c229ac7ff370f568d2f5f8d8aa7a0f170944",
+        "32d3924a567cfc898429fb005ff6e1b482c3f381e4f413ec12bba460818bce94"
+      ],
+      "sha256": "7e2a353f5fe9dbcdaecc110e04df121f165236c764d8480b5089537031afd422"
+    },
+    "suv_2850_off.wav": {
+      "source": [
+        "engine/FSI_ENG/2801o.wav",
+        "engine/FSI_EXH/2801o.wav"
+      ],
+      "source_sha256": [
+        "db1d6f462fcb8a97ca8264266f6d55fe7678bec8f48b63fee94c7ee93509ea19",
+        "1ff6034368ea911d6558bbaf73e9752c3dfed2cf74a42ae156b694b8c0a0376b"
+      ],
+      "sha256": "b9f4e837e06184523e8302e0f513048fdc2851a3c441399c64c121f6b256c347"
+    },
+    "suv_4050_on.wav": {
+      "source": [
+        "engine/FSI_ENG/4444.wav",
+        "engine/FSI_EXH/4444.wav"
+      ],
+      "source_sha256": [
+        "e9f88e69e9faa6987582063841b1438424373fcedac138ed8bbf3ffd85cb6353",
+        "3c1a551d90a0a044d44630f3e665693edf2637e48ca64634556acb3bba27b03e"
+      ],
+      "sha256": "23e01803fba8529be9e162d3965f00b6c2bd31dd1d189b7b971cb41104246702"
+    },
+    "suv_4050_off.wav": {
+      "source": [
+        "engine/FSI_ENG/4460o.wav",
+        "engine/FSI_EXH/4460o.wav"
+      ],
+      "source_sha256": [
+        "dfbc1d27f2adbd3dea069b6eda791e4d79b72e57ebe64be582e14848f7ff2a42",
+        "28b217d8a719d02fa0a34b50659d15a1e1eb2e0088b5b69aab49d8b08e6aea80"
+      ],
+      "sha256": "5bcd7294890b31d315db908a65241a138210026732a71d22969b518bbd81c343"
+    },
+    "suv_5500_on.wav": {
+      "source": [
+        "engine/FSI_ENG/5119.wav",
+        "engine/FSI_EXH/5119.wav"
+      ],
+      "source_sha256": [
+        "cb44a48fad0383312aa07382d32e104c7bbaa6ad3c0481b5e613672699080b3c",
+        "cc5a044abfe290d993845b54f66a9bafe238f424feadfe7e80c942a19dd3e2b8"
+      ],
+      "sha256": "9076036c61fdc05983e8c3a5e5af3eaee39ab713abbd92c8b456668b65215839"
+    },
+    "suv_5500_off.wav": {
+      "source": [
+        "engine/FSI_ENG/5214o.wav",
+        "engine/FSI_EXH/5214o.wav"
+      ],
+      "source_sha256": [
+        "917ee15c46d126e2787b44f3879ac32d7bceed8b845a9eaac9ecbe3594df3235",
+        "f42962206d8aced84c79425f99d603b2021434db398f624f31abf221e64b884b"
+      ],
+      "sha256": "fa2fce1b0fe100c5c2c1e1b2be656bff1d19c617a50c5b5b75c424b2d77b3df6"
+    },
+    "sport_950_on.wav": {
+      "source": [
+        "engine/EJ257_ENG/857.wav",
+        "engine/EJ257_EXH/800.wav"
+      ],
+      "source_sha256": [
+        "9ce41a6d25a32448a01eae5e969b50494d2ab60a60c9827f001f38a39c923de3",
+        "1e8964acd2a090a753339311941823be4b08fef9642e2b791295d90baffd41e6"
+      ],
+      "sha256": "fd02e367517df50c286c6e50f9023876f878020a44f88efa7b4ee7a3755a4aac"
+    },
+    "sport_950_off.wav": {
+      "source": [
+        "engine/EJ257_ENG/989o.wav",
+        "engine/EJ257_EXH/1500o.wav"
+      ],
+      "source_sha256": [
+        "dc28ffd5b504e756ce5c6526512ead79cc36786dad2194b59232fff4d03aa695",
+        "7dcb927182cb937bca920531e88d9dc89f1f3732857df2223a750c387c2d4d2f"
+      ],
+      "sha256": "2ac09f235049900df99522e2d0e5f514d4c1f417c1889e5d20969a178435424d"
+    },
+    "sport_2200_on.wav": {
+      "source": [
+        "engine/EJ257_ENG/2362.wav",
+        "engine/EJ257_EXH/2500.wav"
+      ],
+      "source_sha256": [
+        "8cd992926f161c3225a631ec6b471649ab7d4aedb6475a391f2be67952cc0e6e",
+        "386e2dee1f419a7d56361f9842d2e8cc50632099149408143edfe6dd8b61750b"
+      ],
+      "sha256": "69023ae54c595cd3b939e2f7d86069e8aa22b87f2fd3ecf0a3f2ad2590f877a9"
+    },
+    "sport_2200_off.wav": {
+      "source": [
+        "engine/EJ257_ENG/2131o.wav",
+        "engine/EJ257_EXH/2000o.wav"
+      ],
+      "source_sha256": [
+        "c77c48e9b07c70cb92cd02a1c63622246e0accc52331578b6a17e69cfe93a5d5",
+        "54270d15becccd543e097cfd16c9dd920309966149a50ce4bdc8fa9279bf9f9f"
+      ],
+      "sha256": "c3c8eeec0add550411f3f6f39629bfb33d49dfccde838d11807c57b752d646d9"
+    },
+    "sport_3400_on.wav": {
+      "source": [
+        "engine/EJ257_ENG/3351.wav",
+        "engine/EJ257_EXH/3500.wav"
+      ],
+      "source_sha256": [
+        "08bab97e9f381fb4a3b7d1ab5f22548e7cc3485c894364c6eb252a1e4ee5ef76",
+        "23b2102bbdfdd846997e8336369a370d67d8d40778a75896a615c484b678a00d"
+      ],
+      "sha256": "412415de03b0cc722651b842da0b1fddda07a806b947cbd60917ba6c6f9d8cc9"
+    },
+    "sport_3400_off.wav": {
+      "source": [
+        "engine/EJ257_ENG/3406o.wav",
+        "engine/EJ257_EXH/3500o.wav"
+      ],
+      "source_sha256": [
+        "63913481daf5ca30b53c801615016a66f9ad21d9b0b6ab498c4540ef4175ec81",
+        "84d57c529aeae77ef78ca4f276fbce3376d182705e05445a579950d73bb445df"
+      ],
+      "sha256": "1cc3038cc88fab7c81a00369363edc604b3a2ae4bcd027bc1a449587cd156138"
+    },
+    "sport_5000_on.wav": {
+      "source": [
+        "engine/EJ257_ENG/4823.wav",
+        "engine/EJ257_EXH/5500.wav"
+      ],
+      "source_sha256": [
+        "c499cd0aeb21829dc2ca49575c9365cf5a30ee490134e4f358dc4792223d3f14",
+        "13bbc93cb4c396d87be90600b626ecc988aef14d34f7db270289eab1672f0e74"
+      ],
+      "sha256": "6101c3bd07d33da6964188cfca37fdc183176fb2a34e942836243868ea7a1bc0"
+    },
+    "sport_5000_off.wav": {
+      "source": [
+        "engine/EJ257_ENG/4922o.wav",
+        "engine/EJ257_EXH/5000o.wav"
+      ],
+      "source_sha256": [
+        "75f173ef8c6617fce0f63e064be41dc984a9ef65f152f00814fba4d8bad49f8e",
+        "66fc183252e10a6575c28026fa90c3c4cb641b97afd24c4cc841886c31507d11"
+      ],
+      "sha256": "57f133e06aad808eb42f317d3ab92c4becdfac3b05718ab353636983e9f08fcb"
+    },
+    "sport_6500_on.wav": {
+      "source": [
+        "engine/EJ257_ENG/6295.wav",
+        "engine/EJ257_EXH/6500.wav"
+      ],
+      "source_sha256": [
+        "31d665f355eefff5660ecf20c4f4c6f68a5c452dd81ba4df2cea7bcebe21dd08",
+        "cb82689d05f84356a1bd320bbc3b94bb03981d53e183c3a4a0551d1c51030d73"
+      ],
+      "sha256": "b91b87bdb7925cc57cfe403cb42f243d3e6b56bded8468166d56e356325485eb"
+    },
+    "sport_6500_off.wav": {
+      "source": [
+        "engine/EJ257_ENG/RevLimiterENGEJ257.wav",
+        "engine/EJ257_EXH/6500o.wav"
+      ],
+      "source_sha256": [
+        "cebafbf5beffd15c34ca81214ddc6acb0adbe2f19f6bcfc25410cd70ecbe253b",
+        "4d233df3f1745db2059fef6ecc21043f4166177368f9fc0bf20ecba21efeafa7"
+      ],
+      "sha256": "73788389c31e0e685fdb4d93ae197a83cc830dd419d81c9e3d2f417495003d63"
+    },
+    "bus_820_on.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/818.wav",
+        "engine/GM_LT1_EXH/695.wav"
+      ],
+      "source_sha256": [
+        "0f74b9ab12eab233037f948a90d459277c53ffbafd348d4376ef45e25c703b42",
+        "329e1b0b7c8e84fe62d6f27bbf1fc2ee3dec0e0e04f6852e2192314d0df36d9f"
+      ],
+      "sha256": "2078c8f9265e89ab29fa06513906cec0cd141453d067cc5c8d85e063f42ce88b"
+    },
+    "bus_820_off.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/2433o.wav",
+        "engine/GM_EXH/1996o.wav"
+      ],
+      "source_sha256": [
+        "f74ae5227a780d41eac71f2ee54274d8f43b37989d5561f72697862bb7c16a5c",
+        "31ff206775c50023b6c8a6b9456268d3e9c404ab518b8090131edd0bf9623c26"
+      ],
+      "sha256": "982f6c4f3f025264f79d235505567e3ab281dcf0f6f0af86c0d0cc0e12f8571c"
+    },
+    "bus_1450_on.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/1505.wav",
+        "engine/GM_LT1_EXH/1472.wav"
+      ],
+      "source_sha256": [
+        "9365753d07726300ac266701153ed0a10c0ebe1aff86b02ffbacc085e1181ca1",
+        "d2096c9502513bf47358a47f2bee9b72a9050e67dea15b45651d14d8cba92b83"
+      ],
+      "sha256": "aa744c89a86b669d8c147aabc134e435d534630f8de7b8dd9df4edb6d354cb1e"
+    },
+    "bus_1450_off.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/2433o.wav",
+        "engine/GM_EXH/1996o.wav"
+      ],
+      "source_sha256": [
+        "f74ae5227a780d41eac71f2ee54274d8f43b37989d5561f72697862bb7c16a5c",
+        "31ff206775c50023b6c8a6b9456268d3e9c404ab518b8090131edd0bf9623c26"
+      ],
+      "sha256": "5b0f8e9e276948211efa90ffa48c7582fbb998fcc7ef67cf4cb283244e1abe12"
+    },
+    "bus_2300_on.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/2505.wav",
+        "engine/GM_LT1_EXH/2461.wav"
+      ],
+      "source_sha256": [
+        "87ea4ff45e76d248186a61f98b19951c8a7e35612c7783f8d5853b3c4d98dbdb",
+        "01d72b705da418d4385236165e4cccb34001d1e534e86eda24e02476420feb7a"
+      ],
+      "sha256": "ceda47eeb8c75f9d0644c55ac625ffc9223dc0910f8c6d215ff3955a52ad0bef"
+    },
+    "bus_2300_off.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/2433o.wav",
+        "engine/GM_EXH/2498o.wav"
+      ],
+      "source_sha256": [
+        "f74ae5227a780d41eac71f2ee54274d8f43b37989d5561f72697862bb7c16a5c",
+        "c8b60fd06b7d709f18633dae446e8777e3f2f17ae3de2ae1024e07bea6b42dce"
+      ],
+      "sha256": "89e12950d0ae778e08d8eae818aaa6830f20d7578ffe078c59ac84d81166bcd4"
+    },
+    "bus_3050_on.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/2999.wav",
+        "engine/GM_LT1_EXH/2944.wav"
+      ],
+      "source_sha256": [
+        "c4dd0925408168501bc73320c68238428dfd3382c370d5ee33ce1e14e5e6e8d1",
+        "49ebb0d5da4ea596a571fd3afee0dd5f3752734f54e55ea868250a1f07299ed6"
+      ],
+      "sha256": "0b9e396f02e9999172feec10799ad2e7782c0564dce06c465b24e94cbc2b954f"
+    },
+    "bus_3050_off.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/3708o.wav",
+        "engine/GM_EXH/3003o.wav"
+      ],
+      "source_sha256": [
+        "c2e6386d1c59bf076b5272ebc174ebc412b72e1150f00125b15f5c675d41c157",
+        "cea5788863f89d2c36df8a64e7a7fc9826bf4320e1f8917950ad333c75d70efe"
+      ],
+      "sha256": "1538b25226c8927ccb7291f01f92163ce2b478b0b4bd2c5b808c271b2dbd8c80"
+    },
+    "bus_3900_on.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/3999.wav",
+        "engine/GM_LT1_EXH/3922.wav"
+      ],
+      "source_sha256": [
+        "f3b52b709279fdba4e12cecd7031192cfb46e95264ce9fe6077a56f83a13cd50",
+        "e4d5585699a1e71165c5f708d17338e47c5d85b891e87a82a3a3a1bc522b8603"
+      ],
+      "sha256": "58dffd22900d59f08282283e7c997633580a91687c483ff538f49e6ca897929e"
+    },
+    "bus_3900_off.wav": {
+      "source": [
+        "engine/GM_LT1_ENG/3708o.wav",
+        "engine/GM_EXH/4000o.wav"
+      ],
+      "source_sha256": [
+        "c2e6386d1c59bf076b5272ebc174ebc412b72e1150f00125b15f5c675d41c157",
+        "a3f12100656caf8c8bdcacf5c7f018cd5f4bf9b238cbb026dd03ea2333be72dc"
+      ],
+      "sha256": "33eb768a4474b87704c686439dcef49b35cfe136cf51d24fb9896b54aa742883"
+    }
+  },
+  "tire": {
+    "squeal": "tire_squeal.wav",
+    "scrub": "tire_scrub.wav"
+  },
+  "tire_credit": {
+    "name": "Car tire squeal skid loop",
+    "author": "Tom Haigh (audible-edge), loop by qubodup",
+    "license": "CC BY 3.0",
+    "url": "https://lpc.opengameart.org/content/car-tire-squeal-skid-loop",
+    "changes": "Mono 24 kHz conversion; low-pass treatment for scrub"
+  }
+}

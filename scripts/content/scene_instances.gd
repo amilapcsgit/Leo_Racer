@@ -17,6 +17,14 @@ static func store(node: MultiMeshInstance3D, transforms: Array[Transform3D], col
 	node.multimesh.custom_aabb=bounds;node.multimesh.buffer=buffer
 
 static func restore(node: Node) -> void:
+	restore_one(node)
+	for child in node.get_children():restore(child)
+
+static func restore_one(node: Node) -> void:
+	# Precinct bake helpers belong to the editor, not the live race. Their
+	# direct light is already represented by the original static lightmaps.
+	if node is DirectionalLight3D and node.name=="BakeSun":node.light_energy=0.;node.shadow_enabled=false
+	if node is WorldEnvironment and node.name=="BakeEnvironment":node.environment=null
 	if node is MultiMeshInstance3D and node.multimesh and node.has_meta("instance_buffer"):
 		var buffer: PackedFloat32Array=node.get_meta("instance_buffer")
 		var stride:=16 if node.multimesh.use_colors else 12
@@ -30,4 +38,3 @@ static func restore(node: Node) -> void:
 			instances.custom_aabb=node.get_meta("instance_bounds",AABB());instances.buffer=buffer
 			node.multimesh=instances
 		else:push_error("Invalid scenery instance buffer: "+String(node.name))
-	for child in node.get_children():restore(child)

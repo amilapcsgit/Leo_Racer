@@ -1,20 +1,33 @@
 extends Node
 var screen: LeoLoadingScreen
+const TRACE=preload("res://scripts/content/boot_trace.gd")
 func _ready() -> void:
-	DisplayServer.window_set_title("Leo Racer")
+	TRACE.mark("bootstrap_ready")
+	DisplayServer.window_set_title("Leo Racer — 2.8.0")
 	screen=LeoLoadingScreen.new();add_child(screen)
 	await get_tree().process_frame
+	LeoRaceAudio.shared(get_tree())
 	await begin()
 func begin() -> void:
+	if "--verify-boot-audio" in OS.get_cmdline_user_args():
+		var music:=LeoRaceAudio.shared(get_tree())
+		await get_tree().process_frame;await get_tree().process_frame
+		var report:={"status":"PASS" if music.stream!=null and music.playing and music.last_track in LeoRaceAudio.MENU_TRACKS else "FAIL","before_asset_mount":true,"track":music.last_track,"single_controller":get_tree().root.find_children("LeoRaceMusic","AudioStreamPlayer",false,false).size()==1}
+		print("BOOT_AUDIO279 ",JSON.stringify(report))
+		music.shutdown();await get_tree().create_timer(.1).timeout
+		get_tree().quit(0 if report.status=="PASS" else 1);return
 	if "--vehicle-workshop" in OS.get_cmdline_user_args():
 		await begin_workshop();return
 	if "--verify-boot-art" in OS.get_cmdline_user_args():
 		var errors: Array[String]=[]
-		for path in [LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]:
+		var paths: Array[String]=[LeoLoadingBackdrops.DAY,LeoLoadingBackdrops.NIGHT]
+		for track in LeoLoadingBackdrops.TRACKS:paths.append_array(LeoLoadingBackdrops.paths(track))
+		for path in paths:
 			var texture:=load(path) as Texture2D
 			if not texture or texture.get_width()<1:errors.append(path)
 		print("BOOT_ART_VALIDATION ",JSON.stringify({"status":"PASS" if errors.is_empty() else "FAIL","errors":errors,"before_asset_mount":true}))
 		get_tree().quit(0 if errors.is_empty() else 1);return
+	TRACE.mark("asset_validation_begin")
 	screen.stage("Checking game assets…",5)
 	await get_tree().process_frame
 	if not OS.has_feature("editor"):
@@ -23,7 +36,9 @@ func begin() -> void:
 		validator.start(func():return LeoAssets.configure(root))
 		while validator.is_alive():await get_tree().process_frame
 		var error:=int(validator.wait_to_finish())
+		TRACE.mark("asset_validation_complete")
 		if error==OK:error=LeoAssets.mount_packs()
+		TRACE.mark("packs_mounted")
 		if error!=OK:
 			printerr("CONTENT_VALIDATION_FAILED ",LeoAssets.failure)
 			if "--verify-content" in OS.get_cmdline_user_args():get_tree().quit(2);return
@@ -50,21 +65,37 @@ func begin() -> void:
 		var report: Dictionary=await load("res://scripts/content/content_validator.gd").vehicles(get_tree())
 		FileAccess.open("user://content-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
 		print("VEHICLE_VALIDATION ",JSON.stringify(report));get_tree().quit(0 if report.status=="PASS" else 2);return
+	if "--drive-test" in OS.get_cmdline_user_args():
+		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--ultra-check="):
+				var name:=argument.trim_prefix("--ultra-check=")
+				if name not in ["grass_pilot","teardown280","environment280","tire280","finish_order280","swap_width280","core280_profile","road_corridor280","input","ranking","race","audio279","game_logic279","mirrors279","wheels279","cockpit279","world279","ui279","render279","gallery279","loading","refinements","perf278","release278","core","visual","previews","physics","garage","contacts","audit","impact","finish"]:get_tree().quit(2);return
+				screen.hide()
+				var trial: Node=load("res://tests/native270/"+name+".gd").new()
+				get_tree().root.add_child(trial);queue_free();return
+		for probe in ["ui","content","polish"]:
+			if ("--release-"+probe+"-check") in OS.get_cmdline_user_args():
+				screen.hide();var check_node: Node=load("res://scripts/content/release26_"+probe+"_check.gd").new();get_tree().root.add_child(check_node);queue_free();return
+	TRACE.mark("interface_load_begin")
 	screen.stage("Loading interface…",20)
 	var path:="res://scenes/main.tscn"
 	ResourceLoader.load_threaded_request(path)
 	while ResourceLoader.load_threaded_get_status(path)==ResourceLoader.THREAD_LOAD_IN_PROGRESS:await get_tree().process_frame
 	if ResourceLoader.load_threaded_get_status(path)!=ResourceLoader.THREAD_LOAD_LOADED:
 		screen.show_failure("Game interface could not be loaded.",begin,func():get_tree().quit());return
+	TRACE.mark("interface_resource_loaded")
 	var scene:=ResourceLoader.load_threaded_get(path) as PackedScene
 	var game:=scene.instantiate();get_tree().root.add_child(game)
 	while not game.initialized and game.initialization_error.is_empty():await get_tree().process_frame
 	if not game.initialization_error.is_empty():
 		var message: String=game.initialization_error
 		game.queue_free();screen.show_failure(message,begin,func():get_tree().quit());return
+	TRACE.mark("game_ready")
 	get_tree().current_scene=game
 	if "--drive-test" in OS.get_cmdline_user_args():
 		for argument in OS.get_cmdline_user_args():
+			if argument=="--distinct-check":
+				screen.hide();var probe: Node=load("res://scripts/content/balance_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
 			if argument.begins_with("--vehicle-check="):
 				screen.hide();var probe: Node=load("res://scripts/content/vehicle_check.gd").new();probe.game=game;get_tree().root.add_child(probe);probe.run.call_deferred();break
 			if argument.begins_with("--track-check="):

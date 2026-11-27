@@ -40,7 +40,8 @@ def install(folder):
   text=script.read_text(encoding="utf-8")
   fixed=re.sub(r'\bBaker\b','Terrain3DBaker',text)
   if fixed!=text: script.write_text(fixed,encoding="utf-8")
- for script in (ROOT/'addons/EZ-Tree-Godot-Port').rglob('*.gd'):
+ for script in (ROOT/'addons/EZ-Tree-Godot-Port').rglob('*'):
+  if script.suffix not in ['.gd','.tscn','.tres']:continue
   text=script.read_text(encoding="utf-8")
   fixed=text.replace('res://addons/ez-tree-godot-port/','res://addons/EZ-Tree-Godot-Port/')
   if fixed!=text: script.write_text(fixed,encoding="utf-8")
