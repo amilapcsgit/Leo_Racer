@@ -54,7 +54,7 @@ New profiles start on Astra Lotus Coast with Bigster, three laps, Assisted handl
 
 ### Bonus cars to experiment with
 
-[**Download Experimental Additional Cars**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-AdditionalCars-2.8.1.zip)
+[![Download Experimental Additional Cars](docs/media/download-experimental-cars.svg)](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-AdditionalCars-2.8.1.zip)
 
 Extract the ZIP and follow its installation guide. These cars are optional and use unranked play.
 
