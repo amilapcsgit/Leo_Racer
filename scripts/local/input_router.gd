@@ -108,8 +108,8 @@ func identify(slot: int) -> void:
  var p:=players[slot]
  if p.kind!="keyboard" and p.device>=0:get_tree().call_group("haptics","play",p.device,"identify",1.)
 func claim_event(event: InputEvent) -> bool:
- if event is InputEventJoypadButton and claimed_releases.has(event.device):
-  if not event.pressed and event.button_index==JOY_BUTTON_A:claimed_releases.erase(event.device)
+ if event is InputEventJoypadButton and event.button_index==JOY_BUTTON_A and claimed_releases.has(event.device):
+  if not event.pressed:claimed_releases.erase(event.device)
   get_viewport().set_input_as_handled();return true
  if claim_slot<0:return false
  if (event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_B):
@@ -211,7 +211,13 @@ func feed(event: InputEvent) -> void:
      if is_inside_tree():get_viewport().set_input_as_handled()
     command.emit(slot,action)
 func _notification(what: int) -> void:
- if what == NOTIFICATION_APPLICATION_FOCUS_OUT: claim_slot=-1;clear_all()
+ if what != NOTIFICATION_APPLICATION_FOCUS_OUT:return
+ var was_claiming := claim_slot >= 0
+ claim_slot = -1
+ claimed_releases.clear()
+ menu_confirm_held.clear()
+ clear_all()
+ if was_claiming:binding_changed.emit()
 func _connection(id: int, connected: bool) -> void:
  stop_feedback()
  if connected:
@@ -227,8 +233,13 @@ func _connection(id: int, connected: bool) -> void:
   var audio:=get_tree().get_first_node_in_group("ui_audio")
   if audio:audio.cue("connect")
   binding_changed.emit(); return
+ claimed_releases.erase(id)
+ var prefix := "%d:" % id
+ for key in menu_confirm_held.keys():
+  if String(key).begins_with(prefix):menu_confirm_held.erase(key)
  for i in players.size():
   if players[i].device == id:
+   if capture_slot == i:cancel_capture()
    players[i].device = -1; players[i].clear()
    if i < active_slots: device_lost.emit(i)
  binding_changed.emit()
