@@ -16,8 +16,9 @@ func run() -> void:
 		game.selected_kart = game.catalog.vehicle_index(definition.id)
 		game.local_players[0].vehicle_id = definition.id
 		var showroom: ModularCarSelector = game.hud.garage_selector
+		showroom.home_preview = true
 		await showroom.set_selection(game.catalog.drivers[game.selected_driver].id, definition.id)
-		var preview_ok := is_instance_valid(showroom.assembly) and not showroom.race_button.disabled
+		var preview_ok := is_instance_valid(showroom.assembly) and showroom.assembly.visible
 		await game.start_race()
 		var car: LeoKart = game.player
 		var drive_ok := false
