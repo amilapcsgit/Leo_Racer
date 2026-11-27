@@ -1,147 +1,111 @@
-<p align="center"><img src="assets/ui/icons/crest.svg" width="100" alt="Leo Racer crest"></p>
-<h1 align="center">Leo Racer · 2.8.1</h1>
-<p align="center"><strong>Your ride. Your coast. Your next best lap.</strong><br>A Windows arcade racer on stylized Sri Lankan roads.</p>
+# Leo Racer
 
-<p align="center">
-  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest"><img src="docs/media/download-windows.svg" alt="Download for Windows" width="340"></a><br>
-  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest">Release notes, portable ZIP &amp; SHA256 checksums</a>
-</p>
+**A 3D arcade racer on Sri Lankan roads, built in Godot for Windows. Pick a car in the live showroom, race solo against AI, or share the screen with a second player.**
 
-![Approved solo loading screen with saved keyboard controls](docs/screenshots/2.7.9/loading-solo.png)
+[**Download the Windows installer**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.0/LeoRacer-Setup.exe) · [**Official website**](https://leoracer.amilaperera.it/) · [Portable ZIP and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.0)
 
-*Actual solo loading interface over illustrated Colombo City gallery artwork.*
+[![The Leo Racer driver selector and interactive 3D car showroom](docs/screenshots/2.7.0/garage.png)](docs/screenshots/2.7.0/garage.png)
 
-**21 cars · 6 drivers · 4 tracks · 1–2 local players · 1–10 laps · Offline play**
+*The live 3D garage, captured in-engine in 2.7.0.*
 
-Version 2.8 adds adaptive grass and water, Auto environment detail, refreshed Kandy scenery and recorded vehicle audio. Wennappuwa Street Circuit is bundled as an unranked fourth circuit. See the [2.8 release notes](docs/RELEASE_NOTES_280.md) and [release validation](docs/VALIDATION_280.md); the older screenshots below retain their original version labels.
+**21 cars · 6 drivers · 4 Sri Lankan circuits · 1–2 local players · 1–10 laps · Offline play**
 
-Race five AI rivals, or share the screen with someone next to you. Charge a drift, catch a slipstream, and spend your nitro on the next straight. Pick a driver and car in the showroom, find your line, and chase your personal best. No account or developer tools are required to play.
+I started Leo Racer for my son, **Shaven Leo**, and have spent months building, tuning and playtesting it.
+
+[The garage](#the-3d-garage) · [Circuits](#circuits) · [Play on Windows](#play-on-windows) · [Controls](#controls) · [Creator tools](#creator-tools) · [How I built it](#how-i-built-it)
+
+## The 3D garage
+
+Orbit and zoom around a live 3D model, compare speed, grip and launch stats, and choose a driver before heading to the grid. Cars have their own wheel setups, materials and handling. In split-screen, each player picks their own driver and car.
+
+| 3D showroom in Forward+ | Split-screen cockpit race |
+|---|---|
+| [![Interactive 3D garage rendered in Forward+](docs/qa-lighting/garage-forward.png)](docs/qa-lighting/garage-forward.png) | [![Two driver-seat views on Astra Lotus Coast at night](docs/screenshots/2.7.9/split-screen-cockpit-night.png)](docs/screenshots/2.7.9/split-screen-cockpit-night.png) |
+
+*Both images are in-engine captures from development builds. More [cockpit and loading-screen captures](docs/screenshots/2.7.9/README.md) are in the gallery.*
+
+Drift to build charge, find a slipstream, and spend nitro on the next straight. Switch between Chase, Ghost and Cockpit. The Bigster, Duster My 2014 and Duster 2024 have detailed cockpits with working instruments and mirrors. Each player has their own camera, HUD and controls. The game keeps personal records locally and bundles its engine audio and soundtrack for offline play.
+
+## Circuits
+
+| Circuit | What to expect |
+|---|---|
+| **Astra Lotus Coast** | Oceanfront straights and sweeping coastal corners |
+| **Colombo City Grand Prix** | A longer street circuit through Colombo |
+| **Kandy Lake Circuit** | Lakeside corners in Sri Lanka's hill country |
+| **Wennappuwa Street Circuit** | Unranked street racing in solo and local split-screen |
+
+Choose 1–10 laps and static lighting or **Dusk to Night**. In the 2.8.1 playtest, Easy, Assisted and Standard handling presets offer different speeds and steering response. Records in 2.8.1 also account for the handling preset.
 
 ## Play on Windows
 
-Extract the entire portable ZIP and run `LeoRacer.exe` for Forward+. Use the included Compatibility launcher for the alternate renderer.
-
-- **Settings → Game Logic → Handling** offers Easy, Assisted, and Standard. Easy lowers normal and boosted top speeds by 30% for the whole field and smooths human steering. Assisted blends Easy and Standard. Changes apply at the next race start or restart. Each preset has its own records, and existing records remain saved.
-- **Settings → Graphics → Draw Distance** offers Near, Standard, Far, and Very Far. Higher settings preload scenery farther ahead and use more memory.
-
-New profiles start with **Assisted handling**, **Astra Lotus Coast**, and **two laps**. Boost pads are smaller and alternate sides on all four tracks. Earlier records are available in the rankings filters. GrassField draws low-poly blades close to each player, with stylized grass material extending into the distance. Wennappuwa has a new track icon and separate day and dusk loading illustrations.
-
-## A closer seat to the action
-
-The **Bigster, Duster My 2014 and Duster 2024** now have reviewed driver-seat cockpits. Steering wheels turn as complete assemblies with space around the dashboard. Live instruments and navigation displays bring the cabin to life; the 2014 keeps its analog cluster and adds a fitted navigation/media screen.
-
-Your familiar **analog RPM dial and digital km/h HUD** keep their design and position in Chase, Ghost and Cockpit, for each local player. A shallow cockpit header keeps position, lap and time readable while opening the forward view. Visible mirrors use a **30 Hz refresh target** for smoother traffic feedback.
-
-| Bigster | Duster My 2014 | Duster 2024 |
-|---|---|---|
-| [![Bigster driver-seat cockpit with live instruments](docs/screenshots/2.7.9/cockpit-bigster-driver-view.png)](docs/screenshots/2.7.9/cockpit-bigster-driver-view.png) | [![Duster My 2014 analog dashboard and fitted navigation display](docs/screenshots/2.7.9/cockpit-duster-my-2014-driver-view.png)](docs/screenshots/2.7.9/cockpit-duster-my-2014-driver-view.png) | [![Duster 2024 driver-seat cockpit](docs/screenshots/2.7.9/cockpit-duster-2024-driver-view.png)](docs/screenshots/2.7.9/cockpit-duster-2024-driver-view.png) |
-
-*Actual in-engine cockpit captures. Open an image for the full view.*
-
-## Ready together
-
-Graphical keyboard, controller and wheel guides show each player's saved bindings while a race loads. Solo and split-screen share the same clear player identities, device assignment and remapping tools. Calmer focus effects and clearer results cards keep the next action easy to find.
-
-| Two-player loading controls | Two-player cockpit race at night |
+| Download | What you get |
 |---|---|
-| ![Approved split-screen loading guide showing keyboard and controller bindings](docs/screenshots/2.7.9/loading-split.png) | [![Actual in-engine split-screen cockpit view on Astra Lotus Coast at night](docs/screenshots/2.7.9/split-screen-cockpit-night.png)](docs/screenshots/2.7.9/split-screen-cockpit-night.png) |
+| [**Windows installer**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.0/LeoRacer-Setup.exe) | Stable 2.8.0, with shortcuts, 21 cars and all four circuits |
+| [**Portable ZIP**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.0/LeoRacer-2.8.0-win64.zip) | The same stable game in a folder you can extract and run |
+| [**2.8.1 playtest**](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.1-rc.3) | An optional portable build with handling presets, Draw Distance and a Wennappuwa road collision fix |
 
-*Left: runtime controls over illustrated loading artwork. Right: actual in-engine split-screen cockpit view on Astra Lotus Coast at night, with each player's analog RPM and digital km/h HUD. Open the race image for its full view.*
+The Windows x64 builds include their runtime. You can install and play offline without a separate Godot or .NET SDK installation. Download verification and release notes are on the [stable release page](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.0).
 
-Settings now has five tabs: **Graphics, Audio, Controls, Accessibility and Game Logic**. In **Game Logic**, “Allow Bigster as an AI opponent” starts **off**. Switch it on for your next new race or restart; Bigster remains available to human players throughout.
+1. Run the installer and launch **Leo Racer** from its shortcut. For the portable build, extract the whole archive and run `LeoRacer.exe`.
+2. If Forward+ gives you graphics problems or Vulkan is unavailable, run `Play Compatibility.cmd` from the game folder.
+3. Select **Go Race**, choose **SOLO** or **SPLIT SCREEN**, pick your circuit and car, then select **START RACE**.
 
-## Sri Lanka, from coast to hill country
+### Bonus cars to experiment with
 
-More consistent dry asphalt, restrained surface reflections and additional roadside planting enrich the existing circuits. The shared **23-image loading gallery** includes five new AI-generated location illustrations: **Galle Fort, Hikkaduwa, Nine Arch Bridge, Sigiriya and Sri Dalada Maligawa**. These are promotional loading artwork. A shuffle bag varies the artwork between loads and keeps one image steady throughout each operation.
-
-| Circuit | Character | Length |
-|---|---|---|
-| Astra Lotus Coast | Oceanfront straights and coastal corners | 1.9 km |
-| Colombo City Grand Prix | A longer city circuit through Colombo | 5.5 km |
-| Kandy Lake Circuit | Lakeside corners in Sri Lanka’s hill country | 2.8 km |
-
-Wennappuwa Street Circuit is also included for unranked solo and split-screen racing.
-
-Choose **1–10 laps**, default **3**, and a lighting preset including dusk-to-night progression. Records keep lap counts and driving rulesets separate; historical filters retain access to older times.
-
-| Bigster on the coast | Duster My 2014 on the coast |
-|---|---|
-| ![Dacia Bigster on the coastal circuit — actual in-engine capture](docs/screenshots/2.7.9/bigster-coastal-three-quarter.png) | ![Duster My 2014 on the coastal circuit — actual in-engine capture](docs/screenshots/2.7.9/duster-my-2014-coastal-three-quarter.png) |
-
-*Actual in-engine coastal views, captured with a preset camera and the HUD hidden. Original vehicle and track source assets are preserved.*
-
-## A soundtrack for the whole drive
-
-Two custom intro tracks accompany boot, loading, menus and the garage without restarting at every screen change. Kandy and the coastal circuits have their own race openers, followed by a varied **six-track pool**: four user-supplied custom tracks, **Ceylon Afterglow**, and the original **Island Music**. Smooth transitions keep the music moving between the garage and the race. Everything is bundled for offline play.
-
-The custom recordings retain their [source credits and provenance](licenses/customaudio279.md). The [2.7.9 release notes](docs/RELEASE_NOTES_279.md), [cockpit details](docs/COCKPITS_279.md) and [historical validation](docs/VALIDATION_279.md) document the inherited cockpit and soundtrack work.
-
-## Download and play
-
-1. Download **LeoRacer-Setup.exe** using the button above, from this repository’s GitHub release.
-2. Keep the complete content selection for all **21 cars and three tracks**.
-3. Launch **Leo Racer** from its shortcut. Choose **Let’s Race**, your ride, and **Start Race**.
-
-Windows 64-bit. Use the included **Play Compatibility.cmd** if Vulkan is unavailable. Prefer a dedicated GPU; lower quality or use Compatibility on older hardware. Keep the entire portable folder together if using the ZIP. The supported upgrade path preserves selections, custom content and historical records, and backs up modified managed files.
-
-Downloads are hosted on GitHub over HTTPS. Compare the installer against **SHA256SUMS.txt** on the release page if desired. Windows may display an unfamiliar-publisher warning; the project makes no claim of a trusted code-signing certificate. Download from this repository’s releases.
+`LeoRacer-AdditionalCars-2.3.0.zip` is the older optional pack with 32 imported vehicle folders. It was put together for fun, and the full pack is untested with 2.8. Use the optional imports for unranked play. The [original pack notes](docs/RELEASE_NOTES_2.3.0.md#downloads) describe the archive and its content.
 
 ## Controls
 
-| Action | Keyboard defaults | Xbox-style controller defaults |
+Two local players can share a keyboard, use separate controllers, or mix input devices. To claim a controller, choose **Assign Pad** on the player card and press **A** on that controller. **Identify** helps distinguish identical pads. **Controls** lets you change bindings, and the race loading screen shows the saved bindings for each active player.
+
+| Action | Keyboard defaults | Xbox-style defaults |
 |---|---|---|
-| Drive | WASD / arrows | Left stick; RT accelerate, LT brake |
-| Drift | Space | A |
-| Nitro / boost | Shift | X |
-| Menu OK / Confirm | Enter | **Configured boost button (X by default)**; A also supported |
-| Menu Back | Esc | B |
-| Recover | R | Y |
-| Pause | Esc / P | Start |
+| Steer | A / D or Left / Right | Left stick |
+| Accelerate / brake | W / S or Up / Down | RT / LT |
+| Drift / nitro | Space / Shift | A / X |
+| Recover / pause | R / Esc or P | Y / Start |
 | Horn | H | B |
-| Change camera | C | Right-stick click |
-| Look back | V | Left-stick click |
-| Vehicle actions | O / K, remappable | D-pad Up / Down |
+| Change camera / look back | C / V | Right-stick click / left-stick click |
+| Headlights | L | D-pad Left |
+| Vehicle actions | O / K | D-pad Up / Down |
+| Menu confirm / back | Enter / Esc | A or configured boost button / B |
 
-The Controls screen shows the actual bindings for each player, including shared-keyboard presets. Garage: **LB / RB** changes cars; drag to orbit and scroll to zoom with a mouse. Bigster Action 1 opens its sunroof; Action 2 opens its trunk. Assign identical pads with **Press A to assign**, then use **Identify** to distinguish them. Rumble strength and its test control are in Settings.
+## Creator tools
 
-## Create, play and share a link
+| Tool | What it does |
+|---|---|
+| **Vehicle Workshop** | Import your own GLB, normalize its scale and orientation, set wheel pivots and separate brake calipers, then take it for a private test drive. Export a standalone vehicle folder with its thumbnail and metadata. The workshop runs offline from `Vehicle Workshop.cmd`. [Workshop guide](docs/VEHICLE_WORKSHOP.md) |
+| **Offline Track Kit** | Bring in OpenStreetMap geography and elevation through Earth2Road, then edit the race line, grade and scenery in Godot. Validate and export a standalone track pack. The included Kandy example can be opened offline. [Track Kit guide](sdk/track-kit/README.md) |
+| **Grass Field** | A Godot addon I built for the `2.8` branch. It uses batches of 3D grass blades, adjusts density and geometry with distance, and supports baked track data or a live Terrain3D provider. It can track two cameras for split-screen. [Addon and demo documentation](addons/grass_field/README.md) |
 
-The included **Vehicle Workshop** supports custom imports and matching transparent previews. Use **Vehicle Workshop.cmd** in the game folder, or open the in-game content tools.
+The Windows source build uses **Godot 4.7.2 .NET** and the pinned toolchain. The packaging entry point is `tools/ultra_windows.ps1 -Package`. [Development setup](docs/COLOMBO_SETUP.md) · [Content architecture](docs/MODULARITY.md) · [Media pack](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.7.1)
 
-The [2.7.1 artwork release](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.7.1) includes **LeoRacer-2.7.1-Media-Pack.zip** with transparent cars, vectors, track outlines, artwork, screenshots and attribution guidance. Its individual terms apply. Promotional illustrations are labeled as artwork.
+## How I built it
 
-## Credits and license
+I’m **L.J. Amila Prasad Perera**. Kenney's Racing Starter Kit gave me the starting point. I heavily reworked the handling and race flow, built out solo and split-screen play, and put together the 3D garage, Sri Lankan circuits, content tools and Windows packages.
 
-**Author: L.J. Amila Prasad Perera.** I made Leo Racer for my son, **Shaven Leo**, who is six years old.
-
-Leo Racer is an independent indie project. Third-party trademarks, names, logos and characters belong to their respective owners; their inclusion does not imply affiliation or endorsement. See [licenses](licenses/) for the creators and terms of third-party materials.
-
-Original work is offered under the [custom non-commercial license](LICENSE) where the author holds the necessary rights. Earlier AGPL and MIT permissions remain in effect for material previously supplied under those terms. Third-party licenses continue to apply. Share the official download link; redistribution and commercial use require the permissions described in those terms.
+I use AI as an assistant in parts of development and for some promotional illustrations. I make the design decisions, integrate the assets and systems, tune the driving and playtest the builds.
 
 <details>
-<summary><strong>Credits, licenses &amp; attribution</strong></summary>
+<summary>View the promotional illustrations</summary>
 
-Kenney's Racing Starter Kit and City Kit remain the foundation. The project also uses Rokojori, Terrain3D, EZ Tree, Quaternius CC0 foliage, AmbientCG PBR maps, and the components credited in the source tree. Their individual licenses and notices apply; the repository does not place all third-party assets under one blanket license.
+![Two cars racing above the Indian Ocean in the Astra Lotus Coast illustration](docs/media/hero-astra-lotus-coast.webp)
 
-Rokojori source is obtained separately under its Public Indie License and is not republished as a standalone toolkit. Existing character and vehicle meshes retain their original notices.
+![Two cars racing past the lakeside parapet in the Kandy Lake Circuit illustration](docs/media/hero-kandy-lake.webp)
 
-[Licenses](licenses/) · [Astra artwork and audio](licenses/ASTRA_ASSETS.md) · [Sri Lankan assets](licenses/SRILANKA_ASSETS.md) · [Kandy attribution](licenses/Kandy-2.3.1.txt) · [Custom soundtrack](licenses/customaudio279.md)
+*AI-generated promotional illustrations inspired by Astra Lotus Coast and Kandy Lake Circuit.*
 
 </details>
 
-## Feedback, performance and building
+## Release notes and feedback
 
-Friends and family: please [send feedback or report a problem](https://github.com/amilapcsgit/Leo_Racer/issues/new). Include your Windows version, GPU, renderer, track, player count and what happened. A screenshot helps.
+- **Stable 2.8.0** adds adaptive grass and water, recorded vehicle audio, refreshed Kandy scenery and the fourth circuit at Wennappuwa. [Release notes](docs/RELEASE_NOTES_280.md) · [Validation](docs/VALIDATION_280.md)
+- **The current `2.8` development branch** adds track-matched Grass Field atlases and smaller, alternating boost pads. New profiles start on Astra Lotus Coast with Assisted handling and two laps. [Branch notes](docs/RELEASE_NOTES_281.md)
+- **Bug reports** are most useful with the build, Windows version, GPU, renderer, track, player count and steps to reproduce. [Report a bug](https://github.com/amilapcsgit/Leo_Racer/issues/new) · [Follow 1080p testing](https://github.com/amilapcsgit/Leo_Racer/issues/8)
 
-Performance varies with track, renderer and player count. Compatibility remains available, and split-screen caps scenery at Medium. Physical controller/wheel, rumble, reconnect and display checks are described in the [validation report](docs/VALIDATION_279.md); screenshots do not establish those hardware results.
+## Credits and license
 
-Build with Godot **4.7.2 .NET** and the pinned tools. See [setup instructions](docs/COLOMBO_SETUP.md). The shared Windows entrypoint is `tools/ultra_windows.ps1 -Package`; it stages content and produces the installer, portable archive and diagnostics. Synced project sources and original model assets remain preserved.
+Kenney's Racing Starter Kit and City Kit are credited alongside Rokojori, Terrain3D, EZ Tree, Quaternius foliage, AmbientCG maps, and other contributors. Map-derived data is credited to © OpenStreetMap contributors and retains its applicable terms. [Third-party notices](licenses/) · [Map data attribution](content/toolchain/earth2road/THIRD_PARTY_NOTICES.md) · [Vehicle audio credits](licenses/LeoRacer-280-Assets.md) · [Soundtrack credits](licenses/customaudio279.md)
 
-<hr>
-
-<p align="center">
-  <strong>Pick your ride. Find your line. One more lap.</strong><br><br>
-  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest">Download Leo Racer</a>
-  &nbsp; · &nbsp;
-  <a href="https://github.com/amilapcsgit/Leo_Racer/releases/latest">Release notes &amp; checksums</a>
-</p>
+Original work is offered under the [custom non-commercial license](LICENSE) where the author holds the necessary rights. Earlier AGPL and MIT permissions remain in effect for material previously supplied under those terms. Third-party materials retain their own licenses, and their trademarks and characters belong to their respective owners.
