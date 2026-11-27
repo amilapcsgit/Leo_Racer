@@ -2,7 +2,7 @@
 
 **A 3D arcade racer on Sri Lankan roads, built in Godot for Windows. Pick a car in the live showroom, race solo against AI, or share the screen with a second player.**
 
-[**Download the Windows installer**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.0/LeoRacer-Setup.exe) · [**Official website**](https://leoracer.amilaperera.it/) · [Portable ZIP and checksums](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.0)
+[![Download Windows Installer](docs/media/download-windows.svg)](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-Setup.exe) · [Portable ZIP](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-2.8.1-win64.zip) · [Official website](https://leoracer.amilaperera.it/)
 
 [![The Leo Racer driver selector and interactive 3D car showroom](docs/screenshots/2.7.0/garage.png)](docs/screenshots/2.7.0/garage.png)
 
@@ -35,17 +35,18 @@ Drift to build charge, find a slipstream, and spend nitro on the next straight. 
 | **Kandy Lake Circuit** | Lakeside corners in Sri Lanka's hill country |
 | **Wennappuwa Street Circuit** | Unranked street racing in solo and local split-screen |
 
-Choose 1–10 laps and static lighting or **Dusk to Night**. In the 2.8.1 playtest, Easy, Assisted and Standard handling presets offer different speeds and steering response. Records in 2.8.1 also account for the handling preset.
+Choose 1–10 laps and static lighting or **Dusk to Night**. In 2.8.1, Easy, Assisted and Standard handling presets offer different speeds and steering response. Records in 2.8.1 also account for the handling preset.
 
 ## Play on Windows
 
 | Download | What you get |
 |---|---|
-| [**Windows installer**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.0/LeoRacer-Setup.exe) | Stable 2.8.0, with shortcuts, 21 cars and all four circuits |
-| [**Portable ZIP**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.0/LeoRacer-2.8.0-win64.zip) | The same stable game in a folder you can extract and run |
-| [**2.8.1 playtest**](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.1-rc.3) | An optional portable build with handling presets, Draw Distance and a Wennappuwa road collision fix |
+| [**Windows installer**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-Setup.exe) | Stable 2.8.1, with shortcuts, 21 cars and all four circuits |
+| [**Portable ZIP**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-2.8.1-win64.zip) | The same stable game in a folder you can extract and run |
 
-The Windows x64 builds include their runtime. You can install and play offline without a separate Godot or .NET SDK installation. Download verification and release notes are on the [stable release page](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.0).
+The Windows x64 builds include their runtime. You can install and play offline without a separate Godot or .NET SDK installation. Download verification and release notes are on the [stable release page](https://github.com/amilapcsgit/Leo_Racer/releases/tag/v2.8.1).
+
+New profiles start on Astra Lotus Coast with Bigster, three laps, Assisted handling, and Reduced Motion enabled.
 
 1. Run the installer and launch **Leo Racer** from its shortcut. For the portable build, extract the whole archive and run `LeoRacer.exe`.
 2. If Forward+ gives you graphics problems or Vulkan is unavailable, run `Play Compatibility.cmd` from the game folder.
@@ -53,7 +54,9 @@ The Windows x64 builds include their runtime. You can install and play offline w
 
 ### Bonus cars to experiment with
 
-`LeoRacer-AdditionalCars-2.3.0.zip` is the older optional pack with 32 imported vehicle folders. It was put together for fun, and the full pack is untested with 2.8. Use the optional imports for unranked play. The [original pack notes](docs/RELEASE_NOTES_2.3.0.md#downloads) describe the archive and its content.
+[**Download Experimental Additional Cars**](https://github.com/amilapcsgit/Leo_Racer/releases/download/v2.8.1/LeoRacer-AdditionalCars-2.8.1.zip)
+
+Extract the ZIP and follow its installation guide. These cars are optional and use unranked play.
 
 ## Controls
 
@@ -100,8 +103,8 @@ I use AI as an assistant in parts of development and for some promotional illust
 
 ## Release notes and feedback
 
-- **Stable 2.8.0** adds adaptive grass and water, recorded vehicle audio, refreshed Kandy scenery and the fourth circuit at Wennappuwa. [Release notes](docs/RELEASE_NOTES_280.md) · [Validation](docs/VALIDATION_280.md)
-- **The current `2.8` development branch** adds track-matched Grass Field atlases and smaller, alternating boost pads. New profiles start on Astra Lotus Coast with Assisted handling and two laps. [Branch notes](docs/RELEASE_NOTES_281.md)
+- **2.8.0** added adaptive grass and water, recorded vehicle audio, refreshed Kandy scenery and the fourth circuit at Wennappuwa. [Release notes](docs/RELEASE_NOTES_280.md) · [Validation](docs/VALIDATION_280.md)
+- **2.8.1** adds track-matched Grass Field atlases and smaller, alternating boost pads. New profiles start on Astra Lotus Coast with Bigster, Assisted handling, three laps and Reduced Motion enabled. [Branch notes](docs/RELEASE_NOTES_281.md)
 - **Bug reports** are most useful with the build, Windows version, GPU, renderer, track, player count and steps to reproduce. [Report a bug](https://github.com/amilapcsgit/Leo_Racer/issues/new) · [Follow 1080p testing](https://github.com/amilapcsgit/Leo_Racer/issues/8)
 
 ## Credits and license

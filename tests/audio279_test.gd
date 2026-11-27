@@ -34,11 +34,11 @@ func run() -> void:
  music.set_context("race","kandy_lake");await create_timer(2.2).timeout
  check(music.context=="race" and music.last_track=="kandy_race" and not music.crossing,"Kandy starts with its dedicated recording at GO")
  var seen: Dictionary={"kandy_race":true}
- for i in 5:
+ for i in LeoRaceAudio.TRACKS.size() - 1:
   var song:=music.pick()
   check(song!=null and not seen.has(music.last_track),"Long-race bag uses each other custom/original once")
   seen[music.last_track]=true
- check(seen.size()==6 and seen.has("ceylon_afterglow") and seen.has("island_original"),"Long races include all four custom songs plus both generated originals")
+ check(seen.size()==5 and seen.has("ceylon_afterglow") and not seen.has("island_original"),"Long races use the five retained tracks")
  var previous:=music.last_track
  music.pick();check(music.last_track!=previous,"No repeated race song at bag boundary")
  music.set_context("results","kandy_lake");await create_timer(2.2).timeout

@@ -2,8 +2,8 @@ class_name LeoRaceAudio
 extends AudioStreamPlayer
 ## One boot-persistent player pair; menus never restart music at screen changes.
 const MENU_TRACKS=["intro_main","intro_alt"]
-const TRACKS=["intro_main","intro_alt","kandy_race","coast_race","ceylon_afterglow","island_original"]
-const FILES={"intro_main":"res://assets/audio/custom279/intro_main.ogg","intro_alt":"res://assets/audio/custom279/intro_alt.ogg","kandy_race":"res://assets/audio/custom279/kandy_race.ogg","coast_race":"res://assets/audio/custom279/coast_race.ogg","ceylon_afterglow":"res://assets/audio/menu279/ceylon_afterglow.ogg","island_original":"res://assets/audio/custom279/island_original.ogg"}
+const TRACKS=["intro_main","intro_alt","kandy_race","coast_race","ceylon_afterglow"]
+const FILES={"intro_main":"res://assets/audio/custom279/intro_main.ogg","intro_alt":"res://assets/audio/custom279/intro_alt.ogg","kandy_race":"res://assets/audio/custom279/kandy_race.ogg","coast_race":"res://assets/audio/custom279/coast_race.ogg","ceylon_afterglow":"res://assets/audio/menu279/ceylon_afterglow.ogg"}
 var next: AudioStreamPlayer
 var announcer: AudioStreamPlayer
 var host: Node

@@ -75,7 +75,10 @@ func shell(title: String,subtitle: String="") -> VBoxContainer:
 func show_home() -> void:
  game.input_router.assignment_locked=false;game.input_router.resolve_automatic(game.human_count)
  screen="home";hud.scene_mode="menu"
- var choices: Array=HOME_ART.filter(func(path):return path!=previous_home_art)
+ var candidates: Array=HOME_ART.duplicate()
+ var circuit_art:=LeoLoadingBackdrops.circuit_art(game.chosen_track_id)
+ if ResourceLoader.exists(circuit_art):candidates.append(circuit_art)
+ var choices: Array=candidates.filter(func(path):return path!=previous_home_art)
  home_art=choices.pick_random();previous_home_art=home_art
  var body:=shell("LEO RACER","COLOMBO AFTER DARK")
  var row:=HBoxContainer.new();row.size_flags_vertical=Control.SIZE_EXPAND_FILL;body.add_child(row)

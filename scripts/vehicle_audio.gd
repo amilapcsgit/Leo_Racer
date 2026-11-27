@@ -144,7 +144,7 @@ func update(dt: float) -> void:
 			layers[i].pitch_scale=.75+rev*.85
 	else:
 		var actual_rpm := lerpf(float(engine_rows.front().rpm), float(engine_rows.back().rpm), rev)
-		update_engine_samples(actual_rpm, split_gain)
+		update_engine_samples(actual_rpm, split_gain, dt)
 	layers[4].volume_db=linear_to_db(maxf(.0001,ratio*ratio*split_gain))-28.
 	if tire_layers.size()==2:
 		update_tires(dt,split_gain)
@@ -163,7 +163,7 @@ func update(dt: float) -> void:
 		if zone is Area3D and zone.overlaps_body(kart):room=maxf(room,float(zone.get_meta("reverb",.4)))
 	room_gain=lerpf(room_gain,room,1.-exp(-dt*4.));reverb.wet=room_gain
 
-func update_engine_samples(actual_rpm: float, mix_gain: float) -> void:
+func update_engine_samples(actual_rpm: float, mix_gain: float, dt: float) -> void:
 	var upper := 1
 	while upper < engine_rows.size()-1 and actual_rpm > float(engine_rows[upper].rpm):
 		upper += 1
@@ -185,13 +185,16 @@ func update_engine_samples(actual_rpm: float, mix_gain: float) -> void:
 				if not target.has(layers[index].stream):
 					channel = layers[index]
 					channel.stream = sample
+					channel.volume_db = -80.0
 					channel.play()
 					break
 		if channel:
 			var values: Vector2 = target[sample]
 			channel.pitch_scale = clampf(actual_rpm/values.y,.63,1.52)
 			var shift := .50 if shift_time>.035 else 1.0
-			channel.volume_db = linear_to_db(maxf(.0001,values.x*mix_gain*shift))-18.
+			var gain := values.x * mix_gain * shift * db_to_linear(-18.0)
+			var smoothed := lerpf(db_to_linear(channel.volume_db), gain, 1.0 - exp(-dt * 50.0))
+			channel.volume_db = linear_to_db(maxf(.0001, smoothed))
 
 func update_tires(dt: float, mix_gain: float) -> void:
 	var speed := absf(kart.wheel_motion_speed)

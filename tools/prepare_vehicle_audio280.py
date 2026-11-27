@@ -47,10 +47,23 @@ def prepare(ffmpeg, bank, target):
     return data[:-overlap], path
 
 
+def smooth_wrap(pcm, rate):
+    """Join both sides of a loop at the same level with a short raised-cosine blend."""
+    span = min(round(rate * .003), len(pcm) // 4)
+    if span < 2:
+        return
+    midpoint = round((pcm[0] + pcm[-1]) / 2)
+    for index in range(span):
+        weight = .5 + .5 * math.cos(math.pi * index / (span - 1))
+        for sample in (index, -1 - index):
+            pcm[sample] = round(pcm[sample] * (1 - weight) + midpoint * weight)
+
+
 def write_loop(output, values):
     average = sum(values) / len(values)
     peak = max(abs(sample - average) for sample in values)
     pcm = array("h", (round((sample - average) / max(.02, peak) * 19000) for sample in values))
+    smooth_wrap(pcm, RATE)
     with wave.open(str(output), "wb") as file:
         file.setparams((1, 2, RATE, len(pcm), "NONE", "not compressed"))
         file.writeframes(pcm.tobytes())

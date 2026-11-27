@@ -13,7 +13,7 @@ var retry: Button
 var back: Button
 var summary: Label
 var race_summary:="Your next race is nearly ready."
-var reduced_motion:=false
+var reduced_motion:=true
 var panel: Control
 var design: Control
 var diagram: LeoControllerDiagram
@@ -28,7 +28,7 @@ func words(parent: Node,at: Vector2,extent: Vector2,text: String,font_size: int,
 func _ready() -> void:
  layer=100;process_mode=Node.PROCESS_MODE_ALWAYS
  panel=Control.new();panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);panel.theme=load("res://assets/ui/theme.tres");add_child(panel)
- var saved:=ConfigFile.new();saved.load("user://leo_racer.cfg");reduced_motion=bool(saved.get_value("display","reduced_motion",false))
+ var saved:=ConfigFile.new();saved.load("user://leo_racer.cfg");reduced_motion=bool(saved.get_value("display","reduced_motion",true))
  backdrop_path=LeoLoadingBackdrops.begin_load(operation_id,String(saved.get_value("game","track_id","astra_coast")),"",saved.get_value("game","race_variant","static")=="dusk_night")
  artwork=TextureRect.new();artwork.texture=load(backdrop_path);artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);artwork.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;artwork.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_COVERED;artwork.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(artwork)
  var shade:=ColorRect.new();shade.color=Color(.01,.025,.04,.16);shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);shade.mouse_filter=Control.MOUSE_FILTER_IGNORE;panel.add_child(shade)

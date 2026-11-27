@@ -38,7 +38,7 @@ var selected_kart := 0
 var custom_player_name := ""
 var garage_from_pause := false
 var race_modified := false
-var selected_laps := 2
+var selected_laps := 3
 var active_laps := 3
 var haptics: LeoHaptics
 var countdown := 3.6
@@ -82,7 +82,7 @@ var graphics_quality := 1
 var track_environment: LeoTrackEnvironment
 var base_camera_fov := 63.0
 var opponent_audio: LeoOpponentAudio
-var reduced_motion := false
+var reduced_motion := true
 var camera_roll := 0.0
 var launch_charged := false
 var horn_cooldown := 0.0
@@ -1046,12 +1046,13 @@ func save_settings() -> void:
 func load_settings() -> void:
 	var cfg := ConfigFile.new()
 	var settings_loaded:=cfg.load("user://leo_racer.cfg")
+	selected_kart = catalog.vehicle_index(&"bigster")
 	handling_preset = clampi(int(cfg.get_value("game_logic", "handling", LeoRaceRules.Handling.ASSISTED)), LeoRaceRules.Handling.EASY, LeoRaceRules.Handling.STANDARD)
 	allow_ai_bigster=GameLogic279.read_preference(cfg) if settings_loaded==OK else false
 	if settings_loaded == OK:
 		master_volume = cfg.get_value("audio", "volume", .72)
 		music_enabled = cfg.get_value("audio", "music", true)
-		reduced_motion = cfg.get_value("display", "reduced_motion", false)
+		reduced_motion = cfg.get_value("display", "reduced_motion", true)
 		graphics_quality=clampi(int(cfg.get_value("display","graphics_quality",1)),0,2)
 		base_camera_fov=clampf(float(cfg.get_value("display","camera_fov",63.)),55.,75.)
 		var selection := catalog.migrate(cfg)
@@ -1060,7 +1061,7 @@ func load_settings() -> void:
 		custom_player_name=str(cfg.get_value("game","custom_player_name","")).left(32)
 		chosen_track_id=cfg.get_value("game","track_id","astra_coast")
 		race_variant=cfg.get_value("game","race_variant","static")
-		selected_laps=clampi(int(cfg.get_value("game","laps",2)),1,10)
+		selected_laps=clampi(int(cfg.get_value("game","laps",3)),1,10)
 		if haptics:
 			haptics.enabled=bool(cfg.get_value("controls","rumble",true))
 			haptics.intensity=clampf(float(cfg.get_value("controls","rumble_intensity",1.)),0.,1.)

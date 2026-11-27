@@ -131,6 +131,8 @@ func settings() -> void:
 	stored_settings.load("user://leo_racer.cfg")
 	ConfigFile.new().save("user://leo_racer.cfg")
 	game.load_settings()
+	check(game.selected_laps == 3 and game.chosen_track_id == "astra_coast", "New profiles default to three laps on Astra Lotus Coast")
+	check(game.reduced_motion and game.selected_kart == game.catalog.vehicle_index(&"bigster"), "New profiles default to Reduced Motion and Bigster")
 	for track_definition in game.tracks:
 		var course := LeoCircuit.new(track_definition)
 		for index in course.boosts.size():
