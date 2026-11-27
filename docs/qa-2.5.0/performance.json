@@ -1,0 +1,521 @@
+{
+  "status": "PASS",
+  "gates": [
+    {
+      "gate": "candidate-forward/kandy_lake/1/60fps",
+      "pass": true,
+      "p95_ms": 11.106
+    },
+    {
+      "gate": "candidate-forward/kandy_lake/2/60fps",
+      "pass": true,
+      "p95_ms": 11.753
+    },
+    {
+      "gate": "candidate-forward/astra_coast/1/60fps",
+      "pass": true,
+      "p95_ms": 10.697
+    },
+    {
+      "gate": "candidate-forward/astra_coast/2/60fps",
+      "pass": true,
+      "p95_ms": 11.667
+    },
+    {
+      "gate": "candidate-forward/colombo_city/1/60fps",
+      "pass": true,
+      "p95_ms": 10.875
+    },
+    {
+      "gate": "candidate-forward/colombo_city/2/60fps",
+      "pass": true,
+      "p95_ms": 11.023
+    },
+    {
+      "gate": "candidate-compatibility/kandy_lake/1/60fps",
+      "pass": true,
+      "p95_ms": 13.07
+    },
+    {
+      "gate": "Compatibility versus matched RC/kandy_lake/1",
+      "pass": true,
+      "baseline": 20.68,
+      "candidate": 13.07
+    },
+    {
+      "gate": "candidate-compatibility/kandy_lake/2/60fps",
+      "pass": true,
+      "p95_ms": 16.052
+    },
+    {
+      "gate": "Compatibility versus matched RC/kandy_lake/2",
+      "pass": true,
+      "baseline": 22.661,
+      "candidate": 16.052
+    },
+    {
+      "gate": "candidate-compatibility/astra_coast/1/60fps",
+      "pass": true,
+      "p95_ms": 11.647
+    },
+    {
+      "gate": "Compatibility versus matched RC/astra_coast/1",
+      "pass": true,
+      "baseline": 11.248,
+      "candidate": 11.647
+    },
+    {
+      "gate": "candidate-compatibility/astra_coast/2/60fps",
+      "pass": true,
+      "p95_ms": 10.244
+    },
+    {
+      "gate": "Compatibility versus matched RC/astra_coast/2",
+      "pass": true,
+      "baseline": 9.938,
+      "candidate": 10.244
+    },
+    {
+      "gate": "candidate-compatibility/colombo_city/1/60fps",
+      "pass": true,
+      "p95_ms": 11.953
+    },
+    {
+      "gate": "Compatibility versus matched RC/colombo_city/1",
+      "pass": true,
+      "baseline": 11.513,
+      "candidate": 11.953
+    },
+    {
+      "gate": "candidate-compatibility/colombo_city/2/60fps",
+      "pass": true,
+      "p95_ms": 11.592
+    },
+    {
+      "gate": "Compatibility versus matched RC/colombo_city/2",
+      "pass": true,
+      "baseline": 10.918,
+      "candidate": 11.592
+    }
+  ],
+  "measurements": {
+    "baseline-forward": [
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 16665,
+        "max_frame_ms": 34.547,
+        "p50_ms": 11.001,
+        "p95_ms": 14.437,
+        "p99_ms": 15.941,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1270,
+        "max_frame_ms": 24.555,
+        "p50_ms": 11.844,
+        "p95_ms": 16.363,
+        "p99_ms": 18.669,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 14194,
+        "max_frame_ms": 14.753,
+        "p50_ms": 8.695,
+        "p95_ms": 10.098,
+        "p99_ms": 10.454,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1359,
+        "max_frame_ms": 12.441,
+        "p50_ms": 9.242,
+        "p95_ms": 10.897,
+        "p99_ms": 11.401,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 1192,
+        "max_frame_ms": 16.528,
+        "p50_ms": 7.92,
+        "p95_ms": 10.951,
+        "p99_ms": 11.47,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1061,
+        "max_frame_ms": 23.176,
+        "p50_ms": 8.327,
+        "p95_ms": 10.993,
+        "p99_ms": 11.508,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      }
+    ],
+    "baseline-compatibility": [
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 16256,
+        "max_frame_ms": 629.086,
+        "p50_ms": 16.114,
+        "p95_ms": 20.68,
+        "p99_ms": 24.902,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 7062,
+        "max_frame_ms": 197.972,
+        "p50_ms": 10.273,
+        "p95_ms": 22.661,
+        "p99_ms": 28.138,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 12861,
+        "max_frame_ms": 113.779,
+        "p50_ms": 9.135,
+        "p95_ms": 11.248,
+        "p99_ms": 12.401,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1352,
+        "max_frame_ms": 161.413,
+        "p50_ms": 8.39,
+        "p95_ms": 9.938,
+        "p99_ms": 10.571,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 955,
+        "max_frame_ms": 20.265,
+        "p50_ms": 9.491,
+        "p95_ms": 11.513,
+        "p99_ms": 12.359,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 772,
+        "max_frame_ms": 19.722,
+        "p50_ms": 8.815,
+        "p95_ms": 10.918,
+        "p99_ms": 12.388,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      }
+    ],
+    "candidate-forward": [
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 18974,
+        "max_frame_ms": 21.739,
+        "p50_ms": 8.143,
+        "p95_ms": 11.106,
+        "p99_ms": 12.315,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1290,
+        "max_frame_ms": 202.545,
+        "p50_ms": 9.427,
+        "p95_ms": 11.753,
+        "p99_ms": 13.523,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 1354,
+        "max_frame_ms": 17.133,
+        "p50_ms": 8.835,
+        "p95_ms": 10.697,
+        "p99_ms": 11.343,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 594,
+        "max_frame_ms": 13.189,
+        "p50_ms": 9.773,
+        "p95_ms": 11.667,
+        "p99_ms": 12.326,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 1234,
+        "max_frame_ms": 18.758,
+        "p50_ms": 8.283,
+        "p95_ms": 10.875,
+        "p99_ms": 11.611,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1114,
+        "max_frame_ms": 30.456,
+        "p50_ms": 8.365,
+        "p95_ms": 11.023,
+        "p99_ms": 11.731,
+        "renderer": "forward_plus",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      }
+    ],
+    "candidate-compatibility": [
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 13260,
+        "max_frame_ms": 71.17,
+        "p50_ms": 10.462,
+        "p95_ms": 13.07,
+        "p99_ms": 15.0,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 1456,
+        "max_frame_ms": 746.422,
+        "p50_ms": 10.196,
+        "p95_ms": 16.052,
+        "p99_ms": 17.558,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "kandy_lake",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 2182,
+        "max_frame_ms": 18.241,
+        "p50_ms": 9.284,
+        "p95_ms": 11.647,
+        "p99_ms": 12.899,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 430,
+        "max_frame_ms": 23.186,
+        "p50_ms": 8.612,
+        "p95_ms": 10.244,
+        "p99_ms": 11.277,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "astra_coast",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 1,
+        "load_ms": 953,
+        "max_frame_ms": 42.458,
+        "p50_ms": 9.859,
+        "p95_ms": 11.953,
+        "p99_ms": 13.214,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      },
+      {
+        "gpu": "NVIDIA RTX A1000 6GB Laptop GPU",
+        "humans": 2,
+        "load_ms": 791,
+        "max_frame_ms": 94.374,
+        "p50_ms": 9.068,
+        "p95_ms": 11.592,
+        "p99_ms": 13.443,
+        "renderer": "gl_compatibility",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "sample_seconds": 30,
+        "track": "colombo_city",
+        "warmup_seconds": 6
+      }
+    ]
+  },
+  "candidate_core_sha256": "01035b6b5e7beb52fe0bdad0873a155234cfa850a13529fb5adf9e3dac6e6821",
+  "rc_core_sha256": "e1f04102a925a4d08dad9476690e59593b74257e7074f04cd803bb41ac92c8b5"
+}

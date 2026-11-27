@@ -1,0 +1,34 @@
+{
+  "bounds": {
+    "position": [
+      -1.03300786018372,
+      -0.00139984488487244,
+      -2.16893100738525
+    ],
+    "size": [
+      2.0733859539032,
+      1.76547539234161,
+      4.34650135040283
+    ]
+  },
+  "id": "duster_2024",
+  "lods_generated": true,
+  "merged_static_meshes": 84,
+  "pack_sha256": "a91e4bb2de6f1cb9e52ed8e77df3f936bf055b3f8f910a862880557125ff5b95",
+  "scene_bytes": 11608608,
+  "status": "PASS",
+  "textures": 12,
+  "revision": "2.7.9",
+  "source_file": "Duster_2024\\package\\GameAssets\\vehicles\\duster_2024\\model.glb",
+  "original_sha256": "b1945c391848ab09cdab06808f002b47a9099abf82482e6fa9098553a7d58db0",
+  "source_unchanged": true,
+  "derivative_sha256": "a91e4bb2de6f1cb9e52ed8e77df3f936bf055b3f8f910a862880557125ff5b95",
+  "virtual_scene": "res://cockpit279/duster_2024/model.scn",
+  "minimum_swept_clearance_m": 0.015,
+  "clearance_status": "PASS",
+  "animated_nodes_preserved": true,
+  "certified_clearance_lower_bound_m": 0.025823477956456474,
+  "clearance_method": "Continuous all-angle annular-band superset; exact projected triangle radial bounds, conservative triangle axial bounds",
+  "clearance_geometry_sha256": "7592a04052eee7649406c647a9367e0d4513526c64f148f1781b9881398014bc",
+  "cockpit_profile_sha256": "7a31020a50800e72a6920470b43df8aa28868adfc8cdc162258a27d32d13ddff"
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "cars": 20,
+  "tracks": 3,
+  "core_sha256": "01035b6b5e7beb52fe0bdad0873a155234cfa850a13529fb5adf9e3dac6e6821",
+  "installer_sha256": "24bad11f6d16e6863f65a96cbbb334b59110c1df650d4ffa959d377ab590d301",
+  "installed_content_verified": true,
+  "reinstall_preserves_custom": true,
+  "modified_backup": true,
+  "uninstall_preserves_custom_and_modified": true
+}

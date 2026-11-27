@@ -17,7 +17,8 @@ func run() -> void:
  check(router.assign(1,"keyboard",-1,false),"Shared keyboard assignment is allowed")
  router.assign(1,"gamepad",18,false)
  check(router.assign(0,"gamepad",17,false),"First controller assignment")
- check(not router.assign(1,"gamepad",17,false),"No duplicate device ownership")
+ check(router.assign(1,"gamepad",17,false) and router.players[0].device!=17,"Occupied device transfers ownership without duplicates")
+ router.assign(1,"gamepad",18,false);router.assign(0,"gamepad",17,false)
  router.feed(axis(17,JOY_AXIS_LEFT_X,.9));check(router.players[0].steering()>.8 and router.players[1].steering()==0.,"P1 steering isolation")
  router.feed(axis(18,JOY_AXIS_TRIGGER_RIGHT,.8));check(router.players[1].throttle()>.7 and router.players[0].throttle()==0.,"P2 throttle isolation")
  router.feed(axis(19,JOY_AXIS_TRIGGER_RIGHT,1.));check(router.players[0].throttle()==0.,"Unassigned pad ignored")
@@ -66,12 +67,51 @@ func run() -> void:
  check(router.players[1].bindings.accelerate[0].index==5 and router.players[1].bindings.accelerate[0].pressed<-.8,"Wheel learns actual pedal axis and direction")
  router.start_capture(1,"brake");router._capture(key(KEY_ESCAPE))
  check(router.capture_slot==-1 and router.players[1].value("accelerate")==0.,"Escape cancels capture and clears held inputs")
+ check_controller_transitions(router)
  var panel:=LeoControlsPanel.new();panel.router=router;root.add_child(panel);await process_frame
  check(panel.live.size()==LeoPlayerInput.ACTIONS.size(),"Controls expose every driving action")
  panel.slot=1;panel.refresh();check(panel.live.size()==LeoPlayerInput.ACTIONS.size(),"Second-player controls are editable")
  panel.free()
  var report:={"status":"PASS" if failures.is_empty() else "FAIL","checks":checks,"errors":failures,"physical_wheel":"unverified / hardware unavailable"}
  DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://build/qa-ui"))
- FileAccess.open("res://build/qa-ui/input.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/input"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("input.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_INPUT_TEST ",report)
  router.free();quit(0 if failures.is_empty() else 1)
+
+func joy_button(id: int, index: JoyButton, pressed: bool = true) -> InputEventJoypadButton:
+ var event := InputEventJoypadButton.new()
+ event.device = id
+ event.button_index = index
+ event.pressed = pressed
+ return event
+
+func check_controller_transitions(router: LeoInputRouter) -> void:
+ const CLAIMED_DEVICE := 41
+ const OTHER_DEVICE := 42
+ router.begin_claim(1)
+ check(router.claim_event(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A)), "A claims the controller")
+ check(not router.claim_event(joy_button(CLAIMED_DEVICE, JOY_BUTTON_X)), "Claim only consumes the A press and release")
+ check(router.claim_event(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A, false)), "Claim consumes the matching A release")
+
+ router.begin_claim(1)
+ router.claim_event(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A))
+ check(router.menu_confirm(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A)), "Menu confirm tracks a held button")
+ router.menu_confirm(joy_button(OTHER_DEVICE, JOY_BUTTON_A))
+ router.start_capture(1, "accelerate")
+ router._connection(CLAIMED_DEVICE, false)
+ check(router.capture_slot == -1, "Disconnect cancels binding capture for the removed controller")
+ check(not router.claim_event(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A)), "Reused device ID cannot inherit a consumed claim press")
+ check(not router.menu_confirm_held.has("%d:button:%d" % [CLAIMED_DEVICE, JOY_BUTTON_A]), "Disconnect clears only the removed device's confirm press")
+ check(router.menu_confirm_held.has("%d:button:%d" % [OTHER_DEVICE, JOY_BUTTON_A]), "The other player's confirm press stays latched")
+ check(router.menu_confirm(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A)), "The reconnected controller can confirm on the first press")
+
+ router.begin_claim(1)
+ router.claim_event(joy_button(CLAIMED_DEVICE, JOY_BUTTON_A))
+ router.begin_claim(0)
+ router.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+ check(router.claim_slot == -1 and router.claimed_releases.is_empty(), "Focus loss clears claim state and swallowed releases")
+ check(router.menu_confirm_held.is_empty(), "Focus loss clears menu confirms even when releases are lost")

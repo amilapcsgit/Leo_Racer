@@ -2,15 +2,89 @@ using Godot;
 using Microsoft.Data.Sqlite;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 using GArray = Godot.Collections.Array;
 using GDictionary = Godot.Collections.Dictionary;
 
 public partial class LocalRankingStore : RefCounted
 {
+    // Only plain immutable records cross this serialized worker boundary.
+    private sealed record ResultRow(bool Finished, bool Retired, int Gate, double Race, double Lap,
+        string Profile, string Name, string Driver, string Vehicle, string Class, int Place);
+    private sealed record Entry(string Name, string Driver, string Vehicle, long Race, long Lap, string Profile);
+    private BlockingCollection<System.Action> work = new();
+    private readonly ConcurrentDictionary<int, object> completed = new();
+    private readonly ConcurrentDictionary<int, bool> cancelled = new();
+    private Thread worker;
+    private int serial;
+    private bool closed;
+    public LocalRankingStore() { StartWorker(); }
+    private void StartWorker() {
+        worker = new Thread(() => { foreach (var action in work.GetConsumingEnumerable()) action(); })
+            { IsBackground = true, Name = "Leo rankings" };
+        worker.Start();
+    }
+    private T Execute<T>(Func<T> action) {
+        if (closed) throw new ObjectDisposedException(nameof(LocalRankingStore));
+        var task = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+        work.Add(() => { try { task.SetResult(action()); } catch (Exception ex) { task.SetException(ex); } });
+        return task.Task.GetAwaiter().GetResult();
+    }
+    private int Enqueue(Func<object> action) {
+        if (closed) return -1;
+        int id = Interlocked.Increment(ref serial);
+        work.Add(() => {
+            if (cancelled.TryRemove(id, out _)) return;
+            object value;
+            try { value = action(); } catch (Exception ex) { error = ex.Message; value = -1; }
+            completed[id] = value;
+            if (cancelled.TryRemove(id, out _)) completed.TryRemove(id, out _);
+        });
+        return id;
+    }
+    public bool request_ready(int id) => completed.ContainsKey(id);
+    public void cancel_request(int id) {
+        if (completed.TryRemove(id, out _)) return;
+        cancelled[id] = true;
+        if (completed.TryRemove(id, out _)) cancelled.TryRemove(id, out _);
+    }
+    public int take_write(int id) => completed.TryRemove(id, out var value) && value is int count ? count : -1;
+    private static ResultRow[] Snapshot(GArray rows) {
+        var result = new List<ResultRow>();
+        foreach (Variant item in rows) {
+            var row = item.AsGodotDictionary();
+            result.Add(new ResultRow(row["finished"].AsBool(), row["retired"].AsBool(), row["next_gate"].AsInt32(),
+                row["race_time"].AsDouble(), row["best_lap"].AsDouble(), row["profile_id"].AsString(),
+                row["name"].AsString(), row["driver"].AsString(), row["vehicle"].AsString(), row["class_id"].AsString(), row["place"].AsInt32()));
+        }
+        return result.ToArray();
+    }
+    private static GArray Present(List<Entry> rows) {
+        var result = new GArray();
+        foreach (var row in rows) result.Add(new GDictionary { ["name"]=row.Name, ["driver"]=row.Driver,
+            ["vehicle"]=row.Vehicle, ["race_ms"]=row.Race, ["lap_ms"]=row.Lap, ["profile_id"]=row.Profile });
+        return result;
+    }
+    public int query_async(int mode, string performanceClass, string vehicle, bool laps, string trackId, int revision, string ruleset, int lapCount = 3)
+        => Enqueue(() => Query(mode, performanceClass, vehicle, laps, trackId, revision, ruleset, lapCount));
+    public GArray take_query(int id) => completed.TryRemove(id, out var value) && value is List<Entry> rows ? Present(rows) : new GArray();
+    public int write_async(string session, int mode, GArray rows, bool modified, bool diagnostic, string track, int revision, string ruleset, int lapCount = 3) {
+        try {
+            var snapshot = Snapshot(rows);
+            return Enqueue(() => Save(session, mode, snapshot, modified, diagnostic, track, revision, ruleset, lapCount));
+        } catch (Exception ex) { error = ex.Message; return -1; }
+    }
     private SqliteConnection connection;
-    private string error = "";
+    private volatile string error = "";
     public string get_error() => error;
-    public bool open_store(string filename)
+    public bool open_store(string filename) {
+        if (closed) { work = new(); closed = false; StartWorker(); }
+        return Execute(() => Open(filename));
+    }
+    private bool Open(string filename)
     {
         try
         {
@@ -42,6 +116,9 @@ CREATE INDEX IF NOT EXISTS result_times ON results(class_id,race_ms,lap_ms);
 CREATE TABLE IF NOT EXISTS session_courses (
  session_id TEXT PRIMARY KEY REFERENCES sessions(id), revision INTEGER NOT NULL);
 INSERT OR IGNORE INTO session_courses SELECT id,1 FROM sessions;
+CREATE TABLE IF NOT EXISTS session_laps (
+ session_id TEXT PRIMARY KEY REFERENCES sessions(id), lap_count INTEGER NOT NULL CHECK(lap_count BETWEEN 1 AND 10));
+INSERT OR IGNORE INTO session_laps SELECT id,3 FROM sessions;
 PRAGMA user_version=1;";
             command.ExecuteNonQuery();
             error = "";
@@ -52,9 +129,17 @@ PRAGMA user_version=1;";
     public int save_session(string sessionId, int mode, GArray rows, bool modified, bool diagnostic)
         => save_session_for_track(sessionId, mode, rows, modified, diagnostic, "astra_coast", 1);
 
-    public int save_session_for_track(string sessionId, int mode, GArray rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset = "balanced_v1")
+    public int save_session_for_track(string sessionId, int mode, GArray rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset = "balanced_v1", int lapCount = 3) {
+        if (closed) { error = "Ranking database is closed."; return -1; }
+        try {
+            var snapshot = Snapshot(rows);
+            return Execute(() => Save(sessionId, mode, snapshot, modified, diagnostic, trackId, courseRevision, ruleset, lapCount));
+        } catch (Exception ex) { error = ex.Message; return -1; }
+    }
+    private int Save(string sessionId, int mode, ResultRow[] rows, bool modified, bool diagnostic, string trackId, int courseRevision, string ruleset, int lapCount = 3)
     {
         if (modified || diagnostic) return 0;
+        if (lapCount < 1 || lapCount > 10) { error = "Invalid lap count."; return -1; }
         if (string.IsNullOrWhiteSpace(trackId) || courseRevision < 1) { error = "Invalid course identity."; return -1; }
         if (connection == null) { error = "Ranking database is unavailable."; return -1; }
         try
@@ -78,24 +163,34 @@ PRAGMA user_version=1;";
                 course.Parameters.AddWithValue("$revision",courseRevision);
                 course.ExecuteNonQuery();
             }
+            using (var laps = connection.CreateCommand()) {
+                laps.Transaction = transaction;
+                laps.CommandText = "SELECT lap_count FROM session_laps WHERE session_id=$id";
+                laps.Parameters.AddWithValue("$id",sessionId);
+                var existing = laps.ExecuteScalar();
+                if (existing != null && Convert.ToInt32(existing) != lapCount)
+                    throw new InvalidOperationException("Conflicting lap count for existing session.");
+                laps.CommandText = "INSERT OR IGNORE INTO session_laps(session_id,lap_count) VALUES ($id,$laps)";
+                laps.Parameters.AddWithValue("$laps",lapCount);
+                laps.ExecuteNonQuery();
+            }
             int count = 0;
-            foreach (Variant item in rows)
+            foreach (var row in rows)
             {
-                var row = item.AsGodotDictionary();
-                if (!row["finished"].AsBool() || row["retired"].AsBool() || row["next_gate"].AsInt32() < 25) continue;
-                double race = row["race_time"].AsDouble(), lap = row["best_lap"].AsDouble();
+                if (!row.Finished || row.Retired || row.Gate != 8 * lapCount + 1) continue;
+                double race = row.Race, lap = row.Lap;
                 if (!double.IsFinite(race) || !double.IsFinite(lap) || race <= 0 || lap <= 0 || lap >= 99999) continue;
                 using var insert = connection.CreateCommand();
                 insert.Transaction = transaction;
                 insert.CommandText = @"INSERT OR IGNORE INTO results VALUES
 ($session,$profile,$name,$driver,$vehicle,$class,$place,$race,$lap)";
                 insert.Parameters.AddWithValue("$session",sessionId);
-                insert.Parameters.AddWithValue("$profile",row["profile_id"].AsString());
-                insert.Parameters.AddWithValue("$name",row["name"].AsString());
-                insert.Parameters.AddWithValue("$driver",row["driver"].AsString());
-                insert.Parameters.AddWithValue("$vehicle",row["vehicle"].AsString());
-                insert.Parameters.AddWithValue("$class",row["class_id"].AsString());
-                insert.Parameters.AddWithValue("$place",row["place"].AsInt32());
+                insert.Parameters.AddWithValue("$profile",row.Profile);
+                insert.Parameters.AddWithValue("$name",row.Name);
+                insert.Parameters.AddWithValue("$driver",row.Driver);
+                insert.Parameters.AddWithValue("$vehicle",row.Vehicle);
+                insert.Parameters.AddWithValue("$class",row.Class);
+                insert.Parameters.AddWithValue("$place",row.Place);
                 insert.Parameters.AddWithValue("$race",(long)Math.Round(race*1000,MidpointRounding.AwayFromZero));
                 insert.Parameters.AddWithValue("$lap",(long)Math.Round(lap*1000,MidpointRounding.AwayFromZero));
                 count += insert.ExecuteNonQuery();
@@ -109,9 +204,11 @@ PRAGMA user_version=1;";
     public GArray best_times(int mode, string performanceClass, string vehicle, bool laps)
         => best_times_for_track(mode, performanceClass, vehicle, laps, "astra_coast", 1);
 
-    public GArray best_times_for_track(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset = "balanced_v1")
+    public GArray best_times_for_track(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset = "balanced_v1", int lapCount = 3)
+        => closed ? new GArray() : Present(Execute(() => Query(mode, performanceClass, vehicle, laps, trackId, courseRevision, ruleset, lapCount)));
+    private List<Entry> Query(int mode, string performanceClass, string vehicle, bool laps, string trackId, int courseRevision, string ruleset, int lapCount = 3)
     {
-        var result = new GArray();
+        var result = new List<Entry>();
         if (connection == null) { error = "Ranking database is unavailable."; return result; }
         try
         {
@@ -121,8 +218,9 @@ PRAGMA user_version=1;";
 SELECT r.*,s.ended_utc, ROW_NUMBER() OVER(PARTITION BY r.profile_id ORDER BY r.{metric},s.ended_utc,r.session_id) AS number
 FROM results r JOIN sessions s ON r.session_id=s.id
 LEFT JOIN session_courses c ON c.session_id=s.id
+LEFT JOIN session_laps l ON l.session_id=s.id
 WHERE s.track_id=$track AND COALESCE(c.revision,1)=$revision AND s.ruleset=$rules AND s.mode=$mode
-AND r.class_id=$class AND ($vehicle='' OR r.vehicle_id=$vehicle))
+AND COALESCE(l.lap_count,3)=$laps AND r.class_id=$class AND ($vehicle='' OR r.vehicle_id=$vehicle))
 WHERE number=1 ORDER BY {metric},ended_utc,profile_id LIMIT 100";
             command.Parameters.AddWithValue("$mode",mode);
             command.Parameters.AddWithValue("$rules",ruleset);
@@ -130,15 +228,18 @@ WHERE number=1 ORDER BY {metric},ended_utc,profile_id LIMIT 100";
             command.Parameters.AddWithValue("$revision",courseRevision);
             command.Parameters.AddWithValue("$class",performanceClass);
             command.Parameters.AddWithValue("$vehicle",vehicle);
+            command.Parameters.AddWithValue("$laps",lapCount);
             using var reader = command.ExecuteReader();
-            while (reader.Read()) result.Add(new GDictionary {
-                ["name"]=reader.GetString(0), ["driver"]=reader.GetString(1), ["vehicle"]=reader.GetString(2),
-                ["race_ms"]=reader.GetInt64(3), ["lap_ms"]=reader.GetInt64(4), ["profile_id"]=reader.GetString(5)
-            });
+            while (reader.Read()) result.Add(new Entry(reader.GetString(0), reader.GetString(1), reader.GetString(2),
+                reader.GetInt64(3), reader.GetInt64(4), reader.GetString(5)));
             error = "";
         }
         catch (Exception ex) { error = ex.Message; }
         return result;
     }
-    public void close_store() { connection?.Dispose(); connection = null; }
+    public void close_store() {
+        if (closed) return;
+        Execute(() => { connection?.Dispose(); connection = null; return true; });
+        closed = true; work.CompleteAdding(); worker.Join(); completed.Clear(); cancelled.Clear();
+    }
 }

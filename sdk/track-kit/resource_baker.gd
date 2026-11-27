@@ -5,11 +5,14 @@ var namespace_path: String
 var files: Dictionary={}
 var cache: Dictionary={}
 var save_serial:=0
+var retained_prefixes: Array[String]=[]
 func _init(destination: String, prefix: String) -> void:
 	folder=destination;namespace_path=prefix
 	DirAccess.make_dir_recursive_absolute(folder.path_join("resources"))
 func resource(original: Resource) -> Resource:
 	if not original:return null
+	for prefix in retained_prefixes:
+		if original.resource_path.begins_with(prefix):return original
 	if original.resource_path.begins_with(namespace_path):return original
 	var key:=original.get_instance_id()
 	if cache.has(key):return cache[key]

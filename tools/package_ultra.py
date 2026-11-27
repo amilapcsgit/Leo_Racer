@@ -1,0 +1,239 @@
+"""Reproducible 2.7 assembly and ownership-preserving Windows installer."""
+from pathlib import Path
+import argparse, json, os, re, shutil, subprocess, zipfile
+import city_packs
+from stage_ultra_content import ROOT, sha
+VERSION=re.search(r'config/version="([^"]+)"',(ROOT/'project.godot').read_text(encoding='utf-8')).group(1)
+REV=VERSION.replace('.','')
+RELEASE_LABEL=os.environ.get('LEO_RELEASE_LABEL',VERSION)
+if RELEASE_LABEL != VERSION and not re.fullmatch(re.escape(VERSION)+r'-rc\.[1-9][0-9]*',RELEASE_LABEL):
+    raise ValueError('Release label must match the game version or its release candidate')
+BASE=ROOT/('build/Release-'+VERSION+'-Ultra')
+OUT=ROOT/('dist/release-'+VERSION)
+QA=ROOT/('build/qa'+REV)
+RELEASE_TRACKS=json.loads((ROOT/'content/releases'/(VERSION+'.json' if VERSION.startswith('2.8.') else '2.3.2.json')).read_text(encoding='utf-8'))['tracks']
+TRACK_COUNT=len(RELEASE_TRACKS)
+DIAGNOSTIC_REPORTS={'race-test.json','smoke-test.json'}
+def files(root):
+    return sorted(path for path in root.rglob('*') if path.is_file()
+                  and not path.name.endswith('.log')
+                  and not (root==BASE and path.parent==root and path.name in DIAGNOSTIC_REPORTS))
+def dump(path,value):path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
+def inject_checks(entries):
+    # Keep the brand available before asset mounts, including refreshes of an
+    # already-split candidate. Copying preserves original content-pack hashes.
+    for pack in ['textures/art.pck','textures/imported.pck']:
+        source=BASE/'GameAssets'/pack
+        if source.exists():
+            for key,value in city_packs.read_pack(source)[1].items():
+                if 'neon_lion.svg' in key:entries[key]=value
+    # Runtime keyboard reflow reads vector groups as data, not an imported texture.
+    for path in sorted((ROOT/"assets/ui/controls").glob("*.svg")):
+        entries[path.relative_to(ROOT).as_posix()]=path.read_bytes()
+    for path in sorted((ROOT/"assets/ui/controls").glob("*.json")):
+        entries[path.relative_to(ROOT).as_posix()]=path.read_bytes()
+    for path in sorted((ROOT/"assets/ui/controls").glob("*-279.png")):
+        entries[path.relative_to(ROOT).as_posix()]=path.read_bytes()
+    for path in sorted((ROOT/"assets/config").glob("*.json")):
+        entries[path.relative_to(ROOT).as_posix()]=path.read_bytes()
+    # Release templates intentionally ignore --script. Opt-in bootstrap probes
+    # adapt the same SceneTree tests to Nodes, without a second test implementation.
+    mapping={'audio279':'audio279_test','game_logic279':'game_logic279_test','mirrors279':'mirrors279_test','wheels279':'wheels279_test','cockpit279':'../tools/check_cockpit279','world279':'render_world279_test','ui279':'loading_controls278_test','render279':'render_polish279_test','gallery279':'gallery279_test','loading':'loading_controls278_test','refinements':'refinements278_test','perf278':'release278_performance','release278':'release278_test','finish':'ultra_finish_test','core':'ultra_core_test','visual':'ultra_visual_test','previews':'ultra_preview_test','physics':'ultra_physics_test','garage':'release260_runtime_test','contacts':'release260_collision_test','audit':'release260_collision_test','impact':'lighting_world_test'}
+    adapter='''extends Node
+var root: Window:
+ get:return get_tree().root
+var process_frame: Signal:
+ get:return get_tree().process_frame
+var physics_frame: Signal:
+ get:return get_tree().physics_frame
+func _ready() -> void:_initialize()
+func quit(code: int=0) -> void:
+ var music:=root.get_node_or_null("LeoRaceMusic")
+ if music:
+  music.shutdown();await get_tree().create_timer(.5,true,false,true).timeout
+ get_tree().quit(code)
+func create_timer(seconds: float,always: bool=true,physics: bool=false,ignore_scale: bool=false) -> SceneTreeTimer:return get_tree().create_timer(seconds,always,physics,ignore_scale)
+'''
+    mapping.update(teardown280='teardown280_test', environment280='environment280_test', tire280='tire280_test', finish_order280='finish_order280_test', swap_width280='swap_width280_test',
+                   core280_profile='core280_profile', road_corridor280='road_corridor280_probe', input='local_input_test', ranking='local_ranking_test', race='local_race_test')
+    mapping['grass_pilot']='grass_pilot'
+    for name,source in mapping.items():
+        script=(ROOT/'tests'/ (source+'.gd')).read_text(encoding='utf-8')
+        script=script.replace('extends SceneTree',adapter,1).replace(',self)',',get_tree())')
+        if name != 'road_corridor280':
+            script=re.sub(r'(func _process\([^)]*\)\s*->\s*)bool:',r'\1void:',script).replace('return false','return')
+        entries['tests/native270/'+name+'.gd']=script.expandtabs(4).encode('utf-8')
+    key='scripts/content/bootstrap.gd';entries.pop(key+'.remap',None);entries[key]=(ROOT/key).read_bytes()
+def stage():
+    if (BASE/'GameAssets/catalog.json').exists():raise RuntimeError('Already staged; preserve this candidate')
+    _,exported=city_packs.read_pack(BASE/'LeoRacer.pck')
+    if not exported.get('project.binary',b'').startswith(b'ECFG'):raise RuntimeError('Exported project settings are missing or corrupt')
+    city_packs.split(BASE,True)
+    source=ROOT/'build/content-baseline/GameAssets'
+    for name in ['vehicles','tracks','environments','licenses']:
+        shutil.copytree(source/name,BASE/'GameAssets'/name,dirs_exist_ok=True)
+    if VERSION.startswith('2.8.'):
+        track_source=os.environ.get('LEO_RELEASE_TRACKS')
+        if not track_source:
+            raise RuntimeError('Set LEO_RELEASE_TRACKS to the verified 2.8 track staging directory')
+        for track in RELEASE_TRACKS:
+            folder=Path(track_source)/track['id']
+            if not (folder/'manifest.json').is_file():
+                raise RuntimeError(f"Missing staged track {track['id']}")
+            shutil.copytree(folder,BASE/'GameAssets/tracks'/track['id'],dirs_exist_ok=True)
+        shutil.copy2(ROOT/'assets/audio/vehicle280/manifest.json',BASE/'GameAssets/licenses/vehicle-audio-manifest.json')
+    shutil.copytree(ROOT/'licenses',BASE/'GameAssets/licenses',dirs_exist_ok=True)
+    shutil.copy2(ROOT/'assets/audio/racing278/manifest.json',BASE/'GameAssets/licenses/racing-audio-manifest.json')
+    shutil.copy2(ROOT/'assets/audio/menu279/manifest.json',BASE/'GameAssets/licenses/menu-audio-manifest.json')
+    shutil.copy2(ROOT/'assets/audio/custom279/manifest.json',BASE/'GameAssets/licenses/custom-audio-manifest.json')
+    shutil.copy2(ROOT/'assets/config/loading-gallery-v279.json',BASE/'GameAssets/licenses/loading-gallery-v279.json')
+    shutil.copy2(ROOT/'assets/config/generated-art-v279.json',BASE/'GameAssets/licenses/generated-art-v279.json')
+    shutil.copy2(ROOT/'LICENSE',BASE/'LICENSE.txt')
+    shutil.copy2(ROOT/'addons/grass_field/LICENSE',BASE/'GameAssets/licenses/grass-field.txt')
+    (BASE/'CREDITS.txt').write_text(
+        'Created by L.J. Amila Prasad Perera.\n\n'
+        'I made Leo Racer for my son, Shaven Leo, who is six years old.\n\n'
+        'Leo Racer is an independent indie project. Third-party trademarks, names, '
+        'logos and characters belong to their respective owners; no affiliation '
+        'or endorsement is implied. See GameAssets/licenses for full credits, '
+        'third-party terms and earlier license notices.\n', encoding='utf-8')
+    catalog=json.loads((BASE/'GameAssets/catalog.json').read_text(encoding='utf-8'))
+    catalog.update(vehicle_api=2,core={'min':'2.7.0','max_major':2})
+    derivative=BASE/'GameAssets/ultra/bigster-trunk.pck'
+    derivative.parent.mkdir(exist_ok=True)
+    shutil.copy2(ROOT/'content/ultra/bigster-trunk.pck',derivative)
+    catalog['packs'].append({'id':'ultra/bigster-trunk','file':'ultra/bigster-trunk.pck','sha256':sha(derivative),'bytes':derivative.stat().st_size})
+    for key in ['bigster','duster','duster_2024']:
+        derivative=BASE/('GameAssets/ultra/cockpit279-'+key+'.pck')
+        shutil.copy2(ROOT/('content/ultra/cockpit279-'+key+'.pck'),derivative)
+        catalog['packs'].append({'id':'ultra/cockpit279-'+key,'file':'ultra/'+derivative.name,'sha256':sha(derivative),'bytes':derivative.stat().st_size})
+    neutral=BASE/'GameAssets/environments/dusk-neutral.pck'
+    catalog['packs'].append({'id':'environments/dusk-neutral','file':'environments/dusk-neutral.pck','sha256':sha(neutral),'bytes':neutral.stat().st_size})
+    dump(BASE/'GameAssets/catalog.json',catalog)
+    # Published track packs retain their source hashes and existing record identity.
+    engine,entries=city_packs.read_pack(BASE/'LeoRacer.pck')
+    entries['assets/config/official-track-content.json']=(ROOT/'assets/config/official-track-content.json').read_bytes()
+    # Stage authoritative source scripts after resource splitting. Remove binary
+    # remaps so the shipped core and its source manifest can be verified directly.
+    for path in sorted((ROOT/'scripts').rglob('*.gd')):
+        key=path.relative_to(ROOT).as_posix();entries.pop(key+'.remap',None);entries[key]=path.read_bytes()
+    for test in ['release278_performance','release278_test','baseline271_drive','ultra_core_test','ultra_visual_test','ultra_preview_test','ultra_physics_test','release260_runtime_test','release260_collision_test','lighting_world_test']:
+        entries['tests/'+test+'.gd']=(ROOT/'tests'/ (test+'.gd')).read_bytes()
+    inject_checks(entries)
+    city_packs.write_pack(BASE/'LeoRacer.pck',engine,entries)
+    for pack in catalog['packs']:
+        if sha(BASE/'GameAssets'/pack['file'])!=pack['sha256']:raise RuntimeError('Damaged staged pack: '+pack['file'])
+    for name in ['InstallerContent.ps1'] :shutil.copy2(ROOT/'installer'/name,BASE/name)
+    shutil.copy2(ROOT/'assets/config/default-roster-v1.json',BASE/'default-roster-v1.json')
+    for source_name,destination in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:
+        shutil.copy2(ROOT/'docs'/source_name,BASE/destination)
+    (BASE/'README.txt').write_text('LEO RACER '+VERSION+'\n\nRun LeoRacer.exe. Keep the complete folder together.\n21 cars, six drivers, '+str(TRACK_COUNT)+' tracks; 1–10 laps. New profiles start with Assisted handling and two laps on Astra Lotus Coast.\nUse Play Compatibility.cmd when Vulkan is unavailable.\nNo SDK, account or network is required. Vehicle Workshop is included.\nExtract into a new folder. Installer-managed replacements back up modified files.\nCustom content, settings and historical records are preserved.\nSee TEST_REPORT.md for measured results and remaining limitations.\nAttribution: GameAssets/licenses and each vehicle LICENSE.txt.\n',encoding='utf-8')
+    for name,args in [('Play Compatibility.cmd','--rendering-method gl_compatibility --rendering-driver opengl3'),('Vehicle Workshop.cmd','-- --vehicle-workshop')]:
+        (BASE/name).write_text('@echo off\r\ncd /d "%~dp0"\r\nstart "" "LeoRacer.exe" '+args+'\r\n',encoding='ascii')
+    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'default_vehicles':21,'tracks':TRACK_COUNT,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
+    dump(BASE/'required-payload.json',{'files':{p.relative_to(BASE).as_posix():sha(p) for p in files(BASE) if p.name!='required-payload.json' and not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')}})
+    print('ULTRA_STAGED',flush=True)
+def refresh():
+    """Finalize a staged candidate's source scripts, docs and ownership hashes."""
+    catalog=json.loads((BASE/'GameAssets/catalog.json').read_text(encoding='utf-8'))
+    for key in ['bigster','duster','duster_2024']:
+        target=BASE/('GameAssets/ultra/cockpit279-'+key+'.pck')
+        shutil.copy2(ROOT/('content/ultra/'+target.name),target)
+        for row in catalog['packs']:
+            if row['file']=='ultra/'+target.name:row.update(sha256=sha(target),bytes=target.stat().st_size)
+    dump(BASE/'GameAssets/catalog.json',catalog)
+    engine,entries=city_packs.read_pack(BASE/'LeoRacer.pck')
+    for path in sorted((ROOT/'scripts').rglob('*.gd')):
+        key=path.relative_to(ROOT).as_posix();entries.pop(key+'.remap',None);entries[key]=path.read_bytes()
+    for name in ['release278_performance','release278_test','baseline271_drive','release260_collision_test','ultra_physics_test','ultra_visual_test']:
+        entries['tests/'+name+'.gd']=(ROOT/'tests'/(name+'.gd')).read_bytes()
+    inject_checks(entries)
+    city_packs.write_pack(BASE/'LeoRacer.pck',engine,entries)
+    for name,target in [('RELEASE_NOTES_'+REV+'.md','RELEASE_NOTES.md'),('VALIDATION_'+REV+'.md','TEST_REPORT.md')]:shutil.copy2(ROOT/'docs'/name,BASE/target)
+    dump(BASE/'release-build.json',{'version':VERSION,'label':VERSION,'core_sha256':sha(BASE/'LeoRacer.pck'),'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'default_vehicles':21,'tracks':TRACK_COUNT,'source_scripts':{p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').rglob('*.gd'))}})
+    dump(BASE/'required-payload.json',{'files':{p.relative_to(BASE).as_posix():sha(p) for p in files(BASE) if p.name!='required-payload.json' and not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')}})
+    print('CANDIDATE_REFRESHED',sha(BASE/'LeoRacer.pck'),flush=True)
+
+def payload(items):
+    lines=[]
+    def escape(value):return str(value).replace('$','$$').replace('"','$\\"')
+    for file in items:
+        relative=file.relative_to(BASE)
+        digest=sha(file);short=ROOT/'build/nsis279'/digest;short.parent.mkdir(parents=True,exist_ok=True)
+        # Snapshot the bytes so later test runs cannot change installer inputs.
+        if short.exists() and sha(short)!=digest:short.unlink()
+        if not short.exists():shutil.copy2(file,short)
+        parent=str(relative.parent).replace('/','\\')
+        lines+=['SetOutPath "$PLUGINSDIR\\payload'+('\\'+escape(parent) if parent!='.' else '')+'"','File "/oname='+escape(file.name)+'" "'+escape('..\\'+str(short.relative_to(ROOT)))+'"']
+    return '\n'.join(lines)+'\n'
+
+def track_selection(tracks):
+    text='StrCpy $R3 ",$TrackSelection,"\n'
+    for index,row in enumerate(tracks):
+        text+='''SectionSetFlags ${TRACK_@INDEX@} 0
+${StrStr} $R2 $R3 ",@TRACK@,"
+${If} $TrackSelection == "all"
+${OrIf} $R2 != ""
+SectionSetFlags ${TRACK_@INDEX@} ${SF_SELECTED}
+${EndIf}
+'''.replace('@INDEX@',str(index)).replace('@TRACK@',row['id'])
+    return text
+def installer(build=True):
+    OUT.mkdir(parents=True,exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
+    compiler=ROOT/'.tools/nsis/nsis-3.13/Bin/makensis.exe'
+    if not compiler.exists():
+        subprocess.run([shutil.which('pwsh') or 'powershell','-NoProfile','-ExecutionPolicy','Bypass','-File',str(ROOT/'tools/setup_ultra_nsis.ps1')],check=True)
+    script=(ROOT/'installer/FocusedCars250.nsi').read_text(encoding='utf-8').replace('2.5.0',VERSION).replace('release250-','release'+REV+'-').replace('20 tested cars','21 tested cars').replace('20 cars','21 cars').replace('20 default cars','21 default cars').replace('selected 20 vehicles','selected 21 vehicles')
+    if TRACK_COUNT>3:
+        script=script.replace(' IntOp $0 $0 & ${SF_SELECTED}',
+                              ' SectionGetFlags ${TRACK_3} $3\n IntOp $0 $0 | $3\n IntOp $0 $0 & ${SF_SELECTED}',1)
+    (ROOT/('installer/Release'+REV+'.nsi')).write_text(script,encoding='utf-8')
+    tracks=RELEASE_TRACKS
+    for suffix in ['required','tracks','descriptions','selection']:
+        if suffix=='required':text=payload([p for p in files(BASE) if not p.relative_to(BASE).as_posix().startswith('GameAssets/tracks/')])
+        elif suffix=='tracks':text='\n'.join('Section "'+row['name']+'" TRACK_'+str(i)+'\nSectionIn 1 2\n'+payload(files(BASE/'GameAssets/tracks'/row['id']))+'SectionEnd' for i,row in enumerate(tracks))
+        elif suffix=='descriptions':text='\n'.join('!insertmacro MUI_DESCRIPTION_TEXT ${TRACK_'+str(i)+'} "'+row['name']+'; solo and split-screen."' for i,row in enumerate(tracks))
+        else:text=track_selection(tracks)
+        (ROOT/('installer/release'+REV+'-'+suffix+'.nsh')).write_text(text,encoding='utf-8')
+    if not build:
+        print('INSTALLER_INPUTS_READY',flush=True);return
+    env=os.environ.copy();env['TEMP']=str(ROOT/'build/nsis279-temp');env['TMP']=env['TEMP'];Path(env['TEMP']).mkdir(exist_ok=True)
+    with (QA/'installer-build.log').open('w',encoding='utf-8') as log:
+        subprocess.run([str(compiler),'/V3','installer/Release'+REV+'.nsi'],cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=1800)
+    print('ULTRA_INSTALLER_BUILT',flush=True)
+def portable():
+    OUT.mkdir(parents=True,exist_ok=True)
+    target=OUT/('LeoRacer-'+RELEASE_LABEL+'-win64.zip')
+    with zipfile.ZipFile(target,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
+        for file in files(BASE):archive.write(file,'LeoRacer/'+file.relative_to(BASE).as_posix())
+    with zipfile.ZipFile(target) as archive:
+        if archive.testzip():raise RuntimeError('Portable archive failed CRC validation')
+    print('PORTABLE_READY', target, sha(target), flush=True)
+    return target
+
+def package():
+    target=portable()
+    evidence=OUT/('LeoRacer-'+VERSION+'-Evidence.zip')
+    with zipfile.ZipFile(evidence,'w',zipfile.ZIP_DEFLATED,compresslevel=4) as archive:
+        for file in sorted(QA.rglob('*')):
+            parts=file.relative_to(QA).parts
+            if parts[0]=='benchmark-copies' or parts[0].startswith(('camera-copy','emace-trial')) or 'profile' in parts or 'native-copy' in parts:continue
+            if file.is_file() and (file.suffix in ['.json','.jsonl','.log','.md'] or file.suffix=='.png' and parts[0].startswith('scenes-')):archive.write(file,file.relative_to(QA).as_posix())
+        for file in sorted((ROOT/'docs/screenshots'/VERSION).glob('*')):
+            if file.is_file() and file.suffix in ['.png','.md']:archive.write(file,'screenshots/'+file.name)
+    with zipfile.ZipFile(evidence) as archive:
+        if not any(name.endswith('/process.log') for name in archive.namelist()):raise RuntimeError('Evidence archive must include raw process logs')
+    for name in ['RELEASE_NOTES_'+REV+'.md','VALIDATION_'+REV+'.md']:shutil.copy2(ROOT/'docs'/name,OUT/('RELEASE_NOTES.md' if name.startswith('RELEASE') else 'TEST_REPORT.md'))
+    artifacts=[target,evidence,OUT/'LeoRacer-Setup.exe',OUT/'RELEASE_NOTES.md',OUT/'TEST_REPORT.md']
+    media=OUT/('LeoRacer-'+VERSION+'-Media-Pack.zip')
+    if media.exists():artifacts.append(media)
+    kandy=OUT/'Kandy-Lake-Circuit-2.8-Upgrade.zip'
+    if kandy.exists():artifacts.append(kandy)
+    rows=[{'name':p.name,'bytes':p.stat().st_size,'sha256':sha(p)} for p in artifacts]
+    (OUT/'SHA256SUMS.txt').write_text(''.join(r['sha256']+'  '+r['name']+'\n' for r in rows),encoding='ascii')
+    rows.append({'name':'SHA256SUMS.txt','bytes':(OUT/'SHA256SUMS.txt').stat().st_size,'sha256':sha(OUT/'SHA256SUMS.txt')})
+    dump(OUT/'release-manifest.json',{'version':RELEASE_LABEL,'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'cars':21,'tracks':TRACK_COUNT,'files':rows})
+    print('ULTRA_PACKAGED',flush=True)
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('action',nargs='?',choices=['stage','refresh','installer-inputs','installer','portable','package','all'],default='all');args=parser.parse_args()
+    for action in ([stage,installer,package] if args.action=='all' else [lambda:installer(False)] if args.action=='installer-inputs' else [globals()[args.action]]):action()

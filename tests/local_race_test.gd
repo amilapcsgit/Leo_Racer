@@ -10,6 +10,8 @@ func ticks(n: int) -> void:
 func run() -> void:
  var game: Node3D=load("res://scenes/main.tscn").instantiate();root.add_child(game);await game.initialization_finished;await process_frame
  game.diagnostics_mode=true;game.human_count=2
+ game.set_handling_preset(LeoRaceRules.Handling.STANDARD)
+ game.selected_laps=3
  game.input_router.assign(1,"gamepad",17,false)
  game.selected_kart=game.catalog.vehicle_index(&"bigster")
  game.local_players[1].vehicle_id=&"duster";game.local_players[1].player_name="SECOND PILOT"
@@ -58,12 +60,23 @@ func run() -> void:
  first.speed=20.;second.speed=-20.;game._process(.6)
  check(game.local_players[1].wrong_way>.5 and game.local_players[0].wrong_way==0.,"Wrong-way feedback is independent")
  game.selected_player_slot=1;game.toggle_pause();game.hud.show_garage("pause")
- var swap_id: StringName=&"blue" if game.catalog.vehicle(&"blue") else &"duster"
+ var swap_id: StringName=&"blue" if game.catalog.vehicle(&"blue") else &"duster_2024"
  check(game.swap_player_vehicle(&"mario",swap_id,"SECOND SWAP") and game.karts[0]==first and game.karts[1]!=second and game.local_players[1].kart==game.karts[1],"Pause car swap targets only P2")
  game.toggle_pause();game.hud.show_garage("pause");game.input_router.players[1].device=-1;game.diagnostics_mode=false
  check(not game.swap_player_vehicle(&"mario",&"duster","MISSING DEVICE") and game.paused,"Car change cannot bypass mandatory device reassignment")
  game.diagnostics_mode=true
+ game.set_handling_preset(LeoRaceRules.Handling.EASY)
+ check(game.active_handling == LeoRaceRules.Handling.STANDARD, "Changing handling in pause preserves current race rules")
+ await game.start_race()
+ check(game.active_handling == LeoRaceRules.Handling.EASY and game.current_ruleset().ends_with("+handling_easy_v1+offset_pads_v1"), "Restart captures Easy and uses its record rules")
+ for racer in game.karts:
+  var base_speed: float = LeoRaceRules.resolve(racer.definition).max_speed
+  check(is_equal_approx(racer.max_speed, base_speed * .7), "Easy speed applies to racer %s" % racer.racer_name)
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
- FileAccess.open("res://build/qa-ui/race.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/race"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("race.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RACE_TEST ",report)
- game.return_menu();game.stop_all_audio();game.queue_free();await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)
+ await game.quit_game(0 if errors.is_empty() else 1)

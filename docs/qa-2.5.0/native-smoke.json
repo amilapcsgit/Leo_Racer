@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "case": "content",
+      "pass": true
+    },
+    {
+      "case": "forward",
+      "pass": true
+    },
+    {
+      "case": "compatibility",
+      "pass": true
+    },
+    {
+      "case": "astra_coast-single",
+      "pass": true
+    },
+    {
+      "case": "astra_coast-split",
+      "pass": true
+    },
+    {
+      "case": "colombo_city-single",
+      "pass": true
+    },
+    {
+      "case": "colombo_city-split",
+      "pass": true
+    },
+    {
+      "case": "kandy_lake-single",
+      "pass": true
+    },
+    {
+      "case": "kandy_lake-split",
+      "pass": true
+    }
+  ],
+  "cars": 20,
+  "core_sha256": "01035b6b5e7beb52fe0bdad0873a155234cfa850a13529fb5adf9e3dac6e6821"
+}

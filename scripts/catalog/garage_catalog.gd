@@ -33,7 +33,7 @@ func driver(key: StringName) -> DriverDefinition:
 func vehicle_index(key: StringName) -> int:
 	for i in vehicles.size():
 		if vehicles[i].id==key: return i
-	return 0
+	return vehicles.find(vehicle(&"bigster")) if vehicle(&"bigster") else 0
 
 func driver_index(key: StringName) -> int:
 	for i in drivers.size():
@@ -42,7 +42,8 @@ func driver_index(key: StringName) -> int:
 
 func migrate(cfg: ConfigFile) -> Vector2i:
 	var d: String = cfg.get_value("game","driver_id",LEGACY_DRIVERS[clampi(int(cfg.get_value("game","driver",0)),0,LEGACY_DRIVERS.size()-1)])
-	var v: String = cfg.get_value("game","vehicle_id",LEGACY_VEHICLES[clampi(int(cfg.get_value("game","kart",0)),0,LEGACY_VEHICLES.size()-1)])
+	var legacy_vehicle: String = LEGACY_VEHICLES[clampi(int(cfg.get_value("game","kart",0)),0,LEGACY_VEHICLES.size()-1)] if cfg.has_section_key("game","kart") else "bigster"
+	var v: String = cfg.get_value("game","vehicle_id",legacy_vehicle)
 	return Vector2i(driver_index(d),vehicle_index(v))
 
 func problems() -> PackedStringArray:

@@ -6,6 +6,12 @@ signal binding_changed
 var players: Array[LeoPlayerInput] = [LeoPlayerInput.new("keyboard"),LeoPlayerInput.new("gamepad")]
 var settings_path := "user://local_inputs.cfg"
 var active_slots := 1
+var pad_numbers: Dictionary = {}
+var next_pad_number := 1
+var claim_slot := -1
+var claimed_releases: Dictionary = {}
+var menu_confirm_held: Dictionary = {}
+var menu_popup: WeakRef
 var capture_slot := -1
 var capture_action := ""
 var capture_rest: Dictionary = {}
@@ -16,23 +22,42 @@ var assignment_locked := false
 var pending_binding: Dictionary = {}
 signal binding_conflict
 func _ready() -> void:
+ add_to_group("menu_input_router")
  process_mode = Node.PROCESS_MODE_ALWAYS
  Input.joy_connection_changed.connect(_connection)
  load_profiles()
 func fingerprint(id: int) -> Dictionary:
  var info := Input.get_joy_info(id)
  return {"guid":Input.get_joy_guid(id),"name":Input.get_joy_name(id),"serial":str(info.get("serial_number",""))}
+func connected_devices() -> Array[int]:
+ return Input.get_connected_joypads()
 func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  last_error = ""
+ stop_feedback()
+ if slot<0 or slot>=players.size():return false
+ var connected:=connected_devices()
+ var former_kind:=players[slot].kind
+ var former_id:=players[slot].device
  for i in players.size():
   if i == slot: continue
-  if kind != "keyboard" and id >= 0 and players[i].kind != "keyboard" and players[i].device == id: last_error = "This device is already assigned to the other player."
- if not last_error.is_empty(): return false
+  if kind != "keyboard" and id >= 0 and players[i].kind != "keyboard" and players[i].device == id:
+   var replacement:=-1
+   connected.sort()
+   for candidate in connected:
+    if candidate!=id and candidate!=former_id:replacement=candidate;break
+   if replacement<0 and former_kind!="keyboard" and former_id!=id and former_id in connected:replacement=former_id
+   var displaced:=players[i]
+   var target_kind:=former_kind if replacement==former_id and replacement>=0 else "gamepad" if replacement>=0 else "keyboard"
+   if displaced.kind!=target_kind:displaced.switch_kind(target_kind)
+   displaced.device=replacement
+   displaced.identity=fingerprint(replacement) if replacement>=0 else {}
+   displaced.preference="manual"
+   displaced.clear()
  var p := players[slot]
  p.preference="manual"
  if p.kind != kind:p.switch_kind(kind)
  p.device = id if kind != "keyboard" else -1
- p.identity = fingerprint(id) if id in Input.get_connected_joypads() else {}
+ p.identity = fingerprint(id) if id in connected else {}
  p.clear()
  configure_keyboards(active_slots)
  if save: save_profiles()
@@ -40,7 +65,7 @@ func assign(slot: int, kind: String, id: int = -1, save: bool = true) -> bool:
  return true
 func ready_problem(slot: int) -> String:
  var p := players[slot]
- if p.kind != "keyboard" and not p.device in Input.get_connected_joypads(): return "Player %d: choose a connected controller or wheel." % (slot+1)
+ if p.kind != "keyboard" and not p.device in connected_devices(): return "Player %d: choose a connected controller or wheel." % (slot+1)
  for action in ["accelerate","brake","left","right"]:
   if p.bindings.get(action,[]).is_empty(): return "Player %d: bind %s." % [slot+1,action]
  if active_slots==2 and players[0].kind=="keyboard" and players[1].kind=="keyboard":
@@ -48,12 +73,127 @@ func ready_problem(slot: int) -> String:
    for binding in p.bindings.get(action,[]):
     if not conflicts(slot,action,binding).is_empty():return "Keyboard controls overlap. Open Controls to choose another key."
  return ""
+func stop_feedback() -> void:
+ if is_inside_tree():get_tree().call_group("haptics","stop_all")
+func sync_held() -> void:
+ for p in players:
+  for action in p.bindings:
+   for binding in p.bindings[action]:
+    var index:=int(binding.get("index",0))
+    match String(binding.get("type","")):
+     "key":p.keys[index]=Input.is_physical_key_pressed(index)
+     "button":p.buttons[index]=Input.is_joy_button_pressed(p.device,index) if p.device>=0 else false
+     "axis":
+      if p.device>=0:p.axes[index]=Input.get_joy_axis(p.device,index)
+
 func clear_all() -> void:
- for p in players: p.clear()
+ stop_feedback()
+ for p in players:
+  if p.kind=="gamepad" and p.device>=0:Input.stop_joy_vibration(p.device)
+  p.clear()
+func begin_claim(slot: int) -> void:
+ clear_all();claim_slot=slot;binding_changed.emit()
+func device_label(device: int) -> String:
+ var devices:=connected_devices();devices.sort()
+ if not device in devices:return "Disconnected controller"
+ var owner:="Unassigned"
+ for slot in active_slots:
+  if players[slot].kind!="keyboard" and players[slot].device==device:owner="Player %d" % (slot+1)
+ for id in devices:
+  if not pad_numbers.has(id):pad_numbers[id]=next_pad_number;next_pad_number+=1
+ var name:=String(fingerprint(device).get("name","Controller"))
+ if "xbox" in name.to_lower() or "xinput" in name.to_lower():name="Xbox Controller"
+ return "%s · Pad %d · %s" % [name,int(pad_numbers[device]),owner]
+func identify(slot: int) -> void:
+ var p:=players[slot]
+ if p.kind!="keyboard" and p.device>=0:get_tree().call_group("haptics","play",p.device,"identify",1.)
+func claim_event(event: InputEvent) -> bool:
+ if event is InputEventJoypadButton and event.button_index==JOY_BUTTON_A and claimed_releases.has(event.device):
+  if not event.pressed:claimed_releases.erase(event.device)
+  get_viewport().set_input_as_handled();return true
+ if claim_slot<0:return false
+ if (event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_B):
+  claim_slot=-1;binding_changed.emit()
+ elif event is InputEventJoypadButton and event.pressed and event.button_index==JOY_BUTTON_A:
+  var slot:=claim_slot;claim_slot=-1
+  claimed_releases[event.device]=true
+  assign(slot,"gamepad",event.device)
+ get_viewport().set_input_as_handled();return true
 func _input(event: InputEvent) -> void:
+ if claim_event(event):return
  if capture_slot >= 0:
   _capture(event); return
+ if menu_confirm(event):return
  if gameplay_enabled or controls_testing:feed(event)
+
+func menu_confirm(event: InputEvent) -> bool:
+ if capture_slot>=0 or claim_slot>=0 or controls_testing or not pending_binding.is_empty():return false
+ if not (event is InputEventJoypadButton or event is InputEventJoypadMotion):return false
+ var key:="%d:%s:%d" % [event.device,"button" if event is InputEventJoypadButton else "axis",event.button_index if event is InputEventJoypadButton else event.axis]
+ var pressed: bool=event.pressed if event is InputEventJoypadButton else absf(event.axis_value)>.5
+ if menu_confirm_held.has(key):
+  if event is InputEventJoypadMotion:
+   var binding: Dictionary=menu_confirm_held[key]
+   var rest:=float(binding.get("rest",0.));var end:=float(binding.get("pressed",1.))
+   pressed=(event.axis_value-rest)/(end-rest)>.5 if absf(end-rest)>.001 else false
+  if not pressed:menu_confirm_held.erase(key)
+  get_viewport().set_input_as_handled();return true
+ if gameplay_enabled:return false
+ # Xbox A always confirms menus, independently of gameplay bindings/assignment.
+ if event is InputEventJoypadButton and event.button_index==JOY_BUTTON_A:
+  if not event.pressed:return false
+  menu_confirm_held[key]={"type":"button","index":JOY_BUTTON_A}
+  var focused:=get_viewport().gui_get_focus_owner()
+  _confirm_focused.call_deferred(weakref(focused) if focused else null,event.device)
+  get_viewport().set_input_as_handled();return true
+ for slot in active_slots:
+  var p:=players[slot]
+  if not p.accepts(event):continue
+  for binding in p.bindings.get("boost",[]):
+   if binding.get("type")==("button" if event is InputEventJoypadButton else "axis") and int(binding.get("index",-1))==(event.button_index if event is InputEventJoypadButton else event.axis):
+    if event is InputEventJoypadMotion:
+     var rest:=float(binding.get("rest",0.));var end:=float(binding.get("pressed",1.))
+     pressed=(event.axis_value-rest)/(end-rest)>.5 if absf(end-rest)>.001 else false
+    if not pressed:return false
+    menu_confirm_held[key]=binding.duplicate();p.clear()
+    var focus:=get_viewport().gui_get_focus_owner()
+    _confirm_focused.call_deferred(weakref(focus) if focus else null,event.device)
+    get_viewport().set_input_as_handled();return true
+ return false
+
+func _confirm_focused(previous: WeakRef,device: int) -> void:
+ if gameplay_enabled or claim_slot>=0 or capture_slot>=0:return
+ var popup: PopupMenu=menu_popup.get_ref() if menu_popup else null
+ if is_instance_valid(popup) and popup.visible:
+  var index:=popup.get_focused_item()
+  if index<0:index=0
+  if index<popup.item_count and not popup.is_item_disabled(index):
+   popup.id_pressed.emit(popup.get_item_id(index));popup.hide()
+  return
+ var focused:=get_viewport().gui_get_focus_owner()
+ if previous and previous.get_ref()!=focused:return
+ for garage in get_tree().get_nodes_in_group("controller_garage"):
+  if garage.is_visible_in_tree():
+   if garage.input_device not in [-2,device]:return
+   if garage.name_field.has_focus():garage.open_keyboard()
+   else:garage.activate_controller_focus()
+   return
+ if focused is OptionButton:
+  popup=focused.get_popup();menu_popup=weakref(popup)
+  if not popup.window_input.is_connected(_popup_input):popup.window_input.connect(_popup_input)
+ # Native GUI handling retains correct toggles, dropdowns and popup semantics.
+ for down in [true,false]:
+  var accept:=InputEventKey.new();accept.keycode=KEY_ENTER;accept.physical_keycode=KEY_ENTER;accept.pressed=down
+  accept.set_meta("controller_confirm",true)
+  Input.parse_input_event(accept)
+
+func _popup_input(event: InputEvent) -> void:
+ if menu_confirm(event):
+  var popup: PopupMenu=menu_popup.get_ref() if menu_popup else null
+  if is_instance_valid(popup):popup.set_input_as_handled()
+
+func menu_confirm_label() -> String:
+ return "A"
 func feed(event: InputEvent) -> void:
  if event is InputEventMouseButton or event is InputEventMouseMotion:
   var owner:=0
@@ -71,8 +211,15 @@ func feed(event: InputEvent) -> void:
      if is_inside_tree():get_viewport().set_input_as_handled()
     command.emit(slot,action)
 func _notification(what: int) -> void:
- if what == NOTIFICATION_APPLICATION_FOCUS_OUT: clear_all()
+ if what != NOTIFICATION_APPLICATION_FOCUS_OUT:return
+ var was_claiming := claim_slot >= 0
+ claim_slot = -1
+ claimed_releases.clear()
+ menu_confirm_held.clear()
+ clear_all()
+ if was_claiming:binding_changed.emit()
 func _connection(id: int, connected: bool) -> void:
+ stop_feedback()
  if connected:
   var identity:=fingerprint(id)
   var owners: Array[LeoPlayerInput]=[]
@@ -86,8 +233,13 @@ func _connection(id: int, connected: bool) -> void:
   var audio:=get_tree().get_first_node_in_group("ui_audio")
   if audio:audio.cue("connect")
   binding_changed.emit(); return
+ claimed_releases.erase(id)
+ var prefix := "%d:" % id
+ for key in menu_confirm_held.keys():
+  if String(key).begins_with(prefix):menu_confirm_held.erase(key)
  for i in players.size():
   if players[i].device == id:
+   if capture_slot == i:cancel_capture()
    players[i].device = -1; players[i].clear()
    if i < active_slots: device_lost.emit(i)
  binding_changed.emit()
@@ -103,7 +255,7 @@ func load_profiles() -> void:
   var data: Variant = cfg.get_value("player_%d" % i,"profile",{})
   if data is Dictionary and not data.is_empty():
    players[i].restore(data)
-   if int(data.get("version",1))<3:
+   if int(data.get("version",1))<4:
     for action in LeoPlayerInput.FEATURE_ACTIONS:
      if not data.get("bindings",{}).has(action):added.append({"slot":i,"action":action})
  for entry in added:
@@ -121,6 +273,7 @@ func start_capture(slot: int, action: String) -> void:
   for axis in JOY_AXIS_MAX: capture_rest[axis] = Input.get_joy_axis(p.device,axis)
  p.clear()
 func cancel_capture() -> void:
+ claim_slot=-1
  capture_slot = -1; capture_action = ""
  clear_all()
 func _capture(event: InputEvent) -> void:

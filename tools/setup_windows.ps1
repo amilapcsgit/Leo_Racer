@@ -62,7 +62,7 @@ if ($AssetArchives) {
         $text=Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
         [IO.File]::WriteAllText($_.FullName,($text -replace '\bBaker\b','Terrain3DBaker'))
     }
-    Get-ChildItem (Join-Path $project 'addons/EZ-Tree-Godot-Port') -Recurse -Filter '*.gd' | ForEach-Object {
+    Get-ChildItem (Join-Path $project 'addons/EZ-Tree-Godot-Port') -Recurse -File | Where-Object {$_.Extension -in '.gd','.tscn','.tres'} | ForEach-Object {
         $text=Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8
         [IO.File]::WriteAllText($_.FullName,$text.Replace('res://addons/ez-tree-godot-port/','res://addons/EZ-Tree-Godot-Port/'))
     }

@@ -29,7 +29,9 @@ var local_lobby: LeoLocalLobby
 var garage_selector: ModularCarSelector
 var frontend: LeoFrontend
 var ui_effects: LeoUIEffects
-var unified_hud: LeoPlayerHUD
+var unified_hud: LeoRaceInstruments
+var binding_hints: Array[Label]=[]
+const HINT_ACTIONS=["drift","boost","recover","horn","pause_race"]
 var last_ready := true
 var last_drift_charged := false
 var ready_flash := 0.0
@@ -75,6 +77,7 @@ func _ready() -> void:
 	frontend=LeoFrontend.new();frontend.game=game;frontend.hud=self;frontend.audio=game.ui_audio;add_child(frontend)
 
 func clear(root: Control) -> void:
+	if root==menu_root and is_instance_valid(garage_selector):garage_selector.hide()
 	for c in root.get_children():
 		root.remove_child(c)
 		c.queue_free()
@@ -163,6 +166,17 @@ func backdrop(parent: Node, alpha: float = .7) -> void:
 func show_menu() -> void:
 	frontend.show_home()
 
+func prepare_garage() -> void:
+	if is_instance_valid(garage_selector):return
+	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
+	garage_selector.warm_only=true
+	garage_selector.configure(game.catalog,game.local_players[0].driver_id,game.local_players[0].vehicle_id,game.reduced_motion)
+	add_child(garage_selector)
+	# Prepare the persistent UI and podium pipelines behind the loading screen.
+	for frame in 3:await get_tree().process_frame
+
+	garage_selector.hide();garage_selector.warm_only=false
+
 func show_garage(_focus_group: String = "driver") -> void:
 	var retaining:=_focus_group=="pause"
 	var from_lobby:=_focus_group in ["lobby","setup"]
@@ -177,14 +191,19 @@ func show_garage(_focus_group: String = "driver") -> void:
 		local.player_name=game.custom_player_name
 	game.enter_garage(retaining)
 	scene_mode="garage";hud_root.hide();clear(modal_root);clear(menu_root);menu_root.show()
-	garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate()
+	if not is_instance_valid(garage_selector):
+		garage_selector=preload("res://scenes/ModularCarSelector.tscn").instantiate();garage_selector.warm_only=true;add_child(garage_selector);garage_selector.warm_only=false
+	for event in ["selection_changed","name_changed","race_requested","continue_requested","back_requested"]:
+		for connection in garage_selector.get_signal_connection_list(event):garage_selector.disconnect(event,connection.callable)
+	if garage_selector.keyboard and garage_selector.keyboard.visible:garage_selector.close_keyboard(true)
 	garage_selector.configure(game.catalog,local.driver_id,local.vehicle_id,game.reduced_motion)
 	garage_selector.custom_name=local.player_name;garage_selector.race_context=retaining;garage_selector.player_slot=game.selected_player_slot if from_lobby or retaining else -1
 	garage_selector.input_device=-2
-	menu_root.add_child(garage_selector)
-	garage_selector.race_button.text="Use This Ride" if from_lobby else "Back" if from_home else garage_selector.race_button.text
+	garage_selector.name_field.text=local.player_name
+	garage_selector.home_preview=false;garage_selector.show();garage_selector.set_selection(local.driver_id,local.vehicle_id)
+	garage_selector.race_button.text="Keep Racing" if retaining else "Use This Ride"
 	garage_selector.selection_changed.connect(func(d: StringName,v: StringName):
-		game.preview=garage_selector.assembly
+		game.preview=garage_selector.assembly if is_instance_valid(garage_selector.assembly) else null
 		if not retaining:game.apply_garage_selection(d,v,garage_selector.custom_name)
 		garage_selector.identity.text="Nice choice!")
 	garage_selector.name_changed.connect(func(value: String):
@@ -199,7 +218,7 @@ func show_garage(_focus_group: String = "driver") -> void:
 		if retaining:game.cancel_pause_garage()
 		elif from_lobby:frontend.show_setup()
 		else:game.return_menu())
-	game.preview=garage_selector.assembly
+	game.preview=garage_selector.assembly if is_instance_valid(garage_selector.assembly) else null
 	garage_selector.carousel.grab_focus()
 	queue_redraw()
 
@@ -220,12 +239,18 @@ func close_settings() -> void:
 	frontend.close_modal()
 
 func show_race() -> void:
-	frontend.close_modal(false)
-	scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
+	unified_hud=null
+	if is_instance_valid(garage_selector):
+		garage_selector.hide();garage_selector.race_context=false
+		if garage_selector.keyboard and garage_selector.keyboard.visible:garage_selector.close_keyboard(true)
+		garage_selector.scheduler.suspended=true
+	frontend.close_modal(false);scene_mode="race";photo_mode=false;labels.clear();clear(hud_root);menu_root.hide();speed_overlay.hide()
 	game.input_router.gameplay_enabled=true;game.input_router.assignment_locked=true;game.input_router.clear_all()
-	if game.human_count==2:hud_root.hide();return
-	hud_root.show()
-	unified_hud=LeoPlayerHUD.new();unified_hud.game=game;unified_hud.slot=0;hud_root.add_child(unified_hud)
+	hud_root.visible=game.human_count==1
+	if game.human_count==1:
+		var instruments:=LeoRaceInstruments.new();instruments.game=game;instruments.slot=0;hud_root.add_child(instruments)
+		unified_hud=instruments;labels=instruments.labels;binding_hints=instruments.binding_hints;nitro_liquid=instruments.nitro_liquid
+	queue_redraw()
 
 func announce(words: String, duration: float = 1.8) -> void:
 	announcement = words
@@ -240,6 +265,8 @@ func show_results() -> void:
 	frontend.show_results()
 
 func _process(dt: float) -> void:
+	if scene_mode=="race":
+		hud_root.visible=game.human_count==1 and not photo_mode;speed_overlay.hide();return
 	if scene_mode=="race" and game.human_count==2:
 		hud_root.hide();speed_overlay.hide();return
 	var visual_dt := 0.0 if game and game.paused else dt
@@ -267,8 +294,10 @@ func _process(dt: float) -> void:
 		(speed_overlay.material as ShaderMaterial).set_shader_parameter("strength",intensity)
 		(speed_overlay.material as ShaderMaterial).set_shader_parameter("animation_time",time)
 		(speed_overlay.material as ShaderMaterial).set_shader_parameter("glitch",game.feedback.get_recover_glitch())
+		var bindings: LeoPlayerInput=game.input_router.players[0]
+		for i in binding_hints.size():binding_hints[i].text=bindings.describe(HINT_ACTIONS[i])
 		labels.position.text = str(game.player_place())
-		labels.lap.text = "%d / 3" % p.lap
+		labels.lap.text = "%d / %d" % [p.lap,game.active_laps]
 		labels.timer.text = game.format_time(p.finish_time if p.finished else game.race_time)
 		display_speed = lerpf(display_speed,actual_speed*3.6,1.0-exp(-visual_dt*12))
 		display_nitro = lerpf(display_nitro,p.boost_fuel,1.0-exp(-visual_dt*10))
@@ -294,7 +323,7 @@ func _process(dt: float) -> void:
 		labels.nitro.text = "NITRO READY" if nitro_ready else "CHARGING %d%%"%int(p.boost_fuel*100)
 		labels.nitro.modulate = Color(1.0,1.0,1.0,1.0 if game.reduced_motion or ready_flash<=0 else .8+sin(time*12.0)*.2)
 		labels.sector.text = game.circuit.sector_name(p.last_s)
-		labels.progress.text = "LAP PROGRESS  %02d%%" % int(fposmod(p.last_s/game.circuit.length,1.0)*100.0)
+		labels.progress.text = "LAP PROGRESS  %02d%%" % int(fposmod(maxf(0.,p.progress)/game.circuit.length,1.0)*100.0)
 		var approach: Vector3 = game.circuit.direction(p.last_s+4.0)
 		var bend: Vector3 = game.circuit.direction(p.last_s+28.0+actual_speed*.35)
 		var bend_angle := atan2(approach.cross(bend).y,approach.dot(bend))
@@ -305,6 +334,7 @@ func _process(dt: float) -> void:
 		if not game.paused: announcement_time = maxf(0, announcement_time - dt)
 		labels.callout.text = announcement if announcement_time > 0 else ""
 		if game.wrong_way_time > 1.0: labels.callout.text = "WRONG WAY  /  TURN AROUND"
+		if p.checkpoint_missed:labels.callout.text="CHECKPOINT MISSED / "+bindings.describe("recover")+" RECOVER"
 	else:
 		speed_overlay.hide()
 	queue_redraw()

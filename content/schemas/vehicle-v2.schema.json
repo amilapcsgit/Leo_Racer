@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "format",
+    "vehicle_api",
+    "id",
+    "version",
+    "core",
+    "wheels",
+    "pack",
+    "pack_sha256",
+    "model_scene",
+    "compiled_bounds"
+  ],
+  "properties": {
+    "format": {
+      "const": 1
+    },
+    "vehicle_api": {
+      "const": 2
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_.-]{0,63}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "core": {
+      "type": "object",
+      "required": [
+        "min",
+        "max_major"
+      ],
+      "properties": {
+        "min": {
+          "type": "string"
+        },
+        "max_major": {
+          "const": 2
+        }
+      }
+    },
+    "model": {
+      "type": "string",
+      "pattern": "^[^:]+\\.glb$"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 0
+    },
+    "wheels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rotating",
+          "pivot",
+          "axle",
+          "radius"
+        ],
+        "properties": {
+          "rotating": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "stationary": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pivot": {
+            "$ref": "#/$defs/vector"
+          },
+          "axle": {
+            "$ref": "#/$defs/vector"
+          },
+          "radius": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "setup_complete": {
+      "const": true
+    },
+    "driver_policy": {
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "collision_size": {
+      "$ref": "#/$defs/vector"
+    },
+    "collision_position": {
+      "$ref": "#/$defs/vector"
+    },
+    "preview_target": {
+      "$ref": "#/$defs/vector"
+    },
+    "seat": {
+      "$ref": "#/$defs/transform"
+    },
+    "normalization": {
+      "$ref": "#/$defs/transform"
+    },
+    "max_speed": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "boosted_speed": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "acceleration": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "handling": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "preview_distance": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000
+    },
+    "lighting": {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+        "$ref": "#/$defs/lamp"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    },
+    "pack": {
+      "type": "string",
+      "pattern": "^[^:]+\\.pck$"
+    },
+    "pack_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_scene": {
+      "type": "string",
+      "pattern": "^res://leo_vehicles/[^/]+/.+\\.scn$"
+    },
+    "preview_scene": {
+      "type": "string"
+    },
+    "compiled_bounds": {
+      "type": "object",
+      "required": [
+        "position",
+        "size"
+      ]
+    },
+    "estimated_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "shader_warmup_scene": {
+      "type": "string",
+      "pattern": "^res://leo_vehicles/[a-z0-9_.-]+/[^.].*\\.scn$"
+    }
+  },
+  "$defs": {
+    "vector": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      }
+    },
+    "transform": {
+      "type": "object",
+      "required": [
+        "basis",
+        "origin"
+      ],
+      "properties": {
+        "origin": {
+          "$ref": "#/$defs/vector"
+        },
+        "basis": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/vector"
+          }
+        }
+      }
+    },
+    "lamp_target": {
+      "type": "object",
+      "required": [
+        "node",
+        "material"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 511
+        },
+        "material": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "lamp": {
+      "type": "object",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "head",
+            "tail",
+            "brake",
+            "reverse"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/lamp_target"
+          }
+        },
+        "anchor": {
+          "$ref": "#/$defs/vector"
+        },
+        "rotation": {
+          "$ref": "#/$defs/vector"
+        },
+        "range": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 40
+        },
+        "energy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "running": {
+          "type": "boolean"
+        }
+      }
+    },
+    "action_target": {
+      "type": "object",
+      "required": [
+        "node"
+      ],
+      "properties": {
+        "node": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 511
+        },
+        "closed_position": {
+          "$ref": "#/$defs/vector"
+        },
+        "open_position": {
+          "$ref": "#/$defs/vector"
+        },
+        "closed_rotation": {
+          "$ref": "#/$defs/vector"
+        },
+        "open_rotation": {
+          "$ref": "#/$defs/vector"
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": [
+        "slot",
+        "name"
+      ],
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "enum": [
+            1,
+            2
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "type": {
+          "enum": [
+            "transform",
+            "animation"
+          ]
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/action_target"
+          }
+        },
+        "player": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clip": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "minimum_swept_clearance_m": 0.015,
+  "vehicles": {
+    "bigster": {
+      "wheel_nodes": ["dust25_steering_wheel", "dust25_steering_wheel_001"],
+      "hub": [-0.348568, 1.035044, -0.616297],
+      "shaft": [0, -0.26, 0.965609],
+      "offset": [0, 0, 0.14],
+      "rest_degrees": [180, 0, 0],
+      "max_degrees": 135,
+      "cluster": {"position": [-0.348, 1.064, -0.684], "size": [0.305, 0.119], "normal": [0, 0.12, 1]},
+      "navigation": {"node": "dust25_dash", "material": "gps_screen"},
+      "mirrors": "dust25"
+    },
+    "duster_2024": {
+      "wheel_nodes": ["dust25_steering_wheel", "dust25_steering_wheel_001"],
+      "hub": [-0.348568, 1.035044, -0.616297],
+      "shaft": [0, -0.26, 0.965609],
+      "offset": [0, 0, 0.14],
+      "rest_degrees": [180, 0, 0],
+      "max_degrees": 135,
+      "cluster": {"position": [-0.348, 1.064, -0.684], "size": [0.305, 0.119], "normal": [0, 0.12, 1]},
+      "navigation": {"node": "dust25_dash", "material": "gps_screen"},
+      "mirrors": "dust25"
+    },
+    "duster": {
+      "wheel_nodes": ["Duster_My_2014_steer"],
+      "hub": [-0.33253586, 0.90991712, -0.49996722],
+      "shaft": [0, 0.32494, 0.94573],
+      "offset": [0, 0, 0.05],
+      "rest_degrees": [0, 0, 0],
+      "max_degrees": 135,
+      "analog": [
+        {"node": "Duster_My_2014_needle_speedo", "value": "speed", "maximum": 220, "zero_degrees": 135, "sweep_degrees": -270},
+        {"node": "Duster_My_2014_needle_tacho", "value": "rpm", "maximum": 7000, "zero_degrees": 135, "sweep_degrees": -270}
+      ],
+      "cluster": {"position": [-0.322, 0.928, -0.691], "size": [0.059, 0.032], "normal": [0, 0.38, 0.925], "kind": "trip"},
+      "navigation": {"position": [0.015, 0.760, -0.535], "size": [0.185, 0.104], "normal": [0, 0.15, 0.989], "fitted": true},
+      "mirrors": "duster2014"
+    }
+  }
+}

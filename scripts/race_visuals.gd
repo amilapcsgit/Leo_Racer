@@ -112,6 +112,17 @@ static func chevron_mesh() -> ArrayMesh:
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
 	return mesh
 
+static func conform_surface(mesh: Mesh, frame: Transform3D, circuit: LeoCircuit, lift: float) -> ArrayMesh:
+	var result:=ArrayMesh.new();var inverse:=frame.affine_inverse()
+	for surface in mesh.get_surface_count():
+		var arrays:=mesh.surface_get_arrays(surface);var vertices: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+		for i in vertices.size():
+			var position:=frame*vertices[i];var projection:=circuit.project(position)
+			position.y=circuit.sample(projection.distance,projection.offset).y+lift+vertices[i].y
+			vertices[i]=inverse*position
+		arrays[Mesh.ARRAY_VERTEX]=vertices;result.add_surface_from_arrays(mesh.surface_get_primitive_type(surface) if mesh is ArrayMesh else Mesh.PRIMITIVE_TRIANGLES,arrays);result.surface_set_material(surface,mesh.surface_get_material(surface))
+	return result
+
 static func build_boosts(world: Node3D, circuit: LeoCircuit) -> Node3D:
 	var root := Node3D.new()
 	root.name = "BoostPads"
@@ -119,27 +130,34 @@ static func build_boosts(world: Node3D, circuit: LeoCircuit) -> Node3D:
 	var dark := flat_material(Color("122d43"),.3)
 	var edge := flat_material(Color("ffc750"),.2)
 	var arrow := chevron_mesh()
-	for fraction in circuit.boosts:
-		var s := float(fraction)*circuit.length
+	for index in circuit.boosts.size():
+		var s := float(circuit.boosts[index])*circuit.length
 		var pad := Node3D.new()
 		pad.name = "Boost_%03d" % int(s)
-		pad.position = circuit.sample(s)+Vector3.UP*.075
+		pad.position = circuit.sample(s, circuit.boost_lane(index))+Vector3.UP*.075
 		var t := circuit.direction(s)
-		pad.rotation.y = atan2(-t.x,-t.z)
+		pad.basis = circuit.frame_at(s)
 		pad.set_meta("race_direction",t)
 		pad.add_to_group("race_boost_pad")
 		root.add_child(pad)
-		mesh_box(pad,Vector3(10,.025,7.5),Vector3(0,0,.5),dark)
+		mesh_box(pad,Vector3(LeoCircuit.BOOST_WIDTH,.025,LeoCircuit.BOOST_LENGTH),Vector3.ZERO,dark)
 		for side in [-1,1]:
-			mesh_box(pad,Vector3(.10,.035,7.5),Vector3(side*4.8,.02,.5),edge)
+			mesh_box(pad,Vector3(.10,.035,LeoCircuit.BOOST_LENGTH),Vector3(side*2.95,.02,0),edge)
 		var m := ShaderMaterial.new()
 		m.shader = load("res://shaders/boost_pad.gdshader")
 		for j in range(3):
 			var item := MeshInstance3D.new()
 			item.mesh = arrow
-			item.position = Vector3(0,.04,-2.0+j*2.1)
+			item.position = Vector3(0,.04,-1.5+j*1.5)
+			item.scale = Vector3(.6,1.,.65)
 			var material := m.duplicate() as ShaderMaterial
 			material.set_shader_parameter("phase",float(j)*-.7)
 			item.material_override = material
 			pad.add_child(item)
+		if circuit.definition.elevated():
+			for item in pad.get_children():
+				if not item is MeshInstance3D:continue
+				if item.mesh is BoxMesh:
+					var grid:=item.mesh.duplicate() as BoxMesh;grid.subdivide_width=20;grid.subdivide_depth=15;item.mesh=grid
+				item.mesh=conform_surface(item.mesh,pad.transform*item.transform,circuit,.075+item.position.y)
 	return root

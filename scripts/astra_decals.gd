@@ -20,15 +20,18 @@ static func build(parent: Node3D, circuit: LeoCircuit) -> void:
 		paint.name = "RoadPaint_"+key
 		var plane := PlaneMesh.new()
 		plane.size = spec[2]
+		plane.subdivide_width=24;plane.subdivide_depth=12
 		paint.mesh = plane
 		paint.material_override = materials[key]
 		paint.position = circuit.sample(s)+Vector3.UP*.065
 		var direction := circuit.direction(s)
-		paint.rotation.y = atan2(-direction.x,-direction.z)
+		paint.basis = circuit.frame_at(s)
+		if circuit.definition.elevated():paint.mesh=LeoRaceVisuals.conform_surface(plane,paint.transform,circuit,.065)
 		paint.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		paint.visibility_range_end = 160
 		paint.visibility_range_end_margin = 15
 		paint.add_to_group("astra_road_decal")
 		paint.set_meta("design",key)
 		paint.set_meta("distance",s)
+		paint.set_meta("street_receiver",true)
 		parent.add_child(paint)

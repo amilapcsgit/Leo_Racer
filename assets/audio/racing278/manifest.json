@@ -1,0 +1,366 @@
+{
+  "version": 1,
+  "license": "CC0-1.0",
+  "files": [
+    {
+      "file": "assets/audio/racing278/strange_factory.ogg",
+      "author": "MintoDog",
+      "source": "https://opengameart.org/content/strange-factory",
+      "license": "CC0-1.0",
+      "original_sha256": "a6584d2e0ef9712f15227394238189c6460e2ea62f32092b30f0ba7a25247555",
+      "sha256": "776d5fcc476d36ef4d87bdb957e1a959e5f1ffc44d6d6831303ae48e681bf893",
+      "processing": "loudnorm=I=-18:TP=-2:LRA=9",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/rock_city.ogg",
+      "author": "Ragnar Random",
+      "source": "https://opengameart.org/content/rock-music-pack",
+      "license": "CC0-1.0",
+      "original_sha256": "54d7797dfdc8cc53da1c6be894abe5dc0e743c0d2ea78870832413a7a1de3add",
+      "sha256": "3eb3851dd4f59cd6b32c7a82e0900fab4f302e5209e0a1f41f46383900ace5b4",
+      "processing": "loudnorm=I=-18:TP=-2:LRA=9",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/cheap_speed.ogg",
+      "author": "Ragnar Random",
+      "source": "https://opengameart.org/content/rock-music-pack",
+      "license": "CC0-1.0",
+      "original_sha256": "8c1afef641513d214941d3cc32123a628deb3a0c931642fe8ec83b963752b4be",
+      "sha256": "45c7935059eedf666c18ad21d7b97c5191ec29569ee547ad49937f423108c9e4",
+      "processing": "loudnorm=I=-18:TP=-2:LRA=9",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/voice_3.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/voiceover-pack",
+      "license": "CC0-1.0",
+      "original_sha256": "6a3fec88dd24382bad14882d4cc1c1b32ef9db431cc3e19496ed888ad4ed89d5",
+      "sha256": "de9f53c61d4f1ed228c446e1cf6e1e6d6ff5e164eb6bc95b5bb8cb627e384df7",
+      "processing": "atempo=1.06,loudnorm=I=-14:TP=-1:LRA=7",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/voice_2.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/voiceover-pack",
+      "license": "CC0-1.0",
+      "original_sha256": "47fc7222f50c56e6c242bfc0b669ee54085383f8afbd057489b09645f5e857e4",
+      "sha256": "8bcea2ad0418b136dbe66564e95dc5eb4eb09b83b29926b0d079e5eaa5dac183",
+      "processing": "atempo=1.06,loudnorm=I=-14:TP=-1:LRA=7",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/voice_1.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/voiceover-pack",
+      "license": "CC0-1.0",
+      "original_sha256": "fb84ff9f243c2dcbbd22e6f1a553f2d39808686df06e4a83a75c557af7f8e802",
+      "sha256": "3fde74e2ad43b3b661840f8d5f24eadb4902a1a7f93d8cfcf0f6e5063bb5f833",
+      "processing": "atempo=1.06,loudnorm=I=-14:TP=-1:LRA=7",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/voice_go.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/voiceover-pack",
+      "license": "CC0-1.0",
+      "original_sha256": "1ba6aa2cb3710fd7c6e021622b4ef0428a0107c8f2db2e0dda8de8bcbdb56fd3",
+      "sha256": "7a1164229926f1a5014ec529ffcc1e5152e8814533458db04ce6ee774ed5fcec",
+      "processing": "atempo=1.06,loudnorm=I=-14:TP=-1:LRA=7",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/impact.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "license": "CC0-1.0",
+      "original_sha256": "e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831",
+      "sha256": "fb0ecc6ee55439af016fa4e5d545d138907e4f124e639cf30045eac430298f6d",
+      "processing": "loudnorm=I=-16:TP=-1:LRA=7",
+      "original_synthesis": false
+    },
+    {
+      "file": "assets/audio/racing278/suv0.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "614e915c150553c7e984a0b3a3d4917bd1e06703589d77c9c88c28fab4abd4c3",
+      "sha256": "f45b2b2587e6797b1d0c375a7456d151fb707f86ab0681ba156295209697d39a",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/suv1.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "9de9ac72849dc2ea0b08e27b1a41cfbce64ce60630e7521ef2c510d08fd2ac11",
+      "sha256": "f3e39b4fd9b5ff8e82525ef54db23c4c5283a269865561baedd0d4859b58c1b0",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/suv2.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "264c735b393f92ac80abd8fd8036cab909b367ddc06ea7256b0fc35bfb51eecc",
+      "sha256": "e08748e76dcd6d432fdfd767fc40a888c81abce95dd582f8401b19d194c9abc5",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/suv3.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "7273059790a3b5f489b7eb9562ef5fe6f1a98dd3ee8aa2b826f4d6a4a3961483",
+      "sha256": "23521b16bf86be2c5a63b535f03f5f55ed487f3f3559f06fa560ba8ba56ed8ee",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/suv4.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "c1cea2e42bfa03f99b5c4c412fa27ea91dc34c0aaf4edf13fe073a07fb9649c1",
+      "sha256": "098f84ce514cf80706f526a09d2e3f033182d056e1ece257db452d8b4f118685",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/sport0.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "82b76c7ee5c54887c4efb5f3b3718e58a5017385f297dfcb3ba385546329b401",
+      "sha256": "d5ff8b488584b4c5fdb769a2c228af24ce401aa4135a922ea6f9e198bc2bcf3d",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/sport1.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "ee0ef970dd70a8497d144ab9e345d4ec4edc3e8ab01e630131848d3458830877",
+      "sha256": "67a25376dc7f291b60cf91ac5ebecdcd11a18a0b417912e5fb9b5a0057da2a4c",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/sport2.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "95d6a544d9d49d7994b1f574888fa1c62285140462a8458bdc6ca4c5b2cabeec",
+      "sha256": "adc6179dfeb97002cc56940a3db6bb67752102a512196d854ab38d0a34be6c12",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/sport3.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "e594648da337a573824e5ff00b1da1ec0d87b76ddf66b5271a13d527b2dd1e9c",
+      "sha256": "6f56b11eec4dc2f0a4647778614b74ddefd3fe8c6d6d5c56179558126eb8b08a",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/sport4.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "c0ecaafd8cc320cc0f31089c9be1e22a5616dcacfc49ef9d079291b97bf2fabe",
+      "sha256": "71cd52c9cfdff3bba7ba9059c4c795120eb925d4aeb13a10d3a3402f15a00c2f",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/small0.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "13c87b3d739b4009fc48c0109774ba4048aa5e7d880779a54ef2573354a3b32c",
+      "sha256": "a38f525beb3cd8a5b6b1749a66e351ac9287f1ba9b4be236309ce5b7c41e3427",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/small1.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "e81705ec1b4f51c9c4deda356601178b8d44bcac6f6b3986e74162f23b5e529c",
+      "sha256": "56b61b144e43bab89bd75120ead68aad435b49f8c939e031a71af9aeab18e157",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/small2.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "9dc6e0ab28f7bb35e6aae9d6cb0716125a066b60e3a68fd416c8a08985bfc2f3",
+      "sha256": "c8559ce17d1930d2ec39cddeaada1a6813bbc592772a818d3d17b5b522083354",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/small3.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "9ae588e9cf331ce028b0a23ee8b6a723151ab831cb9af80ca0a508184d6c9e17",
+      "sha256": "da0dc731fedb199aca59f04b7fde25062898d63a47b448b36033de953e12359b",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/small4.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "63086c9c500be3a4e16fd45c261a779bd1b66932a3dffcc56c256425cfcd7eb9",
+      "sha256": "ffdb7123ac025abcacfa60e8ed2686bf1167d2f1d817c3e9c0c4dcabc5a216e3",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/bus0.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "c9d1d3328471357fa2d6170150ed34657109d76cdb55d2f0bc9cf2d7fd43e964",
+      "sha256": "470fd85be250446ac33d757994798d6d08d07f45eb17ec0812d0a0672380f54d",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/bus1.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "4309f3872ce821cb3863abf1014b78e8819a979a9a0b0fd2dac1f4accf4c7edb",
+      "sha256": "1afa9d4c657a65aef946d19655e9b3c8ecbc6f35e70937de58b50f569ec34184",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/bus2.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "13c87b3d739b4009fc48c0109774ba4048aa5e7d880779a54ef2573354a3b32c",
+      "sha256": "53695f182597c086c8d392b1eadb70730cea8d875ae5d88338571662a2acdbf2",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/bus3.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "55229bcc82f16f6fab772ca1b9fafa81d08255ee3f9a62caffb95e5a64acb241",
+      "sha256": "d46edb68819effe19116e08437d3146b5cfcebf20b7b1885c883104e8d3d7522",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/bus4.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "2fe41ed97843395405f4cd84070b32f4de7653ca365f0fa2c804e1d10abd9754",
+      "sha256": "47f41938b29a12128e588f7fbe5da16f427322b045a822874c25125a4c715f91",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/electric0.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "323c584275bafe0ad2d284b432d6de7c53e19b0d6f290aa3332d5c9943be9974",
+      "sha256": "c100e23091f810d93e560fca5b891cbde6e3829a1006b2e3cb120a07b2681b73",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/electric1.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "d97712060a85fdd7cc061fbc00efb08901c3c34d30ee2f3aff4dc3d0c7aedbd3",
+      "sha256": "737b60c3bff0c07eef50b716b7f84d202b588fbe1a7c15e20f2cf9b029eea67d",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/electric2.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "81cf1187ac7bb429b731fe9a5f02f161f6f95c7e736982e7e7a77941aebe6d2d",
+      "sha256": "6a4fbdb603d41a61918fae08762c5f06a4406a2f3eaad6f63cb182a41dde369b",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/electric3.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "390d477c432a03035bd2992ed637ccc0d136135a661b6d5cf24eeff246921c7a",
+      "sha256": "e44ec010a50b0e2c264424e70d1be8bb846a779a1ba49608f8d3b7004a7df8d4",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/electric4.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "db6577482bbac30485ce581b6e0ca92023d6c8f2e40c3c80c1804c45267c3bbe",
+      "sha256": "21dede21bb530b062ceb8b4d8c13b0fba757d4b46dcd0dcb96752b65d7ac5373",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/skid.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "dad244eaddac8213e81c64f3e94347228ea1424544f20987d9bfed39a9b5b9eb",
+      "sha256": "01e2fe7562d54e30a8af023870b8f57b6866338f63205d4ea1760945d5e2e54f",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/scrape.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "827b404d093904f670f65c7d05f8ee0dbfbe6c9e4778c2ad70847c9b4ee7c9bf",
+      "sha256": "57c20ef6238de678e610956718480dc08e5165bf57ed1eba9682fb4b876f3f23",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    },
+    {
+      "file": "assets/audio/racing278/boost.ogg",
+      "author": "Leo Racer contributors",
+      "source": "tools/prepare_audio278.py",
+      "license": "CC0-1.0",
+      "original_sha256": "cb7d2f9a60fb0df2c4a7591dc26bdef69fadd05a2528104c0d894b5b60654151",
+      "sha256": "198b825d0affe5fa40d00b821209d5a6f32f4b5d985819375837cb1462420186",
+      "processing": "volume=0.55",
+      "original_synthesis": true
+    }
+  ]
+}

@@ -8,14 +8,28 @@ public partial class RaceFeedbackBridge : Node
     private double boostAge = 99, clock, shakeTime, recoverTime;
     private float shakeStrength, peak = 14, hold = 9;
     private bool boostActive, reduced;
+    private float activePeak = 14, activeHold = 9;
+    private double driftAge = 99;
+    private double driftDuration;
+    private float driftPeak;
     public int sequence_count { get; private set; }
 
     public override void _Ready() { ProcessMode = ProcessModeEnum.Pausable; ProcessPriority = -10; }
     public void configure(float peakDegrees, float holdDegrees) { peak = peakDegrees; hold = holdDegrees; }
-    public void set_reduced_motion(bool value) { reduced = value; }
+    public void set_reduced_motion(bool value) { reduced = value; if (value) reset_feedback(); }
 
-    public void play_boost(string source, double duration)
+    public void play_boost(string source, double duration) => play_boost_explicit("nitro", 0, duration);
+    public void play_boost_explicit(string kind, int tier, double duration)
     {
+        if (kind == "drift") {
+            driftAge = 0; driftDuration = duration; driftPeak = tier >= 2 ? 10 : 6;
+            if (!reduced) { shakeTime = tier >= 2 ? .18 : .12; shakeStrength = tier >= 2 ? .20f : .12f; }
+            return;
+        }
+        activePeak = kind == "drift" ? (tier >= 2 ? 10 : 6) : peak;
+        activeHold = kind == "drift" ? 0 : hold;
+        activePeak = Mathf.Clamp(activePeak, 0, 14);
+        if (kind == "drift" && !reduced) { shakeTime = tier >= 2 ? .18 : .12; shakeStrength = tier >= 2 ? .20f : .12f; }
         clear_sequence();
         boostSequence = new Sequence { Name = "Nitro_Rokojori_Sequence", triggerDirectChildren = true, noOverlays = true };
         AddChild(boostSequence);
@@ -26,12 +40,12 @@ public partial class RaceFeedbackBridge : Node
         boostSequence.Trigger();
         sequence_count++;
     }
-    public void set_boost_active(bool active) { if (!active) boostActive = false; }
+    public void set_boost_active(bool active) { if (!active) { boostActive = false; driftAge = 99; } }
     public void play_impact(float strength) { shakeTime = .28; shakeStrength = Mathf.Clamp(strength, 0, 1); }
     public void play_recover() { reset_feedback(); recoverTime = .20; }
     public void reset_feedback()
     {
-        clear_sequence(); boostAge = 99; boostActive = false; shakeTime = recoverTime = 0;
+        clear_sequence(); boostAge = driftAge = 99; boostActive = false; shakeTime = recoverTime = 0;
     }
     private void clear_sequence()
     {
@@ -44,17 +58,19 @@ public partial class RaceFeedbackBridge : Node
     }
     public override void _Process(double delta)
     {
-        clock += delta; boostAge += delta;
+        clock += delta; boostAge += delta; driftAge += delta;
         shakeTime = System.Math.Max(0, shakeTime - delta);
         recoverTime = System.Math.Max(0, recoverTime - delta);
     }
-    public float get_boost_gain() => boostActive ? 1 : 0;
+    public float get_boost_gain() => boostActive || driftAge < driftDuration ? 1 : 0;
     public float get_fov_offset()
     {
         if (reduced) return 0;
-        if (!boostActive) return 0;
-        if (boostAge < .1) return peak * Mathf.SmoothStep(0, 1, (float)boostAge / .1f);
-        return Mathf.Lerp(peak, hold, Mathf.SmoothStep(0, 1, (float)(boostAge - .1) / .22f));
+        float drift = driftAge < .1 ? driftPeak * Mathf.SmoothStep(0, 1, (float)driftAge / .1f)
+            : driftPeak * (1 - Mathf.SmoothStep(0, 1, (float)(driftAge - .1) / .32f));
+        float nitro = !boostActive ? 0 : boostAge < .1 ? activePeak * Mathf.SmoothStep(0, 1, (float)boostAge / .1f)
+            : Mathf.Lerp(activePeak, activeHold, Mathf.SmoothStep(0, 1, (float)(boostAge - .1) / .22f));
+        return Mathf.Clamp(drift + nitro, 0, 14);
     }
     public float get_shake_roll() => reduced ? 0 : (float)(System.Math.Sin(clock * 92) * shakeTime * shakeStrength * .06);
     public Vector3 get_shake_offset() => reduced ? Vector3.Zero : new Vector3(

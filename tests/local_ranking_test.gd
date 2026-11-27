@@ -33,16 +33,20 @@ func run() -> void:
  check(game.format_time(320.2)=="05:20.200","Ranking timestamps round to exact milliseconds")
  game.human_count=2;await game.start_race()
  for kart in game.karts:
-  var bigster: bool=kart.vehicle_key=="bigster"
-  check(is_equal_approx(kart.max_speed,50. if bigster else 165./3.6) and is_equal_approx(kart.boosted_ceiling(),62.5 if bigster else 55.) and kart.acceleration==18. and kart.handling==1.,"Resolved human/AI performance "+kart.vehicle_key)
+  var rules:=LeoRaceRules.resolve(kart.definition)
+  check(is_equal_approx(kart.max_speed,rules.max_speed) and is_equal_approx(kart.boosted_ceiling(),rules.boosted_speed) and kart.acceleration==rules.acceleration and kart.handling==rules.handling,"Resolved human/AI performance "+kart.vehicle_key)
  check(game.ranking_rows().size()==2 and game.ranking_rows()[0].driver==String(game.player.visual.get_meta("driver_id")),"Main session rows resolve selected driver identity")
  check(game.ranking_store==null,"Diagnostic scene cannot open personal database")
- game.save_ranking_results();check(game.rankings_written and game.ranking_message.begins_with("DIAGNOSTIC"),"Main race excludes diagnostic writes")
+ game.save_ranking_results();check(game.rankings_written and game.ranking_store==null and (game.ranking_message.begins_with("DIAGNOSTIC") or game.ranking_message.begins_with("MODIFIED")),"Main race excludes diagnostic and imported-grid writes")
  game.hud.show_rankings();await process_frame;check(game.hud.modal_root.get_child_count()==1,"Rankings screen handles unavailable database")
  var report:={"status":"PASS" if errors.is_empty() else "FAIL","checks":checks,"errors":errors}
- FileAccess.open("res://build/qa-ui/rankings.json",FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
+ var output := "user://qa/ranking"
+ for arg in OS.get_cmdline_user_args():
+  if arg.begins_with("--qa-output="):output=arg.trim_prefix("--qa-output=")
+ DirAccess.make_dir_recursive_absolute(output)
+ FileAccess.open(output.path_join("rankings.json"),FileAccess.WRITE).store_string(JSON.stringify(report,"  "))
  print("LOCAL_RANKING_TEST ",report)
- game.return_menu();game.stop_all_audio();game.queue_free();store.close_store()
+ store.close_store()
  for suffix in ["","-shm","-wal",".corrupt"]:DirAccess.remove_absolute(path+suffix)
- await process_frame;await process_frame;quit(0 if errors.is_empty() else 1)
+ await game.quit_game(0 if errors.is_empty() else 1)
 

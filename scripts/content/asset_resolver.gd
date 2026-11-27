@@ -10,6 +10,16 @@ static var _recent: Array[String] = []
 static var _patched_meshes: Dictionary = {}
 static var _loading: Dictionary = {}
 static var _loose_signatures: Dictionary = {}
+static var _cockpits_mounted:=false
+
+static func mount_editor_cockpits() -> Error:
+	if not OS.has_feature("editor") or _cockpits_mounted:return OK
+	for id in ["bigster","duster","duster_2024"]:
+		var pack: String="res://content/ultra/cockpit279-"+String(id)+".pck"
+		if not FileAccess.file_exists(pack):pack="res://content/ultra/cockpit278-"+id+".pck"
+		if FileAccess.file_exists(pack) and not ProjectSettings.load_resource_pack(pack,false):return ERR_FILE_CORRUPT
+	_cockpits_mounted=true
+	return OK
 
 static func refresh_loose_cache() -> void:
 	for id in _loose_signatures.keys():
@@ -47,6 +57,9 @@ static func mount_packs() -> Error:
 	for pack in manifest.get("packs",[]):
 		if not ProjectSettings.load_resource_pack(safe_file(pack.file),false):
 			failure="Cannot open asset pack: "+String(pack.file);return ERR_FILE_CORRUPT
+	if mount_editor_cockpits()!=OK:return ERR_FILE_CORRUPT
+	if OS.has_feature("editor") and FileAccess.file_exists("res://content/ultra/bigster-trunk.pck"):
+		if not ProjectSettings.load_resource_pack("res://content/ultra/bigster-trunk.pck",false):return ERR_FILE_CORRUPT
 	return OK
 
 static func override_for(id: String) -> Dictionary:
@@ -155,7 +168,7 @@ static func _patch_material(original: Material) -> Material:
 				result.set_shader_parameter(uniform.name,texture(value.resource_path))
 	return result
 
-static func apply_overrides(node: Node) -> void:
+static func apply_overrides(node: Node, recursive: bool=true) -> void:
 	if manifest.get("overrides",[]).is_empty() or node.get_meta("_content_override",false):return
 	node.set_meta("_content_override",true)
 	if node is MultiMeshInstance3D and node.multimesh:
@@ -182,4 +195,5 @@ static func apply_overrides(node: Node) -> void:
 		if node.material_override:node.material_override=_patch_material(node.material_override)
 		else:
 			for i in node.mesh.get_surface_count():node.set_surface_override_material(i,_patch_material(node.get_active_material(i)))
-	for child in node.get_children():apply_overrides(child)
+	if recursive:
+		for child in node.get_children():apply_overrides(child)

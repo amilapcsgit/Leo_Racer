@@ -1,0 +1,47 @@
+{
+  "bigster": {
+    "cockpit": true,
+    "eye": [
+      -0.3486,
+      1.32,
+      0.04
+    ],
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "space": "resolved_vehicle",
+    "note": "Left-hand-drive eye aligned to authored driver seat and steering hub."
+  },
+  "duster_2024": {
+    "cockpit": true,
+    "eye": [
+      -0.3483,
+      1.32,
+      0.04
+    ],
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "space": "resolved_vehicle",
+    "note": "Left-hand-drive eye aligned to authored driver seat and steering hub."
+  },
+  "duster": {
+    "cockpit": true,
+    "eye": [
+      -0.341,
+      1.24,
+      -0.04
+    ],
+    "rotation_degrees": [
+      0,
+      0,
+      0
+    ],
+    "space": "resolved_vehicle",
+    "note": "Duster My 2014 left-hand-drive eye; original analog dashboard retained."
+  }
+}
